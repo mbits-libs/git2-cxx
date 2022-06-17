@@ -64,6 +64,6 @@ if (GIT2_CXX_TESTING)
   set(EXTERNAL_GTEST ON)
   include(tools/testing/googletest.cmake)
 
-  add_test_executable(git2-c++-test LIBRARIES git2-c++)
+  add_test_executable(git2-c++-test DATA_PATH repos LIBRARIES git2-c++)
   add_test(NAME git2-c++ COMMAND git2-c++-test)
 endif()
