@@ -1,1 +1,1 @@
-#include "git2++/ptr.hh"
+#include "git2-c++/ptr.hh"

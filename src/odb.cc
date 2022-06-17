@@ -1,4 +1,4 @@
-#include "git2++/odb.hh"
+#include "git2-c++/odb.hh"
 
 namespace git {
 	odb odb::open(const char* path) noexcept

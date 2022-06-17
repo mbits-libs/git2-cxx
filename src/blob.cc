@@ -1,4 +1,4 @@
-#include "git2++/blob.hh"
+#include "git2-c++/blob.hh"
 
 namespace git {
 	blob blob::lookup(repository_handle repo, std::string_view id) noexcept {

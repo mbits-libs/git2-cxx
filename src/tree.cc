@@ -1,4 +1,4 @@
-#include "git2++/tree.hh"
+#include "git2-c++/tree.hh"
 
 namespace git {
 	git_oid const& tree_entry::oid() const noexcept {

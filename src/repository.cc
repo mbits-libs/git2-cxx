@@ -1,4 +1,4 @@
-#include "git2++/repository.hh"
+#include "git2-c++/repository.hh"
 
 namespace git {
 	repository repository::open(char const* path) {

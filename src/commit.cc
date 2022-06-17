@@ -1,4 +1,4 @@
-#include "git2++/commit.hh"
+#include "git2-c++/commit.hh"
 
 #include <chrono>
 

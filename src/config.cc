@@ -1,4 +1,4 @@
-#include "git2++/config.hh"
+#include "git2-c++/config.hh"
 #include "git2/errors.h"
 
 namespace git {

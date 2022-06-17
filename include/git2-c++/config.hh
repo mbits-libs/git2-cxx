@@ -1,5 +1,5 @@
 #pragma once
-#include "git2++/ptr.hh"
+#include "git2-c++/ptr.hh"
 #include "git2/config.h"
 
 #include <string>

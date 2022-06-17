@@ -8,6 +8,8 @@ project (git2-c++
 set(PROJECT_VERSION_STABILITY "-alpha" # or "-beta", or "-rc.1", or "-rc.2", or ""
     CACHE STRING "" FORCE)
 
+set(GIT2_CXX_TESTING ON CACHE BOOL "Compile and/or run self-tests")
+
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -21,33 +23,47 @@ include(${CMAKE_BINARY_DIR}/conan/conanbuildinfo.cmake)
 conan_basic_setup()
 
 set(SOURCES
-	src/blob.cc
-	src/commit.cc
-	src/config.cc
-	src/global.cc
-	src/object.cc
-	src/odb.cc
-	src/ptr.cc
-	src/repository.cc
-	src/submodule.cc
-	src/tree.cc
-	include/git2++/bytes.hh
-	include/git2++/blob.hh
-	include/git2++/commit.hh
-	include/git2++/config.hh
-	include/git2++/global.hh
-	include/git2++/object.hh
-	include/git2++/odb.hh
-	include/git2++/ptr.hh
-	include/git2++/repository.hh
-	include/git2++/submodule.hh
-	include/git2++/tree.hh
-  )
+  src/blob.cc
+  src/commit.cc
+  src/config.cc
+  src/global.cc
+  src/object.cc
+  src/odb.cc
+  src/ptr.cc
+  src/repository.cc
+  src/submodule.cc
+  src/tree.cc
+  include/git2-c++/bytes.hh
+  include/git2-c++/blob.hh
+  include/git2-c++/commit.hh
+  include/git2-c++/config.hh
+  include/git2-c++/global.hh
+  include/git2-c++/object.hh
+  include/git2-c++/odb.hh
+  include/git2-c++/ptr.hh
+  include/git2-c++/repository.hh
+  include/git2-c++/submodule.hh
+  include/git2-c++/tree.hh
+)
 
-add_library(git2++ STATIC ${SOURCES})
-target_compile_options(git2++ PRIVATE ${ADDITIONAL_WALL_FLAGS})
-target_link_options(git2++ PRIVATE ${ADDITIONAL_LINK_FLAGS})
-target_include_directories(git2++ PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(git2++ PUBLIC libgit2::libgit2)
+add_library(${PROJECT_NAME} STATIC ${SOURCES})
+target_compile_options(${PROJECT_NAME} PRIVATE ${ADDITIONAL_WALL_FLAGS})
+target_link_options(${PROJECT_NAME} PRIVATE ${ADDITIONAL_LINK_FLAGS})
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_link_libraries(${PROJECT_NAME} PUBLIC libgit2::libgit2)
 
-set_target_properties(git2++ PROPERTIES FOLDER libs)
+set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER libs)
+
+if (GIT2_CXX_TESTING)
+  find_package(GTest REQUIRED CONFIG HINTS)
+
+  set(COVERALLS_PREFIX git2_cxx_)
+  set(git2_cxx_COVERALLS_DIRS include src)
+  include(tools/coveralls/Coveralls.cmake)
+
+  set(EXTERNAL_GTEST ON)
+  include(tools/testing/googletest.cmake)
+
+  add_test_executable(git2-c++-test LIBRARIES git2-c++)
+  add_test(NAME git2-c++ COMMAND git2-c++-test)
+endif()

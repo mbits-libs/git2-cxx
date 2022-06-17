@@ -1,6 +1,6 @@
 #pragma once
 #include "git2/submodule.h"
-#include "git2++/ptr.hh"
+#include "git2-c++/ptr.hh"
 
 #include <string>
 

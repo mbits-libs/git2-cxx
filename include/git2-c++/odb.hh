@@ -1,7 +1,7 @@
 #pragma once
 #include "git2/odb.h"
-#include "git2++/ptr.hh"
-#include "git2++/bytes.hh"
+#include "git2-c++/ptr.hh"
+#include "git2-c++/bytes.hh"
 
 #include <string>
 

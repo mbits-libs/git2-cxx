@@ -1,7 +1,7 @@
 #pragma once
 #include "git2/commit.h"
-#include "git2++/object.hh"
-#include "git2++/tree.hh"
+#include "git2-c++/object.hh"
+#include "git2-c++/tree.hh"
 
 #include <string>
 

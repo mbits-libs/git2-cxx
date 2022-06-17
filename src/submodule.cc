@@ -1,4 +1,4 @@
-#include "git2++/submodule.hh"
+#include "git2-c++/submodule.hh"
 
 namespace git {
 }

@@ -1,1 +1,1 @@
-#include "git2++/global.hh"
+#include "git2-c++/global.hh"
