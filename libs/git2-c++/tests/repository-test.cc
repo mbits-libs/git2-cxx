@@ -4,6 +4,7 @@
 #include <gtest/gtest.h>
 #include <filesystem>
 #include <fstream>
+#include <git2-c++/commit.hh>
 #include <git2-c++/repository.hh>
 #include "setup.hh"
 
@@ -19,7 +20,7 @@ namespace git::testing {
 		return root / make_path(utf8);
 	}
 
-	path make_absolute(std::string_view utf8, bool absolute) {
+	path make_absolute(std::string_view utf8, bool absolute = false) {
 		if (absolute) return make_path(utf8);
 
 		return append(setup::test_dir(), utf8);
@@ -148,4 +149,13 @@ namespace git::testing {
 	};
 
 	INSTANTIATE_TEST_SUITE_P(dirs, repository, ValuesIn(dirs));
+
+	TEST(repository, README) {
+		auto const repo = git::repository::open(make_absolute("bare.git/"sv));
+		ASSERT_TRUE(repo);
+		auto const initial = repo.lookup<git::commit>(
+		    "ed631389fc343f7788bf414c2b3e77749a15deb6"sv);
+		ASSERT_TRUE(initial);
+	}
+
 }  // namespace git::testing
