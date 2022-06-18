@@ -2,6 +2,7 @@
 // This code is licensed under MIT license (see LICENSE for details)
 
 #include "git2-c++/config.hh"
+#include <numeric>
 #include "git2/errors.h"
 
 namespace git {
@@ -63,7 +64,8 @@ namespace git {
 	}
 
 	int config::get_string(std::string& out, const char* name) const noexcept {
-		git_buf result = GIT_BUF_INIT_CONST(nullptr, 0);
+		char empty[] = "";
+		git_buf result = GIT_BUF_INIT_CONST(empty, 0);
 		auto const ret = git_config_get_string_buf(&result, get(), name);
 		out = result.ptr ? result.ptr : std::string{};
 		git_buf_dispose(&result);
