@@ -4,8 +4,20 @@
 #include "git2-c++/odb.hh"
 
 namespace git {
-	odb odb::open(const char* path) noexcept {
-		return create_handle<odb>(git_odb_open, path);
+	namespace {
+		using namespace std::filesystem;
+#ifdef __cpp_lib_char8_t
+		std::string get_path(path p) {
+			auto const s8 = p.make_preferred().u8string();
+			return {reinterpret_cast<char const*>(s8.data()), s8.length()};
+		}
+#else
+		std::string get_path(path p) { return p.make_preferred().u8string(); }
+#endif
+	}  // namespace
+
+	odb odb::open(std::filesystem::path const& path) {
+		return create_handle<odb>(git_odb_open, get_path(path).c_str());
 	}
 
 	void odb::hash(git_oid* out,

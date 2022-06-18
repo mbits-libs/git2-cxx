@@ -6,6 +6,7 @@
 #include "git2-c++/ptr.hh"
 #include "git2/odb.h"
 
+#include <filesystem>
 #include <string>
 
 namespace git {
@@ -14,7 +15,7 @@ namespace git {
 	struct odb : ptr<git_odb> {
 		using ptr<git_odb>::ptr;
 
-		static odb open(const char*) noexcept;
+		static odb open(std::filesystem::path const&);
 		static void hash(git_oid*, bytes const&, git_object_t) noexcept;
 		bool exists(git_oid const&) const noexcept;
 		bool write(git_oid*, bytes const&, git_object_t) const noexcept;

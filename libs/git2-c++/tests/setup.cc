@@ -9,7 +9,6 @@
 
 namespace git::testing::setup {
 	using namespace ::std::literals;
-	using std::filesystem::path;
 
 	namespace {
 		class test_globals {
@@ -51,6 +50,28 @@ namespace git::testing::setup {
 		return dirname;
 	}
 
+#ifdef __cpp_lib_char8_t
+	template <typename CharTo, typename Source>
+	std::basic_string_view<CharTo> conv(Source const& view) {
+		return {reinterpret_cast<CharTo const*>(view.data()), view.length()};
+	}
+
+	std::string get_path(path const& p) {
+		auto const s8 = p.generic_u8string();
+		auto const view = conv<char>(s8);
+		return {view.data(), view.length()};
+	}
+
+	path make_path(std::string_view utf8) { return conv<char8_t>(utf8); }
+
+#else
+	std::string get_path(path const& p) { return p.generic_u8string(); }
+
+	path make_path(std::string_view utf8) {
+		return std::filesystem::u8path(utf8);
+	}
+#endif
+
 	namespace {
 		namespace file {
 			static constexpr auto HEAD = "ref: refs/heads/main\n"sv;
@@ -88,20 +109,6 @@ namespace git::testing::setup {
 		    {"bare.git/config", file::config_bare},
 		    {"gitdir/subdir/a-file"},
 		};
-
-#ifdef __cpp_lib_char8_t
-		template <typename CharTo, typename Source>
-		std::basic_string_view<CharTo> conv(Source const& view) {
-			return {reinterpret_cast<CharTo const*>(view.data()),
-			        view.length()};
-		}
-
-		path as_path(std::string_view utf8) { return conv<char8_t>(utf8); }
-#else
-		path as_path(std::string_view utf8) {
-			return std::filesystem::u8path(utf8);
-		}
-#endif
 	}  // namespace
 
 	void test_globals::setup_test_env() {
@@ -112,11 +119,11 @@ namespace git::testing::setup {
 		remove_all(test_dir(), ignore);
 
 		for (auto const subdir : setup::subdirs) {
-			create_directories(test_dir() / as_path(subdir), ignore);
+			create_directories(test_dir() / make_path(subdir), ignore);
 		}
 
 		for (auto const [filename, contents] : setup::files) {
-			auto const p = test_dir() / as_path(filename);
+			auto const p = test_dir() / make_path(filename);
 			create_directories(p.parent_path(), ignore);
 			std::ofstream out{p};
 			out.write(contents.data(), contents.size());
@@ -130,3 +137,7 @@ namespace git::testing::setup {
 		remove_all(test_dir(), ignore);
 	}
 }  // namespace git::testing::setup
+
+void PrintTo(std::filesystem::path const& path, ::std::ostream* os) {
+	*os << git::testing::setup::get_path(path);
+}

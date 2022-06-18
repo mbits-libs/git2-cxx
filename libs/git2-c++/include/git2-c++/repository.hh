@@ -8,6 +8,7 @@
 #include "git2/object.h"
 #include "git2/repository.h"
 
+#include <filesystem>
 #include <string>
 #include <string_view>
 
@@ -75,10 +76,11 @@ namespace git {
 	struct repository : basic_repository<ptr<git_repository>> {
 		using basic_repository<ptr<git_repository>>::basic_repository;
 
-		static repository open(char const* path);
+		static repository open(std::filesystem::path const& path);
 		static repository wrap(const git::odb& odb);
-		static std::string discover(char const* start_path,
-		                            Discover accross_fs = Discover::WithinFs);
+		static std::filesystem::path discover(
+		    std::filesystem::path const& start_path,
+		    Discover accross_fs = Discover::WithinFs);
 
 		operator repository_handle() const noexcept {
 			return repository_handle{get()};
