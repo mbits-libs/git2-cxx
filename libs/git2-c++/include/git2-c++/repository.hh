@@ -9,6 +9,7 @@
 #include "git2/repository.h"
 
 #include <filesystem>
+#include <optional>
 #include <string>
 #include <string_view>
 
@@ -20,11 +21,8 @@ namespace git {
 	struct basic_repository : Holder {
 		using Holder::Holder;
 
-		std::string_view workdir() const {
-			return git_repository_workdir(this->get());
-		}
-		std::string_view gitdir() const {
-			return git_repository_gitdir(this->get());
+		std::optional<std::string_view> workdir() const {
+			return safe(git_repository_workdir(this->get()));
 		}
 		std::string_view commondir() const {
 			return git_repository_commondir(this->get());
@@ -55,6 +53,10 @@ namespace git {
 
 	protected:
 		auto get() const { return Holder::get(); }
+		std::optional<std::string_view> safe(char const* str) const noexcept {
+			if (!str) return std::nullopt;
+			return str;
+		}
 
 	private:
 		template <typename SubmoduleCallback>
