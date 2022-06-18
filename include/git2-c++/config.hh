@@ -1,3 +1,6 @@
+// Copyright (c) 2022 midnightBITS
+// This code is licensed under MIT license (see LICENSE for details)
+
 #pragma once
 #include "git2-c++/ptr.hh"
 #include "git2/config.h"
@@ -32,8 +35,7 @@ namespace git {
 		                    unsigned if_missing) const noexcept;
 		int get_string(std::string& out, const char* name) const noexcept;
 		int get_path(std::string& out, const char* name) const noexcept;
-		int get_entry(config_entry& out, char const* name) const
-		    noexcept;
+		int get_entry(config_entry& out, char const* name) const noexcept;
 
 		int delete_entry(const char* name) const noexcept;
 

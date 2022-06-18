@@ -1,7 +1,10 @@
+// Copyright (c) 2022 midnightBITS
+// This code is licensed under MIT license (see LICENSE for details)
+
 #pragma once
-#include "git2/tree.h"
-#include "git2-c++/object.hh"
 #include "git2-c++/blob.hh"
+#include "git2-c++/object.hh"
+#include "git2/tree.h"
 
 #include <string>
 
@@ -16,17 +19,19 @@ namespace git {
 	struct basic_treeish : object_ptr<GitObject, ObjectType> {
 		using object_ptr<GitObject, ObjectType>::object_ptr;
 
-		blob blob_bypath(const char* path) const noexcept { return bypath<blob>(path); }
+		blob blob_bypath(const char* path) const noexcept {
+			return bypath<blob>(path);
+		}
 		inline tree tree_bypath(const char* path) const noexcept;
+
 	protected:
 		template <typename Result>
 		Result bypath(const char* path) const noexcept {
 			auto* obj = this->get_object();
-			return git::create_object<Result>(
-				git_object_lookup_bypath,
-				obj, path, Result::OBJECT_TYPE
-				);
+			return git::create_object<Result>(git_object_lookup_bypath, obj,
+			                                  path, Result::OBJECT_TYPE);
 		}
+
 	private:
 	};
 
@@ -41,12 +46,14 @@ namespace git {
 		using basic_treeish<git_tree, GIT_OBJECT_TREE>::basic_treeish;
 		using basic_treeish<git_tree, GIT_OBJECT_TREE>::operator bool;
 
-		static tree lookup(repository_handle repo, std::string_view id) noexcept;
+		static tree lookup(repository_handle repo,
+		                   std::string_view id) noexcept;
 		tree_entry entry_bypath(const char* path) const noexcept;
 	};
 
 	template <class GitObject, git_object_t ObjectType>
-	inline tree basic_treeish<GitObject, ObjectType>::tree_bypath(const char* path) const noexcept {
+	inline tree basic_treeish<GitObject, ObjectType>::tree_bypath(
+	    const char* path) const noexcept {
 		return this->bypath<tree>(path);
 	}
-}
+}  // namespace git

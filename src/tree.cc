@@ -1,3 +1,6 @@
+// Copyright (c) 2022 midnightBITS
+// This code is licensed under MIT license (see LICENSE for details)
+
 #include "git2-c++/tree.hh"
 
 namespace git {
@@ -7,7 +10,7 @@ namespace git {
 
 	std::string tree_entry::strid() const noexcept {
 		try {
-			auto out = std::string(size_t{ GIT_OID_HEXSZ }, ' ');
+			auto out = std::string(size_t{GIT_OID_HEXSZ}, ' ');
 			git_oid_fmt(out.data(), git_tree_entry_id(get()));
 			return out;
 		} catch (std::bad_alloc&) {
@@ -20,6 +23,7 @@ namespace git {
 	}
 
 	tree_entry tree::entry_bypath(const char* path) const noexcept {
-		return git::create_handle<tree_entry>(git_tree_entry_bypath, get(), path);
+		return git::create_handle<tree_entry>(git_tree_entry_bypath, get(),
+		                                      path);
 	}
-}
+}  // namespace git
