@@ -4,22 +4,20 @@
 #include "git2-c++/tree.hh"
 
 namespace git {
-	git_oid const& tree_entry::oid() const noexcept {
-		return *git_tree_entry_id(get());
-	}
-
-	std::string tree_entry::strid() const noexcept {
-		try {
-			auto out = std::string(size_t{GIT_OID_HEXSZ}, ' ');
-			git_oid_fmt(out.data(), git_tree_entry_id(get()));
-			return out;
-		} catch (std::bad_alloc&) {
-			return {};
-		}
-	}
-
 	tree tree::lookup(repository_handle repo, std::string_view id) noexcept {
 		return repo.lookup<tree>(id);
+	}
+
+	tree tree::lookup(repository_handle repo, git_oid const& id) noexcept {
+		return repo.lookup<tree>(id);
+	}
+
+	size_t tree::count() const noexcept {
+		return git_tree_entrycount(get());
+	}
+
+	tree_entry_handle tree::entry_byindex(size_t index) const noexcept {
+		return tree_entry_handle{git_tree_entry_byindex(get(), index)};
 	}
 
 	tree_entry tree::entry_bypath(const char* path) const noexcept {

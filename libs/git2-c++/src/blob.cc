@@ -9,6 +9,7 @@ namespace git {
 		inline bytes::size_type as_size_type(bytes::size_type in) noexcept {
 			return in;
 		}
+
 		template <typename A, typename B>
 		concept NotA = !std::same_as<A, B>;
 

@@ -23,7 +23,7 @@ namespace git {
 	class handle {
 	public:
 		using pointer = Object*;
-		using element_type = Object;
+		using element_type = std::remove_cvref_t<Object>;
 
 		explicit handle(pointer ptr) noexcept : ptr_{ptr} {}
 		handle() = default;
@@ -57,6 +57,8 @@ namespace git {
 	struct is_git_object<git_blob*> : std::true_type {};
 	template <>
 	struct is_git_object<git_tag*> : std::true_type {};
+	template <>
+	struct is_git_object<git_tree_entry*> : std::true_type {};
 
 	template <class A, class B>
 	struct can_cast
