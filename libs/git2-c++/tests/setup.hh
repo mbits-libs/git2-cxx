@@ -8,7 +8,7 @@
 
 namespace git::testing::setup {
 	using std::filesystem::path;
-	using ::std::literals::operator""sv;
+	using namespace ::std::literals;
 
 	struct test_initializer {
 		test_initializer();

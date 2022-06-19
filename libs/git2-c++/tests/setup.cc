@@ -37,7 +37,12 @@ namespace git::testing::setup {
 			static constexpr auto repos = "repos"sv;
 			std::error_code ec{};
 			auto const temp = std::filesystem::temp_directory_path(ec);
-			if (ec) return repos;
+			if (ec) {
+				printf("Running tests from %.*s\n",
+				       static_cast<int>(repos.length()), repos.data());
+				return repos;
+			}
+			printf("Running tests from %s\n", get_path(temp / repos).c_str());
 			return temp / repos;
 		}
 	};  // namespace
@@ -46,7 +51,7 @@ namespace git::testing::setup {
 	test_initializer::~test_initializer() { test_globals::get().leave(); }
 
 	std::filesystem::path test_dir() {
-		std::filesystem::path dirname = get_test_dir();
+		static std::filesystem::path dirname = get_test_dir();
 		return dirname;
 	}
 

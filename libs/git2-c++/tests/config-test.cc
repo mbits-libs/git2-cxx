@@ -184,7 +184,8 @@ namespace git::testing {
 		ASSERT_EQ(0, cfg.add_file_ondisk(repo.c_str())) << repo;
 		cfg.set_path(test_name, "dir/subdir"sv);
 		ASSERT_FALSE(cfg.get_unsigned(test_name));
-		ASSERT_FALSE(*cfg.get_bool(test_name));
+		auto const bool_opt = cfg.get_bool(test_name);
+		if (bool_opt) ASSERT_FALSE(*bool_opt);
 		ASSERT_EQ("dir/subdir"sv, *cfg.get_string(test_name));
 		ASSERT_EQ("dir/subdir"sv, setup::get_path(*cfg.get_path(test_name)));
 		auto const entry = cfg.get_entry(test_name);
