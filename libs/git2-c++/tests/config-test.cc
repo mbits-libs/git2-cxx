@@ -24,6 +24,11 @@ namespace git::testing {
 	struct config_info {
 		std::string_view repo;
 		std::string_view values{};
+
+		friend std::ostream& operator<<(std::ostream& out,
+		                                config_info const& param) {
+			return out << "[$REPOS/" << param.repo << "config]";
+		}
 	};
 
 	class config : public TestWithParam<config_info> {};

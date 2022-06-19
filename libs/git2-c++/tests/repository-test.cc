@@ -34,6 +34,13 @@ namespace git::testing {
 			std::string_view workdir{};
 		} expected{};
 		repo_kind kind{repo_kind::workspace};
+
+		friend std::ostream& operator<<(std::ostream& out,
+		                                repo_param const& param) {
+			out << '[';
+			if (param.kind != repo_kind::failing) out << "$REPOS/";
+			return out << param.start_path << ']';
+		}
 	};
 
 	class repository : public TestWithParam<repo_param> {};
