@@ -38,6 +38,26 @@ namespace git::testing {
 
 	class repository : public TestWithParam<repo_param> {};
 
+	TEST(repository, submodules) {
+		auto const repo =
+		    git::repository::open(make_absolute("gitdir/.git/"sv));
+		ASSERT_TRUE(repo);
+		bool seen_bare = false;
+		bool seen_something_else = false;
+		std::string something_else;
+		repo.submodule_foreach([&](auto const& handle, auto name) {
+			if (name == "bare"sv)
+				seen_bare = true;
+			else {
+				if (!seen_something_else) something_else.assign(name);
+				seen_something_else = true;
+			}
+		});
+
+		ASSERT_TRUE(seen_bare);
+		ASSERT_FALSE(seen_something_else) << "Seen: " << something_else;
+	}
+
 	TEST_P(repository, discover) {
 		auto [start_path, expected, kind] = GetParam();
 		auto const start =
@@ -146,6 +166,7 @@ namespace git::testing {
 	    {"gitdir/subdir/"sv, {"gitdir/.git/"sv, "gitdir/"sv}},
 	    {"gitdir/"sv, {"gitdir/.git/"sv, "gitdir/"sv}},
 	    {"gitdir"sv, {"gitdir/.git/"sv, "gitdir/"sv}},
+	    {"gitdir/bare/"sv, {"gitdir/.git/modules/bare/"sv, "gitdir/bare/"sv}},
 	};
 
 	INSTANTIATE_TEST_SUITE_P(dirs, repository, ValuesIn(dirs));

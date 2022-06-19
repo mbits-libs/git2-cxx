@@ -233,7 +233,9 @@ core.ignorecase=true)"sv,
 core.filemode=false
 core.bare=false
 core.logallrefupdates=true
-core.ignorecase=true)"sv,
+core.ignorecase=true
+submodule.bare.url=/tmp/repos/bare.git
+submodule.bare.active=true)"sv,
 	    },
 	};
 
