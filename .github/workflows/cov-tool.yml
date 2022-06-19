@@ -65,7 +65,8 @@ jobs:
       id: cache
       with:
         path: ${{ matrix.home }}/.conan/data
-        key: ${{ matrix.os }}-${{ matrix.build_type }}
+        key: ${{ matrix.os }}-${{ matrix.build_type }}-${{ hashFiles('conanfile.txt') }}
+        restore-keys: ${{ matrix.os }}-${{ matrix.build_type }}
 
     - name: Configure Conan
       working-directory: ${{github.workspace}}/build/conan
