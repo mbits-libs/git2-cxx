@@ -51,20 +51,14 @@ namespace git::testing {
 		    reinterpret_cast<char const*>(content.data()), content.size()};
 		ASSERT_EQ(view, "# Testing repos\n"sv);
 
+#if 0
 		auto buf = readme.filtered("README.md");
 		auto const data = git::bytes{buf};
 		auto const filtered_view = std::string_view{
 		    reinterpret_cast<char const*>(data.data()), data.size()};
 		ASSERT_EQ(filtered_view, "# Testing repos\n"sv);
 		git_buf_dispose(&buf);
+#endif
 	}
 
-#if 0
-	TEST(commit, raw) {
-		auto const repo = setup::open_repo();
-		ASSERT_TRUE(repo);
-		auto const initial = git::blob::lookup(repo, setup::hash::commit);
-		ASSERT_TRUE(initial);
-	}
-#endif
 }  // namespace git::testing
