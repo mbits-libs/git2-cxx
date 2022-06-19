@@ -16,6 +16,8 @@ namespace git {
 #endif
 	}  // namespace
 
+	odb odb::create() { return create_handle<odb>(git_odb_new); }
+
 	odb odb::open(std::filesystem::path const& path) {
 		return create_handle<odb>(git_odb_open, get_path(path).c_str());
 	}

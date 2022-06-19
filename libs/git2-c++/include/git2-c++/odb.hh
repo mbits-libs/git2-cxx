@@ -15,6 +15,7 @@ namespace git {
 	struct odb : ptr<git_odb> {
 		using ptr<git_odb>::ptr;
 
+		static odb create();
 		static odb open(std::filesystem::path const&);
 		static void hash(git_oid*, bytes const&, git_object_t) noexcept;
 		bool exists(git_oid const&) const noexcept;
