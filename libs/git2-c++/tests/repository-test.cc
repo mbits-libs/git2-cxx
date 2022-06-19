@@ -149,13 +149,4 @@ namespace git::testing {
 	};
 
 	INSTANTIATE_TEST_SUITE_P(dirs, repository, ValuesIn(dirs));
-
-	TEST(repository, README) {
-		auto const repo = git::repository::open(make_absolute("bare.git/"sv));
-		ASSERT_TRUE(repo);
-		auto const initial = repo.lookup<git::commit>(
-		    "ed631389fc343f7788bf414c2b3e77749a15deb6"sv);
-		ASSERT_TRUE(initial);
-	}
-
 }  // namespace git::testing

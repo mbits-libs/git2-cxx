@@ -72,6 +72,10 @@ namespace git::testing::setup {
 	}
 #endif
 
+	git::repository open_repo() {
+		return git::repository::open(test_dir() / make_path("bare.git/"sv));
+	}
+
 	namespace {
 		namespace file {
 			static constexpr auto HEAD = "ref: refs/heads/main\n"sv;
@@ -152,12 +156,12 @@ namespace git::testing::setup {
 		};
 
 		template <size_t Length>
-		std::basic_string_view<unsigned char> span(
+		constexpr std::basic_string_view<unsigned char> span(
 		    unsigned char const (&v)[Length]) noexcept {
 			return {v, Length};
 		}
 
-		file::binary binary[] = {
+		constexpr file::binary binary[] = {
 		    {"bare.git/objects/ed/631389fc343f7788bf414c2b3e77749a15deb6"sv,
 		     span(file::objects_ed_631389fc343f7788bf414c2b3e77749a15deb6)},
 		    {"bare.git/objects/d8/5c6a23a700aa20fda7cfae8eaa9e80ea22dde0"sv,
@@ -180,7 +184,6 @@ namespace git::testing::setup {
 
 		for (auto const [filename, contents] : setup::files) {
 			auto const p = test_dir() / make_path(filename);
-			printf("+ %s\n", p.string().c_str());
 			create_directories(p.parent_path(), ignore);
 			std::ofstream out{p};
 			out.write(contents.data(), contents.size());
@@ -188,7 +191,6 @@ namespace git::testing::setup {
 
 		for (auto const nfo : setup::binary) {
 			auto const p = test_dir() / make_path(nfo.path);
-			printf("+ %s\n", p.string().c_str());
 			create_directories(p.parent_path(), ignore);
 			std::ofstream out{p};
 			out.write(reinterpret_cast<char const*>(nfo.content.data()),
