@@ -1,0 +1,103 @@
+// Copyright (c) 2022 midnightBITS
+// This code is licensed under MIT license (see LICENSE for details)
+
+#include <gtest/gtest.h>
+#include <cov/io/file.hh>
+#include <git2-c++/bytes.hh>
+#include "setup.hh"
+
+namespace cov::testing {
+	namespace {
+		using namespace ::std::literals;
+
+		static constexpr unsigned char readme_z[] = {
+		    0x78, 0x01, 0x4b, 0xca, 0xc9, 0x4f, 0x52, 0x30, 0x34, 0x63, 0x50,
+		    0x56, 0x08, 0x49, 0x2d, 0x2e, 0xc9, 0xcc, 0x4b, 0x57, 0x28, 0x4a,
+		    0x2d, 0xc8, 0x2f, 0xe6, 0x02, 0x00, 0x5b, 0x5a, 0x07, 0x9b};
+
+		template <size_t Length>
+		inline git::bytes wrap(unsigned char const (&data)[Length]) {
+			return git::bytes{data, Length};
+		}
+
+	}  // namespace
+
+	TEST(file, ctors) {
+		io::file one{};
+		io::file two =
+		    io::fopen(setup::test_dir() / setup::make_path("file"sv), "w");
+		ASSERT_FALSE(one);
+		ASSERT_TRUE(two);
+		std::swap(one, two);
+		ASSERT_TRUE(one);
+		ASSERT_FALSE(two);
+	}
+
+	TEST(file, io) {
+		auto const filename = setup::test_dir() / setup::make_path("file"sv);
+		std::error_code ec{};
+		std::filesystem::remove(filename, ec);
+		ASSERT_FALSE(ec) << "What: " << ec.message();
+
+		{
+			auto in = io::fopen(filename, "rb");
+			ASSERT_FALSE(in);
+		}
+		{
+			auto out = io::fopen(filename, "wb");
+			ASSERT_TRUE(out);
+			ASSERT_EQ(std::size(readme_z),
+			          out.store(readme_z, std::size(readme_z)));
+		}
+		{
+			auto in = io::fopen(filename, "rb");
+			ASSERT_TRUE(in);
+			std::vector<unsigned char> buffer(std::size(readme_z), '\0');
+			ASSERT_EQ(std::size(readme_z),
+			          in.load(buffer.data(), buffer.size()));
+			ASSERT_EQ((std::basic_string_view{readme_z, std::size(readme_z)}),
+			          (std::basic_string_view{buffer.data(), buffer.size()}));
+		}
+	}
+
+	TEST(file, skip) {
+		auto const filename = setup::test_dir() / setup::make_path("file"sv);
+		std::error_code ec{};
+		std::filesystem::remove(filename, ec);
+		ASSERT_FALSE(ec) << "What: " << ec.message();
+
+		{
+			auto in = io::fopen(filename, "rb");
+			ASSERT_FALSE(in);
+		}
+		{
+			auto out = io::fopen(filename, "wb");
+			ASSERT_TRUE(out);
+			ASSERT_EQ(std::size(readme_z),
+			          out.store(readme_z, std::size(readme_z)));
+		}
+		{
+			static constexpr auto pre_read = 4u;
+			static constexpr auto skip = 7u;
+			static constexpr auto read = 10u;
+
+			auto in = io::fopen(filename, "rb");
+			ASSERT_TRUE(in);
+			std::vector<unsigned char> buffer(std::size(readme_z), '\0');
+
+			ASSERT_EQ(pre_read, in.load(buffer.data(), pre_read));
+			ASSERT_EQ(
+			    (std::basic_string_view{readme_z, std::size(readme_z)}.substr(
+			        0, pre_read)),
+			    (std::basic_string_view{buffer.data(), pre_read}));
+
+			ASSERT_TRUE(in.skip(skip));
+
+			ASSERT_EQ(read, in.load(buffer.data(), read));
+			ASSERT_EQ(
+			    (std::basic_string_view{readme_z, std::size(readme_z)}.substr(
+			        pre_read + skip, read)),
+			    (std::basic_string_view{buffer.data(), read}));
+		}
+	}
+}  // namespace cov::testing
