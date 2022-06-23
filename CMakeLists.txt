@@ -25,7 +25,7 @@ if (COV_TESTING)
   find_package(GTest REQUIRED)
 
   set(COVERALLS_PREFIX cov_)
-  foreach(module libs/git2-c++)
+  foreach(module libs/git2-c++ libs/cov)
     list(APPEND cov_COVERALLS_DIRS ${module}/include ${module}/src)
   endforeach()
   include(${PROJECT_SOURCE_DIR}/tools/coveralls/Coveralls.cmake)

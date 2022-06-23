@@ -6,6 +6,8 @@ set(SOURCES
 	src/io/file.cc
 	src/io/read_stream.cc
 	src/io/safe_stream.cc
+	src/init.cc
+	src/path-utils.hh
 	src/streams.cc
 	src/zstream.cc
 	include/cov/hash/hash.hh
@@ -14,6 +16,7 @@ set(SOURCES
 	include/cov/io/file.hh
 	include/cov/io/read_stream.hh
 	include/cov/io/safe_stream.hh
+	include/cov/init.hh
 	include/cov/streams.hh
 	include/cov/zstream.hh
 )
