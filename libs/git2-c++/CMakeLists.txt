@@ -2,6 +2,7 @@ set(SOURCES
   src/blob.cc
   src/commit.cc
   src/config.cc
+  src/error.cc
   src/global.cc
   src/object.cc
   src/odb.cc
@@ -13,6 +14,7 @@ set(SOURCES
   include/git2-c++/blob.hh
   include/git2-c++/commit.hh
   include/git2-c++/config.hh
+  include/git2-c++/error.hh
   include/git2-c++/global.hh
   include/git2-c++/object.hh
   include/git2-c++/odb.hh
