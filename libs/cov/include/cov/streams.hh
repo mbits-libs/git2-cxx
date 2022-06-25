@@ -9,6 +9,7 @@
 #include <git2-c++/bytes.hh>
 #include <system_error>
 #include <type_traits>
+#include <vector>
 
 namespace cov {
 	template <typename Type>

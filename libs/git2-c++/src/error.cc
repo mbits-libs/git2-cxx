@@ -3,6 +3,7 @@
 
 #include "git2-c++/error.hh"
 #include "git2/errors.h"
+#include <string>
 
 namespace git {
 	namespace {

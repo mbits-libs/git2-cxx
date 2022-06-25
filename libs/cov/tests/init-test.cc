@@ -61,7 +61,7 @@ namespace cov::testing {
 	protected:
 		void assert_tree(path const& result, std::string_view const& gitdir) {
 			std::vector<entry_t> entries;
-			for (auto const entry : recursive_directory_iterator{result}) {
+			for (auto const& entry : recursive_directory_iterator{result}) {
 				entries.push_back(
 				    {setup::get_path(proximate(entry.path(), result)),
 				     entry.status().type()});

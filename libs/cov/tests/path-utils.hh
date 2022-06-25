@@ -14,7 +14,7 @@ namespace cov::testing {
 	struct path_info {
 		std::string_view name;
 		path_kind kind{path_kind::create_directories};
-		std::string_view second;
+		std::string_view second{};
 
 		void op(std::error_code& ec) const {
 			switch (kind) {
