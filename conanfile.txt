@@ -5,7 +5,6 @@ fmt/8.1.1
 gtest/cci.20210126
 
 [options]
-gtest:build_gmock=False
 libgit2:with_libssh2=False
 
 [generators]

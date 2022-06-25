@@ -36,6 +36,7 @@ conan_basic_setup()
 
 if (MSVC)
   set(ADDITIONAL_WALL_FLAGS
+      /D_CRT_SECURE_NO_WARNINGS
       /permissive-
       /Zc:__cplusplus
       /W4

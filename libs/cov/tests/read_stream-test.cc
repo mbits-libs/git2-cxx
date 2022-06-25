@@ -75,10 +75,6 @@ namespace cov::testing {
 		TypeParam in = storage<TypeParam>::open(ec);
 		ASSERT_FALSE(ec) << "What: " << ec.message();
 
-		static constexpr auto pre_read = 4u;
-		static constexpr auto skip = 7u;
-		static constexpr auto read = 10u;
-
 		ASSERT_TRUE(in);
 		std::vector<uint32_t> buffer{};
 
@@ -91,10 +87,6 @@ namespace cov::testing {
 		std::error_code ec{};
 		TypeParam in = storage<TypeParam>::open(ec);
 		ASSERT_FALSE(ec) << "What: " << ec.message();
-
-		static constexpr auto pre_read = 4u;
-		static constexpr auto skip = 7u;
-		static constexpr auto read = 10u;
 
 		ASSERT_TRUE(in);
 		uint32_t data{};
