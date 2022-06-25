@@ -42,7 +42,8 @@ namespace cov::testing {
 		if (expected.empty()) {
 			ASSERT_TRUE(repo.empty());
 		} else {
-			ASSERT_EQ(setup::get_path(setup::test_dir() / expected), repo);
+			ASSERT_EQ(setup::get_path(canonical(setup::test_dir() / expected)),
+			          repo);
 		}
 	}
 

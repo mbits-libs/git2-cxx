@@ -22,6 +22,7 @@ jobs:
           - os: ubuntu-latest
             build_type: Debug
             coverage: true
+          - latest_conan_hash: 49b35cda083b6915ce102462a9206f25edc385ee90edd0879701d638f077ab0b
 
     env:
       BUILD_TYPE: ${{ matrix.build_type }}
@@ -66,7 +67,9 @@ jobs:
       with:
         path: ${{ matrix.home }}/.conan/data
         key: ${{ matrix.os }}-${{ matrix.build_type }}-${{ hashFiles('conanfile.txt') }}
-        restore-keys: ${{ matrix.os }}-${{ matrix.build_type }}
+        restore-keys: |
+          ${{ matrix.os }}-${{ matrix.build_type }}
+          ${{ matrix.os }}-${{ matrix.build_type }}-${{ matrix.latest_conan_hash }}
 
     - name: Configure Conan
       working-directory: ${{github.workspace}}/build/conan
@@ -81,16 +84,11 @@ jobs:
     - name: Test
       working-directory: ${{github.workspace}}/build
       run: |
-        mkdir ${{github.workspace}}/test-results
-        mkdir ${{github.workspace}}/test-results/${{matrix.os}}
-        mkdir ${{github.workspace}}/test-results/${{matrix.os}}/${{matrix.build_type}}
-        ctest -C ${{env.BUILD_TYPE}}
-      env:
-        GTEST_OUTPUT: xml:${{github.workspace}}/test-results/${{matrix.os}}/${{matrix.build_type}}/test_detail.xml
+        ctest -C ${{env.BUILD_TYPE}} --output-on-failure
 
-    - name: Upload test_detail.xml
+    - name: Upload test results
       uses: actions/upload-artifact@v3
       if: always()
       with:
         name: Test results
-        path: ${{github.workspace}}/test-results/
+        path: ${{github.workspace}}/build/test-results/
