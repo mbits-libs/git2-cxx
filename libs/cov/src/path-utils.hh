@@ -72,22 +72,21 @@ namespace cov {
 		}
 
 		inline path rel_path(path const& dst, path const& srcdir) {
-			auto result = proximate(dst, srcdir);
+			auto src_abs = weakly_canonical(srcdir);
+			auto dst_abs = weakly_canonical(dst);
+			if (dst_abs.has_root_name() &&
+			    dst_abs.root_name() == src_abs.root_name()) {
+				dst_abs = "/"sv / dst_abs.relative_path();
+			}
+			auto result = proximate(dst, src_abs);
 			auto rel_str = get_path(result);
-			auto abs_str = get_path(dst);
+			auto abs_str = get_path(dst_abs);
 			auto rel_view = std::string_view{rel_str};
 			auto abs_view = std::string_view{abs_str};
 
-			if (!rel_view.empty() &&
-			    rel_view.back() == path::preferred_separator)
-				rel_view = rel_view.substr(0, rel_view.length() - 1);
-			if (!abs_view.empty() &&
-			    abs_view.back() == path::preferred_separator)
-				abs_view = abs_view.substr(0, abs_view.length() - 1);
-
-			if (rel_view.length() > abs_view.length() &&
-			    rel_view.substr(rel_view.length() - abs_view.length()) ==
-			        abs_view) {
+			if ((rel_view.length() > abs_view.length() &&
+			     rel_view.substr(rel_view.length() - abs_view.length()) ==
+			         abs_view)) {
 				result = dst;
 			}
 

@@ -54,21 +54,21 @@ namespace cov {
 		}
 	}  // namespace
 
-#define TRY(DIRNAME)                                \
-	do {                                            \
-		auto local = (DIRNAME);                     \
-		if (is_valid_path(local)) return local;     \
-		auto covlink = read_covlink(local);         \
-		if (covlink) {                              \
-			local = std::move(*covlink);            \
-			if (is_valid_path(local)) return local; \
-		}                                           \
+#define TRY(DIRNAME)                                                  \
+	do {                                                              \
+		auto local = (DIRNAME);                                       \
+		if (is_valid_path(local)) return weakly_canonical(local);     \
+		auto covlink = read_covlink(local);                           \
+		if (covlink) {                                                \
+			local = std::move(*covlink);                              \
+			if (is_valid_path(local)) return weakly_canonical(local); \
+		}                                                             \
 	} while (0)
 
 	std::filesystem::path discover_repository(
 	    std::filesystem::path const& current_dir,
 	    discover across_fs) {
-		if (is_valid_path(current_dir)) return current_dir;
+		if (is_valid_path(current_dir)) return weakly_canonical(current_dir);
 
 		TRY(current_dir / names::covdata_dir);
 		if (auto const git_dir = git::repository::discover(
@@ -98,7 +98,7 @@ namespace cov {
 					}
 				}
 			}
-			if (is_valid_path(dirname)) return dirname;
+			if (is_valid_path(dirname)) return weakly_canonical(dirname);
 			TRY(dirname / names::covdata_dir);
 		}
 

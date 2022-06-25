@@ -29,6 +29,9 @@ if (COV_TESTING)
     list(APPEND cov_COVERALLS_DIRS ${module}/include ${module}/src)
   endforeach()
   include(${PROJECT_SOURCE_DIR}/tools/coveralls/Coveralls.cmake)
+
+  set(TEST_REPORT_DIR "${PROJECT_BINARY_DIR}/test-results")
+  set(TEST_REPORT_FILE "${CMAKE_SYSTEM_NAME}-${CMAKE_BUILD_TYPE}.xml")
 endif()
 
 include(${CMAKE_BINARY_DIR}/conan/conanbuildinfo.cmake)

@@ -48,7 +48,8 @@ namespace cov::testing {
 		std::vector<path_info> steps{};
 		struct {
 			std::string_view expected_git{};
-			std::errc error{};
+			bool error{false};
+			bool may_have_root_name{false};
 		} expected{};
 
 		friend std::ostream& operator<<(std::ostream& out,
@@ -59,7 +60,9 @@ namespace cov::testing {
 
 	class init : public ::testing::TestWithParam<init_test> {
 	protected:
-		void assert_tree(path const& result, std::string_view const& gitdir) {
+		void assert_tree(path const& result,
+		                 std::string_view const& gitdir,
+		                 bool may_have_root_name) {
 			std::vector<entry_t> entries;
 			for (auto const& entry : recursive_directory_iterator{result}) {
 				entries.push_back(
@@ -81,8 +84,14 @@ namespace cov::testing {
 
 			ASSERT_EQ(expected_tree, entries);
 
-			auto const dir = core_gitdir(result);
+			auto dir = core_gitdir(result);
 			ASSERT_TRUE(dir);
+			auto const git = setup::make_path(gitdir);
+			auto const actual = setup::make_path(*dir);
+			if (git != actual && may_have_root_name) {
+				if (actual.has_root_name())
+					*dir = setup::get_path("/" / actual.relative_path());
+			}
 			ASSERT_EQ(gitdir, *dir);
 		}
 
@@ -109,16 +118,17 @@ namespace cov::testing {
 		    init_repository(setup::test_dir() / repo.location,
 		                    setup::test_dir() / repo.git, ec, repo.opts);
 
-		if (expected.error == std::errc{}) {
+		if (!expected.error) {
 			ASSERT_FALSE(ec)
 			    << "   Error: " << ec.message() << " (" << ec.category().name()
 			    << ' ' << ec.value() << ')';
 			ASSERT_EQ(setup::get_path(setup::test_dir() / repo.location),
 			          setup::get_path(result));
 
-			assert_tree(result, expected.expected_git);
+			assert_tree(result, expected.expected_git,
+			            expected.may_have_root_name);
 		} else {
-			ASSERT_EQ(ec, expected.error);
+			ASSERT_TRUE(ec);
 			ASSERT_TRUE(result.empty());
 		}
 	}
@@ -140,8 +150,24 @@ namespace cov::testing {
 	        },
 	        make_setup(remove_all("outside_git"sv),
 	                   create_directories("outside_git"sv)),
-	        {"/1234567890aswedferckarek/project/.git"sv},
+	        {
+	            .expected_git = "/1234567890aswedferckarek/project/.git"sv,
+	            .may_have_root_name = true,
+	        },
 	    },
+
+#ifdef WIN32
+	    {
+	        "outside_git_win32"sv,
+	        {
+	            "outside_git/.covdata"sv,
+	            "Z:/1234567890aswedferckarek/project/.git"sv,
+	        },
+	        make_setup(remove_all("outside_git"sv),
+	                   create_directories("outside_git"sv)),
+	        {"Z:/1234567890aswedferckarek/project/.git"sv},
+	    },
+#endif
 
 	    {
 	        "beside_git"sv,
@@ -158,7 +184,7 @@ namespace cov::testing {
 	                   create_directories("preexisting/objects/coverage"sv),
 	                   touch("preexisting/config"sv),
 	                   touch("preexisting/HEAD"sv)),
-	        {.error = std::errc::file_exists},
+	        {.error = true},
 	    },
 
 	    {
@@ -177,7 +203,7 @@ namespace cov::testing {
 	        make_setup(remove_all("with_cleanup"sv),
 	                   create_directories("with_cleanup/objects"sv),
 	                   touch("with_cleanup/objects/pack"sv)),
-	        {.error = std::errc::not_a_directory},
+	        {.error = true},
 	    },
 
 	    {
@@ -186,7 +212,7 @@ namespace cov::testing {
 	        make_setup(remove_all("with_cleanup"sv),
 	                   create_directories("with_cleanup/objects"sv),
 	                   create_directories("with_cleanup/HEAD"sv)),
-	        {.error = std::errc::is_a_directory},
+	        {.error = true},
 	    },
 	};
 

@@ -29,7 +29,7 @@ namespace cov::testing {
 		auto prep_file(std::string_view name) {
 			static constexpr auto content = "first line\nsecond line\n"sv;
 			auto outname = setup::test_dir() / setup::make_path(name);
-			auto const out = io::fopen(content, "wb");
+			auto const out = io::fopen(outname, "wb");
 			out.store(content.data(), content.size());
 			return outname;
 		}
@@ -45,6 +45,7 @@ namespace cov::testing {
 
 	TEST(stream, safe) {
 		auto const outname = prep_file("secured.txt"sv);
+		ASSERT_FALSE(outname.empty());
 		{
 			io::safe_stream out{outname};
 			ASSERT_TRUE(out.opened());
@@ -56,6 +57,7 @@ namespace cov::testing {
 
 	TEST(stream, safe_commit) {
 		auto const outname = prep_file("secured.txt"sv);
+		ASSERT_FALSE(outname.empty());
 		{
 			io::safe_stream out{outname};
 			ASSERT_TRUE(out.opened());
@@ -70,6 +72,7 @@ namespace cov::testing {
 
 	TEST(stream, unsecured) {
 		auto const outname = prep_file("unsecured.txt"sv);
+		ASSERT_FALSE(outname.empty());
 		{
 			auto out = io::fopen(outname, "wb");
 			ASSERT_TRUE(out);
