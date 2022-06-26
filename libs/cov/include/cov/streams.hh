@@ -6,7 +6,7 @@
 #include <git2/oid.h>
 #include <concepts>
 #include <filesystem>
-#include <git2-c++/bytes.hh>
+#include <git2/bytes.hh>
 #include <system_error>
 #include <type_traits>
 #include <vector>

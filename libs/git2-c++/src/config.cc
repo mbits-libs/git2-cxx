@@ -1,9 +1,9 @@
 // Copyright (c) 2022 midnightBITS
 // This code is licensed under MIT license (see LICENSE for details)
 
-#include "git2-c++/config.hh"
+#include <git2/errors.h>
+#include <git2/config.hh>
 #include <numeric>
-#include "git2/errors.h"
 
 namespace git {
 	config config::create() noexcept {

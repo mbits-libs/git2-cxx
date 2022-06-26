@@ -1,4 +1,4 @@
 // Copyright (c) 2022 midnightBITS
 // This code is licensed under MIT license (see LICENSE for details)
 
-#include "git2-c++/ptr.hh"
+#include <git2/ptr.hh>

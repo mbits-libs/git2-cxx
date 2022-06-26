@@ -2,11 +2,11 @@
 // This code is licensed under MIT license (see LICENSE for details)
 
 #pragma once
-#include "git2-c++/odb.hh"
-#include "git2-c++/ptr.hh"
-#include "git2-c++/submodule.hh"
-#include "git2/object.h"
-#include "git2/repository.h"
+#include <git2/object.h>
+#include <git2/repository.h>
+#include <git2/odb.hh>
+#include <git2/ptr.hh>
+#include <git2/submodule.hh>
 
 #include <filesystem>
 #include <optional>

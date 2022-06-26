@@ -5,7 +5,7 @@
 #include <cstring>
 #include <string>
 
-#include "git2-c++/bytes.hh"
+#include <git2/bytes.hh>
 
 namespace hash {
 	enum class endian {

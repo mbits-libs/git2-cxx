@@ -4,8 +4,8 @@
 #include <gtest/gtest.h>
 #include <filesystem>
 #include <fstream>
-#include <git2-c++/commit.hh>
-#include <git2-c++/repository.hh>
+#include <git2/commit.hh>
+#include <git2/repository.hh>
 #include "setup.hh"
 
 namespace git::testing {

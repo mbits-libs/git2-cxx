@@ -10,18 +10,18 @@ set(SOURCES
   src/repository.cc
   src/submodule.cc
   src/tree.cc
-  include/git2-c++/bytes.hh
-  include/git2-c++/blob.hh
-  include/git2-c++/commit.hh
-  include/git2-c++/config.hh
-  include/git2-c++/error.hh
-  include/git2-c++/global.hh
-  include/git2-c++/object.hh
-  include/git2-c++/odb.hh
-  include/git2-c++/ptr.hh
-  include/git2-c++/repository.hh
-  include/git2-c++/submodule.hh
-  include/git2-c++/tree.hh
+  include/git2/bytes.hh
+  include/git2/blob.hh
+  include/git2/commit.hh
+  include/git2/config.hh
+  include/git2/error.hh
+  include/git2/global.hh
+  include/git2/object.hh
+  include/git2/odb.hh
+  include/git2/ptr.hh
+  include/git2/repository.hh
+  include/git2/submodule.hh
+  include/git2/tree.hh
 )
 
 add_library(git2-c++ STATIC ${SOURCES})
@@ -40,14 +40,13 @@ if (COV_TESTING)
 	file(GLOB TEST_SRCS_CC tests/*.cc)
 	file(GLOB TEST_SRCS_CPP tests/*.cpp)
 	file(GLOB TEST_SRCS_CXX tests/*.cxx)
-	add_executable(git2-c++-test ${TEST_SRCS_CC} ${TEST_SRCS_CPP} ${TEST_SRCS_CXX})
-	set_target_properties(git2-c++-test PROPERTIES FOLDER tests)
-	target_link_libraries(git2-c++-test git2-c++ GTest::gtest_main)
-	target_include_directories(git2-c++-test
+	add_executable(git2-test ${TEST_SRCS_CC} ${TEST_SRCS_CPP} ${TEST_SRCS_CXX})
+	set_target_properties(git2-test PROPERTIES FOLDER tests)
+	target_link_libraries(git2-test git2-c++ GTest::gtest_main)
+	target_include_directories(git2-test
 		PRIVATE
 			${CMAKE_CURRENT_SOURCE_DIR}/${TEST_EXE_TEST_SUBDIR}
 			${CMAKE_CURRENT_BINARY_DIR})
 
-  add_test(NAME git2-c++ COMMAND git2-c++-test "--gtest_output=xml:${TEST_REPORT_DIR}/libgit2-c++/${TEST_REPORT_FILE}")
-	message(STATUS "bin/git2-c++-test \"--gtest_output=xml:${TEST_REPORT_DIR}/libgit2-c++/${TEST_REPORT_FILE}\"")
+  add_test(NAME git2-c++ COMMAND git2-test "--gtest_output=xml:${TEST_REPORT_DIR}/libgit2-c++/${TEST_REPORT_FILE}")
 endif()

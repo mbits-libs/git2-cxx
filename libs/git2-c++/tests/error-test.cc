@@ -3,7 +3,7 @@
 
 #include <git2/errors.h>
 #include <gtest/gtest.h>
-#include <git2-c++/error.hh>
+#include <git2/error.hh>
 
 namespace git::testing {
 	using namespace ::std::literals;

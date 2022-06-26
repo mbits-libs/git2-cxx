@@ -3,9 +3,9 @@
 
 #include <gtest/gtest.h>
 #include <cstdio>
-#include <git2-c++/blob.hh>
-#include <git2-c++/commit.hh>
-#include <git2-c++/tree.hh>
+#include <git2/blob.hh>
+#include <git2/commit.hh>
+#include <git2/tree.hh>
 #include "setup.hh"
 
 namespace git::testing {

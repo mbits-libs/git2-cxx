@@ -4,7 +4,7 @@
 #pragma once
 
 #include <filesystem>
-#include <git2-c++/repository.hh>
+#include <git2/repository.hh>
 
 namespace git::testing::setup {
 	using std::filesystem::path;

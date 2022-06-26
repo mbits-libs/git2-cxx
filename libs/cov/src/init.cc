@@ -6,9 +6,9 @@
 #include <cov/object.hh>
 #include <cov/types.hh>
 #include <fstream>
-#include <git2-c++/config.hh>
-#include <git2-c++/error.hh>
-#include <git2-c++/repository.hh>
+#include <git2/config.hh>
+#include <git2/error.hh>
+#include <git2/repository.hh>
 #include "path-utils.hh"
 
 namespace cov {

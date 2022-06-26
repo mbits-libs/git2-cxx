@@ -2,7 +2,7 @@
 // This code is licensed under MIT license (see LICENSE for details)
 
 #include <gtest/gtest.h>
-#include <git2-c++/bytes.hh>
+#include <git2/bytes.hh>
 #include "setup.hh"
 
 namespace git::testing {
