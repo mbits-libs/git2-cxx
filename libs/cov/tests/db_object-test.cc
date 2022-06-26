@@ -52,12 +52,10 @@ namespace cov::testing {
 		             read_stream& in,
 		             std::error_code& ec),
 		            (const, override));
+		MOCK_METHOD(bool, recognized, (ref<counted> const& obj), (const));
 		MOCK_METHOD(bool,
-		            print,
-		            (uint32_t magic,
-		             uint32_t version,
-		             ref<counted> const& obj,
-		             write_stream& in),
+		            store,
+		            (ref<counted> const& obj, write_stream& in),
 		            (const, override));
 	};
 
@@ -157,6 +155,31 @@ namespace cov::testing {
 		ASSERT_FALSE(ec) << "   Error: " << ec.message() << " ("
 		                 << ec.category().name() << ')';
 		ASSERT_EQ(raw, result.get());
+		ASSERT_FALSE(result->is_object());
+		ASSERT_EQ(result, result.duplicate());
+	}
+
+	TEST(dbo, pass_created_object_OBJECT) {
+		static constexpr auto s = "sxts\x00\x00\x01\x00"sv;
+		io::bytes_read_stream stream{git::bytes{s.data(), s.size()}};
+
+		io::db_object dbo{};
+
+		auto obj = make_ref<mock_counted>();
+		auto raw = obj.get();
+
+		auto handler = std::make_unique<mock_handler>();
+		EXPECT_CALL(*handler, load("stxs"_tag, v1::VERSION, _, _))
+		    .WillRepeatedly(Return(ByMove(std::move(obj))));
+
+		dbo.add_handler(OBJECT::HILITES, std::move(handler));
+
+		std::error_code ec{};
+		auto const result = dbo.load(stream, ec);
+		ASSERT_FALSE(ec) << "   Error: " << ec.message() << " ("
+		                 << ec.category().name() << ')';
+		ASSERT_EQ(raw, result.get());
+		ASSERT_FALSE(result->is_object());
 		ASSERT_EQ(result, result.duplicate());
 	}
 }  // namespace cov::testing

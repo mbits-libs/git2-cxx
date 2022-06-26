@@ -3,7 +3,7 @@
 
 #pragma once
 #include <concepts>
-#include <cov/counted.hh>
+#include <cov/object.hh>
 #include <cov/streams.hh>
 #include <cov/types.hh>
 #include <memory>
@@ -34,10 +34,16 @@ namespace cov::io {
 		                          uint32_t version,
 		                          read_stream& in,
 		                          std::error_code& ec) const = 0;
-		virtual bool print(uint32_t magic,
-		                   uint32_t version,
-		                   ref<counted> const& obj,
-		                   write_stream& in) const = 0;
+		virtual bool recognized(ref<counted> const& obj) const = 0;
+		virtual bool store(ref<counted> const& obj, write_stream& in) const = 0;
+	};
+
+	template <typename Handled>
+	struct db_handler_for : db_handler {
+		bool recognized(ref<counted> const& obj) const override {
+			if (!obj || !obj->is_object()) return false;
+			return is_a<Handled>(static_cast<object const*>(obj.get()));
+		}
 	};
 
 	class db_object {
@@ -63,6 +69,7 @@ namespace cov::io {
 		}
 
 		ref<counted> load(read_stream& in, std::error_code& ec) const;
+		bool store(ref<counted> const& value, write_stream& in) const;
 
 	private:
 		std::unordered_map<uint32_t, std::unique_ptr<db_handler>> handlers_{};

@@ -3,11 +3,13 @@
 
 #pragma once
 #include <atomic>
+#include <concepts>
 
 namespace cov {
 	struct counted {
 		virtual void acquire() = 0;
 		virtual void release() = 0;
+		virtual bool is_object() const noexcept { return false; }
 
 	protected:
 		virtual ~counted();
@@ -41,19 +43,29 @@ namespace cov {
 		constexpr ref() noexcept = default;
 		constexpr ref(std::nullptr_t) noexcept {}
 		explicit ref(pointer p) noexcept : ptr_{p} {}
+
 		ref(ref&& other) noexcept : ptr_{other.ptr_} { other.ptr_ = nullptr; }
-		template <class Other>
+		ref(ref const& other) noexcept : ref{other.duplicate()} {}
+
+		template <std::derived_from<Object> Other>
 		ref(ref<Other>&& other) noexcept : ptr_{other.unlink()} {}
+		template <std::derived_from<Object> Other>
+		ref(ref<Other> const& other) noexcept : ref{other.duplicate()} {}
+
 		~ref() { release(); }
 
 		ref& operator=(ref&& other) noexcept {
 			reset(other.unlink());
 			return *this;
 		}
-		template <class Other>
+		template <std::derived_from<Object> Other>
 		ref& operator=(ref<Other>&& other) noexcept {
 			reset(other.unlink());
 			return *this;
+		}
+		template <std::derived_from<Object> Other>
+		ref& operator=(ref<Other> const& other) noexcept {
+			return *this = other.duplicate();
 		}
 		ref& operator=(std::nullptr_t) noexcept {
 			reset();
@@ -73,11 +85,11 @@ namespace cov {
 			ptr_ = nullptr;
 			return tmp;
 		}
-		template <class Other>
+		template <std::derived_from<Object> Other>
 		bool operator==(ref<Other> const& other) const noexcept {
 			return get() == other.get();
 		}
-		template <class Other>
+		template <std::derived_from<Object> Other>
 		auto operator<=>(ref<Other> const& other) const noexcept {
 			return get() <=> other.get();
 		}

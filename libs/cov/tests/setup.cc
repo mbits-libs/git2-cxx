@@ -132,7 +132,8 @@ namespace cov::testing::setup {
 			auto const p = test_dir() / make_path(filename);
 			create_directories(p.parent_path(), ignore);
 			std::ofstream out{p, std::ios::binary};
-			out.write(contents.data(), contents.size());
+			out.write(contents.data(),
+			          static_cast<std::streamsize>(contents.size()));
 		}
 
 #if 0
