@@ -13,7 +13,7 @@ set(COV_TESTING ON CACHE BOOL "Compile and/or run self-tests")
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-list(APPEND CMAKE_MODULE_PATH "${PROJECT_BINARY_DIR}/conan")
+list(APPEND CMAKE_MODULE_PATH "${PROJECT_BINARY_DIR}/conan" "${PROJECT_SOURCE_DIR}/cmake")
 list(APPEND CMAKE_PREFIX_PATH "${PROJECT_BINARY_DIR}/conan")
 
 set(CONAN_CMAKE_SILENT_OUTPUT ON)
@@ -91,5 +91,7 @@ else()
       )
   endif()
 endif()
+
+include(prepare_pack)
 
 add_subdirectory(libs)

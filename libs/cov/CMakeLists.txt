@@ -59,3 +59,20 @@ if (COV_TESTING)
 
 	add_test(NAME cov COMMAND cov-test "--gtest_output=xml:${TEST_REPORT_DIR}/libcov/${TEST_REPORT_FILE}")
 endif()
+
+install(
+  TARGETS libcov
+  COMPONENT libcov
+)
+
+install(
+  DIRECTORY include/
+  TYPE INCLUDE
+  COMPONENT libcov
+)
+
+cpack_add_component(libcov
+  DISPLAY_NAME "libgit2-c++"
+  DEPENDS libgit2-c++
+  GROUP devel
+)

@@ -50,3 +50,19 @@ if (COV_TESTING)
 
   add_test(NAME git2-c++ COMMAND git2-test "--gtest_output=xml:${TEST_REPORT_DIR}/libgit2-c++/${TEST_REPORT_FILE}")
 endif()
+
+install(
+  TARGETS git2-c++
+  COMPONENT libgit2-c++
+)
+
+install(
+  DIRECTORY include/
+  TYPE INCLUDE
+  COMPONENT libgit2-c++
+)
+
+cpack_add_component(libgit2-c++
+  DISPLAY_NAME "libgit2-c++"
+  GROUP devel
+)
