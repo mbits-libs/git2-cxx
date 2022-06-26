@@ -4,6 +4,8 @@
 #pragma once
 #include <cov/counted.hh>
 #include <cov/types.hh>
+#include <memory>
+#include <string_view>
 
 namespace cov {
 #define KNOWN_OBJECTS(X) \
@@ -24,9 +26,10 @@ namespace cov {
 #undef FORWARD
 
 	struct object : counted {
+		bool is_object() const noexcept override { return true; }
 		virtual obj_type type() const noexcept = 0;
-		virtual std::error_code write() = 0;
-		virtual std::error_code read() = 0;
+		// virtual std::error_code write() = 0;
+		// virtual std::error_code read() = 0;
 		template <typename Derived>
 		inline bool is_a() const noexcept;
 #define IS_A(NAME) \
@@ -118,4 +121,5 @@ namespace cov {
 		bool is_line_coverage() const noexcept final { return true; }
 		virtual std::vector<v1::coverage> const& coverage() const noexcept = 0;
 	};
+	ref<line_coverage_object> line_coverage_create(std::vector<v1::coverage>&&);
 }  // namespace cov

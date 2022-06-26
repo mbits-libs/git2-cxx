@@ -8,6 +8,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <numeric>
+#include <vector>
 
 namespace cov {
 	using std::size_t;
@@ -24,7 +25,7 @@ namespace cov {
 		              len > 2 ? s[2] : ' ', len > 3 ? s[3] : ' ');
 	}
 
-	enum OBJECT : uint32_t {
+	enum class OBJECT : uint32_t {
 		REPORT = "rprt"_tag,
 		COVERAGE = "lnes"_tag,
 		HILITES = "stxs"_tag,  // highlights list file
@@ -221,8 +222,8 @@ namespace cov {
 		};
 
 		struct coverage {
-			uint32_t is_null : 1;
 			uint32_t value : 31;
+			uint32_t is_null : 1;
 		};
 
 		inline coverage_stats& coverage_stats::operator+=(
