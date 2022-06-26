@@ -1,3 +1,3 @@
-# git2-c++
+# Cov
 
-C++ wrappers for libgit2
+Coverage visualization system
