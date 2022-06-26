@@ -5,7 +5,7 @@
 #include <cstdio>
 #include <filesystem>
 #include <fstream>
-#include <git2-c++/global.hh>
+#include <git2/global.hh>
 
 namespace cov::testing::setup {
 	using namespace ::std::literals;

@@ -3,7 +3,7 @@
 
 #include <cov/discover.hh>
 #include <fstream>
-#include <git2-c++/repository.hh>
+#include <git2/repository.hh>
 #include "path-utils.hh"
 
 #ifdef WIN32

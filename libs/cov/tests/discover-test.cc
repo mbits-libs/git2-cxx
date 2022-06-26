@@ -6,8 +6,8 @@
 #include <cov/discover.hh>
 #include <cov/init.hh>
 #include <cov/io/file.hh>
-#include <git2-c++/config.hh>
-#include <git2-c++/global.hh>
+#include <git2/config.hh>
+#include <git2/global.hh>
 #include "path-utils.hh"
 #include "setup.hh"
 

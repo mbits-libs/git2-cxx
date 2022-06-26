@@ -58,5 +58,4 @@ if (COV_TESTING)
 			${CMAKE_CURRENT_BINARY_DIR})
 
 	add_test(NAME cov COMMAND cov-test "--gtest_output=xml:${TEST_REPORT_DIR}/libcov/${TEST_REPORT_FILE}")
-	message(STATUS "bin/cov-test \"--gtest_output=xml:${TEST_REPORT_DIR}/libcov/${TEST_REPORT_FILE}\"")
 endif()

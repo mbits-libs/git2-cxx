@@ -2,8 +2,8 @@
 // This code is licensed under MIT license (see LICENSE for details)
 
 #pragma once
-#include "git2-c++/ptr.hh"
-#include "git2/config.h"
+#include <git2/config.h>
+#include <git2/ptr.hh>
 
 #include <filesystem>
 #include <optional>

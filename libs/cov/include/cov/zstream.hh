@@ -4,7 +4,7 @@
 #pragma once
 #include <zlib.h>
 #include <cov/io/file.hh>
-#include <git2-c++/bytes.hh>
+#include <git2/bytes.hh>
 #include <vector>
 
 namespace cov {

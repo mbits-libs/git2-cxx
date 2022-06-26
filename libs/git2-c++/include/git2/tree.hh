@@ -2,9 +2,9 @@
 // This code is licensed under MIT license (see LICENSE for details)
 
 #pragma once
-#include "git2-c++/blob.hh"
-#include "git2-c++/object.hh"
-#include "git2/tree.h"
+#include <git2/tree.h>
+#include <git2/blob.hh>
+#include <git2/object.hh>
 
 #include <string>
 

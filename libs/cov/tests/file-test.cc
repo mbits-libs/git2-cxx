@@ -3,7 +3,7 @@
 
 #include <gtest/gtest.h>
 #include <cov/io/file.hh>
-#include <git2-c++/bytes.hh>
+#include <git2/bytes.hh>
 #include "setup.hh"
 
 namespace cov::testing {

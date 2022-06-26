@@ -5,7 +5,7 @@
 #include <gtest/gtest.h>
 #include <cov/io/db_object.hh>
 #include <cov/io/read_stream.hh>
-#include <git2-c++/bytes.hh>
+#include <git2/bytes.hh>
 #include "setup.hh"
 
 namespace cov::testing {
