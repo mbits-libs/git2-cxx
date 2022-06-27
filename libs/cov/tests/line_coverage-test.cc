@@ -27,22 +27,23 @@ namespace cov::testing {
 		}
 	};
 
-	struct line_coverage_impl : counted_impl<line_coverage_object> {
-		std::vector<v1::coverage> lines{};
+	struct line_coverage_impl : counted_impl<cov::line_coverage> {
+		std::vector<io::v1::coverage> lines{};
 
-		std::vector<v1::coverage> const& coverage() const noexcept override {
+		std::vector<io::v1::coverage> const& coverage()
+		    const noexcept override {
 			return lines;
 		}
 	};
 
 	TEST(line_coverage, load) {
 		static constexpr auto s =
-		    "senl\x00\x00\x01\x00"
+		    "lnes\x00\x00\x01\x00"
 		    "\x00\x00\x00\x00"sv;
 		io::bytes_read_stream stream{git::bytes{s.data(), s.size()}};
 
 		io::db_object dbo{};
-		dbo.add_handler<OBJECT::COVERAGE, io::handlers::line_coverage>();
+		dbo.add_handler<io::OBJECT::COVERAGE, io::handlers::line_coverage>();
 
 		std::error_code ec{};
 		auto const result = dbo.load(stream, ec);
@@ -52,20 +53,20 @@ namespace cov::testing {
 		ASSERT_TRUE(result->is_object());
 		auto const obj = static_cast<object const*>(result.get());
 		ASSERT_EQ(obj_line_coverage, obj->type());
-		auto const lines = as_a<line_coverage_object>(obj);
+		auto const lines = as_a<cov::line_coverage>(obj);
 		ASSERT_TRUE(lines);
 		ASSERT_TRUE(lines->coverage().empty());
 	}
 
 	TEST(line_coverage, load_1) {
 		static constexpr auto s =
-		    "senl\x00\x00\x01\x00"
+		    "lnes\x00\x00\x01\x00"
 		    "\x01\x00\x00\x00"
 		    "\x20\x00\x00\x80"sv;
 		io::bytes_read_stream stream{git::bytes{s.data(), s.size()}};
 
 		io::db_object dbo{};
-		dbo.add_handler<OBJECT::COVERAGE, io::handlers::line_coverage>();
+		dbo.add_handler<io::OBJECT::COVERAGE, io::handlers::line_coverage>();
 
 		std::error_code ec{};
 		auto const result = dbo.load(stream, ec);
@@ -77,7 +78,7 @@ namespace cov::testing {
 		auto const obj = static_cast<object const*>(result.get());
 
 		ASSERT_EQ(obj_line_coverage, obj->type());
-		auto const lines = as_a<line_coverage_object>(obj);
+		auto const lines = as_a<cov::line_coverage>(obj);
 		ASSERT_TRUE(lines);
 		ASSERT_EQ(1u, lines->coverage().size());
 
@@ -88,13 +89,13 @@ namespace cov::testing {
 
 	TEST(line_coverage, load_partial) {
 		static constexpr auto s =
-		    "senl\x00\x00\x01\x00"
+		    "lnes\x00\x00\x01\x00"
 		    "\x02\x00\x00\x00"
 		    "\x20\x00\x00\x80"sv;
 		io::bytes_read_stream stream{git::bytes{s.data(), s.size()}};
 
 		io::db_object dbo{};
-		dbo.add_handler<OBJECT::COVERAGE, io::handlers::line_coverage>();
+		dbo.add_handler<io::OBJECT::COVERAGE, io::handlers::line_coverage>();
 
 		std::error_code ec{};
 		auto const result = dbo.load(stream, ec);
@@ -104,12 +105,12 @@ namespace cov::testing {
 
 	TEST(line_coverage, store) {
 		static constexpr auto expected =
-		    "senl\x00\x00\x01\x00"
+		    "lnes\x00\x00\x01\x00"
 		    "\x00\x00\x00\x00"sv;
 		test_stream stream{};
 
 		io::db_object dbo{};
-		dbo.add_handler<OBJECT::COVERAGE, io::handlers::line_coverage>();
+		dbo.add_handler<io::OBJECT::COVERAGE, io::handlers::line_coverage>();
 
 		auto const obj = make_ref<line_coverage_impl>();
 		auto const result = dbo.store(obj, stream);
@@ -119,13 +120,13 @@ namespace cov::testing {
 
 	TEST(line_coverage, store_1) {
 		static constexpr auto expected =
-		    "senl\x00\x00\x01\x00"
+		    "lnes\x00\x00\x01\x00"
 		    "\x01\x00\x00\x00"
 		    "\x20\x00\x00\x80"sv;
 		test_stream stream{};
 
 		io::db_object dbo{};
-		dbo.add_handler<OBJECT::COVERAGE, io::handlers::line_coverage>();
+		dbo.add_handler<io::OBJECT::COVERAGE, io::handlers::line_coverage>();
 
 		auto const obj = make_ref<line_coverage_impl>();
 		obj->lines.push_back({.value = 32, .is_null = 1});

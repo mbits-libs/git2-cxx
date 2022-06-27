@@ -3,14 +3,14 @@
 
 #pragma once
 #include <cov/counted.hh>
-#include <cov/types.hh>
+#include <cov/io/types.hh>
 #include <memory>
 #include <string_view>
 
 namespace cov {
 #define KNOWN_OBJECTS(X) \
 	X(report)            \
-	X(reported_file)     \
+	X(report_files)      \
 	X(line_coverage)     \
 	X(blob)
 
@@ -21,7 +21,7 @@ namespace cov {
 #undef OBJECT_TYPE
 	};
 
-#define FORWARD(name) struct name##_object;
+#define FORWARD(name) struct name;
 	KNOWN_OBJECTS(FORWARD)
 #undef FORWARD
 
@@ -38,10 +38,10 @@ namespace cov {
 #undef IS_A
 	};
 
-#define IS_A(NAME)                                             \
-	template <>                                                \
-	inline bool object::is_a<NAME##_object>() const noexcept { \
-		return is_##NAME();                                    \
+#define IS_A(NAME)                                    \
+	template <>                                       \
+	inline bool object::is_a<NAME>() const noexcept { \
+		return is_##NAME();                           \
 	}
 	KNOWN_OBJECTS(IS_A)
 #undef IS_A
@@ -86,14 +86,7 @@ namespace cov {
 		return is_a<derived>(var) ? static_cast<derived*>(var) : nullptr;
 	}
 
-	struct report_entry {
-		virtual ~report_entry();
-		virtual git_oid const* reported_file() const noexcept = 0;
-		virtual v1::coverage_stats stats() const noexcept = 0;
-		virtual std::string_view path() const noexcept = 0;
-	};
-
-	struct report_object : object {
+	struct report : object {
 		obj_type type() const noexcept override { return obj_report; };
 		bool is_report() const noexcept final { return true; }
 		virtual git_oid const* parent_report() const noexcept = 0;
@@ -106,20 +99,81 @@ namespace cov {
 		virtual std::string_view message() const noexcept = 0;
 		virtual git_time_t commit_time_utc() const noexcept = 0;
 		virtual git_time_t add_time_utc() const noexcept = 0;
-		virtual std::vector<std::unique_ptr<v1::report_entry>> const& entries()
+	};
+
+	struct report_entry {
+		virtual ~report_entry();
+		virtual bool is_dirty() const noexcept = 0;
+		bool in_workdir() const noexcept { return is_dirty(); }
+		bool in_index() const noexcept { return !is_dirty(); }
+		virtual bool is_modified() const noexcept = 0;
+		virtual std::string_view path() const noexcept = 0;
+		virtual io::v1::coverage_stats const& stats() const noexcept = 0;
+		virtual git_oid const* contents() const noexcept = 0;
+		virtual git_oid const* line_coverage() const noexcept = 0;
+	};
+
+	struct report_entry_builder {
+		bool is_dirty{};
+		bool is_modified{};
+		std::string path{};
+		io::v1::coverage_stats stats{};
+		git_oid contents{};
+		git_oid line_coverage{};
+
+		report_entry_builder& set_dirty(bool value = true) {
+			is_dirty = value;
+			return *this;
+		}
+
+		report_entry_builder& set_modifed(bool value = true) {
+			is_modified = value;
+			return *this;
+		}
+
+		report_entry_builder& set_path(std::string_view value) {
+			path.assign(value);
+			return *this;
+		}
+
+		report_entry_builder& set_stats(io::v1::coverage_stats const& value) {
+			stats = value;
+			return *this;
+		}
+
+		report_entry_builder& set_stats(uint32_t total,
+		                                uint32_t relevant,
+		                                uint32_t covered) {
+			return set_stats({total, relevant, covered});
+		}
+
+		report_entry_builder& set_contents(git_oid const& value) {
+			contents = value;
+			return *this;
+		}
+
+		report_entry_builder& set_line_coverage(git_oid const& value) {
+			line_coverage = value;
+			return *this;
+		}
+
+		std::unique_ptr<report_entry> create() &&;
+	};
+
+	struct report_files : object {
+		obj_type type() const noexcept override { return obj_report_files; };
+		bool is_report_files() const noexcept final { return true; }
+		virtual std::vector<std::unique_ptr<report_entry>> const& entries()
 		    const noexcept = 0;
 	};
+	ref<report_files> report_files_create(
+	    std::vector<std::unique_ptr<report_entry>>&&);
 
-	struct reported_file_object : object {
-		obj_type type() const noexcept override { return obj_reported_file; };
-		bool is_reported_file() const noexcept final { return true; }
-		virtual v1::coverage_stats stats() const noexcept = 0;
-	};
-
-	struct line_coverage_object : object {
+	struct line_coverage : object {
 		obj_type type() const noexcept override { return obj_line_coverage; };
 		bool is_line_coverage() const noexcept final { return true; }
-		virtual std::vector<v1::coverage> const& coverage() const noexcept = 0;
+		virtual std::vector<io::v1::coverage> const& coverage()
+		    const noexcept = 0;
 	};
-	ref<line_coverage_object> line_coverage_create(std::vector<v1::coverage>&&);
+	ref<line_coverage> line_coverage_create(std::vector<io::v1::coverage>&&);
 }  // namespace cov

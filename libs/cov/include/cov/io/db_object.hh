@@ -3,9 +3,9 @@
 
 #pragma once
 #include <concepts>
+#include <cov/io/types.hh>
 #include <cov/object.hh>
 #include <cov/streams.hh>
-#include <cov/types.hh>
 #include <memory>
 #include <unordered_map>
 
