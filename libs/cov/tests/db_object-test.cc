@@ -112,11 +112,12 @@ namespace cov::testing {
 		io::db_object dbo{};
 
 		auto handler = std::make_unique<mock_handler>();
-		EXPECT_CALL(*handler, load("dcba"_tag, v1::VERSION, _, _));
-		dbo.add_handler("dcba"_tag, std::move(handler));
+		EXPECT_CALL(*handler, load("abcd"_tag, io::v1::VERSION, _, _));
+		dbo.add_handler("abcd"_tag, std::move(handler));
 
 		std::error_code ec{};
 		auto const result = dbo.load(stream, ec);
+		dbo.remove_handler("abcd"_tag);
 		ASSERT_FALSE(result);
 		ASSERT_FALSE(ec) << "   Error: " << ec.message() << " ("
 		                 << ec.category().name() << ')';
@@ -127,7 +128,7 @@ namespace cov::testing {
 		io::bytes_read_stream stream{git::bytes{s.data(), s.size()}};
 
 		io::db_object dbo{};
-		dbo.add_handler("dcba"_tag, {});
+		dbo.add_handler("abcd"_tag, {});
 
 		std::error_code ec{};
 		auto const result = dbo.load(stream, ec);
@@ -145,10 +146,10 @@ namespace cov::testing {
 		auto raw = obj.get();
 
 		auto handler = std::make_unique<mock_handler>();
-		EXPECT_CALL(*handler, load("dcba"_tag, v1::VERSION, _, _))
+		EXPECT_CALL(*handler, load("abcd"_tag, io::v1::VERSION, _, _))
 		    .WillRepeatedly(Return(ByMove(std::move(obj))));
 
-		dbo.add_handler("dcba"_tag, std::move(handler));
+		dbo.add_handler("abcd"_tag, std::move(handler));
 
 		std::error_code ec{};
 		auto const result = dbo.load(stream, ec);
@@ -160,7 +161,7 @@ namespace cov::testing {
 	}
 
 	TEST(dbo, pass_created_object_OBJECT) {
-		static constexpr auto s = "sxts\x00\x00\x01\x00"sv;
+		static constexpr auto s = "stxs\x00\x00\x01\x00"sv;
 		io::bytes_read_stream stream{git::bytes{s.data(), s.size()}};
 
 		io::db_object dbo{};
@@ -169,10 +170,10 @@ namespace cov::testing {
 		auto raw = obj.get();
 
 		auto handler = std::make_unique<mock_handler>();
-		EXPECT_CALL(*handler, load("stxs"_tag, v1::VERSION, _, _))
+		EXPECT_CALL(*handler, load("stxs"_tag, io::v1::VERSION, _, _))
 		    .WillRepeatedly(Return(ByMove(std::move(obj))));
 
-		dbo.add_handler(OBJECT::HILITES, std::move(handler));
+		dbo.add_handler(io::OBJECT::HILITES, std::move(handler));
 
 		std::error_code ec{};
 		auto const result = dbo.load(stream, ec);

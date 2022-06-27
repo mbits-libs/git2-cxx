@@ -7,7 +7,7 @@
 #include <cov/object.hh>
 
 namespace cov::io::handlers {
-	struct line_coverage : db_handler_for<cov::line_coverage> {
+	struct report_files : db_handler_for<cov::report_files> {
 		ref<counted> load(uint32_t magic,
 		                  uint32_t version,
 		                  read_stream& in,

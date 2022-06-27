@@ -3,8 +3,8 @@
 
 #include <cov/init.hh>
 #include <cov/io/file.hh>
+#include <cov/io/types.hh>
 #include <cov/object.hh>
-#include <cov/types.hh>
 #include <fstream>
 #include <git2/config.hh>
 #include <git2/error.hh>

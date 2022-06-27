@@ -8,7 +8,9 @@ set(SOURCES
 	src/io/file.cc
 	src/io/line_coverage.cc
 	src/io/read_stream.cc
+	src/io/report_files.cc
 	src/io/safe_stream.cc
+	src/io/strings.cc
 	src/counted.cc
 	src/discover.cc
 	src/init.cc
@@ -22,12 +24,14 @@ set(SOURCES
 	include/cov/io/file.hh
 	include/cov/io/line_coverage.hh
 	include/cov/io/read_stream.hh
+	include/cov/io/report_files.hh
 	include/cov/io/safe_stream.hh
+	include/cov/io/strings.hh
+	include/cov/io/types.hh
 	include/cov/counted.hh
 	include/cov/discover.hh
 	include/cov/init.hh
 	include/cov/object.hh
-	include/cov/types.hh
 	include/cov/streams.hh
 	include/cov/zstream.hh
 )
