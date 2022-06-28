@@ -135,7 +135,7 @@ namespace cov::io {
 		        file_header:
 		            0:1: "rprt" (tag)
 		            1:1: 1.0 (version)
-		        report_header:
+		        report:
 		            2:5: parent report (oid)
 		            7:5: file list (oid)
 		            12:2: added (timestamp)
@@ -172,7 +172,7 @@ namespace cov::io {
 		static_assert(sizeof(report_commit) == sizeof(uint32_t[13]),
 		              "git_oid and/or header email does not pack well here");
 
-		struct report_header {
+		struct report {
 			git_oid parent_report;
 			git_oid file_list;
 			timestamp added;
@@ -182,7 +182,7 @@ namespace cov::io {
 			uint32_t strings_size;
 		};
 
-		static_assert(sizeof(report_header) == sizeof(uint32_t[30]),
+		static_assert(sizeof(report) == sizeof(uint32_t[30]),
 		              "report_header does not pack well here");
 
 		/*

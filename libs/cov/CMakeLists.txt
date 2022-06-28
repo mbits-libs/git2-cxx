@@ -9,6 +9,7 @@ set(SOURCES
 	src/io/line_coverage.cc
 	src/io/read_stream.cc
 	src/io/report_files.cc
+	src/io/report.cc
 	src/io/safe_stream.cc
 	src/io/strings.cc
 	src/counted.cc
@@ -25,6 +26,7 @@ set(SOURCES
 	include/cov/io/line_coverage.hh
 	include/cov/io/read_stream.hh
 	include/cov/io/report_files.hh
+	include/cov/io/report.hh
 	include/cov/io/safe_stream.hh
 	include/cov/io/strings.hh
 	include/cov/io/types.hh

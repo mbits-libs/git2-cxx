@@ -90,6 +90,7 @@ namespace cov {
 		obj_type type() const noexcept override { return obj_report; };
 		bool is_report() const noexcept final { return true; }
 		virtual git_oid const* parent_report() const noexcept = 0;
+		virtual git_oid const* file_list() const noexcept = 0;
 		virtual git_oid const* commit() const noexcept = 0;
 		virtual std::string_view branch() const noexcept = 0;
 		virtual std::string_view author_name() const noexcept = 0;
@@ -99,7 +100,21 @@ namespace cov {
 		virtual std::string_view message() const noexcept = 0;
 		virtual git_time_t commit_time_utc() const noexcept = 0;
 		virtual git_time_t add_time_utc() const noexcept = 0;
+		virtual io::v1::coverage_stats const& stats() const noexcept = 0;
 	};
+
+	ref<report> report_create(git_oid const& parent_report,
+	                          git_oid const& file_list,
+	                          git_oid const& commit,
+	                          std::string const& branch,
+	                          std::string const& author_name,
+	                          std::string const& author_email,
+	                          std::string const& committer_name,
+	                          std::string const& committer_email,
+	                          std::string const& message,
+	                          git_time_t commit_time_utc,
+	                          git_time_t add_time_utc,
+	                          io::v1::coverage_stats const& stats);
 
 	struct report_entry {
 		virtual ~report_entry();
