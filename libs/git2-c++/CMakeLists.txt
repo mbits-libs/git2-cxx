@@ -23,6 +23,7 @@ set(SOURCES
   include/git2/submodule.hh
   include/git2/tree.hh
 )
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})
 
 add_library(git2-c++ STATIC ${SOURCES})
 target_compile_options(git2-c++ PRIVATE ${ADDITIONAL_WALL_FLAGS})
@@ -40,6 +41,7 @@ if (COV_TESTING)
 	file(GLOB TEST_SRCS_CC tests/*.cc)
 	file(GLOB TEST_SRCS_CPP tests/*.cpp)
 	file(GLOB TEST_SRCS_CXX tests/*.cxx)
+	source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/tests FILES ${TEST_SRCS_CC} ${TEST_SRCS_CPP} ${TEST_SRCS_CXX})
 	add_executable(git2-test ${TEST_SRCS_CC} ${TEST_SRCS_CPP} ${TEST_SRCS_CXX})
 	set_target_properties(git2-test PROPERTIES FOLDER tests)
 	target_link_libraries(git2-test git2-c++ GTest::gtest_main)

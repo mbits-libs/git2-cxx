@@ -37,6 +37,7 @@ set(SOURCES
 	include/cov/streams.hh
 	include/cov/zstream.hh
 )
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})
 
 add_library(libcov STATIC ${SOURCES})
 target_compile_options(libcov PRIVATE ${ADDITIONAL_WALL_FLAGS})
@@ -56,6 +57,7 @@ if (COV_TESTING)
 	file(GLOB TEST_SRCS_CC tests/*.cc)
 	file(GLOB TEST_SRCS_CPP tests/*.cpp)
 	file(GLOB TEST_SRCS_CXX tests/*.cxx)
+	source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/tests FILES ${TEST_SRCS_CC} ${TEST_SRCS_CPP} ${TEST_SRCS_CXX})
 	add_executable(cov-test ${TEST_SRCS_CC} ${TEST_SRCS_CPP} ${TEST_SRCS_CXX})
 	set_target_properties(cov-test PROPERTIES FOLDER tests)
 	target_compile_options(cov-test PRIVATE ${ADDITIONAL_WALL_FLAGS})
