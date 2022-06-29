@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <git2/oid.h>
 #include <filesystem>
 
 namespace cov::testing::setup {
@@ -18,6 +19,7 @@ namespace cov::testing::setup {
 	std::filesystem::path test_dir();
 	std::string get_path(path const& p);
 	path make_path(std::string_view utf8);
+	std::string get_oid(git_oid const& id);
 }  // namespace cov::testing::setup
 
 void PrintTo(std::filesystem::path const& path, ::std::ostream* os);

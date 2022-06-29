@@ -78,6 +78,11 @@ namespace cov::io {
 		return ec;
 	}
 
+	void safe_stream::rollback() {
+		out_.close();
+		std::filesystem::remove(tmp_filename_);
+	}
+
 	safe_z_stream::~safe_z_stream() {
 		std::error_code ignore{};
 		remove(tmp_filename_, ignore);
@@ -110,5 +115,10 @@ namespace cov::io {
 		create_directories(filename.parent_path());
 		rename(tmp_filename_, filename);
 		return out;
+	}
+
+	void safe_z_stream::rollback() {
+		out_.close();
+		std::filesystem::remove(tmp_filename_);
 	}
 }  // namespace cov::io

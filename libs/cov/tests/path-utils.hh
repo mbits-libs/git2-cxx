@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <cov/init.hh>
+#include <cov/io/file.hh>
 #include "setup.hh"
 
 namespace cov::testing {

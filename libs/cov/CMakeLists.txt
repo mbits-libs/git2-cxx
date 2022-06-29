@@ -13,6 +13,7 @@ set(SOURCES
 	src/io/safe_stream.cc
 	src/io/strings.cc
 	src/counted.cc
+	src/db.cc
 	src/discover.cc
 	src/init.cc
 	src/path-utils.hh
@@ -31,6 +32,7 @@ set(SOURCES
 	include/cov/io/strings.hh
 	include/cov/io/types.hh
 	include/cov/counted.hh
+	include/cov/db.hh
 	include/cov/discover.hh
 	include/cov/init.hh
 	include/cov/object.hh

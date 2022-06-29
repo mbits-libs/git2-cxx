@@ -6,7 +6,7 @@
   - [x] `report`
   - [x] `report_file`
   - [x] `line_coverage`
-- [ ] Wrap I/O in Z streams
+- [x] Wrap I/O in Z streams
 - [ ] Report format for `list`
 - [ ] Add diff to `git2-c++` with file movement
 - [ ] Add highlighting API

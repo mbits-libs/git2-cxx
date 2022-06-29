@@ -112,6 +112,13 @@ namespace cov {
 		pointer ptr_{};
 	};
 
+	template <Counted derived, Counted base>
+	inline ref<derived> as_a(ref<base> const& var) {
+		auto ptr = as_a<derived>(var.get());
+		if (ptr) ptr->acquire();
+		return ref{ptr};
+	}
+
 	template <Counted Object, typename... Args>
 	inline ref<Object> make_ref(Args&&... args) {
 		return ref<Object>{new Object(std::forward<Args>(args)...)};

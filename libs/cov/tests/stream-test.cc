@@ -70,6 +70,21 @@ namespace cov::testing {
 		ASSERT_EQ("first line\nsecond line\nthird line\n"sv, data);
 	}
 
+	TEST(stream, safe_rollback) {
+		auto const outname = prep_file("secured.txt"sv);
+		ASSERT_FALSE(outname.empty());
+		{
+			io::safe_stream out{outname};
+			ASSERT_TRUE(out.opened());
+			out.write(git::bytes{"first line\n"sv});
+			out.write(git::bytes{"second line\n"sv});
+			out.write(git::bytes{"third line\n"sv});
+			out.rollback();
+		}
+		auto const data = load_file(outname);
+		ASSERT_EQ("first line\nsecond line\n"sv, data);
+	}
+
 	TEST(stream, unsecured) {
 		auto const outname = prep_file("unsecured.txt"sv);
 		ASSERT_FALSE(outname.empty());
@@ -95,6 +110,7 @@ namespace cov::testing {
 			auto out = io::safe_z_stream{setup::test_dir(), "binary"sv};
 			ASSERT_TRUE(out.opened());
 			out.write(bytes.subview(0, bytes.size() / 2));
+			out.rollback();
 		}
 
 		ASSERT_FALSE(std::filesystem::exists(setup::test_dir() /

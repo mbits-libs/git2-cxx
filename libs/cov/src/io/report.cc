@@ -82,12 +82,6 @@ namespace cov::io::handlers {
 			git_time_t add_time_utc_;
 			io::v1::coverage_stats stats_;
 		};
-
-		constexpr uint32_t uint_30(size_t value) {
-			return static_cast<uint32_t>(value & ((1u << 30) - 1u));
-		}
-		static_assert(uint_30(std::numeric_limits<size_t>::max()) ==
-		              0x3FFF'FFFF);
 	}  // namespace
 
 	ref<counted> report::load(uint32_t,
@@ -139,10 +133,6 @@ namespace cov::io::handlers {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wnull-dereference"
 #endif
-	constexpr uint32_t uint_30(size_t value) {
-		return static_cast<uint32_t>(value & ((1u << 30) - 1u));
-	}
-
 	bool report::store(ref<counted> const& value, write_stream& out) const {
 		auto const obj =
 		    as_a<cov::report>(static_cast<object const*>(value.get()));

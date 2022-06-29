@@ -29,6 +29,7 @@ namespace cov::io {
 		size_t write(git::bytes data) override;
 		bool opened() const noexcept override;
 		std::error_code commit() override;
+		void rollback() override;
 
 	private:
 		io::file out_{io::fopen(tmp_filename_, "wb")};
@@ -43,6 +44,7 @@ namespace cov::io {
 		size_t write(git::bytes data) override;
 		bool opened() const noexcept override;
 		git_oid finish() override;
+		void rollback() override;
 
 	private:
 		hash::sha1 id_{};

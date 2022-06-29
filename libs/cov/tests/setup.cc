@@ -78,6 +78,12 @@ namespace cov::testing::setup {
 	}
 #endif
 
+	std::string get_oid(git_oid const& id) {
+		char buffer[42] = "";
+		git_oid_fmt(buffer, &id);
+		return buffer;
+	}
+
 	namespace {
 		namespace file {
 			static constexpr auto safe = "first line\nsecond line\n"sv;

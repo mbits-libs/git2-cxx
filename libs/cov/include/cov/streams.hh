@@ -45,10 +45,12 @@ namespace cov {
 	};
 
 	struct z_write_stream : write_stream {
+		virtual void rollback() = 0;
 		virtual git_oid finish() = 0;
 	};
 
 	struct tmp_write_stream : write_stream {
+		virtual void rollback() = 0;
 		[[nodiscard]] virtual std::error_code commit() = 0;
 	};
 
