@@ -1,0 +1,37 @@
+# Roadmap
+
+- [x] RAII-based API for `libgit2`
+- [x] Directory initialization/discovery
+- [x] Add file serdes
+  - [x] `report`
+  - [x] `report_file`
+  - [x] `line_coverage`
+- [ ] Wrap I/O in Z streams
+- [ ] Report format for `list`
+- [ ] Add diff to `git2-c++` with file movement
+- [ ] Add highlighting API
+  - [ ] Add hilite for C++
+  - [ ] Add hilite for Python _(nice to have)_
+  - [ ] Add hilite for TypeScript _(nice to have)_
+- [ ] Add commands
+  - [ ] lngs baseline
+  - [ ] `cov` and `libexec/cov`
+  - [ ] `cov init`
+  - [ ] `cov config`
+  - [ ] `cov add`
+    - [ ] coveralls
+    - [ ] cobertura
+  - [ ] `cov add --amend`
+  - [ ] `cov tag`
+  - [ ] `cov remove`
+  - [ ] `cov list`
+  - [ ] `cov show`
+- [ ] `cov serve`
+  - [ ] Boost.Beast WS
+  - [ ] React frontend
+  - [ ] Project list
+  - [ ] Project view
+    - [ ] Coverage graph
+    - [ ] Latest report / report list
+  - [ ] Report / component / directory view
+  - [ ] File view
