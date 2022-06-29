@@ -16,6 +16,7 @@
 - [ ] Add commands
   - [ ] lngs baseline
   - [ ] `cov` and `libexec/cov`
+  - [ ] Support for `less`
   - [ ] `cov init`
   - [ ] `cov config`
   - [ ] `cov add`
@@ -26,6 +27,8 @@
   - [ ] `cov remove`
   - [ ] `cov list`
   - [ ] `cov show`
+    - [ ] Report / component / directory view
+    - [ ] File view
 - [ ] `cov serve`
   - [ ] Boost.Beast WS
   - [ ] React frontend
