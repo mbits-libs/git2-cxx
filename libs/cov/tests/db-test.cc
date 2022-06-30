@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 #include <cov/db.hh>
 #include <cov/io/types.hh>
-#include <cov/object.hh>
+#include <cov/report.hh>
 #include <filesystem>
 #include <map>
 #include "path-utils.hh"

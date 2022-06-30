@@ -4,7 +4,7 @@
 #pragma once
 
 #include <cov/io/db_object.hh>
-#include <cov/object.hh>
+#include <cov/report.hh>
 
 namespace cov::io::handlers {
 	struct report_files : db_handler_for<cov::report_files> {

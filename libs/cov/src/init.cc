@@ -5,7 +5,6 @@
 #include <cov/io/file.hh>
 #include <cov/io/types.hh>
 #include <cov/object.hh>
-#include <fstream>
 #include <git2/config.hh>
 #include <git2/error.hh>
 #include <git2/repository.hh>

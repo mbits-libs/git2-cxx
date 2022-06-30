@@ -2,7 +2,7 @@
 // This code is licensed under MIT license (see LICENSE for details)
 
 #include <cov/discover.hh>
-#include <fstream>
+#include <cov/io/file.hh>
 #include <git2/repository.hh>
 #include "path-utils.hh"
 
@@ -19,23 +19,11 @@ namespace cov {
 		std::optional<path> read_covlink(path const& basename) {
 			std::error_code ec{};
 			if (!is_regular_file(basename, ec) || ec) return std::nullopt;
-			std::ifstream in{basename};
-			std::string line{};
-			if (!std::getline(in, line)) return std::nullopt;
-			std::string_view view{line};
-			if (view.length() < names::covlink_prefix.length() ||
-			    view.substr(0, names::covlink_prefix.length()) !=
-			        names::covlink_prefix)
-				return std::nullopt;
-			view = view.substr(names::covlink_prefix.length());
-			auto const isspace = [](char c) {
-				return std::isspace(static_cast<unsigned char>(c));
-			};
-			while (!view.empty() && isspace(view.front()))
-				view = view.substr(1);
-			while (!view.empty() && isspace(view.back()))
-				view = view.substr(0, view.length() - 1);
-			return weakly_canonical(basename.parent_path() / make_path(view));
+			auto in = io::fopen(basename);
+			auto line = in.read_line();
+			auto view = prefixed(names::covlink_prefix, line);
+			if (!view) return std::nullopt;
+			return weakly_canonical(basename.parent_path() / make_path(*view));
 		}
 
 		auto device_id(path const& name) {

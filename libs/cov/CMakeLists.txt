@@ -12,6 +12,10 @@ set(SOURCES
 	src/io/report.cc
 	src/io/safe_stream.cc
 	src/io/strings.cc
+	src/ref/internal.hh
+	src/ref/reference_list.cc
+	src/ref/reference.cc
+	src/ref/references.cc
 	src/counted.cc
 	src/db.cc
 	src/discover.cc
@@ -36,6 +40,8 @@ set(SOURCES
 	include/cov/discover.hh
 	include/cov/init.hh
 	include/cov/object.hh
+	include/cov/reference.hh
+	include/cov/report.hh
 	include/cov/streams.hh
 	include/cov/zstream.hh
 )

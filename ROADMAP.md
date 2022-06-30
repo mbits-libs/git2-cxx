@@ -7,13 +7,20 @@
   - [x] `report_file`
   - [x] `line_coverage`
 - [x] Wrap I/O in Z streams _(M⬆️P)_
-- [ ] Idea of references, tags and "branches" _(M⬆️P)_
+- [x] Idea of references, tags and "branches" _(M⬆️P)_
 - [ ] Report format for `list` _(M⬆️P)_
 - [ ] Add diff to `git2-c++` with file movement _(M⬆️P)_
 - [ ] Add highlighting API
   - [ ] Add hilite for C++ _(M⬆️P)_
   - [ ] Add hilite for Python _(nice to have, M⬆️P)_
   - [ ] Add hilite for TypeScript _(nice to have, M⬆️P)_
+- [ ] Repository _(M⬆️P)_
+  - config,
+  - reports,
+  - references,
+  - formatting,
+  - highlighting,
+  - diffing
 - [ ] Add commands _(drop alpha)_
   - [ ] lngs baseline
   - [ ] `cov` and `libexec/cov` _(M⬆️P)_
@@ -23,7 +30,7 @@
     - [ ] coveralls _(separate M⬆️P)_
     - [ ] cobertura _(separate M⬆️P)_
   - [ ] `cov add --amend`
-  - [ ] `cov tag`
+  - [ ] `cov tag` / `branch` / `checkout` _(only one M⬆️P)_
   - [ ] `cov remove`
   - [ ] `cov list`
   - [ ] `cov show` _(only one M⬆️P)_

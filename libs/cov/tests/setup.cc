@@ -2,9 +2,9 @@
 // This code is licensed under MIT license (see LICENSE for details)
 
 #include "setup.hh"
+#include <cov/io/file.hh>
 #include <cstdio>
 #include <filesystem>
-#include <fstream>
 #include <git2/global.hh>
 
 namespace cov::testing::setup {
@@ -137,18 +137,16 @@ namespace cov::testing::setup {
 		for (auto const [filename, contents] : setup::text) {
 			auto const p = test_dir() / make_path(filename);
 			create_directories(p.parent_path(), ignore);
-			std::ofstream out{p, std::ios::binary};
-			out.write(contents.data(),
-			          static_cast<std::streamsize>(contents.size()));
+			auto out = io::fopen(p, "wb");
+			out.store(contents.data(), contents.size());
 		}
 
 #if 0
 		for (auto const nfo : setup::binary) {
 			auto const p = test_dir() / make_path(nfo.path);
 			create_directories(p.parent_path(), ignore);
-			std::ofstream out{p, std::ios::binary};
-			out.write(reinterpret_cast<char const*>(nfo.content.data()),
-			          nfo.content.size());
+			auto out = io::fopen(p, "wb");
+			out.store(contents.data(), contents.size());
 		}
 #endif
 	}

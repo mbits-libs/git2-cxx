@@ -37,7 +37,8 @@ namespace cov::io {
 			reset(fopen(fname, mode));
 		}
 
-		std::vector<std::byte> read() const noexcept;
+		std::vector<std::byte> read() const;
+		std::string read_line() const;
 		size_t load(void* buffer, size_t length) const noexcept;
 		size_t store(void const* buffer, size_t length) const noexcept;
 		bool skip(size_t length) const noexcept;
