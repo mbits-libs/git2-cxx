@@ -6,35 +6,37 @@
   - [x] `report`
   - [x] `report_file`
   - [x] `line_coverage`
-- [x] Wrap I/O in Z streams
-- [ ] Report format for `list`
-- [ ] Add diff to `git2-c++` with file movement
+- [x] Wrap I/O in Z streams _(M⬆️P)_
+- [ ] Idea of references, tags and "branches" _(M⬆️P)_
+- [ ] Report format for `list` _(M⬆️P)_
+- [ ] Add diff to `git2-c++` with file movement _(M⬆️P)_
 - [ ] Add highlighting API
-  - [ ] Add hilite for C++
-  - [ ] Add hilite for Python _(nice to have)_
-  - [ ] Add hilite for TypeScript _(nice to have)_
-- [ ] Add commands
+  - [ ] Add hilite for C++ _(M⬆️P)_
+  - [ ] Add hilite for Python _(nice to have, M⬆️P)_
+  - [ ] Add hilite for TypeScript _(nice to have, M⬆️P)_
+- [ ] Add commands _(drop alpha)_
   - [ ] lngs baseline
-  - [ ] `cov` and `libexec/cov`
-  - [ ] Support for `less`
-  - [ ] `cov init`
+  - [ ] `cov` and `libexec/cov` _(M⬆️P)_
+  - [ ] `cov init` _(each is a M⬆️P)_
   - [ ] `cov config`
   - [ ] `cov add`
-    - [ ] coveralls
-    - [ ] cobertura
+    - [ ] coveralls _(separate M⬆️P)_
+    - [ ] cobertura _(separate M⬆️P)_
   - [ ] `cov add --amend`
   - [ ] `cov tag`
   - [ ] `cov remove`
   - [ ] `cov list`
-  - [ ] `cov show`
+  - [ ] `cov show` _(only one M⬆️P)_
     - [ ] Report / component / directory view
     - [ ] File view
+  - [ ] Support for `less` _(optional, M⬆️P)_
+  - _(⬆️FP)_
 - [ ] `cov serve`
   - [ ] Boost.Beast WS
   - [ ] React frontend
-  - [ ] Project list
-  - [ ] Project view
+  - [ ] Project list _(M⬆️P)_
+  - [ ] Project view _(M⬆️P)_
     - [ ] Coverage graph
     - [ ] Latest report / report list
   - [ ] Report / component / directory view
-  - [ ] File view
+  - [ ] File view _(M⬆️P)_
