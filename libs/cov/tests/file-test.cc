@@ -100,4 +100,94 @@ namespace cov::testing {
 			    (std::basic_string_view{buffer.data(), read}));
 		}
 	}
+
+	TEST(file, lines) {
+		static constexpr std::string_view input[] = {
+		    "first line"sv,  "second line"sv, "third line"sv,
+		    "fourth line"sv, "last line"sv,
+		};
+
+		// write
+		{
+			auto newline = '\n';
+			auto out = io::fopen(setup::test_dir() / "lines"sv, "wb");
+			ASSERT_TRUE(out);
+			bool first = true;
+			for (auto const line : input) {
+				if (first)
+					first = false;
+				else
+					out.store(&newline, 1);
+				out.store(line.data(), line.size());
+			}
+		}
+
+		// read
+		std::vector<std::string> actual{};
+		std::vector<std::string> expected{std::begin(input), std::end(input)};
+
+		actual.reserve(std::size(input));
+		auto in = io::fopen(setup::test_dir() / "lines"sv, "rb");
+		ASSERT_TRUE(in);
+		while (!in.feof())
+			actual.push_back(in.read_line());
+
+		ASSERT_EQ(expected, actual);
+	}
+
+	TEST(file, long_lines) {
+		static constexpr std::string_view input[] = {
+		    "first line"sv,
+		    "second line"sv,
+		    "012345678901234567890123456789012345678901234567890123456789"
+		    "012345678901234567890123456789012345678901234567890123456789"
+		    "012345678901234567890123456789012345678901234567890123456789"
+		    "012345678901234567890123456789012345678901234567890123456789"
+		    "012345678901234567890123456789012345678901234567890123456789"
+		    "012345678901234567890123456789012345678901234567890123456789"
+		    "012345678901234567890123456789012345678901234567890123456789"
+		    "012345678901234567890123456789012345678901234567890123456789"
+		    "012345678901234567890123456789012345678901234567890123456789"
+		    "012345678901234567890123456789012345678901234567890123456789"
+		    "012345678901234567890123456789012345678901234567890123456789"
+		    "012345678901234567890123456789012345678901234567890123456789"
+		    "012345678901234567890123456789012345678901234567890123456789"
+		    "012345678901234567890123456789012345678901234567890123456789"
+		    "012345678901234567890123456789012345678901234567890123456789"
+		    "012345678901234567890123456789012345678901234567890123456789"
+		    "012345678901234567890123456789012345678901234567890123456789"
+		    "012345678901234567890123456789012345678901234567890123456789"
+		    "012345678901234567890123456789012345678901234567890123456789"
+		    "012345678901234567890123456789012345678901234567890123456789"sv,
+		    "fourth line"sv,
+		    "last line"sv,
+		};
+
+		// write
+		{
+			auto newline = '\n';
+			auto out = io::fopen(setup::test_dir() / "lines"sv, "wb");
+			ASSERT_TRUE(out);
+			bool first = true;
+			for (auto const line : input) {
+				if (first)
+					first = false;
+				else
+					out.store(&newline, 1);
+				out.store(line.data(), line.size());
+			}
+		}
+
+		// read
+		std::vector<std::string> actual{};
+		std::vector<std::string> expected{std::begin(input), std::end(input)};
+
+		actual.reserve(std::size(input));
+		auto in = io::fopen(setup::test_dir() / "lines"sv, "rb");
+		ASSERT_TRUE(in);
+		while (!in.feof())
+			actual.push_back(in.read_line());
+
+		ASSERT_EQ(expected, actual);
+	}
 }  // namespace cov::testing

@@ -42,7 +42,7 @@ namespace cov::io {
 #endif
 	}
 
-	std::vector<std::byte> file::read() const noexcept {
+	std::vector<std::byte> file::read() const {
 		std::vector<std::byte> out;
 		if (!*this) return out;
 		std::byte buffer[1024];
@@ -54,6 +54,36 @@ namespace cov::io {
 				break;
 			}
 			out.insert(end(out), buffer, buffer + ret);
+		}
+
+		return out;
+	}
+
+	std::string file::read_line() const {
+		std::string out;
+		if (!*this) return out;
+
+		char buffer[1024];
+
+		while (true) {
+			auto ret = std::fread(buffer, 1, sizeof(buffer), get());
+			if (!ret) {
+				if (!std::feof(get())) out.clear();
+				break;
+			}
+			auto it = std::find(buffer, buffer + ret, '\n');
+			if (it == std::end(buffer)) {
+				out.insert(end(out), buffer, buffer + ret);
+				continue;
+			}
+
+			auto new_length = static_cast<size_t>(it - buffer);
+			out.insert(end(out), buffer, buffer + new_length);
+			auto rewind =
+			    static_cast<std::make_signed_t<size_t>>(ret - new_length) - 1;
+			if (rewind > 0)
+				std::fseek(get(), static_cast<long>(-rewind), SEEK_CUR);
+			break;
 		}
 
 		return out;

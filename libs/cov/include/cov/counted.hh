@@ -34,7 +34,7 @@ namespace cov {
 		ref.release();
 	};
 
-	template <Counted Object>
+	template <typename Object>
 	class ref {
 	public:
 		using pointer = Object*;
@@ -122,5 +122,14 @@ namespace cov {
 	template <Counted Object, typename... Args>
 	inline ref<Object> make_ref(Args&&... args) {
 		return ref<Object>{new Object(std::forward<Args>(args)...)};
+	};
+
+	template <class Counted, class Intermediate>
+	struct enable_ref_from_this {
+		ref<Counted> ref_from_this() {
+			auto self = static_cast<Counted*>(static_cast<Intermediate*>(this));
+			self->acquire();
+			return ref{self};
+		}
 	};
 }  // namespace cov

@@ -4,10 +4,10 @@
 #pragma once
 
 #include <cov/init.hh>
-#include <fstream>
 #include <git2/config.hh>
 #include <git2/error.hh>
 #include <git2/repository.hh>
+#include <optional>
 
 #ifdef WIN32
 #include <Windows.h>
@@ -25,11 +25,16 @@ namespace cov {
 		namespace names {
 			constexpr auto covdata_dir = ".covdata"sv;
 			constexpr auto covlink_prefix = "covdata: "sv;
+			constexpr auto ref_prefix = "ref: "sv;
 			constexpr auto objects_dir = "objects"sv;
 			constexpr auto objects_pack_dir = "objects/pack"sv;
 			constexpr auto coverage_dir = "objects/coverage"sv;
+			constexpr auto refs_dir = "refs"sv;
 			constexpr auto heads_dir = "refs/heads"sv;
 			constexpr auto tags_dir = "refs/tags"sv;
+			constexpr auto refs_dir_prefix = "refs/"sv;
+			constexpr auto heads_dir_prefix = "refs/heads/"sv;
+			constexpr auto tags_dir_prefix = "refs/tags/"sv;
 			constexpr auto config = "config"sv;
 			constexpr auto dotconfig = ".covconfig"sv;
 			constexpr auto HEAD = "HEAD"sv;
@@ -91,6 +96,24 @@ namespace cov {
 			}
 
 			return result;
+		}
+
+		inline std::string_view strip(std::string_view view) {
+			auto const isspace = [](char c) {
+				return std::isspace(static_cast<unsigned char>(c));
+			};
+			while (!view.empty() && isspace(view.front()))
+				view = view.substr(1);
+			while (!view.empty() && isspace(view.back()))
+				view = view.substr(0, view.length() - 1);
+
+			return view;
+		}
+
+		inline std::optional<std::string_view> prefixed(std::string_view prefix,
+		                                                std::string_view line) {
+			if (!line.starts_with(prefix)) return std::nullopt;
+			return strip(line.substr(prefix.length()));
 		}
 	}  // namespace
 };     // namespace cov
