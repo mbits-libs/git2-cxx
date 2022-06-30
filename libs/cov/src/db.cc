@@ -1,4 +1,4 @@
-// Copyright (c) 2022 midnightBITS
+// Copyright (c) 2022 Marcin Zdun
 // This code is licensed under MIT license (see LICENSE for details)
 
 #include <git2/oid.h>

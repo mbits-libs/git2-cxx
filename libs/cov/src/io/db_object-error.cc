@@ -1,4 +1,4 @@
-// Copyright (c) 2022 midnightBITS
+// Copyright (c) 2022 Marcin Zdun
 // This code is licensed under MIT license (see LICENSE for details)
 
 #include <cov/io/db_object.hh>
@@ -25,8 +25,7 @@ namespace cov::io {
 
 			bool equivalent(int err, const std::error_condition& cond)
 			    const noexcept override {
-				return cond ==
-				       make_error_condition(static_cast<errc>(err));
+				return cond == make_error_condition(static_cast<errc>(err));
 			}
 		};
 	}  // namespace
