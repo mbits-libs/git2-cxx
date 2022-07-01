@@ -84,10 +84,10 @@ namespace cov::io::handlers {
 		};
 	}  // namespace
 
-	ref<counted> report::load(uint32_t,
-	                          uint32_t,
-	                          read_stream& in,
-	                          std::error_code& ec) const {
+	ref_ptr<counted> report::load(uint32_t,
+	                              uint32_t,
+	                              read_stream& in,
+	                              std::error_code& ec) const {
 		ec = make_error_code(errc::bad_syntax);
 		v1::report header{};
 		if (!in.load(header)) return {};
@@ -133,7 +133,7 @@ namespace cov::io::handlers {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wnull-dereference"
 #endif
-	bool report::store(ref<counted> const& value, write_stream& out) const {
+	bool report::store(ref_ptr<counted> const& value, write_stream& out) const {
 		auto const obj =
 		    as_a<cov::report>(static_cast<object const*>(value.get()));
 		auto stg = [obj] {
@@ -192,18 +192,18 @@ namespace cov::io::handlers {
 }  // namespace cov::io::handlers
 
 namespace cov {
-	ref<report> report_create(git_oid const& parent_report,
-	                          git_oid const& file_list,
-	                          git_oid const& commit,
-	                          std::string const& branch,
-	                          std::string const& author_name,
-	                          std::string const& author_email,
-	                          std::string const& committer_name,
-	                          std::string const& committer_email,
-	                          std::string const& message,
-	                          git_time_t commit_time_utc,
-	                          git_time_t add_time_utc,
-	                          io::v1::coverage_stats const& stats) {
+	ref_ptr<report> report_create(git_oid const& parent_report,
+	                              git_oid const& file_list,
+	                              git_oid const& commit,
+	                              std::string const& branch,
+	                              std::string const& author_name,
+	                              std::string const& author_email,
+	                              std::string const& committer_name,
+	                              std::string const& committer_email,
+	                              std::string const& message,
+	                              git_time_t commit_time_utc,
+	                              git_time_t add_time_utc,
+	                              io::v1::coverage_stats const& stats) {
 		return make_ref<io::handlers::impl>(
 		    parent_report, file_list, commit, branch, author_name, author_email,
 		    committer_name, committer_email, message, commit_time_utc,

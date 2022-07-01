@@ -93,7 +93,7 @@ namespace cov::testing {
 		auto result = std::visit(
 		    [refs, ref_name, &modified](auto const& tgt, auto const& match) {
 			    if constexpr (!std::is_same_v<decltype(tgt), decltype(match)>) {
-				    return ref<cov::reference>{};
+				    return ref_ptr<cov::reference>{};
 			    } else {
 				    return refs->create_matching(ref_name, tgt, match,
 				                                 modified);

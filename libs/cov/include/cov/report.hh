@@ -25,18 +25,18 @@ namespace cov {
 		virtual io::v1::coverage_stats const& stats() const noexcept = 0;
 	};
 
-	ref<report> report_create(git_oid const& parent_report,
-	                          git_oid const& file_list,
-	                          git_oid const& commit,
-	                          std::string const& branch,
-	                          std::string const& author_name,
-	                          std::string const& author_email,
-	                          std::string const& committer_name,
-	                          std::string const& committer_email,
-	                          std::string const& message,
-	                          git_time_t commit_time_utc,
-	                          git_time_t add_time_utc,
-	                          io::v1::coverage_stats const& stats);
+	ref_ptr<report> report_create(git_oid const& parent_report,
+	                              git_oid const& file_list,
+	                              git_oid const& commit,
+	                              std::string const& branch,
+	                              std::string const& author_name,
+	                              std::string const& author_email,
+	                              std::string const& committer_name,
+	                              std::string const& committer_email,
+	                              std::string const& message,
+	                              git_time_t commit_time_utc,
+	                              git_time_t add_time_utc,
+	                              io::v1::coverage_stats const& stats);
 
 	struct report_entry {
 		virtual ~report_entry();
@@ -103,7 +103,7 @@ namespace cov {
 		virtual std::vector<std::unique_ptr<report_entry>> const& entries()
 		    const noexcept = 0;
 	};
-	ref<report_files> report_files_create(
+	ref_ptr<report_files> report_files_create(
 	    std::vector<std::unique_ptr<report_entry>>&&);
 
 	struct line_coverage : object {
@@ -112,5 +112,6 @@ namespace cov {
 		virtual std::vector<io::v1::coverage> const& coverage()
 		    const noexcept = 0;
 	};
-	ref<line_coverage> line_coverage_create(std::vector<io::v1::coverage>&&);
+	ref_ptr<line_coverage> line_coverage_create(
+	    std::vector<io::v1::coverage>&&);
 }  // namespace cov

@@ -18,8 +18,9 @@ namespace cov::io {
 
 	void db_object::remove_handler(uint32_t magic) { handlers_.erase(magic); }
 
-	ref<counted> db_object::load(read_stream& in, std::error_code& ec) const {
-		auto const error = [&ec](errc code) -> ref<counted> {
+	ref_ptr<counted> db_object::load(read_stream& in,
+	                                 std::error_code& ec) const {
+		auto const error = [&ec](errc code) -> ref_ptr<counted> {
 			ec = make_error_code(code);
 			return {};
 		};
@@ -40,7 +41,8 @@ namespace cov::io {
 		return handler->load(hdr.magic, hdr.version, in, ec);
 	}
 
-	bool db_object::store(ref<counted> const& value, write_stream& out) const {
+	bool db_object::store(ref_ptr<counted> const& value,
+	                      write_stream& out) const {
 		if (!value) return false;
 
 		for (auto const& [magic, handler] : handlers_) {

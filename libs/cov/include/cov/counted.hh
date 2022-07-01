@@ -35,39 +35,42 @@ namespace cov {
 	};
 
 	template <typename Object>
-	class ref {
+	class ref_ptr {
 	public:
 		using pointer = Object*;
 		using element_type = Object;
 
-		constexpr ref() noexcept = default;
-		constexpr ref(std::nullptr_t) noexcept {}
-		explicit ref(pointer p) noexcept : ptr_{p} {}
+		constexpr ref_ptr() noexcept = default;
+		constexpr ref_ptr(std::nullptr_t) noexcept {}
+		explicit ref_ptr(pointer p) noexcept : ptr_{p} {}
 
-		ref(ref&& other) noexcept : ptr_{other.ptr_} { other.ptr_ = nullptr; }
-		ref(ref const& other) noexcept : ref{other.duplicate()} {}
+		ref_ptr(ref_ptr&& other) noexcept : ptr_{other.ptr_} {
+			other.ptr_ = nullptr;
+		}
+		ref_ptr(ref_ptr const& other) noexcept : ref_ptr{other.duplicate()} {}
 
 		template <std::derived_from<Object> Other>
-		ref(ref<Other>&& other) noexcept : ptr_{other.unlink()} {}
+		ref_ptr(ref_ptr<Other>&& other) noexcept : ptr_{other.unlink()} {}
 		template <std::derived_from<Object> Other>
-		ref(ref<Other> const& other) noexcept : ref{other.duplicate()} {}
+		ref_ptr(ref_ptr<Other> const& other) noexcept
+		    : ref_ptr{other.duplicate()} {}
 
-		~ref() { release(); }
+		~ref_ptr() { release(); }
 
-		ref& operator=(ref&& other) noexcept {
+		ref_ptr& operator=(ref_ptr&& other) noexcept {
 			reset(other.unlink());
 			return *this;
 		}
 		template <std::derived_from<Object> Other>
-		ref& operator=(ref<Other>&& other) noexcept {
+		ref_ptr& operator=(ref_ptr<Other>&& other) noexcept {
 			reset(other.unlink());
 			return *this;
 		}
 		template <std::derived_from<Object> Other>
-		ref& operator=(ref<Other> const& other) noexcept {
+		ref_ptr& operator=(ref_ptr<Other> const& other) noexcept {
 			return *this = other.duplicate();
 		}
-		ref& operator=(std::nullptr_t) noexcept {
+		ref_ptr& operator=(std::nullptr_t) noexcept {
 			reset();
 			return *this;
 		}
@@ -76,9 +79,9 @@ namespace cov {
 		pointer get() const noexcept { return ptr_; }
 		element_type& operator*() const noexcept { return &ptr_; }
 		pointer operator->() const noexcept { return ptr_; }
-		ref<Object> duplicate() const noexcept {
+		ref_ptr<Object> duplicate() const noexcept {
 			acquire();
-			return ref{ptr_};
+			return ref_ptr{ptr_};
 		}
 		pointer unlink() noexcept {
 			auto tmp = ptr_;
@@ -86,11 +89,11 @@ namespace cov {
 			return tmp;
 		}
 		template <std::derived_from<Object> Other>
-		bool operator==(ref<Other> const& other) const noexcept {
+		bool operator==(ref_ptr<Other> const& other) const noexcept {
 			return get() == other.get();
 		}
 		template <std::derived_from<Object> Other>
-		auto operator<=>(ref<Other> const& other) const noexcept {
+		auto operator<=>(ref_ptr<Other> const& other) const noexcept {
 			return get() <=> other.get();
 		}
 
@@ -113,23 +116,23 @@ namespace cov {
 	};
 
 	template <Counted derived, Counted base>
-	inline ref<derived> as_a(ref<base> const& var) {
+	inline ref_ptr<derived> as_a(ref_ptr<base> const& var) {
 		auto ptr = as_a<derived>(var.get());
 		if (ptr) ptr->acquire();
-		return ref{ptr};
+		return ref_ptr{ptr};
 	}
 
 	template <Counted Object, typename... Args>
-	inline ref<Object> make_ref(Args&&... args) {
-		return ref<Object>{new Object(std::forward<Args>(args)...)};
+	inline ref_ptr<Object> make_ref(Args&&... args) {
+		return ref_ptr<Object>{new Object(std::forward<Args>(args)...)};
 	};
 
 	template <class Counted, class Intermediate>
 	struct enable_ref_from_this {
-		ref<Counted> ref_from_this() {
+		ref_ptr<Counted> ref_from_this() {
 			auto self = static_cast<Counted*>(static_cast<Intermediate*>(this));
 			self->acquire();
-			return ref{self};
+			return ref_ptr{self};
 		}
 	};
 }  // namespace cov

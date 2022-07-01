@@ -116,7 +116,7 @@ namespace cov {
 		git_oid const* direct_target() const noexcept override {
 			return &target_;
 		}
-		ref<reference> peel_target() noexcept override {
+		ref_ptr<reference> peel_target() noexcept override {
 			return ref_from_this();
 		}
 
@@ -124,10 +124,10 @@ namespace cov {
 		git_oid target_;
 	};
 
-	ref<reference> direct_reference_create(ref_tgt tgt_kind,
-	                                       std::string const& name,
-	                                       size_t shorthand_prefix,
-	                                       git_oid const& target) {
+	ref_ptr<reference> direct_reference_create(ref_tgt tgt_kind,
+	                                           std::string const& name,
+	                                           size_t shorthand_prefix,
+	                                           git_oid const& target) {
 		return make_ref<direct_reference>(tgt_kind, name, shorthand_prefix,
 		                                  target);
 	}
@@ -140,7 +140,7 @@ namespace cov {
 		                   std::string const& name,
 		                   size_t shorthand_prefix,
 		                   std::string const& target,
-		                   ref<references> const& peel_source)
+		                   ref_ptr<references> const& peel_source)
 		    : reference_base{tgt_kind, name, shorthand_prefix}
 		    , target_{target}
 		    , peel_source_{peel_source} {}
@@ -150,7 +150,7 @@ namespace cov {
 		std::string_view symbolic_target() const noexcept override {
 			return target_;
 		}
-		ref<reference> peel_target() noexcept override {
+		ref_ptr<reference> peel_target() noexcept override {
 			auto bead = ref_from_this();
 			while (bead &&
 			       bead->reference_type() != cov::reference_type::direct) {
@@ -161,15 +161,15 @@ namespace cov {
 
 	private:
 		std::string target_;
-		ref<references> peel_source_;
+		ref_ptr<references> peel_source_;
 	};
 
-	ref<reference> symbolic_reference_create(
+	ref_ptr<reference> symbolic_reference_create(
 	    ref_tgt tgt_kind,
 	    std::string const& name,
 	    size_t shorthand_prefix,
 	    std::string const& target,
-	    ref<references> const& peel_source) {
+	    ref_ptr<references> const& peel_source) {
 		return make_ref<symbolic_reference>(tgt_kind, name, shorthand_prefix,
 		                                    target, peel_source);
 	}

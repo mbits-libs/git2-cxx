@@ -13,8 +13,8 @@ namespace cov {
 	public:
 		references_impl(std::filesystem::path const& root) : root_{root} {}
 
-		ref<reference> create(std::string_view name,
-		                      git_oid const& target) override {
+		ref_ptr<reference> create(std::string_view name,
+		                          git_oid const& target) override {
 			if (!reference::is_valid_name(name)) return {};
 
 			char buffer[GIT_OID_HEXSZ];
@@ -26,8 +26,8 @@ namespace cov {
 			                               prefix_length, target);
 		}
 
-		ref<reference> create(std::string_view name,
-		                      std::string_view target) override {
+		ref_ptr<reference> create(std::string_view name,
+		                          std::string_view target) override {
 			if (!reference::is_valid_name(name)) return {};
 
 			static constexpr auto REF = "ref: "sv;
@@ -45,10 +45,10 @@ namespace cov {
 			    {target.data(), target.size()}, self);
 		}
 
-		ref<reference> create_matching(std::string_view name,
-		                               git_oid const& target,
-		                               git_oid const& expected,
-		                               bool& modified) override {
+		ref_ptr<reference> create_matching(std::string_view name,
+		                                   git_oid const& target,
+		                                   git_oid const& expected,
+		                                   bool& modified) override {
 			modified = false;
 			auto prev = lookup(name);
 			if (prev) {
@@ -61,10 +61,10 @@ namespace cov {
 			return create(name, target);
 		}
 
-		ref<reference> create_matching(std::string_view name,
-		                               std::string_view target,
-		                               std::string_view expected,
-		                               bool& modified) override {
+		ref_ptr<reference> create_matching(std::string_view name,
+		                                   std::string_view target,
+		                                   std::string_view expected,
+		                                   bool& modified) override {
 			modified = false;
 			auto prev = lookup(name);
 			if (prev) {
@@ -77,7 +77,7 @@ namespace cov {
 			return create(name, target);
 		}
 
-		ref<reference> dwim(std::string_view shorthand) override {
+		ref_ptr<reference> dwim(std::string_view shorthand) override {
 			static constexpr std::string_view prefixes[] = {
 			    ""sv,
 			    names::refs_dir_prefix,
@@ -98,7 +98,7 @@ namespace cov {
 			return {};
 		}
 
-		ref<reference> lookup(std::string_view name) override {
+		ref_ptr<reference> lookup(std::string_view name) override {
 			if (!reference::is_valid_name(name)) return {};
 
 			auto in = io::fopen(root_ / make_path(name));
@@ -139,11 +139,11 @@ namespace cov {
 			return {};
 		}
 
-		ref<reference_list> iterator() override {
+		ref_ptr<reference_list> iterator() override {
 			return iterator(names::refs_dir);
 		}
 
-		ref<reference_list> iterator(std::string_view prefix) override {
+		ref_ptr<reference_list> iterator(std::string_view prefix) override {
 			return reference_list_create(root_, {prefix.data(), prefix.size()},
 			                             ref_from_this());
 		}
@@ -179,7 +179,8 @@ namespace cov {
 		std::filesystem::path root_;
 	};
 
-	ref<references> references::make_refs(std::filesystem::path const& root) {
+	ref_ptr<references> references::make_refs(
+	    std::filesystem::path const& root) {
 		return make_ref<references_impl>(root);
 	}
 }  // namespace cov

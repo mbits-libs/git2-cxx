@@ -20,10 +20,10 @@ namespace cov::io::handlers {
 		};
 	}  // namespace
 
-	ref<counted> line_coverage::load(uint32_t,
-	                                 uint32_t,
-	                                 read_stream& in,
-	                                 std::error_code& ec) const {
+	ref_ptr<counted> line_coverage::load(uint32_t,
+	                                     uint32_t,
+	                                     read_stream& in,
+	                                     std::error_code& ec) const {
 		ec = make_error_code(errc::bad_syntax);
 		uint32_t count{0};
 		if (!in.load(count)) return {};
@@ -40,7 +40,7 @@ namespace cov::io::handlers {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wnull-dereference"
 #endif
-	bool line_coverage::store(ref<counted> const& value,
+	bool line_coverage::store(ref_ptr<counted> const& value,
 	                          write_stream& out) const {
 		auto const obj =
 		    as_a<cov::line_coverage>(static_cast<object const*>(value.get()));
@@ -57,7 +57,7 @@ namespace cov::io::handlers {
 }  // namespace cov::io::handlers
 
 namespace cov {
-	ref<line_coverage> line_coverage_create(
+	ref_ptr<line_coverage> line_coverage_create(
 	    std::vector<io::v1::coverage>&& lines) {
 		return make_ref<io::handlers::impl>(std::move(lines));
 	}
