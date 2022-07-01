@@ -77,7 +77,7 @@ namespace cov {
 
 		explicit operator bool() const noexcept { return !!ptr_; }
 		pointer get() const noexcept { return ptr_; }
-		element_type& operator*() const noexcept { return &ptr_; }
+		element_type& operator*() const noexcept { return *ptr_; }
 		pointer operator->() const noexcept { return ptr_; }
 		ref_ptr<Object> duplicate() const noexcept {
 			acquire();

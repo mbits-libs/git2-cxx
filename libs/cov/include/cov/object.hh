@@ -12,7 +12,11 @@ namespace cov {
 	X(blob)              \
 	X(reference)         \
 	X(reference_list)    \
-	X(references)
+	X(references)        \
+	X(tag)               \
+	X(tag_list)          \
+	X(branch)            \
+	X(branch_list)
 
 	enum obj_type {
 		obj_unknown,
