@@ -16,12 +16,15 @@ set(SOURCES
 	src/ref/reference_list.cc
 	src/ref/reference.cc
 	src/ref/references.cc
+	src/branch-tag.hh
+	src/branch.cc
 	src/counted.cc
 	src/db.cc
 	src/discover.cc
 	src/init.cc
 	src/path-utils.hh
 	src/streams.cc
+	src/tag.cc
 	src/zstream.cc
 	include/cov/hash/hash.hh
 	include/cov/hash/md5.hh
@@ -35,6 +38,7 @@ set(SOURCES
 	include/cov/io/safe_stream.hh
 	include/cov/io/strings.hh
 	include/cov/io/types.hh
+	include/cov/branch.hh
 	include/cov/counted.hh
 	include/cov/db.hh
 	include/cov/discover.hh
@@ -43,6 +47,7 @@ set(SOURCES
 	include/cov/reference.hh
 	include/cov/report.hh
 	include/cov/streams.hh
+	include/cov/tag.hh
 	include/cov/zstream.hh
 )
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})

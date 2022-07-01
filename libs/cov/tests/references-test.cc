@@ -65,8 +65,9 @@ namespace cov::testing {
 		ASSERT_FALSE(
 		    is_a<cov::references>(static_cast<object*>(primary.get())));
 
-		ASSERT_EQ(expected.primary_type == REF::branch, primary->is_branch());
-		ASSERT_EQ(expected.primary_type == REF::tag, primary->is_tag());
+		ASSERT_EQ(expected.primary_type == REF::branch,
+		          primary->references_branch());
+		ASSERT_EQ(expected.primary_type == REF::tag, primary->references_tag());
 
 		if (primary->reference_type() == reference_type::direct) {
 			auto const id = primary->direct_target();
@@ -91,8 +92,9 @@ namespace cov::testing {
 		ASSERT_TRUE(secondary);
 
 		ASSERT_EQ(expected.secondary_type == REF::branch,
-		          secondary->is_branch());
-		ASSERT_EQ(expected.secondary_type == REF::tag, secondary->is_tag());
+		          secondary->references_branch());
+		ASSERT_EQ(expected.secondary_type == REF::tag,
+		          secondary->references_tag());
 
 		if (secondary->reference_type() == reference_type::direct) {
 			auto const id = secondary->direct_target();

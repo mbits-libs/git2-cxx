@@ -77,10 +77,10 @@ namespace cov {
 		    : tgt_kind_{tgt_kind}
 		    , name_{name}
 		    , shorthand_prefix_{shorthand_prefix} {}
-		bool is_branch() const noexcept override {
+		bool references_branch() const noexcept override {
 			return tgt_kind_ == ref_tgt::branch;
 		}
-		bool is_tag() const noexcept override {
+		bool references_tag() const noexcept override {
 			return tgt_kind_ == ref_tgt::tag;
 		}
 		std::string_view name() const noexcept override { return name_; };

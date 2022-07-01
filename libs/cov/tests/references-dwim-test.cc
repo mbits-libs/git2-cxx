@@ -52,8 +52,8 @@ namespace cov::testing {
 
 		ASSERT_TRUE(ref);
 
-		ASSERT_EQ(type == REF::branch, ref->is_branch());
-		ASSERT_EQ(type == REF::tag, ref->is_tag());
+		ASSERT_EQ(type == REF::branch, ref->references_branch());
+		ASSERT_EQ(type == REF::tag, ref->references_tag());
 		ASSERT_EQ(expected, ref->name());
 	}
 

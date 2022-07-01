@@ -14,8 +14,8 @@ namespace cov {
 		obj_type type() const noexcept override { return obj_reference; };
 		bool is_reference() const noexcept final { return true; }
 		virtual cov::reference_type reference_type() const noexcept = 0;
-		virtual bool is_branch() const noexcept = 0;
-		virtual bool is_tag() const noexcept = 0;
+		virtual bool references_branch() const noexcept = 0;
+		virtual bool references_tag() const noexcept = 0;
 		static bool is_valid_name(std::string_view);
 		virtual std::string_view name() const noexcept = 0;
 		virtual std::string_view shorthand() const noexcept = 0;
@@ -24,43 +24,45 @@ namespace cov {
 		virtual ref_ptr<reference> peel_target() noexcept = 0;
 	};
 
+	template <typename ListType, typename ItemType>
+	class iterator_t {
+	public:
+		using difference_type = void;
+		using value_type = void;
+		using pointer = void;
+		using reference = void;
+		using iterator_category = std::input_iterator_tag;
+
+		iterator_t(ListType* parent = nullptr) : parent_{parent} {
+			if (parent) parent->acquire();
+			next();
+		}
+
+		bool operator==(iterator_t const&) const = default;
+		iterator_t& operator++() {
+			next();
+			return *this;
+		}
+
+		ref_ptr<ItemType> operator*() noexcept { return current_; }
+
+	private:
+		void next() {
+			if (!parent_) return;
+			current_ = parent_->next();
+			if (!current_) parent_.reset();
+		}
+
+		ref_ptr<ListType> parent_;
+		ref_ptr<ItemType> current_;
+	};
+
 	struct reference_list : object {
 		obj_type type() const noexcept override { return obj_reference_list; };
 		bool is_reference_list() const noexcept final { return true; }
-		virtual ref_ptr<reference> next() noexcept = 0;
+		virtual ref_ptr<reference> next() = 0;
 
-		class iter_t {
-		public:
-			using difference_type = void;
-			using value_type = void;
-			using pointer = void;
-			using reference = void;
-			using iterator_category = std::input_iterator_tag;
-
-			iter_t(reference_list* parent = nullptr) : parent_{parent} {
-				if (parent) parent->acquire();
-				next();
-			}
-
-			bool operator==(iter_t const&) const = default;
-			iter_t& operator++() {
-				next();
-				return *this;
-			}
-
-			ref_ptr<cov::reference> operator*() noexcept { return current_; }
-
-		private:
-			void next() {
-				if (!parent_) return;
-				current_ = parent_->next();
-				if (!current_) parent_.reset();
-			}
-
-			ref_ptr<cov::reference_list> parent_;
-			ref_ptr<cov::reference> current_;
-		};
-
+		using iter_t = iterator_t<reference_list, reference>;
 		iter_t begin() { return {this}; }
 		iter_t end() { return {}; }
 	};
