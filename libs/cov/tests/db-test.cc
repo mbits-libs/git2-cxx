@@ -50,7 +50,8 @@ namespace cov::testing {
 		std::vector<file> files{};
 	};
 
-	ref<line_coverage> from_lines(line_cvg const& lines, unsigned finish = 0) {
+	ref_ptr<line_coverage> from_lines(line_cvg const& lines,
+	                                  unsigned finish = 0) {
 		size_t need = finish ? 1 : 0 + lines.size();
 		unsigned prev_line = 0;
 		for (auto&& [line, count] : lines) {

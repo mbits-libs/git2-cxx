@@ -51,10 +51,10 @@ namespace cov::io::handlers {
 		              0x3FFF'FFFF);
 	}  // namespace
 
-	ref<counted> report_files::load(uint32_t,
-	                                uint32_t,
-	                                read_stream& in,
-	                                std::error_code& ec) const {
+	ref_ptr<counted> report_files::load(uint32_t,
+	                                    uint32_t,
+	                                    read_stream& in,
+	                                    std::error_code& ec) const {
 		ec = make_error_code(errc::bad_syntax);
 		v1::report_files header{};
 		if (!in.load(header)) return {};
@@ -109,7 +109,7 @@ namespace cov::io::handlers {
 #pragma GCC diagnostic ignored "-Wnull-dereference"
 #pragma GCC diagnostic ignored "-Wconversion"
 #endif
-	bool report_files::store(ref<counted> const& value,
+	bool report_files::store(ref_ptr<counted> const& value,
 	                         write_stream& out) const {
 		auto const obj =
 		    as_a<cov::report_files>(static_cast<object const*>(value.get()));
@@ -174,7 +174,7 @@ namespace cov {
 		    std::move(*this));
 	}
 
-	ref<report_files> report_files_create(
+	ref_ptr<report_files> report_files_create(
 	    std::vector<std::unique_ptr<report_entry>>&& entries) {
 		return make_ref<io::handlers::impl>(std::move(entries));
 	}

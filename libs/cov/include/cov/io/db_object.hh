@@ -30,17 +30,18 @@ namespace cov::io {
 	struct db_handler {
 		virtual ~db_handler();
 
-		virtual ref<counted> load(uint32_t magic,
-		                          uint32_t version,
-		                          read_stream& in,
-		                          std::error_code& ec) const = 0;
-		virtual bool recognized(ref<counted> const& obj) const = 0;
-		virtual bool store(ref<counted> const& obj, write_stream& in) const = 0;
+		virtual ref_ptr<counted> load(uint32_t magic,
+		                              uint32_t version,
+		                              read_stream& in,
+		                              std::error_code& ec) const = 0;
+		virtual bool recognized(ref_ptr<counted> const& obj) const = 0;
+		virtual bool store(ref_ptr<counted> const& obj,
+		                   write_stream& in) const = 0;
 	};
 
 	template <typename Handled>
 	struct db_handler_for : db_handler {
-		bool recognized(ref<counted> const& obj) const override {
+		bool recognized(ref_ptr<counted> const& obj) const override {
 			if (!obj || !obj->is_object()) return false;
 			return is_a<Handled>(static_cast<object const*>(obj.get()));
 		}
@@ -68,8 +69,8 @@ namespace cov::io {
 			return remove_handler(static_cast<uint32_t>(magic));
 		}
 
-		ref<counted> load(read_stream& in, std::error_code& ec) const;
-		bool store(ref<counted> const& value, write_stream& in) const;
+		ref_ptr<counted> load(read_stream& in, std::error_code& ec) const;
+		bool store(ref_ptr<counted> const& value, write_stream& in) const;
 
 	private:
 		std::unordered_map<uint32_t, std::unique_ptr<db_handler>> handlers_{};

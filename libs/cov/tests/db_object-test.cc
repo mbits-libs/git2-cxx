@@ -45,17 +45,17 @@ namespace cov::testing {
 
 	class mock_handler : public io::db_handler {
 	public:
-		MOCK_METHOD(ref<counted>,
+		MOCK_METHOD(ref_ptr<counted>,
 		            load,
 		            (uint32_t magic,
 		             uint32_t version,
 		             read_stream& in,
 		             std::error_code& ec),
 		            (const, override));
-		MOCK_METHOD(bool, recognized, (ref<counted> const& obj), (const));
+		MOCK_METHOD(bool, recognized, (ref_ptr<counted> const& obj), (const));
 		MOCK_METHOD(bool,
 		            store,
-		            (ref<counted> const& obj, write_stream& in),
+		            (ref_ptr<counted> const& obj, write_stream& in),
 		            (const, override));
 	};
 

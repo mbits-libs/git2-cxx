@@ -21,13 +21,13 @@ namespace cov {
 		virtual std::string_view shorthand() const noexcept = 0;
 		virtual std::string_view symbolic_target() const noexcept = 0;
 		virtual git_oid const* direct_target() const noexcept = 0;
-		virtual ref<reference> peel_target() noexcept = 0;
+		virtual ref_ptr<reference> peel_target() noexcept = 0;
 	};
 
 	struct reference_list : object {
 		obj_type type() const noexcept override { return obj_reference_list; };
 		bool is_reference_list() const noexcept final { return true; }
-		virtual ref<reference> next() noexcept = 0;
+		virtual ref_ptr<reference> next() noexcept = 0;
 
 		class iter_t {
 		public:
@@ -48,7 +48,7 @@ namespace cov {
 				return *this;
 			}
 
-			ref<cov::reference> operator*() noexcept { return current_; }
+			ref_ptr<cov::reference> operator*() noexcept { return current_; }
 
 		private:
 			void next() {
@@ -57,8 +57,8 @@ namespace cov {
 				if (!current_) parent_.reset();
 			}
 
-			ref<cov::reference_list> parent_;
-			ref<cov::reference> current_;
+			ref_ptr<cov::reference_list> parent_;
+			ref_ptr<cov::reference> current_;
 		};
 
 		iter_t begin() { return {this}; }
@@ -66,24 +66,24 @@ namespace cov {
 	};
 
 	struct references : object {
-		static ref<references> make_refs(std::filesystem::path const& root);
+		static ref_ptr<references> make_refs(std::filesystem::path const& root);
 		obj_type type() const noexcept override { return obj_references; };
 		bool is_references() const noexcept final { return true; }
-		virtual ref<reference> create(std::string_view name,
-		                              git_oid const& target) = 0;
-		virtual ref<reference> create(std::string_view name,
-		                              std::string_view target) = 0;
-		virtual ref<reference> create_matching(std::string_view name,
-		                                       git_oid const& target,
-		                                       git_oid const& expected,
-		                                       bool& modified) = 0;
-		virtual ref<reference> create_matching(std::string_view name,
-		                                       std::string_view target,
-		                                       std::string_view expected,
-		                                       bool& modified) = 0;
-		virtual ref<reference> dwim(std::string_view) = 0;
-		virtual ref<reference> lookup(std::string_view) = 0;
-		virtual ref<reference_list> iterator() = 0;
-		virtual ref<reference_list> iterator(std::string_view prefix) = 0;
+		virtual ref_ptr<reference> create(std::string_view name,
+		                                  git_oid const& target) = 0;
+		virtual ref_ptr<reference> create(std::string_view name,
+		                                  std::string_view target) = 0;
+		virtual ref_ptr<reference> create_matching(std::string_view name,
+		                                           git_oid const& target,
+		                                           git_oid const& expected,
+		                                           bool& modified) = 0;
+		virtual ref_ptr<reference> create_matching(std::string_view name,
+		                                           std::string_view target,
+		                                           std::string_view expected,
+		                                           bool& modified) = 0;
+		virtual ref_ptr<reference> dwim(std::string_view) = 0;
+		virtual ref_ptr<reference> lookup(std::string_view) = 0;
+		virtual ref_ptr<reference_list> iterator() = 0;
+		virtual ref_ptr<reference_list> iterator(std::string_view prefix) = 0;
 	};
 }  // namespace cov

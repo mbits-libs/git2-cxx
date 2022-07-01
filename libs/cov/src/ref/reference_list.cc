@@ -11,10 +11,10 @@ namespace cov {
 	public:
 		reference_list_impl(std::filesystem::path const& path,
 		                    std::string const& prefix,
-		                    ref<references> const& source)
+		                    ref_ptr<references> const& source)
 		    : root_{path}, prefix_{prefix}, source_{source} {}
 
-		ref<reference> next() noexcept override {
+		ref_ptr<reference> next() noexcept override {
 			while (iter_ != dir_iter{}) {
 				auto const entry = *iter_;
 				++iter_;
@@ -37,12 +37,13 @@ namespace cov {
 		std::filesystem::path root_;
 		std::string prefix_;
 		dir_iter iter_{prepare(root_ / make_path(prefix_))};
-		ref<references> source_;
+		ref_ptr<references> source_;
 	};
 
-	ref<reference_list> reference_list_create(std::filesystem::path const& path,
-	                                          std::string const& prefix,
-	                                          ref<references> const& source) {
+	ref_ptr<reference_list> reference_list_create(
+	    std::filesystem::path const& path,
+	    std::string const& prefix,
+	    ref_ptr<references> const& source) {
 		return make_ref<reference_list_impl>(path, prefix, source);
 	}
 }  // namespace cov

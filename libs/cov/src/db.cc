@@ -32,8 +32,8 @@ namespace cov {
 	class loose_backend : public counted_impl<backend> {
 	public:
 		loose_backend(std::filesystem::path const&);
-		ref<object> lookup_object(git_oid const& id) override;
-		bool write(git_oid& id, ref<object> const& obj) override;
+		ref_ptr<object> lookup_object(git_oid const& id) override;
+		bool write(git_oid& id, ref_ptr<object> const& obj) override;
 
 	private:
 		std::filesystem::path root_{};
@@ -47,7 +47,7 @@ namespace cov {
 		io_.add_handler<io::OBJECT::COVERAGE, io::handlers::line_coverage>();
 	}
 
-	ref<object> loose_backend::lookup_object(git_oid const& id) {
+	ref_ptr<object> loose_backend::lookup_object(git_oid const& id) {
 		char buffer[GIT_OID_HEXSZ + 1];
 		if (git_oid_pathfmt(buffer, &id)) return {};
 		std::vector<std::byte> bytes;
@@ -60,10 +60,10 @@ namespace cov {
 		auto result = io_.load(stream, ec);
 		if (!result || ec || !result->is_object()) return {};
 
-		return ref{static_cast<cov::object*>(result.unlink())};
+		return ref_ptr{static_cast<cov::object*>(result.unlink())};
 	}
 
-	bool loose_backend::write(git_oid& id, ref<object> const& obj) {
+	bool loose_backend::write(git_oid& id, ref_ptr<object> const& obj) {
 		io::safe_z_stream output{root_, "object"sv};
 		if (!output.opened()) return false;
 
@@ -76,7 +76,7 @@ namespace cov {
 		return true;
 	}
 
-	ref<backend> loose_backend_create(std::filesystem::path const& root) {
+	ref_ptr<backend> loose_backend_create(std::filesystem::path const& root) {
 		return make_ref<loose_backend>(root);
 	}
 }  // namespace cov

@@ -52,7 +52,7 @@ namespace cov::testing {
 		std::vector<std::string> actual{};
 		actual.reserve(expected.size());
 		std::transform(iter->begin(), iter->end(), std::back_inserter(actual),
-		               [](ref<cov::reference> const& item) -> std::string {
+		               [](ref_ptr<cov::reference> const& item) -> std::string {
 			               auto name = item->name();
 			               return {name.data(), name.size()};
 		               });
