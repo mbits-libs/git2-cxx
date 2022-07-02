@@ -21,6 +21,7 @@ set(SOURCES
 	src/counted.cc
 	src/db.cc
 	src/discover.cc
+	src/format.cc
 	src/init.cc
 	src/path-utils.hh
 	src/streams.cc
@@ -42,6 +43,7 @@ set(SOURCES
 	include/cov/counted.hh
 	include/cov/db.hh
 	include/cov/discover.hh
+	include/cov/format.hh
 	include/cov/init.hh
 	include/cov/object.hh
 	include/cov/reference.hh
@@ -58,7 +60,7 @@ target_link_options(libcov PRIVATE ${ADDITIONAL_LINK_FLAGS})
 target_include_directories(libcov PUBLIC
 	${CMAKE_CURRENT_SOURCE_DIR}/include
 	${CMAKE_CURRENT_BINARY_DIR}/include)
-target_link_libraries(libcov PUBLIC git2-c++ OpenSSL::OpenSSL)
+target_link_libraries(libcov PUBLIC git2-c++ OpenSSL::OpenSSL fmt::fmt)
 
 set_target_properties(libcov PROPERTIES FOLDER libs OUTPUT_NAME cov)
 
@@ -67,7 +69,7 @@ if (COV_TESTING)
 
 	find_package(GTest REQUIRED CONFIG HINTS)
 
-	file(GLOB TEST_SRCS_CC tests/*.cc)
+	file(GLOB TEST_SRCS_CC tests/*.cc tests/format/*.cc)
 	file(GLOB TEST_SRCS_CPP tests/*.cpp)
 	file(GLOB TEST_SRCS_CXX tests/*.cxx)
 	source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/tests FILES ${TEST_SRCS_CC} ${TEST_SRCS_CPP} ${TEST_SRCS_CXX})

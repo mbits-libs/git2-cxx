@@ -1,0 +1,207 @@
+// Copyright (c) 2022 Marcin Zdun
+// This code is licensed under MIT license (see LICENSE for details)
+
+#include <gtest/gtest.h>
+#include <cov/format.hh>
+#include "../path-utils.hh"
+#include "../print-view.hh"
+
+namespace cov::testing {
+	using namespace ::std::literals;
+	using ::testing::TestWithParam;
+	using ::testing::ValuesIn;
+	namespace ph = placeholder;
+
+	static git_time_t now() {
+		using clock = std::chrono::system_clock;
+		static const git_time_t now_ = clock::to_time_t(clock::now());
+		return now_;
+	}
+
+	struct format_test {
+		std::string_view name;
+		std::string_view tmplt{};
+		std::string_view expected{};
+		struct {
+			std::string_view report{};
+			std::optional<io::v1::coverage_stats> stats{};
+			std::string head{"feat/task-1"s};
+			git_time_t commit{};
+			git_time_t add{};
+		} tweaks{};
+
+		friend std::ostream& operator<<(std::ostream& out,
+		                                format_test const& param) {
+			return print_view(out << param.name << ", ", param.tmplt);
+		}
+	};
+
+	class format : public TestWithParam<format_test> {};
+
+	TEST_P(format, print) {
+		auto const& [_, tmplt, expected, tweaks] = GetParam();
+		auto const& [report_id, stats, head, commit, add] = tweaks;
+		auto fmt = formatter::from(tmplt);
+
+		ph::context ctx = {
+		    .now = now(),
+		    .hash_length = 9,
+		    .names =
+		        {
+		            .HEAD = head,
+		            .tags = {{
+		                         "v1.0.0"s,
+		                         "221133445566778899aabbccddeeff0012345678"s,
+		                     },
+		                     {
+		                         "v1.0.1"s,
+		                         "112233445566778899aabbccddeeff0012345678"s,
+		                     }},
+		            .heads = {{
+		                          "main"s,
+		                          "221144335566778899aabbccddeeff0012345678"s,
+		                      },
+		                      {
+		                          "feat/task-1"s,
+		                          "112233445566778899aabbccddeeff0012345678"s,
+		                      }},
+		            .HEAD_ref = "112233445566778899aabbccddeeff0012345678"s,
+		        },
+		};
+
+		git_oid id{}, parent_id{}, commit_id{}, zero{};
+		git_oid_fromstr(&id, report_id.empty()
+		                         ? "112233445566778899aabbccddeeff0012345678"
+		                         : report_id.data());
+		git_oid_fromstr(&parent_id, "8765432100ffeeddccbbaa998877665544332211");
+		git_oid_fromstr(&commit_id, "36109a1c35e0d5cf3e5e68d896c8b1b4be565525");
+
+		io::v1::coverage_stats const default_stats{1250, 300, 299};
+		auto report =
+		    report_create(parent_id, zero, commit_id, "develop"s,
+		                  "Johnny Appleseed"s, "johnny@appleseed.com"s,
+		                  "Johnny Committer"s, "committer@appleseed.com"s,
+		                  "Subject, isn't it?\n\nBody para 1\n\nBody para 2\n"s,
+		                  commit, add, stats.value_or(default_stats));
+		ASSERT_TRUE(report);
+
+		auto view = ph::report_view::from(*report, &id);
+		auto actual = fmt.format(view, ctx);
+		ASSERT_EQ(expected, actual);
+	}  // namespace cov::testing
+
+	static format_test const tests[] = {
+	    {"empty"sv},
+	    {
+	        "HEAD"sv,
+	        "%hr%d %pC/%pR %pP (%pr) - from [%hc] %s <%an>"sv,
+	        "112233445 (HEAD -> feat/task-1, tag: v1.0.1, feat/task-1) 299/300 100% (pass) - from [36109a1c3] Subject, isn't it? <Johnny Appleseed>"sv,
+	        {.report = "112233445566778899aabbccddeeff0012345678"sv},
+	    },
+	    {
+	        "detached HEAD"sv,
+	        "%hr%d %pC/%pR %pP (%pr) - from [%hc] %s <%an>"sv,
+	        "112233445 (HEAD, tag: v1.0.1, feat/task-1) 299/300 100% (pass) - from [36109a1c3] Subject, isn't it? <Johnny Appleseed>"sv,
+	        {.report = "112233445566778899aabbccddeeff0012345678"sv,
+	         .head = ""s},
+	    },
+	    {
+	        "main"sv,
+	        "%hr%d %pC/%pR %pP (%pr) - from [%hc] %s <%an>"sv,
+	        "221144335 (main) 226/300 75% (incomplete) - from [36109a1c3] Subject, isn't it? <Johnny Appleseed>"sv,
+	        {.report = "221144335566778899aabbccddeeff0012345678"sv,
+	         .stats = io::v1::coverage_stats{1250, 300, 226}},
+	    },
+	    {
+	        "v1.0.0"sv,
+	        "%hr%d %pC/%pR %pP (%pr) - from [%hc] %s <%an>"sv,
+	        "221133445 (tag: v1.0.0) 270/300 90% (pass) - from [36109a1c3] Subject, isn't it? <Johnny Appleseed>"sv,
+	        {.report = "221133445566778899aabbccddeeff0012345678"sv,
+	         .stats = io::v1::coverage_stats{1250, 300, 270}},
+	    },
+	    {
+	        "no refs"sv,
+	        "%hr%d %pC/%pR %pP (%pr) - from [%hc] %s <%an>"sv,
+	        "442211335 100/300 33% (fail) - from [36109a1c3] Subject, isn't it? <Johnny Appleseed>"sv,
+	        {.report = "442211335566778899aabbccddeeff0012345678"sv,
+	         .stats = io::v1::coverage_stats{1250, 300, 100}},
+	    },
+	    {
+	        "HEAD (unwrapped)"sv,
+	        "%hr [%D] %pC/%pR %pP (%pr) - from [%hc] %s <%an>"sv,
+	        "112233445 [HEAD -> feat/task-1, tag: v1.0.1, feat/task-1] 299/300 100% (pass) - from [36109a1c3] Subject, isn't it? <Johnny Appleseed>"sv,
+	        {.report = "112233445566778899aabbccddeeff0012345678"sv},
+	    },
+	    {
+	        "detached HEAD (unwrapped)"sv,
+	        "%hr [%D] %pC/%pR %pP (%pr) - from [%hc] %s <%an>"sv,
+	        "112233445 [HEAD, tag: v1.0.1, feat/task-1] 299/300 100% (pass) - from [36109a1c3] Subject, isn't it? <Johnny Appleseed>"sv,
+	        {.report = "112233445566778899aabbccddeeff0012345678"sv,
+	         .head = ""s},
+	    },
+	    {
+	        "main (unwrapped)"sv,
+	        "%hr [%D] %pC/%pR %pP (%pr) - from [%hc] %s <%an>"sv,
+	        "221144335 [main] 226/300 75% (incomplete) - from [36109a1c3] Subject, isn't it? <Johnny Appleseed>"sv,
+	        {.report = "221144335566778899aabbccddeeff0012345678"sv,
+	         .stats = io::v1::coverage_stats{1250, 300, 226}},
+	    },
+	    {
+	        "no refs (unwrapped)"sv,
+	        "%hr [%D] %pC/%pR %pP (%pr) - from [%hc] %s <%an>"sv,
+	        "442211335 [] 100/300 33% (fail) - from [36109a1c3] Subject, isn't it? <Johnny Appleseed>"sv,
+	        {.report = "442211335566778899aabbccddeeff0012345678"sv,
+	         .stats = io::v1::coverage_stats{1250, 300, 100}},
+	    },
+	    {
+	        "export name"sv,
+	        "0001-%hr-%f.xml"sv,
+	        "0001-112233445-Subject-isn-t-it.xml"sv,
+	    },
+	    {
+	        "full body"sv,
+	        "%Hr%d %pC/%pR %pP (%pr) - from [%Hc] %s <%an %al %ae>%n%B"sv,
+	        "112233445566778899aabbccddeeff0012345678 (HEAD -> feat/task-1, "
+	        "tag: v1.0.1, feat/task-1) 299/300 100% (pass) - from "
+	        "[36109a1c35e0d5cf3e5e68d896c8b1b4be565525] Subject, isn't it? "
+	        "<Johnny Appleseed johnny johnny@appleseed.com>\n"
+	        "Subject, isn't it?\n"
+	        "\n"
+	        "Body para 1\n"
+	        "\n"
+	        "Body para 2\n"sv,
+	    },
+	    {
+	        "full printout"sv,
+	        "report %Hr%n"
+	        "parent: %rP [%rp]%n"
+	        "stats: %pC/%pR (%pT) %pP (%pr)%n"
+	        "commit: %hc%n"
+	        "  branch: %rD%n"
+	        "  author: %an <%ae> %at (%as)%n"
+	        "  committer: %cn <%ce> %ct (%cs)%n"
+	        "  subject: %s%n"
+	        "%n"
+	        "%n"
+	        "%b"sv,
+	        "report 112233445566778899aabbccddeeff0012345678\n"
+	        "parent: 8765432100ffeeddccbbaa998877665544332211 [876543210]\n"
+	        "stats: 299/300 (1250) 100% (pass)\n"
+	        "commit: 36109a1c3\n"
+	        "  branch: develop\n"
+	        "  author: Johnny Appleseed <johnny@appleseed.com> 951827696 "
+	        "(2000-02-29)\n"
+	        "  committer: Johnny Committer <committer@appleseed.com> "
+	        "951827696 (2000-02-29)\n"
+	        "  subject: Subject, isn't it?\n"
+	        "\n"
+	        "\n"
+	        "Body para 1\n"
+	        "\n"
+	        "Body para 2"sv,
+	        {.commit = 951827696},
+	    },
+	};
+
+	INSTANTIATE_TEST_SUITE_P(tests, format, ::testing::ValuesIn(tests));
+}  // namespace cov::testing
