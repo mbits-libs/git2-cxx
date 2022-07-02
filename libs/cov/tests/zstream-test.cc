@@ -5,46 +5,12 @@
 #include <cctype>
 #include <cov/hash/sha1.hh>
 #include <cov/zstream.hh>
+#include "print-view.hh"
 
 namespace cov::testing {
 	using namespace ::std::literals;
 	using ::testing::TestWithParam;
 	using ::testing::ValuesIn;
-
-	void print_view(std::ostream& out, std::string_view text) {
-		out << '"';
-		for (auto c : text) {
-			switch (c) {
-				case '"':
-					out << "\\\"";
-					break;
-				case '\n':
-					out << "\\n";
-					break;
-				case '\r':
-					out << "\\r";
-					break;
-				case '\t':
-					out << "\\t";
-					break;
-				case '\v':
-					out << "\\v";
-					break;
-				case '\a':
-					out << "\\a";
-					break;
-				default:
-					if (!std::isprint(static_cast<unsigned char>(c))) {
-						char buffer[10];
-						sprintf(buffer, "\\x%02x", c);
-						out << buffer;
-					} else
-						out << c;
-					break;
-			}
-		}
-		out << '"';
-	}
 
 	struct z_param {
 		std::string_view title{};
