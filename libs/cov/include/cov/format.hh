@@ -122,22 +122,25 @@ namespace cov::placeholder {
 	};
 
 	struct context {
-		git_time_t now;
+		sys_seconds now;
 		unsigned hash_length;
 		refs names;
 		rating marks{.incomplete{75, 100}, .passing{9, 10}};
+		std::string_view time_zone{};
+		std::string_view locale{};
 		void* app{};
 		std::string (*translate)(long long count,
 		                         translatable scale,
 		                         void* app) = {};
 	};
+	struct internal_context;
 
 	struct git_person {
 		std::string_view name;
 		std::string_view email;
-		git_time_t date;
+		sys_seconds date;
 
-		iterator format(iterator out, context& ctx, person fld) const;
+		iterator format(iterator out, internal_context& ctx, person fld) const;
 		static git_person from(cov::report const& report, who type) noexcept {
 			if (type == who::author) {
 				return {
@@ -161,9 +164,9 @@ namespace cov::placeholder {
 		std::string_view message{};
 		git_person author{}, committer{};
 
-		iterator format(iterator out, context& ctx, commit fld) const;
+		iterator format(iterator out, internal_context& ctx, commit fld) const;
 		iterator format(iterator out,
-		                context& ctx,
+		                internal_context& ctx,
 		                person_info const& pair) const {
 			if (std::get<0>(pair) == who::author)
 				return author.format(out, ctx, std::get<1>(pair));
@@ -183,16 +186,16 @@ namespace cov::placeholder {
 	struct report_view {
 		git_oid const* id{};
 		git_oid const* parent{};
-		git_time_t date{};
+		sys_seconds date{};
 		git_commit_view git{};
 		io::v1::coverage_stats const* stats{};
 
-		iterator format(iterator out, context& ctx, report fld) const;
-		iterator format(iterator out, context& ctx, commit fld) const {
+		iterator format(iterator out, internal_context& ctx, report fld) const;
+		iterator format(iterator out, internal_context& ctx, commit fld) const {
 			return git.format(out, ctx, fld);
 		}
 		iterator format(iterator out,
-		                context& ctx,
+		                internal_context& ctx,
 		                person_info const& pair) const {
 			if (std::get<0>(pair) == who::reporter)
 				return git_person{{}, {}, date}.format(out, ctx,
@@ -200,7 +203,7 @@ namespace cov::placeholder {
 			return git.format(out, ctx, pair);
 		}
 		iterator format_with(iterator out,
-		                     context& ctx,
+		                     internal_context& ctx,
 		                     placeholder::format const& fmt) const;
 		static report_view from(cov::report const& report,
 		                        git_oid const* id) noexcept {
@@ -224,7 +227,7 @@ namespace cov {
 		static formatter from(std::string_view input);
 
 		std::string format(placeholder::report_view const&,
-		                   placeholder::context&);
+		                   placeholder::context const&);
 
 		std::vector<placeholder::format> const& parsed() const noexcept {
 			return format_;

@@ -59,6 +59,11 @@ namespace cov::io {
 		return out;
 	}
 
+	constexpr long to_long(long value) noexcept { return value; }
+	constexpr long to_long(auto value) noexcept {
+		return static_cast<long>(value);
+	}
+
 	std::string file::read_line() const {
 		std::string out;
 		if (!*this) return out;
@@ -81,8 +86,7 @@ namespace cov::io {
 			out.insert(end(out), buffer, buffer + new_length);
 			auto rewind =
 			    static_cast<std::make_signed_t<size_t>>(ret - new_length) - 1;
-			if (rewind > 0)
-				std::fseek(get(), static_cast<long>(-rewind), SEEK_CUR);
+			if (rewind > 0) std::fseek(get(), to_long(-rewind), SEEK_CUR);
 			break;
 		}
 

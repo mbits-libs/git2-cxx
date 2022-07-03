@@ -1,12 +1,38 @@
 // Copyright (c) 2022 Marcin Zdun
 // This code is licensed under MIT license (see LICENSE for details)
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4189)
+#endif
 #include <fmt/format.h>
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+
+#include <date/tz.h>
+#include <fmt/chrono.h>
 #include <cov/format.hh>
 #include <ctime>
+#include <iostream>
 #include "path-utils.hh"
 
 namespace cov::placeholder {
+	struct internal_context {
+		context const* client;
+		void* app;
+		std::string (*tr)(long long count, translatable scale, void* app);
+		date::time_zone const* tz;
+
+		std::string translate(long long count, translatable scale) const {
+			return tr(count, scale, app);
+		}
+
+		std::string translate(translatable scale) const {
+			return tr(0, scale, app);
+		}
+	};
+
 	namespace {
 		struct leaky_iterator : iterator {
 			auto cont() { return container; }
@@ -64,39 +90,120 @@ namespace cov::placeholder {
 
 		iterator format_rating(iterator out,
 		                       io::v1::coverage_stats const& stats,
-		                       context const& ctx) {
+		                       internal_context const& ctx) {
 			auto mark = [&] {
-				if (!stats.relevant || !ctx.marks.incomplete.den ||
-				    !ctx.marks.passing.den)
+				if (!stats.relevant || !ctx.client->marks.incomplete.den ||
+				    !ctx.client->marks.passing.den)
 					return translatable::mark_failing;
 				auto const gcd_1 = std::gcd(stats.relevant, stats.covered);
 				auto const cov = stats.covered / gcd_1;
 				auto const rel = stats.relevant / gcd_1;
 
-				auto const incomplete = ctx.marks.incomplete.gcd();
+				auto const incomplete = ctx.client->marks.incomplete.gcd();
 				auto const lhs = cov * incomplete.den;
 				auto const rhs = incomplete.num * rel;
 				// if ((cov * incomplete.den) < (incomplete.num * rel))
 				if (lhs < rhs) return translatable::mark_failing;
 
-				auto const passing = ctx.marks.passing.gcd();
+				auto const passing = ctx.client->marks.passing.gcd();
 				if ((cov * passing.den) < (passing.num * rel))
 					return translatable::mark_incomplete;
 				return translatable::mark_passing;
 			}();
-			return format_str(out, ctx.translate(0, mark, ctx.app));
+			return format_str(out, ctx.translate(mark));
 		}
 
 		iterator format_num(iterator out, auto value) {
 			return fmt::format_to(out, "{}", value);
 		}
 
-		iterator format_date(iterator out, git_time_t date, char const* fmt) {
-			char str[200];
-			time_t in = date;
-			tm local = *std::localtime(&in);
-			auto const size = std::strftime(str, sizeof(str), fmt, &local);
-			return format_str(out, {str, size});
+		enum class Z { none, ISO, ISO_colon };
+
+		template <typename Storage, typename Ratio>
+		static int to_int(std::chrono::duration<Storage, Ratio> dur) {
+			return static_cast<int>(dur.count());
+		}
+
+		static int to_uint(auto dur) {
+			return static_cast<int>(static_cast<unsigned int>(dur));
+		}
+
+#ifdef __struct_tm_defined  // Linux?
+#define HAS_TM_GMTOFF
+#endif
+
+		static
+#ifdef HAS_TM_GMTOFF
+		    std::pair<tm, std::string>
+#else
+		    tm
+#endif
+		    sys_to_tm(sys_seconds date, ::date::time_zone const* tz) {
+			auto const local_seconds = tz->to_local(date);
+			auto const faux_sys = sys_seconds{local_seconds.time_since_epoch()};
+			auto const days = std::chrono::floor<date::days>(faux_sys);
+			auto const sys_date = date::year_month_day{days};
+			auto const weekday = date::year_month_weekday{days}.weekday();
+			auto const sys_hms = date::hh_mm_ss{faux_sys - days};
+
+			return {
+#ifdef HAS_TM_GMTOFF
+			    {
+#endif
+			        .tm_sec = to_int(sys_hms.seconds()),
+			        .tm_min = to_int(sys_hms.minutes()),
+			        .tm_hour = to_int(sys_hms.hours()),
+			        .tm_mday = to_uint(sys_date.day()),
+			        .tm_mon = to_uint(sys_date.month()) - 1,
+			        .tm_year = static_cast<int>(sys_date.year()) - 1900,
+			        .tm_wday = to_uint(weekday.c_encoding()),
+			        .tm_yday = -1,
+			        .tm_isdst = -1,
+#ifdef HAS_TM_GMTOFF
+			        .tm_gmtoff = tz->get_info(date).offset.count(),
+			        .tm_zone = nullptr,
+			    },
+			    tz->get_info(date).abbrev,
+#endif
+			};
+		}
+
+		iterator format_date(iterator out,
+		                     sys_seconds date,
+		                     ::date::time_zone const* tz,
+		                     std::string_view locale,
+		                     std::string_view fmt,
+		                     Z suffix = Z::none) {
+			auto loc =
+			    locale.empty()
+			        ? std::locale{""}
+			        : std::locale{std::string{locale.data(), locale.size()}};
+
+#ifdef HAS_TM_GMTOFF
+			auto [tm, abbrev] = sys_to_tm(date, tz);
+			tm.tm_zone = abbrev.c_str();
+#else
+			auto const tm = sys_to_tm(date, tz);
+#endif
+
+			out = fmt::format_to(out, loc, fmt::runtime(fmt), tm);
+
+			if (suffix != Z::none) {
+				auto const offset = tz->get_info(date).offset;
+				auto const hours =
+				    std::chrono::floor<std::chrono::hours>(offset);
+				auto const minutes =
+				    std::chrono::floor<std::chrono::minutes>(offset - hours);
+
+				if (suffix == Z::ISO)
+					out = fmt::format_to(out, "{:+03}{:02}"sv, hours.count(),
+					                     minutes.count());
+				else
+					out = fmt::format_to(out, "{:+03}:{:02}"sv, hours.count(),
+					                     minutes.count());
+			}
+
+			return out;
 		}
 
 		using days = std::chrono::duration<
@@ -107,38 +214,33 @@ namespace cov::placeholder {
 			return days{val};
 		}
 
-		std::string relative_date(std::chrono::seconds then,
-		                          context const& ctx) {
+		std::string relative_date(sys_seconds then,
+		                          internal_context const& ctx) {
 			using namespace std::chrono;
-			auto const now = seconds{ctx.now};
-			if (now < then)
-				return ctx.translate(0, translatable::in_the_future, ctx.app);
+			if (ctx.client->now < then)
+				return ctx.translate(translatable::in_the_future);
 
-			auto const secs = now - then;
+			auto const secs = ctx.client->now - then;
 			if (secs < 90s)
-				return ctx.translate(secs.count(), translatable::seconds_ago,
-				                     ctx.app);
+				return ctx.translate(secs.count(), translatable::seconds_ago);
 
 			auto const mins = duration_cast<minutes>(secs + 30s);
 			if (mins < 90min)
-				return ctx.translate(mins.count(), translatable::minutes_ago,
-				                     ctx.app);
+				return ctx.translate(mins.count(), translatable::minutes_ago);
 
 			auto const hrs = duration_cast<hours>(mins + 30min);
 			if (hrs < 36h)
-				return ctx.translate(hrs.count(), translatable::hours_ago,
-				                     ctx.app);
+				return ctx.translate(hrs.count(), translatable::hours_ago);
 
 			auto const days = duration_cast<cov::placeholder::days>(hrs + 12h);
 			if (days < 14_d)
-				return ctx.translate(days.count(), translatable::days_ago,
-				                     ctx.app);
+				return ctx.translate(days.count(), translatable::days_ago);
 			if (days < 70_d)
 				return ctx.translate((days + 3_d) / 7_d,
-				                     translatable::weeks_ago, ctx.app);
+				                     translatable::weeks_ago);
 			if (days < 365_d)
 				return ctx.translate((days + 15_d) / 30_d,
-				                     translatable::months_ago, ctx.app);
+				                     translatable::months_ago);
 
 			if (days < 1825_d) {
 				auto const totalmonths = (days * 12 * 2 + 365_d) / (365_d * 2);
@@ -146,23 +248,21 @@ namespace cov::placeholder {
 				auto const months = totalmonths % 12;
 				if (months) {
 					auto yrs =
-					    ctx.translate(years, translatable::years_months_ago,
-					                  ctx.app)
-					        .append(ctx.translate(
-					            months, translatable::months_ago, ctx.app));
+					    ctx.translate(years, translatable::years_months_ago)
+					        .append(ctx.translate(months,
+					                              translatable::months_ago));
 					return yrs;
 				} else
-					return ctx.translate(years, translatable::years_ago,
-					                     ctx.app);
+					return ctx.translate(years, translatable::years_ago);
 			}
 			return ctx.translate((days + 183_d) / 365_d,
-			                     translatable::years_ago, ctx.app);
+			                     translatable::years_ago);
 		}
 
 		struct visitor {
 			report_view const& view;
 			iterator& out;
-			context& ctx;
+			internal_context& ctx;
 
 			iterator operator()(char c) {
 				*out++ = c;
@@ -222,7 +322,8 @@ namespace cov::placeholder {
 				case translatable::mark_passing:
 					return "pass";
 			}
-			return std::to_string(count);
+			// all enums are handled above
+			return std::to_string(count);  // GCOV_EXCL_LINE
 		}
 	}  // namespace
 
@@ -272,7 +373,9 @@ namespace cov::placeholder {
 		return out;
 	}
 
-	iterator git_person::format(iterator out, context& ctx, person fld) const {
+	iterator git_person::format(iterator out,
+	                            internal_context& ctx,
+	                            person fld) const {
 		switch (fld) {
 			case person::name:
 				return format_str(out, name);
@@ -281,30 +384,33 @@ namespace cov::placeholder {
 			case person::email_local:
 				return format_str(out, email.substr(0, email.find('@')));
 			case person::date:
-				return format_date(out, date, "%c");
+				return format_date(out, date, ctx.tz, ctx.client->locale,
+				                   "{:%c}"sv);
 			case person::date_relative:
-				return format_str(
-				    out, relative_date(std::chrono::seconds{date}, ctx));
+				return format_str(out, relative_date(date, ctx));
 			case person::date_timestamp:
-				return format_num(out, date);
+				return format_num(out, date.time_since_epoch().count());
 			case person::date_iso_like:
-				return format_date(out, date, "%F %T %z");
+				return format_date(out, date, ctx.tz, ctx.client->locale,
+				                   "{:%F %T }"sv, Z::ISO_colon);
 			case person::date_iso_strict:
-				return format_date(out, date, "%FT%T%z");
+				return format_date(out, date, ctx.tz, ctx.client->locale,
+				                   "{:%FT%T}"sv, Z::ISO);
 			case person::date_short:
-				return format_date(out, date, "%F");
+				return format_date(out, date, ctx.tz, ctx.client->locale,
+				                   "{:%F}"sv);
 		}
-		return out;
+		return out;  // GCOV_EXCL_LINE - all enums are handled above
 	}
 
 	iterator git_commit_view::format(iterator out,
-	                                 context& ctx,
+	                                 internal_context& ctx,
 	                                 commit fld) const {
 		switch (fld) {
 			case commit::hash:
 				return format_hash(out, id);
 			case commit::hash_abbr:
-				return format_hash(out, id, ctx.hash_length);
+				return format_hash(out, id, ctx.client->hash_length);
 			case commit::subject:
 				return format_str(out, subject_from(message));
 			case commit::subject_sanitized:
@@ -314,23 +420,25 @@ namespace cov::placeholder {
 			case commit::body_raw:
 				return format_str(out, message);
 		}
-		return out;
+		return out;  // GCOV_EXCL_LINE - all enums are handled above
 	}
 
-	iterator report_view::format(iterator out, context& ctx, report fld) const {
+	iterator report_view::format(iterator out,
+	                             internal_context& ctx,
+	                             report fld) const {
 		switch (fld) {
 			case report::hash:
 				return format_hash(out, id);
 			case report::hash_abbr:
-				return format_hash(out, id, ctx.hash_length);
+				return format_hash(out, id, ctx.client->hash_length);
 			case report::parent_hash:
 				return format_hash(out, parent);
 			case report::parent_hash_abbr:
-				return format_hash(out, parent, ctx.hash_length);
+				return format_hash(out, parent, ctx.client->hash_length);
 			case report::ref_names:
-				return ctx.names.format(out, id, true);
+				return ctx.client->names.format(out, id, true);
 			case report::ref_names_unwrapped:
-				return ctx.names.format(out, id, false);
+				return ctx.client->names.format(out, id, false);
 			case report::branch:
 				return format_str(out, git.branch);
 			case report::lines_percent:
@@ -344,11 +452,11 @@ namespace cov::placeholder {
 			case report::lines_rating:
 				return !stats ? out : format_rating(out, *stats, ctx);
 		}
-		return out;
+		return out;  // GCOV_EXCL_LINE - all enums are handled above
 	}
 
 	iterator report_view::format_with(iterator out,
-	                                  context& ctx,
+	                                  internal_context& ctx,
 	                                  placeholder::format const& fmt) const {
 		return std::visit(visitor{*this, out, ctx}, fmt);
 	}
@@ -374,6 +482,7 @@ namespace cov {
 	case CHAR:                        \
 		++cur;                        \
 		return CB(cur, end, ARG)
+
 		unsigned hex(char c) {
 			switch (c) {
 				case '0':
@@ -552,12 +661,20 @@ namespace cov {
 	}
 
 	std::string formatter::format(placeholder::report_view const& report,
-	                              placeholder::context& ctx) {
+	                              placeholder::context const& ctx) {
 		std::string result{};
-		if (!ctx.translate) ctx.translate = placeholder::default_relative_date;
+
+		placeholder::internal_context int_ctx{
+		    .client = &ctx,
+		    .app = ctx.app,
+		    .tr = ctx.translate ? ctx.translate
+		                        : placeholder::default_relative_date,
+		    .tz = ctx.time_zone.empty() ? date::current_zone()
+		                                : date::locate_zone(ctx.time_zone),
+		};
 
 		for (auto const& fmt : format_)
-			report.format_with(std::back_inserter(result), ctx, fmt);
+			report.format_with(std::back_inserter(result), int_ctx, fmt);
 
 		return result;
 	}

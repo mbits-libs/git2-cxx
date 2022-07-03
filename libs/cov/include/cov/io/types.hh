@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <date/date.h>
 #include <git2/oid.h>
 #include <algorithm>
 #include <cstddef>
@@ -11,8 +12,10 @@
 #include <vector>
 
 namespace cov {
+	using date::sys_seconds;
 	using std::size_t;
 	using std::uint32_t;
+	using std::chrono::seconds;
 
 	constexpr inline uint32_t MK_TAG(char c1, char c2, char c3, char c4) {
 		return ((static_cast<uint32_t>(c1) & 0xFF)) |
@@ -45,14 +48,26 @@ namespace cov::io {
 	struct timestamp {
 		uint32_t hi;
 		uint32_t lo;
-		timestamp& operator=(uint64_t time) noexcept {
+		[[deprecated("use operator=(sys_seconds)")]] timestamp& operator=(
+		    uint64_t time) noexcept {
 			hi = static_cast<uint32_t>((time >> 32) & 0xFFFF'FFFF);
 			lo = static_cast<uint32_t>((time)&0xFFFF'FFFF);
 			return *this;
 		}
-		uint64_t to_time_t() const noexcept {
+		timestamp& operator=(sys_seconds seconds) noexcept {
+			auto const time =
+			    static_cast<uint64_t>(seconds.time_since_epoch().count());
+			hi = static_cast<uint32_t>((time >> 32) & 0xFFFF'FFFF);
+			lo = static_cast<uint32_t>((time)&0xFFFF'FFFF);
+			return *this;
+		}
+		[[deprecated("use to_seconds()")]] uint64_t to_time_t() const noexcept {
 			return (static_cast<uint64_t>(hi) << 32) |
 			       static_cast<uint64_t>(lo);
+		}
+		sys_seconds to_seconds() const noexcept {
+			return sys_seconds{seconds{(static_cast<uint64_t>(hi) << 32) |
+			                           static_cast<uint64_t>(lo)}};
 		}
 	};
 

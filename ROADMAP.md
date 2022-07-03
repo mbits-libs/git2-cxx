@@ -9,6 +9,8 @@
 - [x] Wrap I/O in Z streams _(M⬆️P)_
 - [x] Idea of references, tags and "branches" _(M⬆️P)_
 - [ ] Report format for `list` _(M⬆️P)_
+  - [ ] Properly setup access_install inside `data`
+  - [ ] Work with 7zip binary
 - [ ] Add diff to `git2-c++` with file movement _(M⬆️P)_
 - [ ] Add highlighting API
   - [ ] Add hilite for C++ _(M⬆️P)_

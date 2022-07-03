@@ -14,8 +14,8 @@ namespace cov::testing {
 
 	struct parser_test {
 		std::string_view name;
-		std::string_view tmplt;
-		std::vector<ph::format> expected;
+		std::string_view tmplt{};
+		std::vector<ph::format> expected{};
 
 		friend std::ostream& operator<<(std::ostream& out,
 		                                parser_test const& param) {
@@ -162,6 +162,16 @@ namespace cov::testing {
 	        "not recognized"sv,
 	        "pre %z post"sv,
 	        {"pre %z post"s},
+	    },
+	    {
+	        "not hex I"sv,
+	        "pre %x0g post"sv,
+	        {"pre %x0g post"s},
+	    },
+	    {
+	        "not hex II"sv,
+	        "pre %xhg post"sv,
+	        {"pre %xhg post"s},
 	    },
 	    {
 	        "not hash"sv,

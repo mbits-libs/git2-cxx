@@ -362,7 +362,8 @@ namespace git::testing::setup {
 			auto const p = test_dir() / make_path(filename);
 			create_directories(p.parent_path(), ignore);
 			std::ofstream out{p};
-			out.write(contents.data(), contents.size());
+			out.write(contents.data(),
+			          static_cast<std::streamsize>(contents.size()));
 		}
 
 		for (auto const nfo : setup::binary) {
@@ -370,7 +371,7 @@ namespace git::testing::setup {
 			create_directories(p.parent_path(), ignore);
 			std::ofstream out{p, std::ios::binary};
 			out.write(reinterpret_cast<char const*>(nfo.content.data()),
-			          nfo.content.size());
+			          static_cast<std::streamsize>(nfo.content.size()));
 		}
 	}
 

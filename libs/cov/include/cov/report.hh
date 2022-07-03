@@ -20,8 +20,8 @@ namespace cov {
 		virtual std::string_view committer_name() const noexcept = 0;
 		virtual std::string_view committer_email() const noexcept = 0;
 		virtual std::string_view message() const noexcept = 0;
-		virtual git_time_t commit_time_utc() const noexcept = 0;
-		virtual git_time_t add_time_utc() const noexcept = 0;
+		virtual sys_seconds commit_time_utc() const noexcept = 0;
+		virtual sys_seconds add_time_utc() const noexcept = 0;
 		virtual io::v1::coverage_stats const& stats() const noexcept = 0;
 	};
 
@@ -34,8 +34,8 @@ namespace cov {
 	                              std::string const& committer_name,
 	                              std::string const& committer_email,
 	                              std::string const& message,
-	                              git_time_t commit_time_utc,
-	                              git_time_t add_time_utc,
+	                              sys_seconds commit_time_utc,
+	                              sys_seconds add_time_utc,
 	                              io::v1::coverage_stats const& stats);
 
 	struct report_entry {

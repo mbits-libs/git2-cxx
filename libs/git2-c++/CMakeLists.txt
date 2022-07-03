@@ -44,6 +44,7 @@ if (COV_TESTING)
 	source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/tests FILES ${TEST_SRCS_CC} ${TEST_SRCS_CPP} ${TEST_SRCS_CXX})
 	add_executable(git2-test ${TEST_SRCS_CC} ${TEST_SRCS_CPP} ${TEST_SRCS_CXX})
 	set_target_properties(git2-test PROPERTIES FOLDER tests)
+	target_compile_options(git2-test PRIVATE ${ADDITIONAL_WALL_FLAGS})
 	target_link_libraries(git2-test git2-c++ GTest::gtest_main)
 	target_include_directories(git2-test
 		PRIVATE

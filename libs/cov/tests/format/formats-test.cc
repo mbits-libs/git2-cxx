@@ -12,9 +12,9 @@ namespace cov::testing {
 	using ::testing::ValuesIn;
 	namespace ph = placeholder;
 
-	static git_time_t now() {
+	static sys_seconds now() {
 		using clock = std::chrono::system_clock;
-		static const git_time_t now_ = clock::to_time_t(clock::now());
+		static const auto now_ = std::chrono::floor<seconds>(clock::now());
 		return now_;
 	}
 
@@ -26,8 +26,8 @@ namespace cov::testing {
 			std::string_view report{};
 			std::optional<io::v1::coverage_stats> stats{};
 			std::string head{"feat/task-1"s};
-			git_time_t commit{};
-			git_time_t add{};
+			sys_seconds commit{};
+			sys_seconds add{};
 		} tweaks{};
 
 		friend std::ostream& operator<<(std::ostream& out,
@@ -199,7 +199,7 @@ namespace cov::testing {
 	        "Body para 1\n"
 	        "\n"
 	        "Body para 2"sv,
-	        {.commit = 951827696},
+	        {.commit = sys_seconds{951827696s}},
 	    },
 	};
 

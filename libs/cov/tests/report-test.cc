@@ -107,10 +107,10 @@ namespace cov::testing {
 		std::string_view message() const noexcept override {
 			return state.message;
 		}
-		git_time_t commit_time_utc() const noexcept override {
+		sys_seconds commit_time_utc() const noexcept override {
 			return state.commit_time_utc;
 		}
-		git_time_t add_time_utc() const noexcept override {
+		sys_seconds add_time_utc() const noexcept override {
 			return state.add_time_utc;
 		}
 		io::v1::coverage_stats const& stats() const noexcept override {
@@ -127,8 +127,8 @@ namespace cov::testing {
 			std::string committer_name;
 			std::string committer_email;
 			std::string message;
-			git_time_t commit_time_utc;
-			git_time_t add_time_utc;
+			sys_seconds commit_time_utc;
+			sys_seconds add_time_utc;
 			io::v1::coverage_stats stats;
 		} state;
 	};
@@ -157,8 +157,8 @@ namespace cov::testing {
 		ASSERT_EQ("Johnny Appleseed"sv, rprt->committer_name());
 		ASSERT_EQ("johnny@appleseed.com"sv, rprt->committer_email());
 		ASSERT_EQ("Initial commit"sv, rprt->message());
-		ASSERT_EQ(0x11223344556677, rprt->commit_time_utc());
-		ASSERT_EQ(0x11223344556677, rprt->add_time_utc());
+		ASSERT_EQ(sys_seconds{0x11223344556677s}, rprt->commit_time_utc());
+		ASSERT_EQ(sys_seconds{0x11223344556677s}, rprt->add_time_utc());
 		ASSERT_EQ(1250u, rprt->stats().total);
 		ASSERT_EQ(300u, rprt->stats().relevant);
 		ASSERT_EQ(299u, rprt->stats().covered);
@@ -243,8 +243,8 @@ namespace cov::testing {
 		    .committer_name = "Johnny Appleseed"s,
 		    .committer_email = "johnny@appleseed.com"s,
 		    .message = "Initial commit"s,
-		    .commit_time_utc = 0x11223344556677,
-		    .add_time_utc = 0x11223344556677,
+		    .commit_time_utc = sys_seconds{0x11223344556677s},
+		    .add_time_utc = sys_seconds{0x11223344556677s},
 		    .stats =
 		        {
 		            .total = 1250,
