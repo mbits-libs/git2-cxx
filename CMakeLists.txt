@@ -21,6 +21,7 @@ list(APPEND CMAKE_PREFIX_PATH "${PROJECT_BINARY_DIR}/conan")
 set(CONAN_CMAKE_SILENT_OUTPUT ON)
 find_package(libgit2 REQUIRED)
 find_package(fmt REQUIRED)
+find_package(date REQUIRED)
 
 if (COV_TESTING)
   enable_testing()

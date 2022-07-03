@@ -40,12 +40,12 @@ namespace cov::testing {
 		std::string committer_name{};
 		std::string committer_email{};
 		std::string message{};
-		git_time_t commit_time_utc{};
+		sys_seconds commit_time_utc{};
 	};
 
 	struct report {
 		git_oid parent{};
-		git_time_t add_time_utc{};
+		sys_seconds add_time_utc{};
 		git head{};
 		std::vector<file> files{};
 	};
@@ -63,6 +63,10 @@ namespace cov::testing {
 		std::vector<io::v1::coverage> result{};
 		result.reserve(need);
 
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
+#endif
 		prev_line = 0;
 		for (auto&& [line, count] : lines) {
 			auto const nulls = line - prev_line - 1;
@@ -71,6 +75,9 @@ namespace cov::testing {
 			prev_line = line;
 		}
 		if (finish) result.push_back({.value = finish, .is_null = 1});
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 
 		return line_coverage_create(std::move(result));
 	}
@@ -118,38 +125,39 @@ namespace cov::testing {
 		    loose_backend_create(setup::test_dir() / "full_report"sv);
 		ASSERT_TRUE(backend);
 
-		report rprt = {.add_time_utc = 0x11223344556677,
-		               .head = {.branch = "develop"s,
-		                        .author_name = "Johnny Appleseed"s,
-		                        .author_email = "johnny@appleseed.com"s,
-		                        .committer_name = "Johnny Appleseed"s,
-		                        .committer_email = "johnny@appleseed.com"s,
-		                        .message = "Initial commit"s,
-		                        .commit_time_utc = 0x11223344556677},
-		               .files = {{.name = "main.cpp"sv,
-		                          .dirty = false,
-		                          .modified = false,
-		                          .lines = {{10, 1},
-		                                    {11, 1},
-		                                    {12, 1},
-		                                    {15, 0},
-		                                    {16, 0},
-		                                    {18, 0},
-		                                    {19, 0}}},
-		                         {.name = "module.cpp"sv,
-		                          .dirty = false,
-		                          .modified = false,
-		                          .lines = {{10, 15},
-		                                    {11, 15},
-		                                    {12, 10},
-		                                    {13, 5},
-		                                    {14, 15},
-		                                    {100, 15},
-		                                    {101, 15},
-		                                    {102, 10},
-		                                    {103, 5},
-		                                    {104, 15}},
-		                          .finish = 20}}};
+		report rprt = {
+		    .add_time_utc = sys_seconds{0x11223344556677s},
+		    .head = {.branch = "develop"s,
+		             .author_name = "Johnny Appleseed"s,
+		             .author_email = "johnny@appleseed.com"s,
+		             .committer_name = "Johnny Appleseed"s,
+		             .committer_email = "johnny@appleseed.com"s,
+		             .message = "Initial commit"s,
+		             .commit_time_utc = sys_seconds{0x11223344556677s}},
+		    .files = {{.name = "main.cpp"sv,
+		               .dirty = false,
+		               .modified = false,
+		               .lines = {{10, 1},
+		                         {11, 1},
+		                         {12, 1},
+		                         {15, 0},
+		                         {16, 0},
+		                         {18, 0},
+		                         {19, 0}}},
+		              {.name = "module.cpp"sv,
+		               .dirty = false,
+		               .modified = false,
+		               .lines = {{10, 15},
+		                         {11, 15},
+		                         {12, 10},
+		                         {13, 5},
+		                         {14, 15},
+		                         {100, 15},
+		                         {101, 15},
+		                         {102, 10},
+		                         {103, 5},
+		                         {104, 15}},
+		               .finish = 20}}};
 
 		// write
 		{
@@ -248,8 +256,20 @@ namespace cov::testing {
 
 	struct none : counted_impl<object> {
 		obj_type type() const noexcept override {
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
+// warning: the result of the conversion is unspecified because
+// ‘std::numeric_limits<unsigned int>::max()’ is outside the range of type
+// ‘cov::obj_type’
+//
+// Which is kinda the point...
+#endif
 			return static_cast<obj_type>(
 			    std::numeric_limits<std::underlying_type_t<obj_type>>::max());
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 		};
 	};
 

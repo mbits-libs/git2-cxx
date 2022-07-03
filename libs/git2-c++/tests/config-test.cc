@@ -56,7 +56,7 @@ namespace git::testing {
 		    setup::get_path(setup::test_dir() / "config.unsigned");
 		ASSERT_EQ(0, cfg.add_file_ondisk(repo.c_str())) << repo;
 		cfg.set_unsigned(test_name, 3456);
-		ASSERT_EQ(3456, *cfg.get_unsigned(test_name));
+		ASSERT_EQ(3456u, *cfg.get_unsigned(test_name));
 		ASSERT_TRUE(*cfg.get_bool(test_name));
 		ASSERT_EQ("3456"sv, *cfg.get_string(test_name));
 		ASSERT_EQ("3456"sv, setup::get_path(*cfg.get_path(test_name)));
@@ -86,7 +86,7 @@ namespace git::testing {
 			cfg.set_string(test_name_2, svalue);
 		}
 
-		ASSERT_EQ(0, *cfg.get_unsigned(test_name));
+		ASSERT_EQ(0u, *cfg.get_unsigned(test_name));
 		if constexpr (sizeof(int64_t) > sizeof(unsigned)) {
 			constexpr auto value = std::numeric_limits<unsigned>::max();
 			ASSERT_EQ(value, *cfg.get_unsigned(test_name_2));
@@ -98,7 +98,7 @@ namespace git::testing {
 		auto const repo = setup::get_path(setup::test_dir() / "config.string");
 		ASSERT_EQ(0, cfg.add_file_ondisk(repo.c_str())) << repo;
 		cfg.set_string(test_name, "3456"s);
-		ASSERT_EQ(3456, *cfg.get_unsigned(test_name));
+		ASSERT_EQ(3456u, *cfg.get_unsigned(test_name));
 		ASSERT_TRUE(*cfg.get_bool(test_name));
 		ASSERT_EQ("3456"sv, *cfg.get_string(test_name));
 		ASSERT_EQ("3456"sv, setup::get_path(*cfg.get_path(test_name)));
@@ -190,7 +190,9 @@ namespace git::testing {
 		cfg.set_path(test_name, "dir/subdir"sv);
 		ASSERT_FALSE(cfg.get_unsigned(test_name));
 		auto const bool_opt = cfg.get_bool(test_name);
-		if (bool_opt) ASSERT_FALSE(*bool_opt);
+		if (bool_opt) {
+			ASSERT_FALSE(*bool_opt);
+		}
 		ASSERT_EQ("dir/subdir"sv, *cfg.get_string(test_name));
 		ASSERT_EQ("dir/subdir"sv, setup::get_path(*cfg.get_path(test_name)));
 		auto const entry = cfg.get_entry(test_name);

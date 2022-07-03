@@ -60,7 +60,7 @@ target_link_options(libcov PRIVATE ${ADDITIONAL_LINK_FLAGS})
 target_include_directories(libcov PUBLIC
 	${CMAKE_CURRENT_SOURCE_DIR}/include
 	${CMAKE_CURRENT_BINARY_DIR}/include)
-target_link_libraries(libcov PUBLIC git2-c++ OpenSSL::OpenSSL fmt::fmt)
+target_link_libraries(libcov PUBLIC git2-c++ OpenSSL::OpenSSL fmt::fmt date::date)
 
 set_target_properties(libcov PROPERTIES FOLDER libs OUTPUT_NAME cov)
 

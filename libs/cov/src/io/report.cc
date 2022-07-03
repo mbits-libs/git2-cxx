@@ -17,8 +17,8 @@ namespace cov::io::handlers {
 			              std::string const& committer_name,
 			              std::string const& committer_email,
 			              std::string const& message,
-			              git_time_t commit_time_utc,
-			              git_time_t add_time_utc,
+			              sys_seconds commit_time_utc,
+			              sys_seconds add_time_utc,
 			              io::v1::coverage_stats const& stats)
 			    : parent_report_{parent_report}
 			    , file_list_{file_list}
@@ -58,10 +58,10 @@ namespace cov::io::handlers {
 			std::string_view message() const noexcept override {
 				return message_;
 			}
-			git_time_t commit_time_utc() const noexcept override {
+			sys_seconds commit_time_utc() const noexcept override {
 				return commit_time_utc_;
 			}
-			git_time_t add_time_utc() const noexcept override {
+			sys_seconds add_time_utc() const noexcept override {
 				return add_time_utc_;
 			}
 			io::v1::coverage_stats const& stats() const noexcept override {
@@ -78,8 +78,8 @@ namespace cov::io::handlers {
 			std::string committer_name_;
 			std::string committer_email_;
 			std::string message_;
-			git_time_t commit_time_utc_;
-			git_time_t add_time_utc_;
+			sys_seconds commit_time_utc_;
+			sys_seconds add_time_utc_;
 			io::v1::coverage_stats stats_;
 		};
 	}  // namespace
@@ -122,8 +122,8 @@ namespace cov::io::handlers {
 		return report_create(header.parent_report, header.file_list,
 		                     header.commit.commit_id, branch, author_name,
 		                     author_email, committer_name, committer_email,
-		                     message, header.commit.committed.to_time_t(),
-		                     header.added.to_time_t(), header.stats);
+		                     message, header.commit.committed.to_seconds(),
+		                     header.added.to_seconds(), header.stats);
 	}
 
 #if defined(__GNUC__)
@@ -154,7 +154,7 @@ namespace cov::io::handlers {
 			return offset32;
 		};
 
-		auto const time_stamp = [](git_time_t time) {
+		auto const time_stamp = [](sys_seconds time) {
 			timestamp ts{};
 			ts = time;
 			return ts;
@@ -201,8 +201,8 @@ namespace cov {
 	                              std::string const& committer_name,
 	                              std::string const& committer_email,
 	                              std::string const& message,
-	                              git_time_t commit_time_utc,
-	                              git_time_t add_time_utc,
+	                              sys_seconds commit_time_utc,
+	                              sys_seconds add_time_utc,
 	                              io::v1::coverage_stats const& stats) {
 		return make_ref<io::handlers::impl>(
 		    parent_report, file_list, commit, branch, author_name, author_email,
