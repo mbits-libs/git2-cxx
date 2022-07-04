@@ -9,6 +9,7 @@ set(PROJECT_VERSION_STABILITY "-alpha" # or "-beta", or "-rc.1", or "-rc.2", or 
     CACHE STRING "" FORCE)
 
 set(COV_TESTING ON CACHE BOOL "Compile and/or run self-tests")
+set(COV_CUTDOWN_OS OFF CACHE BOOL "Run tests on cutdown OS (e.g. GitHub docker)")
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_EXTENSIONS OFF)

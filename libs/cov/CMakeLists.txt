@@ -76,6 +76,10 @@ if (COV_TESTING)
 	add_executable(cov-test ${TEST_SRCS_CC} ${TEST_SRCS_CPP} ${TEST_SRCS_CXX})
 	set_target_properties(cov-test PROPERTIES FOLDER tests)
 	target_compile_options(cov-test PRIVATE ${ADDITIONAL_WALL_FLAGS})
+	if (COV_CUTDOWN_OS)
+		message(STATUS "cov-test: removing some tests on cutdown OS")
+		target_compile_options(cov-test PRIVATE -DCUTDOWN_OS=1)
+	endif()
 	target_link_libraries(cov-test libcov GTest::gmock_main)
 	target_include_directories(cov-test
 		PRIVATE
