@@ -13,23 +13,28 @@ jobs:
         os: [ubuntu-latest, windows-latest]
         build_type: [Release, Debug]
         include:
-          - os: windows-latest
-            build_type: Release
-            cpack_generator: ZIP
-          - os: ubuntu-latest
-            build_type: Release
-            cpack_generator: TGZ
+            # Ubuntu ANY
           - os: ubuntu-latest
             ubuntu: true
             home: /home/runner
+            latest_conan_hash: 29f24b8b55c4a367e3041c678c26b91149c8ab579a5f9c1dd2324f0f1f15831d
+            # Windows ANY
           - os: windows-latest
             windows: true
             home: C:/Users/runneradmin
+            latest_conan_hash: 8c1370b4796ea7399cc31d9b362e5ec2532c434e75ed721cfbed7e3425f33b60
+            # Ubuntu Release
+          - os: ubuntu-latest
+            build_type: Release
+            cpack_generator: TGZ
+            # Ubuntu Debug
           - os: ubuntu-latest
             build_type: Debug
             coverage: true
-          - latest_conan_hash_linux: 29f24b8b55c4a367e3041c678c26b91149c8ab579a5f9c1dd2324f0f1f15831d
-          - latest_conan_hash_windows: 8c1370b4796ea7399cc31d9b362e5ec2532c434e75ed721cfbed7e3425f33b60
+            # Windows Release
+          - os: windows-latest
+            build_type: Release
+            cpack_generator: ZIP
 
     env:
       BUILD_TYPE: ${{ matrix.build_type }}
@@ -45,6 +50,7 @@ jobs:
     - name: Conanfile hash
       run: |
         echo ${{ hashFiles('conanfile.txt') }}
+        echo ${{ matrix.latest_conan_hash }}
 
     - name: GCC 11
       if: ${{ matrix.ubuntu }}
@@ -80,8 +86,7 @@ jobs:
         key: ${{ matrix.os }}-${{ matrix.build_type }}-${{ hashFiles('conanfile.txt') }}
         restore-keys: |
           ${{ matrix.os }}-${{ matrix.build_type }}
-          ${{ matrix.os }}-${{ matrix.build_type }}-${{ matrix.latest_conan_hash_linux }}
-          ${{ matrix.os }}-${{ matrix.build_type }}-${{ matrix.latest_conan_hash_windows }}
+          ${{ matrix.os }}-${{ matrix.build_type }}-${{ matrix.latest_conan_hash }}
 
     - name: Configure Conan
       working-directory: ${{github.workspace}}/build/conan
