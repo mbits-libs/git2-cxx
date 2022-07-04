@@ -28,7 +28,8 @@ jobs:
           - os: ubuntu-latest
             build_type: Debug
             coverage: true
-          - latest_conan_hash: 49b35cda083b6915ce102462a9206f25edc385ee90edd0879701d638f077ab0b
+          - latest_conan_hash_linux: 29f24b8b55c4a367e3041c678c26b91149c8ab579a5f9c1dd2324f0f1f15831d
+          - latest_conan_hash_windows: 8c1370b4796ea7399cc31d9b362e5ec2532c434e75ed721cfbed7e3425f33b60
 
     env:
       BUILD_TYPE: ${{ matrix.build_type }}
@@ -79,7 +80,8 @@ jobs:
         key: ${{ matrix.os }}-${{ matrix.build_type }}-${{ hashFiles('conanfile.txt') }}
         restore-keys: |
           ${{ matrix.os }}-${{ matrix.build_type }}
-          ${{ matrix.os }}-${{ matrix.build_type }}-${{ matrix.latest_conan_hash }}
+          ${{ matrix.os }}-${{ matrix.build_type }}-${{ matrix.latest_conan_hash_linux }}
+          ${{ matrix.os }}-${{ matrix.build_type }}-${{ matrix.latest_conan_hash_windows }}
 
     - name: Configure Conan
       working-directory: ${{github.workspace}}/build/conan
