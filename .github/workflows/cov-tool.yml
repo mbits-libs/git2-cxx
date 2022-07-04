@@ -41,6 +41,10 @@ jobs:
       with:
          submodules: true
 
+    - name: Conanfile hash
+      run: |
+        echo ${{ hashFiles('conanfile.txt') }}
+
     - name: GCC 11
       if: ${{ matrix.ubuntu }}
       run: |
