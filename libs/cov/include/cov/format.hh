@@ -56,7 +56,10 @@ namespace cov::placeholder {
 	};
 
 	struct width {
-		auto operator<=>(width const&) const noexcept = default;
+		unsigned total;
+		unsigned indent1;
+		unsigned indent2;
+		constexpr auto operator<=>(width const&) const noexcept = default;
 	};
 
 	enum class report {
@@ -196,11 +199,13 @@ namespace cov::placeholder {
 		iterator format(iterator out, internal_context& ctx, report fld) const;
 		iterator format(iterator out, internal_context& ctx, color fld) const;
 		iterator format(iterator out, internal_context& ctx, commit fld) const {
+			width_cleaner clean{ctx};
 			return git.format(out, ctx, fld);
 		}
 		iterator format(iterator out,
 		                internal_context& ctx,
 		                person_info const& pair) const {
+			width_cleaner clean{ctx};
 			if (std::get<0>(pair) == who::reporter)
 				return git_person{{}, {}, date}.format(out, ctx,
 				                                       std::get<1>(pair));
@@ -219,6 +224,12 @@ namespace cov::placeholder {
 			    .stats = &report.stats(),
 			};
 		}
+
+	private:
+		struct width_cleaner {
+			internal_context& ctx;
+			~width_cleaner();
+		};
 	};
 }  // namespace cov::placeholder
 

@@ -12,6 +12,7 @@
 
 #include <date/tz.h>
 #include <fmt/chrono.h>
+#include <charconv>
 #include <cov/format.hh>
 #include <ctime>
 #include <iostream>
@@ -23,6 +24,8 @@ namespace cov::placeholder {
 		void* app;
 		std::string (*tr)(long long count, translatable scale, void* app);
 		date::time_zone const* tz;
+		iterator formatted_output(iterator out, std::string_view view);
+		std::optional<width> current_witdh{};
 
 		std::string translate(long long count, translatable scale) const {
 			return tr(count, scale, app);
@@ -42,7 +45,55 @@ namespace cov::placeholder {
 			leaky_iterator{out}.cont()->append(view);
 			return out;
 		}
+	}  // namespace
 
+	iterator internal_context::formatted_output(iterator out,
+	                                            std::string_view view) {
+		if (!current_witdh) return format_str(out, view);
+		view = strip(view);
+		auto first = true;
+		unsigned indent = current_witdh->indent1;
+		while (!view.empty()) {
+			if (first)
+				first = false;
+			else
+				out = format_str(out, "\n\n"sv);
+
+			auto const pos = view.find("\n\n"sv);
+			auto chunk = view.substr(0, pos);
+
+			size_t index{}, length{current_witdh->total - indent};
+			auto const indent_str = std::string(indent, ' ');
+			while (!chunk.empty()) {
+				size_t word_len{};
+				while (word_len < chunk.length() && !isspace(chunk[word_len]))
+					++word_len;
+				auto const word = chunk.substr(0, word_len);
+				while (word_len < chunk.length() && isspace(chunk[word_len]))
+					++word_len;
+				chunk = chunk.substr(word_len);
+
+				if (index && (index + word.length() + 1) > length) {
+					*out++ = '\n';
+					index = 0;
+				} else if (index) {
+					index++;
+					*out++ = ' ';
+				}
+
+				if (!index) out = format_str(out, indent_str);
+				out = format_str(out, word);
+				index += word.length();
+			}
+			view = pos == std::string_view::npos ? std::string_view{}
+			                                     : lstrip(view.substr(pos));
+			indent = current_witdh->indent2;
+		}
+
+		return out;
+	}
+
+	namespace {
 		std::string_view subject_from(std::string_view message) {
 			return strip(message.substr(0, message.find('\n')));
 		}
@@ -279,7 +330,10 @@ namespace cov::placeholder {
 				return view.format(out, ctx, pair);
 			}
 			iterator operator()(auto fld) { return view.format(out, ctx, fld); }
-			iterator operator()(width const&) { return out; }
+			iterator operator()(width const& w) {
+				ctx.current_witdh = w;
+				return out;
+			}
 		};
 		std::string default_tr(long long count,
 		                       std::string_view singular,
@@ -413,13 +467,13 @@ namespace cov::placeholder {
 			case commit::hash_abbr:
 				return format_hash(out, id, ctx.client->hash_length);
 			case commit::subject:
-				return format_str(out, subject_from(message));
+				return ctx.formatted_output(out, subject_from(message));
 			case commit::subject_sanitized:
 				return sanitized_subject(out, subject_from(message));
 			case commit::body:
-				return format_str(out, body_from(message));
+				return ctx.formatted_output(out, body_from(message));
 			case commit::body_raw:
-				return format_str(out, message);
+				return ctx.formatted_output(out, strip(message));
 		}
 		return out;  // GCOV_EXCL_LINE - all enums are handled above
 	}
@@ -427,6 +481,8 @@ namespace cov::placeholder {
 	iterator report_view::format(iterator out,
 	                             internal_context& ctx,
 	                             report fld) const {
+		width_cleaner clean{ctx};
+
 		switch (fld) {
 			case report::hash:
 				return format_hash(out, id);
@@ -459,21 +515,27 @@ namespace cov::placeholder {
 	iterator report_view::format(iterator out,
 	                             internal_context& ctx,
 	                             color clr) const {
+		width_cleaner clean{ctx};
 		if (ctx.client->colorize) {
 			if (clr == color::rating || clr == color::bg_rating) {
 				auto const mark = apply_mark(*stats, ctx.client->marks);
 				if (clr == color::rating)
-					clr = mark == cov::translatable::mark_failing ? color::red
-					      : mark == cov::translatable::mark_incomplete
-					          ? color::yellow
-					          : color::green;
+					clr = mark == cov::translatable::mark_failing
+					          ? color::red
+					          : mark == cov::translatable::mark_incomplete
+					                ? color::yellow
+					                : color::green;
 				else
-					clr = mark == cov::translatable::mark_failing ? color::bg_red
-					      : mark == cov::translatable::mark_incomplete
-					          ? color::bg_yellow
-					          : color::bg_green;
+					clr = mark == cov::translatable::mark_failing
+					          ? color::bg_red
+					          : mark == cov::translatable::mark_incomplete
+					                ? color::bg_yellow
+					                : color::bg_green;
 			}
-			out = format_str(out, ctx.client->colorize(clr, ctx.client->app));
+			out = format_str(
+			    out,
+			    ctx.client->colorize(
+			        clr, ctx.client->app));  // don't count towards width...
 		}
 		return out;
 	}
@@ -482,6 +544,10 @@ namespace cov::placeholder {
 	                                  internal_context& ctx,
 	                                  placeholder::format const& fmt) const {
 		return std::visit(visitor{*this, out, ctx}, fmt);
+	}
+
+	report_view::width_cleaner::~width_cleaner() {
+		ctx.current_witdh = std::nullopt;
 	}
 }  // namespace cov::placeholder
 
@@ -536,6 +602,16 @@ namespace cov {
 					return static_cast<unsigned>(c - 'a' + 10);
 			}
 			return 16;
+		}
+
+		std::optional<unsigned> uint_from(std::string_view view) noexcept {
+			unsigned result{};
+			if (view.empty()) return std::nullopt;
+			auto ptr = view.data();
+			auto end = ptr + view.size();
+			auto [finish, errc] = std::from_chars(ptr, end, result);
+			if (errc == std::errc{} && finish == end) return result;
+			return std::nullopt;
 		}
 
 		template <typename It>
@@ -658,6 +734,53 @@ namespace cov {
 			return std::nullopt;
 		}
 		template <typename It>
+		std::optional<format> parse_width(It& cur, It end) {
+			static constexpr auto default_total = 76u;
+			static constexpr auto default_indent1 = 6u;
+			static constexpr auto default_indent2 = 9u;
+
+			if (cur == end || *cur != '(') return std::nullopt;
+			++cur;
+			auto start = cur;
+			while (cur != end && *cur != ')')
+				++cur;
+			if (cur == end) return std::nullopt;
+			auto args = strip(std::string_view{start, cur});
+			++cur;
+			if (args.empty()) {
+				return placeholder::width{default_total, default_indent1,
+				                          default_indent2};
+			}
+
+			auto comma_pos = args.find(',');
+			auto const total = uint_from(strip(args.substr(0, comma_pos)));
+			if (!total) return std::nullopt;
+
+			if (comma_pos == std::string_view::npos) {
+				return placeholder::width{*total, default_indent1,
+				                          default_indent2};
+			}
+			++comma_pos;
+			args = args.substr(comma_pos);
+
+			comma_pos = args.find(',');
+			auto const indent1 = uint_from(strip(args.substr(0, comma_pos)));
+			if (!indent1) return std::nullopt;
+
+			if (comma_pos == std::string_view::npos) {
+				return placeholder::width{*total, *indent1, *indent1};
+			}
+			++comma_pos;
+			args = args.substr(comma_pos);
+
+			comma_pos = args.find(',');
+			if (comma_pos != std::string_view::npos) return std::nullopt;
+			auto const indent2 = uint_from(strip(args));
+			if (!indent2) return std::nullopt;
+			if (*indent1 >= *total || *indent2 >= *total) return std::nullopt;
+			return placeholder::width{*total, *indent1, *indent2};
+		}
+		template <typename It>
 		std::optional<format> parse_hash(It& cur, It end) {
 			if (cur == end) return std::nullopt;
 
@@ -753,6 +876,7 @@ namespace cov {
 				SIMPLE_FORMAT('n', '\n');
 				DEEPER_FORMAT('x', parse_hex);
 				DEEPER_FORMAT('C', parse_color);
+				DEEPER_FORMAT('w', parse_width);
 				SIMPLE_FORMAT('D', placeholder::report::ref_names_unwrapped);
 				SIMPLE_FORMAT('d', placeholder::report::ref_names);
 				SIMPLE_FORMAT('s', placeholder::commit::subject);

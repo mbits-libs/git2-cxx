@@ -98,16 +98,25 @@ namespace cov {
 			return result;
 		}
 
-		inline std::string_view strip(std::string_view view) {
-			auto const isspace = [](char c) {
-				return std::isspace(static_cast<unsigned char>(c));
-			};
+		inline auto isspace(char c) {
+			return std::isspace(static_cast<unsigned char>(c));
+		};
+
+		inline std::string_view lstrip(std::string_view view) {
 			while (!view.empty() && isspace(view.front()))
 				view = view.substr(1);
+			return view;
+		}
+
+		inline std::string_view rstrip(std::string_view view) {
 			while (!view.empty() && isspace(view.back()))
 				view = view.substr(0, view.length() - 1);
 
 			return view;
+		}
+
+		inline std::string_view strip(std::string_view view) {
+			return rstrip(lstrip(view));
 		}
 
 		inline std::optional<std::string_view> prefixed(std::string_view prefix,
