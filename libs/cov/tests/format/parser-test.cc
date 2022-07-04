@@ -109,6 +109,8 @@ namespace cov::testing {
 	    PERSON_TEST("email local", NAME, CODE, "l", WHO, email_local), \
 	    MAKE_DATE_TEST(NAME, CODE, WHO)
 
+#define MAKE_COLOR_TEST(NAME, COLOR) MAKE_TEST(NAME, "%" NAME, COLOR)
+
 	static parser_test const tests[] = {
 	    {"empty"sv},
 	    {
@@ -131,6 +133,35 @@ namespace cov::testing {
 	        "pre %xAb post"sv,
 	        {"pre "s, '\xab', " post"s},
 	    },
+	    MAKE_COLOR_TEST("Creset", ph::color::reset),
+	    MAKE_COLOR_TEST("Cred", ph::color::red),
+	    MAKE_COLOR_TEST("Cgreen", ph::color::green),
+	    MAKE_COLOR_TEST("Cblue", ph::color::blue),
+	    MAKE_COLOR_TEST("C(normal)", ph::color::normal),
+	    MAKE_COLOR_TEST("C(reset)", ph::color::reset),
+	    MAKE_COLOR_TEST("C(bold)", ph::color::bold),
+	    MAKE_COLOR_TEST("C(red)", ph::color::red),
+	    MAKE_COLOR_TEST("C(green)", ph::color::green),
+	    MAKE_COLOR_TEST("C(yellow)", ph::color::yellow),
+	    MAKE_COLOR_TEST("C(blue)", ph::color::blue),
+	    MAKE_COLOR_TEST("C(magenta)", ph::color::magenta),
+	    MAKE_COLOR_TEST("C(cyan)", ph::color::cyan),
+	    MAKE_COLOR_TEST("C(bold red)", ph::color::bold_red),
+	    MAKE_COLOR_TEST("C(bold green)", ph::color::bold_green),
+	    MAKE_COLOR_TEST("C(bold yellow)", ph::color::bold_yellow),
+	    MAKE_COLOR_TEST("C(bold blue)", ph::color::bold_blue),
+	    MAKE_COLOR_TEST("C(bold magenta)", ph::color::bold_magenta),
+	    MAKE_COLOR_TEST("C(bold cyan)", ph::color::bold_cyan),
+	    MAKE_COLOR_TEST("C(bg red)", ph::color::bg_red),
+	    MAKE_COLOR_TEST("C(bg green)", ph::color::bg_green),
+	    MAKE_COLOR_TEST("C(bg yellow)", ph::color::bg_yellow),
+	    MAKE_COLOR_TEST("C(bg blue)", ph::color::bg_blue),
+	    MAKE_COLOR_TEST("C(bg magenta)", ph::color::bg_magenta),
+	    MAKE_COLOR_TEST("C(bg cyan)", ph::color::bg_cyan),
+	    MAKE_COLOR_TEST("C(faint)", ph::color::faint),
+	    MAKE_COLOR_TEST("C(faint italic)", ph::color::faint_italic),
+	    MAKE_COLOR_TEST("C(rating)", ph::color::rating),
+	    MAKE_COLOR_TEST("C(bg rating)", ph::color::bg_rating),
 	    MAKE_TEST("refs", "%d", ph::report::ref_names),
 	    MAKE_TEST("refs unwrapped", "%D", ph::report::ref_names_unwrapped),
 	    MAKE_TEST("subject", "%s", ph::commit::subject),
@@ -202,6 +233,46 @@ namespace cov::testing {
 	        "not line coverage"sv,
 	        "pre %pz post"sv,
 	        {"pre %pz post"s},
+	    },
+	    {
+	        "not direct color (rex)"sv,
+	        "pre %Crex post"sv,
+	        {"pre %Crex post"s},
+	    },
+	    {
+	        "not direct color (great)"sv,
+	        "pre %Cgreat post"sv,
+	        {"pre %Cgreat post"s},
+	    },
+	    {
+	        "not direct color (blu)"sv,
+	        "pre %Cblu post"sv,
+	        {"pre %Cblu post"s},
+	    },
+	    {
+	        "not direct color (zeen)"sv,
+	        "pre %Czeen post"sv,
+	        {"pre %Czeen post"s},
+	    },
+	    {
+	        "not parens color (bold rex)"sv,
+	        "pre %C(bold rex) post"sv,
+	        {"pre %C(bold rex) post"s},
+	    },
+	    {
+	        "not parens color (great)"sv,
+	        "pre %C(great) post"sv,
+	        {"pre %C(great) post"s},
+	    },
+	    {
+	        "not parens color (zeen)"sv,
+	        "pre %C(zeen) post"sv,
+	        {"pre %C(zeen) post"s},
+	    },
+	    {
+	        "not parens color (aquamarine)"sv,
+	        "pre %C(aquamarine) post"sv,
+	        {"pre %C(aquamarine) post"s},
 	    },
 	};
 

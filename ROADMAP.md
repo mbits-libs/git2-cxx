@@ -8,7 +8,7 @@
   - [x] `line_coverage`
 - [x] Wrap I/O in Z streams _(M⬆️P)_
 - [x] Idea of references, tags and "branches" _(M⬆️P)_
-- [ ] Report format for `list` _(M⬆️P)_
+- [ ] Report format for `log` _(M⬆️P)_
   - [ ] Properly setup access_install inside `data`
   - [ ] Work with 7zip binary
 - [ ] Add diff to `git2-c++` with file movement _(M⬆️P)_
@@ -25,7 +25,8 @@
   - diffing
 - [ ] Add commands _(drop alpha)_
   - [ ] lngs baseline
-  - [ ] `cov` and `libexec/cov` _(M⬆️P)_
+  - [ ] `cov`, builtin and `libexec/cov` _(M⬆️P)_
+    - [ ] aliases inside config
   - [ ] `cov init` _(each is a M⬆️P)_
   - [ ] `cov config`
   - [ ] `cov add`
@@ -34,7 +35,7 @@
   - [ ] `cov add --amend`
   - [ ] `cov tag` / `branch` / `checkout` _(only one M⬆️P)_
   - [ ] `cov remove`
-  - [ ] `cov list`
+  - [ ] `cov log`
   - [ ] `cov show` _(only one M⬆️P)_
     - [ ] Report / component / directory view
     - [ ] File view

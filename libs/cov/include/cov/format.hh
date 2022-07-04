@@ -51,6 +51,8 @@ namespace cov::placeholder {
 		bg_cyan,
 		faint,
 		faint_italic,
+		rating,
+		bg_rating,
 	};
 
 	struct width {
@@ -132,6 +134,7 @@ namespace cov::placeholder {
 		std::string (*translate)(long long count,
 		                         translatable scale,
 		                         void* app) = {};
+		std::string (*colorize)(color, void* app) = {};
 	};
 	struct internal_context;
 
@@ -191,6 +194,7 @@ namespace cov::placeholder {
 		io::v1::coverage_stats const* stats{};
 
 		iterator format(iterator out, internal_context& ctx, report fld) const;
+		iterator format(iterator out, internal_context& ctx, color fld) const;
 		iterator format(iterator out, internal_context& ctx, commit fld) const {
 			return git.format(out, ctx, fld);
 		}
@@ -225,6 +229,8 @@ namespace cov {
 		    : format_{std::move(format)} {}
 
 		static formatter from(std::string_view input);
+
+		static std::string shell_colorize(placeholder::color, void*);
 
 		std::string format(placeholder::report_view const&,
 		                   placeholder::context const&);
