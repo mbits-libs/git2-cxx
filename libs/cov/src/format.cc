@@ -88,28 +88,30 @@ namespace cov::placeholder {
 			return fmt::format_to(out, "{:>2}%", std::get<0>(stats.calc(0)));
 		}
 
+		static auto apply_mark(io::v1::coverage_stats const& stats,
+		                       rating const& marks) {
+			if (!stats.relevant || !marks.incomplete.den || !marks.passing.den)
+				return translatable::mark_failing;
+			auto const gcd_1 = std::gcd(stats.relevant, stats.covered);
+			auto const cov = stats.covered / gcd_1;
+			auto const rel = stats.relevant / gcd_1;
+
+			auto const incomplete = marks.incomplete.gcd();
+			auto const lhs = cov * incomplete.den;
+			auto const rhs = incomplete.num * rel;
+			// if ((cov * incomplete.den) < (incomplete.num * rel))
+			if (lhs < rhs) return translatable::mark_failing;
+
+			auto const passing = marks.passing.gcd();
+			if ((cov * passing.den) < (passing.num * rel))
+				return translatable::mark_incomplete;
+			return translatable::mark_passing;
+		};
+
 		iterator format_rating(iterator out,
 		                       io::v1::coverage_stats const& stats,
 		                       internal_context const& ctx) {
-			auto mark = [&] {
-				if (!stats.relevant || !ctx.client->marks.incomplete.den ||
-				    !ctx.client->marks.passing.den)
-					return translatable::mark_failing;
-				auto const gcd_1 = std::gcd(stats.relevant, stats.covered);
-				auto const cov = stats.covered / gcd_1;
-				auto const rel = stats.relevant / gcd_1;
-
-				auto const incomplete = ctx.client->marks.incomplete.gcd();
-				auto const lhs = cov * incomplete.den;
-				auto const rhs = incomplete.num * rel;
-				// if ((cov * incomplete.den) < (incomplete.num * rel))
-				if (lhs < rhs) return translatable::mark_failing;
-
-				auto const passing = ctx.client->marks.passing.gcd();
-				if ((cov * passing.den) < (passing.num * rel))
-					return translatable::mark_incomplete;
-				return translatable::mark_passing;
-			}();
+			auto mark = apply_mark(stats, ctx.client->marks);
 			return format_str(out, ctx.translate(mark));
 		}
 
@@ -261,7 +263,7 @@ namespace cov::placeholder {
 
 		struct visitor {
 			report_view const& view;
-			iterator& out;
+			iterator out;
 			internal_context& ctx;
 
 			iterator operator()(char c) {
@@ -278,7 +280,6 @@ namespace cov::placeholder {
 			}
 			iterator operator()(auto fld) { return view.format(out, ctx, fld); }
 			iterator operator()(width const&) { return out; }
-			iterator operator()(color) { return out; }
 		};
 		std::string default_tr(long long count,
 		                       std::string_view singular,
@@ -455,6 +456,28 @@ namespace cov::placeholder {
 		return out;  // GCOV_EXCL_LINE - all enums are handled above
 	}
 
+	iterator report_view::format(iterator out,
+	                             internal_context& ctx,
+	                             color clr) const {
+		if (ctx.client->colorize) {
+			if (clr == color::rating || clr == color::bg_rating) {
+				auto const mark = apply_mark(*stats, ctx.client->marks);
+				if (clr == color::rating)
+					clr = mark == cov::translatable::mark_failing ? color::red
+					      : mark == cov::translatable::mark_incomplete
+					          ? color::yellow
+					          : color::green;
+				else
+					clr = mark == cov::translatable::mark_failing ? color::bg_red
+					      : mark == cov::translatable::mark_incomplete
+					          ? color::bg_yellow
+					          : color::bg_green;
+			}
+			out = format_str(out, ctx.client->colorize(clr, ctx.client->app));
+		}
+		return out;
+	}
+
 	iterator report_view::format_with(iterator out,
 	                                  internal_context& ctx,
 	                                  placeholder::format const& fmt) const {
@@ -464,6 +487,7 @@ namespace cov::placeholder {
 
 namespace cov {
 	namespace parser {
+		using placeholder::color;
 		using placeholder::format;
 
 #define SIMPLEST_FORMAT(CHAR, RESULT) \
@@ -515,7 +539,7 @@ namespace cov {
 		}
 
 		template <typename It>
-		std::optional<placeholder::format> parse_hex(It& cur, It end) {
+		std::optional<format> parse_hex(It& cur, It end) {
 			if (cur == end) return std::nullopt;
 			auto const hi_nybble = hex(*cur);
 			if (hi_nybble > 15) return std::nullopt;
@@ -527,8 +551,114 @@ namespace cov {
 
 			return format{static_cast<char>(lo_nybble | (hi_nybble << 4))};
 		}
+
+		template <typename Item, size_t Length>
+		consteval bool is_sorted(Item const (&items)[Length]) {
+			if constexpr (Length > 1) {
+				for (size_t index = 1; index < Length; ++index) {
+					if (items[index] < items[index - 1]) return false;
+				}
+			}
+			return true;
+		}
+
+		std::optional<color> find_color(std::string_view name) {
+			struct color_pair {
+				std::string_view name;
+				color value;
+				constexpr auto operator<=>(std::string_view other) const {
+					return name <=> other;
+				}
+				constexpr auto operator<=>(color_pair const& other) const =
+				    default;
+			};
+			static_assert(color_pair{"blue"sv, color::blue} < "cyan"sv);
+			static_assert("blue"sv < color_pair{"cyan"sv, color::cyan});
+
+			static constexpr color_pair colors[] = {
+			    {"bg blue"sv, color::bg_blue},
+			    {"bg cyan"sv, color::bg_cyan},
+			    {"bg green"sv, color::bg_green},
+			    {"bg magenta"sv, color::bg_magenta},
+			    {"bg rating"sv, color::bg_rating},
+			    {"bg red"sv, color::bg_red},
+			    {"bg yellow"sv, color::bg_yellow},
+			    {"blue"sv, color::blue},
+			    {"bold"sv, color::bold},
+			    {"bold blue"sv, color::bold_blue},
+			    {"bold cyan"sv, color::bold_cyan},
+			    {"bold green"sv, color::bold_green},
+			    {"bold magenta"sv, color::bold_magenta},
+			    {"bold red"sv, color::bold_red},
+			    {"bold yellow"sv, color::bold_yellow},
+			    {"cyan"sv, color::cyan},
+			    {"faint"sv, color::faint},
+			    {"faint italic"sv, color::faint_italic},
+			    {"green"sv, color::green},
+			    {"magenta"sv, color::magenta},
+			    {"normal"sv, color::normal},
+			    {"rating"sv, color::rating},
+			    {"red"sv, color::red},
+			    {"reset"sv, color::reset},
+			    {"yellow"sv, color::yellow},
+			};
+			static_assert(is_sorted(colors), "Sort this table!");
+
+			auto const it =
+			    std::lower_bound(std::begin(colors), std::end(colors), name);
+			if (it != std::end(colors) && it->name == name) return it->value;
+			return std::nullopt;
+		}
+
 		template <typename It>
-		std::optional<placeholder::format> parse_hash(It& cur, It end) {
+		std::optional<format> is_it(std::string_view name,
+		                            placeholder::color response,
+		                            It& cur,
+		                            It end) {
+			auto sv_cur = name.begin();
+			auto sv_end = name.end();
+			while (cur != end && sv_cur != sv_end && *cur == *sv_cur) {
+				++cur;
+				++sv_cur;
+			}
+			if (sv_cur == sv_end) return response;
+			return std::nullopt;
+		}
+
+		template <typename It>
+		std::optional<format> parse_color(It& cur, It end) {
+			if (cur == end) return std::nullopt;
+			if (*cur == '(') {
+				++cur;
+				if (cur == end) return std::nullopt;
+				auto const start = cur;
+				while (cur != end && *cur != ')')
+					++cur;
+				if (cur == end) return std::nullopt;
+				auto const color = find_color({start, cur});
+				++cur;
+				if (color) return *color;
+				return std::nullopt;
+			}
+
+			if (*cur == 'g') return is_it("green"sv, color::green, cur, end);
+			if (*cur == 'b') return is_it("blue"sv, color::blue, cur, end);
+			if (*cur == 'r') {
+				++cur;
+				if (cur == end || *cur != 'e') return std::nullopt;
+				++cur;
+				if (cur == end) return std::nullopt;
+				if (*cur == 'd') {
+					++cur;
+					return color::red;
+				}
+				return is_it("set"sv, color::reset, cur, end);
+			}
+
+			return std::nullopt;
+		}
+		template <typename It>
+		std::optional<format> parse_hash(It& cur, It end) {
 			if (cur == end) return std::nullopt;
 
 			switch (*cur) {
@@ -538,7 +668,7 @@ namespace cov {
 			return std::nullopt;
 		}
 		template <typename It>
-		std::optional<placeholder::format> parse_hash_abbr(It& cur, It end) {
+		std::optional<format> parse_hash_abbr(It& cur, It end) {
 			if (cur == end) return std::nullopt;
 
 			switch (*cur) {
@@ -562,7 +692,7 @@ namespace cov {
 			return std::nullopt;
 		}
 		template <typename It>
-		std::optional<placeholder::format> parse_report(It& cur, It end) {
+		std::optional<format> parse_report(It& cur, It end) {
 			using placeholder::person_info;
 			if (cur == end) return std::nullopt;
 
@@ -580,7 +710,7 @@ namespace cov {
 			return std::nullopt;
 		}
 		template <typename It>
-		std::optional<placeholder::format> parse_stats(It& cur, It end) {
+		std::optional<format> parse_stats(It& cur, It end) {
 			if (cur == end) return std::nullopt;
 
 			switch (*cur) {
@@ -593,9 +723,9 @@ namespace cov {
 			return std::nullopt;
 		}
 		template <typename It>
-		std::optional<placeholder::format> parse_person(It& cur,
-		                                                It end,
-		                                                placeholder::who who) {
+		std::optional<format> parse_person(It& cur,
+		                                   It end,
+		                                   placeholder::who who) {
 			if (cur == end) return std::nullopt;
 
 			using placeholder::person;
@@ -615,13 +745,14 @@ namespace cov {
 			return std::nullopt;
 		}
 		template <typename It>
-		std::optional<placeholder::format> parse(It& cur, It end) {
+		std::optional<format> parse(It& cur, It end) {
 			if (cur == end) return std::nullopt;
 
 			switch (*cur) {
 				SIMPLE_FORMAT('%', '%');
 				SIMPLE_FORMAT('n', '\n');
 				DEEPER_FORMAT('x', parse_hex);
+				DEEPER_FORMAT('C', parse_color);
 				SIMPLE_FORMAT('D', placeholder::report::ref_names_unwrapped);
 				SIMPLE_FORMAT('d', placeholder::report::ref_names);
 				SIMPLE_FORMAT('s', placeholder::commit::subject);
@@ -678,4 +809,36 @@ namespace cov {
 
 		return result;
 	}
+
+	std::string formatter::shell_colorize(placeholder::color clr, void*) {
+		static constexpr std::string_view colors[] = {
+		    ""sv,            // color::normal
+		    "\033[m"sv,      // color::reset
+		    "\033[1m"sv,     // color::bold
+		    "\033[31m"sv,    // color::red
+		    "\033[32m"sv,    // color::green
+		    "\033[33m"sv,    // color::yellow
+		    "\033[34m"sv,    // color::blue
+		    "\033[35m"sv,    // color::magenta
+		    "\033[36m"sv,    // color::cyan
+		    "\033[1;31m"sv,  // color::bold_red
+		    "\033[1;32m"sv,  // color::bold_green
+		    "\033[1;33m"sv,  // color::bold_yellow
+		    "\033[1;34m"sv,  // color::bold_blue
+		    "\033[1;35m"sv,  // color::bold_magenta
+		    "\033[1;36m"sv,  // color::bold_cyan
+		    "\033[41m"sv,    // color::bg_red
+		    "\033[42m"sv,    // color::bg_green
+		    "\033[43m"sv,    // color::bg_yellow
+		    "\033[44m"sv,    // color::bg_blue
+		    "\033[45m"sv,    // color::bg_magenta
+		    "\033[46m"sv,    // color::bg_cyan
+		    "\033[2m"sv,     // color::faint
+		    "\033[2;3m"sv,   // color::faint_italic
+		};
+		auto const index = static_cast<size_t>(clr);
+		auto const color =
+		    index >= std::size(colors) ? colors[0] : colors[index];
+		return {color.data(), color.size()};
+	}  // namespace cov
 }  // namespace cov
