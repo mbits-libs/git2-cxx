@@ -36,7 +36,10 @@ namespace cov::testing {
 			}
 			std::ostream& operator()(char c) { return print_char(out, c); }
 			std::ostream& operator()(ph::color) { return out; }
-			std::ostream& operator()(ph::width const&) { return out; }
+			std::ostream& operator()(ph::width const& w) {
+				return out << "%w(" << w.total << ',' << w.indent1 << ','
+				           << w.indent2 << ')';
+			}
 			std::ostream& operator()(ph::report r) {
 				return out << "%report{" << static_cast<int>(r) << '}';
 			}
@@ -180,10 +183,13 @@ namespace cov::testing {
 	    MAKE_TEST("relevant", "%pR", ph::report::lines_relevant),
 	    MAKE_TEST("covered", "%pC", ph::report::lines_covered),
 	    MAKE_TEST("covered", "%pr", ph::report::lines_rating),
-
 	    MAKE_DATE_TEST("report", "r", ph::who::reporter),
 	    MAKE_PERSON_TEST("author", "a", ph::who::author),
 	    MAKE_PERSON_TEST("committer", "c", ph::who::committer),
+	    MAKE_TEST("empty width", "%w()", (ph::width{76, 6, 9})),
+	    MAKE_TEST("width (1 arg)", "%w(60)", (ph::width{60, 6, 9})),
+	    MAKE_TEST("width (indent only)", "%w(0, 6)", (ph::width{0, 6, 6})),
+	    MAKE_TEST("width (full suite)", "%w(60, 6, 8)", (ph::width{60, 6, 8})),
 	};
 
 	INSTANTIATE_TEST_SUITE_P(good, format_parser, ::testing::ValuesIn(tests));
@@ -273,6 +279,61 @@ namespace cov::testing {
 	        "not parens color (aquamarine)"sv,
 	        "pre %C(aquamarine) post"sv,
 	        {"pre %C(aquamarine) post"s},
+	    },
+	    {
+	        "not width I"sv,
+	        "pre %w post"sv,
+	        {"pre %w post"s},
+	    },
+	    {
+	        "not width IIa"sv,
+	        "pre %w(123,) post"sv,
+	        {"pre %w(123,) post"s},
+	    },
+	    {
+	        "not width IIb"sv,
+	        "pre %w(123,10,) post"sv,
+	        {"pre %w(123,10,) post"s},
+	    },
+	    {
+	        "not width IIc"sv,
+	        "pre %w(123,,10) post"sv,
+	        {"pre %w(123,,10) post"s},
+	    },
+	    {
+	        "not width IId"sv,
+	        "pre %w(,5,10) post"sv,
+	        {"pre %w(,5,10) post"s},
+	    },
+	    {
+	        "not width IIIa"sv,
+	        "pre %w(123,345,10) post"sv,
+	        {"pre %w(123,345,10) post"s},
+	    },
+	    {
+	        "not width IIIb"sv,
+	        "pre %w(123,10,345) post"sv,
+	        {"pre %w(123,10,345) post"s},
+	    },
+	    {
+	        "not width IV"sv,
+	        "pre %w(123,10,11,12) post"sv,
+	        {"pre %w(123,10,11,12) post"s},
+	    },
+	    {
+	        "not width Va"sv,
+	        "pre %w(123x,10,11) post"sv,
+	        {"pre %w(123x,10,11) post"s},
+	    },
+	    {
+	        "not width Vb"sv,
+	        "pre %w(123,x,11) post"sv,
+	        {"pre %w(123,x,11) post"s},
+	    },
+	    {
+	        "not width Vc"sv,
+	        "pre %w(123,10,z) post"sv,
+	        {"pre %w(123,10,z) post"s},
 	    },
 	};
 
