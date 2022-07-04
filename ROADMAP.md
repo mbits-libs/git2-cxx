@@ -6,13 +6,13 @@
   - [x] `report`
   - [x] `report_file`
   - [x] `line_coverage`
-- [x] Wrap I/O in Z streams _(M⬆️P)_
-- [x] Idea of references, tags and "branches" _(M⬆️P)_
-- [x] Report format for `log` _(M⬆️P)_
+- [x] Wrap I/O in Z streams _(0.2.0-alpha)_
+- [x] Idea of references, tags and "branches" _(0.3.0-alpha)_
+- [x] Report format for `log` _(0.4.1-alpha)_
+- [x] Add diff to `git2-c++` with file movement _(0.5.0-alpha)_
 - [ ] 💸 Cleanup initalization for `data-tz`
   - [ ] Properly setup `access_install` directory
   - [ ] Work with 7zip binary
-- [ ] Add diff to `git2-c++` with file movement _(M⬆️P)_
 - [ ] Add highlighting API
   - [ ] Add hilite for C++ _(M⬆️P)_
   - [ ] Add hilite for Python _(nice to have, M⬆️P)_
