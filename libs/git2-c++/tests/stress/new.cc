@@ -1,6 +1,7 @@
 #include "new.hh"
 #include <cstdio>
 #include <cstdlib>
+#include <new>
 
 static bool oom = false;
 static size_t threshold = 0;
