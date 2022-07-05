@@ -7,30 +7,31 @@
 #include <map>
 #include <string>
 #include <vector>
+#include "renames.hh"
 #include "setup.hh"
 
 namespace git::testing {
 	using namespace ::std::literals;
-	// [cov] Stress-testing allocator uses
-	static constexpr auto new_commit =
-	    "3a0d3e6bc19a581808ce005385437a4a276657c4"sv;
-	// [git2] Stress-testing allocator uses
+	// Initial commit
 	static constexpr auto old_commit =
-	    "cb62947f3ebcaf2869b0a7c1c76673db3641b72a"sv;
+	    "c4a21c57f65652474ae8945f84552e9e9d7c14f3"sv;
+	// Go crazy
+	static constexpr auto new_commit =
+	    "4e9be2749a866125dac0bb7fbe26c5a1ca667aac"sv;
 
 	TEST(diff, tree2tree) {
-		auto repo = repository::open(repository::discover("."sv));
+		auto repo = renames::open_repo();
 		ASSERT_TRUE(repo);
 
-		auto newer = commit::lookup(repo, new_commit);
 		auto older = commit::lookup(repo, old_commit);
-		ASSERT_TRUE(newer);
-		ASSERT_TRUE(older);
+		auto newer = commit::lookup(repo, new_commit);
+		ASSERT_TRUE(older) << "     SHA: " << old_commit;
+		ASSERT_TRUE(newer) << "     SHA: " << new_commit;
 
-		auto new_tree = newer.tree();
 		auto old_tree = older.tree();
-		ASSERT_TRUE(new_tree);
+		auto new_tree = newer.tree();
 		ASSERT_TRUE(old_tree);
+		ASSERT_TRUE(new_tree);
 
 		auto diff = old_tree.diff_to(new_tree, repo);
 		ASSERT_TRUE(diff);
@@ -40,8 +41,14 @@ namespace git::testing {
 
 		for (auto const& delta : diff.deltas()) {
 			if (delta.status != GIT_DELTA_RENAMED &&
-			    delta.status != GIT_DELTA_COPIED)
+			    delta.status != GIT_DELTA_COPIED) {
+				fmt::print("{}    {}\n", git_diff_status_char(delta.status),
+				           delta.new_file.path);
 				continue;
+			}
+			fmt::print("{}{:<3} {} {}\n", git_diff_status_char(delta.status),
+			           delta.similarity, delta.new_file.path,
+			           delta.old_file.path);
 			renames[delta.new_file.path] = delta.old_file.path;
 		}
 
@@ -49,16 +56,12 @@ namespace git::testing {
 		                                                        renames.end()};
 
 		for (auto const& [new_name, old_name] : actual) {
-			fmt::print("{} was {}\n", new_name, old_name);
+			fmt::print("> {} was {}\n", new_name, old_name);
 		}
 
 		std::vector<std::pair<std::string, std::string>> expected{
-		    {"libs/git2-c++/tests/stress/new.cc"s,
-		     "libs/git2-c++/tests/bad_alloc/new.cc"s},
-		    {"libs/git2-c++/tests/stress/new.hh"s,
-		     "libs/git2-c++/tests/bad_alloc/new.hh"s},
-		    {"libs/git2-c++/tests/stress/oom.cc"s,
-		     "libs/git2-c++/tests/bad_alloc/oom.cc"s}};
+		    {"subfolder/file.txt"s, "file.txt"s},
+		};
 		ASSERT_EQ(expected, actual);
 	}
 }  // namespace git::testing
