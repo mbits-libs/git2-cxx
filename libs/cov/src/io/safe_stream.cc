@@ -57,12 +57,12 @@ namespace cov::io {
 		}
 	}  // namespace
 
-	std::filesystem::path safe_base::alt_filename(
-	    std::string_view alt_prefix) const {
+	std::filesystem::path safe_base::alt_filename(std::string_view alt_prefix,
+	                                              bool ignore_mkdir) const {
 		return tmp_fname(
 		    path_.parent_path(),
 		    alt_prefix.empty() ? path_.stem().string() + "_tmp" : alt_prefix,
-		    path_.extension().string(), true);
+		    path_.extension().string(), ignore_mkdir);
 	}
 
 	size_t safe_stream::write(git::bytes data) {

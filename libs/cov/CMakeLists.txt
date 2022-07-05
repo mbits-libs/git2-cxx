@@ -72,21 +72,40 @@ if (COV_TESTING)
 	file(GLOB TEST_SRCS_CC tests/*.cc tests/format/*.cc)
 	file(GLOB TEST_SRCS_CPP tests/*.cpp)
 	file(GLOB TEST_SRCS_CXX tests/*.cxx)
-	source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/tests FILES ${TEST_SRCS_CC} ${TEST_SRCS_CPP} ${TEST_SRCS_CXX})
+	file(GLOB STRESS_TEST_SRCS_CC tests/stress/*.cc)
+	source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/tests FILES
+		${TEST_SRCS_CC}
+		${TEST_SRCS_CPP}
+		${TEST_SRCS_CXX}
+		${STRESS_TEST_SRCS_CC})
+
 	add_executable(cov-test ${TEST_SRCS_CC} ${TEST_SRCS_CPP} ${TEST_SRCS_CXX})
+	add_executable(cov-stress-test ${STRESS_TEST_SRCS_CC} tests/setup.cc ../git2-c++/tests/stress/new.cc)
+
 	set_target_properties(cov-test PROPERTIES FOLDER tests)
 	target_compile_options(cov-test PRIVATE ${ADDITIONAL_WALL_FLAGS})
-	if (COV_CUTDOWN_OS)
-		message(STATUS "cov-test: removing some tests on cutdown OS")
-		target_compile_options(cov-test PRIVATE -DCUTDOWN_OS=1)
-	endif()
 	target_link_libraries(cov-test libcov GTest::gmock_main)
 	target_include_directories(cov-test
 		PRIVATE
 			${CMAKE_CURRENT_SOURCE_DIR}/${TEST_EXE_TEST_SUBDIR}
 			${CMAKE_CURRENT_BINARY_DIR})
 
+	target_compile_options(cov-stress-test PRIVATE ${ADDITIONAL_WALL_FLAGS})
+	target_link_libraries(cov-stress-test PRIVATE libcov GTest::gtest_main)
+	target_include_directories(cov-stress-test
+		PRIVATE
+			${CMAKE_CURRENT_SOURCE_DIR}/${TEST_EXE_TEST_SUBDIR}
+			${CMAKE_CURRENT_SOURCE_DIR}/../git2-c++/tests/stress
+			${CMAKE_CURRENT_BINARY_DIR})
+
+	if (COV_CUTDOWN_OS)
+		message(STATUS "cov-test: removing some tests on cutdown OS")
+		target_compile_options(cov-test PRIVATE -DCUTDOWN_OS=1)
+		target_compile_options(cov-stress-test PRIVATE -DCUTDOWN_OS=1)
+	endif()
+
 	add_test(NAME cov COMMAND cov-test "--gtest_output=xml:${TEST_REPORT_DIR}/libcov/${TEST_REPORT_FILE}")
+	add_test(NAME cov-stress COMMAND cov-stress-test "--gtest_output=xml:${TEST_REPORT_DIR}/libcov-stress/${TEST_REPORT_FILE}")
 endif()
 
 install(

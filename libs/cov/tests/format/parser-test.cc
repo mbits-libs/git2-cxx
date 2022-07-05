@@ -211,6 +211,11 @@ namespace cov::testing {
 	        {"pre %xhg post"s},
 	    },
 	    {
+	        "not hex III"sv,
+	        "pre %x3\0 post"sv,
+	        {"pre %x3\0 post"s},
+	    },
+	    {
 	        "not hash"sv,
 	        "pre %Ha post"sv,
 	        {"pre %Ha post"s},

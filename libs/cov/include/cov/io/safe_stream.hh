@@ -9,22 +9,25 @@
 namespace cov::io {
 	class safe_base {
 	public:
-		safe_base(std::filesystem::path filename, std::string_view prefix = {})
-		    : path_{std::move(filename)}, tmp_filename_{alt_filename(prefix)} {}
+		safe_base(std::filesystem::path filename,
+		          std::string_view prefix = {},
+		          bool ignore_mkdir = true)
+		    : path_{std::move(filename)}
+		    , tmp_filename_{alt_filename(prefix, ignore_mkdir)} {}
 
 	protected:
 		std::filesystem::path path_;
 		std::filesystem::path tmp_filename_;
 
 	private:
-		std::filesystem::path alt_filename(
-		    std::string_view alt_prefix = {}) const;
+		std::filesystem::path alt_filename(std::string_view alt_prefix = {},
+		                                   bool ignore_mkdir = true) const;
 	};
 
 	class safe_stream final : public tmp_write_stream, private safe_base {
 	public:
-		safe_stream(std::filesystem::path filename)
-		    : safe_base{std::move(filename)} {}
+		safe_stream(std::filesystem::path filename, bool ignore_mkdir = true)
+		    : safe_base{std::move(filename), {}, ignore_mkdir} {}
 
 		size_t write(git::bytes data) override;
 		bool opened() const noexcept override;
@@ -37,8 +40,10 @@ namespace cov::io {
 
 	class safe_z_stream final : public z_write_stream, private safe_base {
 	public:
-		safe_z_stream(std::filesystem::path builddir, std::string_view prefix)
-		    : safe_base{std::move(builddir), prefix} {}
+		safe_z_stream(std::filesystem::path builddir,
+		              std::string_view prefix,
+		              bool ignore_mkdir = true)
+		    : safe_base{std::move(builddir), prefix, ignore_mkdir} {}
 		~safe_z_stream();
 
 		size_t write(git::bytes data) override;

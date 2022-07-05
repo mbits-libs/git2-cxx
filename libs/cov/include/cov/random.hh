@@ -18,7 +18,7 @@ namespace cov {
 	template <size_t len>
 	using mt = typename mt_t<len>::type;
 
-	struct seed_sequence {
+	struct seed_sequence {  // GCOV_EXCL_LINE -- automagical functions
 		std::random_device rd{};
 
 		using result_type = std::random_device::result_type;

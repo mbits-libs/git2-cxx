@@ -10,6 +10,7 @@ namespace cov::io::handlers {
 		struct report_entry_impl : report_entry {
 			report_entry_impl(report_entry_builder&& data)
 			    : data_{std::move(data)} {}
+			~report_entry_impl() = default;
 			bool is_dirty() const noexcept override { return data_.is_dirty; }
 			bool is_modified() const noexcept override {
 				return data_.is_modified;

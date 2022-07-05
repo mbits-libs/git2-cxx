@@ -173,7 +173,7 @@ namespace cov {
 			if (result)
 				out.commit();
 			else
-				out.rollback();
+				out.rollback();  // GCOV_EXCL_LINE -- untestable
 			return result;
 		}
 		std::filesystem::path root_;

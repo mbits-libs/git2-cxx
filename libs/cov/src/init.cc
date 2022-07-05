@@ -62,8 +62,11 @@ namespace cov {
 		}
 
 		if (auto const err = init_config(base_dir, git_dir)) {
+			// GCOV_EXCL_START -- untestable without a create_directories
+			// already reporting an error
 			ec = git::make_error_code(err);
 			return result;
+			// GCOV_EXCL_STOP
 		}
 
 		if (auto const touch = io::fopen(base_dir / names::HEAD, "wb");

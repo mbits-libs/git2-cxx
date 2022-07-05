@@ -79,10 +79,14 @@ namespace cov {
 		inline path rel_path(path const& dst, path const& srcdir) {
 			auto src_abs = weakly_canonical(srcdir);
 			auto dst_abs = weakly_canonical(dst);
+			// GCOV_EXCL_START -- this is Windows-specific
+			// remove this exclusion, when reports are merged
+			// alt: make platform-specific EXCL directives
 			if (dst_abs.has_root_name() &&
 			    dst_abs.root_name() == src_abs.root_name()) {
 				dst_abs = "/"sv / dst_abs.relative_path();
 			}
+			// GCOV_EXCL_STOP
 			auto result = proximate(dst, src_abs);
 			auto rel_str = get_path(result);
 			auto abs_str = get_path(dst_abs);

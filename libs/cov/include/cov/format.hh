@@ -228,7 +228,7 @@ namespace cov::placeholder {
 	private:
 		struct width_cleaner {
 			internal_context& ctx;
-			~width_cleaner();
+			~width_cleaner() noexcept;
 		};
 	};
 }  // namespace cov::placeholder
