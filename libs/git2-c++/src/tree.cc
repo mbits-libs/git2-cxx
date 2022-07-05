@@ -22,4 +22,12 @@ namespace git {
 		return git::create_handle<tree_entry>(git_tree_entry_bypath, get(),
 		                                      path);
 	}
+
+	diff tree::diff_to(tree const& other,
+	                   repository_handle repo,
+	                   git_diff_options const* opts) const noexcept {
+		return git::create_handle<diff>(git_diff_tree_to_tree, repo.get(),
+		                                get(), other.get(), opts);
+	}
+
 }  // namespace git

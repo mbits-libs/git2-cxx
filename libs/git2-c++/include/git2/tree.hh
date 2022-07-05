@@ -4,6 +4,7 @@
 #pragma once
 #include <git2/tree.h>
 #include <git2/blob.hh>
+#include <git2/diff.hh>
 #include <git2/object.hh>
 
 #include <string>
@@ -75,6 +76,10 @@ namespace git {
 		size_t count() const noexcept;
 		tree_entry_handle entry_byindex(size_t) const noexcept;
 		tree_entry entry_bypath(const char* path) const noexcept;
+
+		diff diff_to(tree const& new_tree,
+		             repository_handle repo,
+		             git_diff_options const* opts = nullptr) const noexcept;
 	};
 
 	template <class GitObject, git_object_t ObjectType>
