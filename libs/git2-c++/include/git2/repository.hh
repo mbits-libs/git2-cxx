@@ -76,13 +76,15 @@ namespace git {
 	enum class Discover { WithinFs = false, AcrossFs = true };
 
 	struct repository : basic_repository<ptr<git_repository>> {
+		// GCOV_EXCL_START - ctor seems to be inlined away
 		using basic_repository<ptr<git_repository>>::basic_repository;
+		// GCOV_EXCL_STOP
 
 		static repository open(std::filesystem::path const& path);
 		static repository wrap(const git::odb& odb);
 		static std::filesystem::path discover(
 		    std::filesystem::path const& start_path,
-		    Discover accross_fs = Discover::WithinFs);
+		    Discover accross_fs = Discover::WithinFs) noexcept;
 
 		operator repository_handle() const noexcept {
 			return repository_handle{get()};

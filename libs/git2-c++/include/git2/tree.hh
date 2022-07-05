@@ -37,7 +37,7 @@ namespace git {
 
 	template <class Holder>
 	struct basic_tree_entry : Holder {
-		using Holder::Holder;
+		using Holder::Holder;  // GCOV_EXCL_LINE - ctor seems to be inlined away
 
 		git_oid const& oid() const noexcept {
 			return *git_tree_entry_id(this->get());

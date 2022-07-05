@@ -13,7 +13,9 @@ namespace git {
 	GIT_PTR_FREE(git_odb);
 
 	struct odb : ptr<git_odb> {
+		// GCOV_EXCL_START - ctor seems to be inlined away
 		using ptr<git_odb>::ptr;
+		// GCOV_EXCL_STOP
 
 		static odb create();
 		static odb open(std::filesystem::path const&);

@@ -12,7 +12,9 @@ namespace git {
 	GIT_PTR_FREE(git_commit);
 
 	struct commit : basic_treeish<git_commit, GIT_OBJECT_COMMIT> {
+		// GCOV_EXCL_START - ctor seems to be inlined away
 		using basic_treeish<git_commit, GIT_OBJECT_COMMIT>::basic_treeish;
+		// GCOV_EXCL_STOP
 
 		static commit lookup(repository_handle repo,
 		                     std::string_view id) noexcept;

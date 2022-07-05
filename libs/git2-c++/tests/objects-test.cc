@@ -36,9 +36,16 @@ namespace git::testing {
 		ASSERT_EQ(setup::hash::README, readme.strid());
 		ASSERT_EQ("README.md"sv, readme.name());
 
+		auto const copy = readme;
+		ASSERT_TRUE(copy);
+		ASSERT_EQ(setup::hash::README, copy.strid());
+
 		auto const readme_id = dir.entry_bypath("README.md");
 		ASSERT_TRUE(readme_id);
 		ASSERT_EQ(setup::hash::README, readme_id.strid());
+
+		auto const subdir = dir.tree_bypath("subdir");
+		ASSERT_FALSE(subdir);
 	}
 
 	TEST(objects, blob) {
@@ -51,7 +58,7 @@ namespace git::testing {
 		    reinterpret_cast<char const*>(content.data()), content.size()};
 		ASSERT_EQ(view, "# Testing repos\n"sv);
 
-#if 0
+#if !defined(_WIN32) || !defined(CUTDOWN_OS)
 		auto buf = readme.filtered("README.md");
 		auto const data = git::bytes{buf};
 		auto const filtered_view = std::string_view{
