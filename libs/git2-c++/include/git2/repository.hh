@@ -51,8 +51,9 @@ namespace git {
 			                                      ObjectType::OBJECT_TYPE);
 		}
 
-	protected:
 		auto get() const { return Holder::get(); }
+
+	protected:
 		std::optional<std::string_view> safe(char const* str) const noexcept {
 			if (!str) return std::nullopt;
 			return str;

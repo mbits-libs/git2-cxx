@@ -14,6 +14,7 @@ set(SOURCES
   include/git2/blob.hh
   include/git2/commit.hh
   include/git2/config.hh
+  include/git2/diff.hh
   include/git2/error.hh
   include/git2/global.hh
   include/git2/object.hh
@@ -54,14 +55,14 @@ if (COV_TESTING)
   set_target_properties(git2-test git2-stress-test PROPERTIES FOLDER tests)
 
   target_compile_options(git2-test PRIVATE ${ADDITIONAL_WALL_FLAGS})
-	target_link_libraries(git2-test PRIVATE git2-c++ GTest::gtest_main)
+	target_link_libraries(git2-test PRIVATE git2-c++ GTest::gtest_main fmt::fmt)
 	target_include_directories(git2-test
 		PRIVATE
 			${CMAKE_CURRENT_SOURCE_DIR}/${TEST_EXE_TEST_SUBDIR}
 			${CMAKE_CURRENT_BINARY_DIR})
 
   target_compile_options(git2-stress-test PRIVATE ${ADDITIONAL_WALL_FLAGS})
-	target_link_libraries(git2-stress-test PRIVATE git2-c++ GTest::gtest_main)
+	target_link_libraries(git2-stress-test PRIVATE git2-c++ GTest::gtest_main fmt::fmt)
 	target_include_directories(git2-stress-test
 		PRIVATE
 			${CMAKE_CURRENT_SOURCE_DIR}/${TEST_EXE_TEST_SUBDIR}
