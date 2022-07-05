@@ -3,22 +3,49 @@
 #include <cstdlib>
 #include <new>
 
-static bool oom = false;
-static size_t threshold = 0;
+enum POLICY { USE_EVERYTHING, THRESHOLD, LIMIT };
 
-void set_oom(bool value, size_t next_threshold) {
-	oom = value;
-	threshold = next_threshold;
+static POLICY policy = POLICY::USE_EVERYTHING;
+static size_t argument = 0;
+
+void set_oom_as_threshold(size_t threshold) {
+	std::printf("threshold: %zu\n", threshold);
+	policy = POLICY::THRESHOLD;
+	argument = threshold;
+}
+
+void set_oom_as_limit(size_t limit) {
+	std::printf("limit: %zu\n", limit);
+	policy = POLICY::LIMIT;
+	argument = limit;
+}
+
+void reset_oom() {
+	policy = POLICY::USE_EVERYTHING;
 }
 
 namespace {
+	bool can_allocate(size_t size) {
+		if (policy == POLICY::THRESHOLD) {
+			if (size > argument) return false;
+		} else if (policy == POLICY::LIMIT) {
+			if (size > argument) return false;
+			argument -= size;
+		};
+		return true;
+	}
+
 	void* throw_bad_alloc() { throw std::bad_alloc(); }
 	void* return_nullptr() noexcept { return nullptr; }
 	void* alloc(size_t count, auto handler) noexcept(noexcept(handler())) {
-		auto result = oom && count > threshold ? nullptr : std::malloc(count);
-		if (oom) {
-			fprintf(stderr, "count: (%c) %zu\n", count > threshold ? '-' : '+',
-			        count);
+		auto const saved = argument;
+		auto allowed = can_allocate(count);
+		auto result = !allowed ? nullptr : std::malloc(count);
+		if (policy == POLICY::LIMIT) {
+			fprintf(stderr, "count: (%c) %zu / %zu\n", allowed ? '+' : '-',
+			        saved, count);
+		} else if (policy == POLICY::THRESHOLD) {
+			fprintf(stderr, "count: (%c) %zu\n", allowed ? '+' : '-', count);
 		}
 		if (!result) return handler();
 		return result;

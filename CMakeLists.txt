@@ -30,8 +30,11 @@ if (COV_TESTING)
   find_package(GTest REQUIRED)
 
   set(COVERALLS_PREFIX cov_)
-  foreach(module libs/git2-c++ libs/cov)
+  foreach(module libs/git2-c++ libs/cov libs/cell libs/hilite extras/highlighter)
     list(APPEND cov_COVERALLS_DIRS ${module}/include ${module}/src)
+  endforeach()
+  foreach(extra cxx py3 ts)
+    list(APPEND cov_COVERALLS_DIRS extras/hilite-${extra}/src)
   endforeach()
   include(${PROJECT_SOURCE_DIR}/tools/coveralls/Coveralls.cmake)
 
@@ -45,6 +48,7 @@ conan_basic_setup()
 if (MSVC)
   set(ADDITIONAL_WALL_FLAGS
       /D_CRT_SECURE_NO_WARNINGS
+      /utf-8
       /permissive-
       /Zc:__cplusplus
       /W4
@@ -100,3 +104,4 @@ endif()
 include(prepare_pack)
 
 add_subdirectory(libs)
+add_subdirectory(extras)

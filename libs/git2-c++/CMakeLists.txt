@@ -39,11 +39,11 @@ if (COV_TESTING)
 
   find_package(GTest REQUIRED CONFIG HINTS)
 
-	file(GLOB TEST_SRCS_CC tests/*.cc)
-	file(GLOB TEST_SRCS_CPP tests/*.cpp)
-	file(GLOB TEST_SRCS_CXX tests/*.cxx)
-	file(GLOB STRESS_TEST_SRCS_CC tests/stress/*.cc)
-	source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/tests FILES
+  file(GLOB TEST_SRCS_CC tests/*.cc)
+  file(GLOB TEST_SRCS_CPP tests/*.cpp)
+  file(GLOB TEST_SRCS_CXX tests/*.cxx)
+  file(GLOB STRESS_TEST_SRCS_CC tests/stress/*.cc)
+  source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/tests FILES
     ${TEST_SRCS_CC}
     ${TEST_SRCS_CPP}
     ${TEST_SRCS_CXX}
@@ -55,24 +55,24 @@ if (COV_TESTING)
   set_target_properties(git2-test git2-stress-test PROPERTIES FOLDER tests)
 
   target_compile_options(git2-test PRIVATE ${ADDITIONAL_WALL_FLAGS})
-	target_link_libraries(git2-test PRIVATE git2-c++ GTest::gtest_main fmt::fmt)
-	target_include_directories(git2-test
-		PRIVATE
-			${CMAKE_CURRENT_SOURCE_DIR}/${TEST_EXE_TEST_SUBDIR}
-			${CMAKE_CURRENT_BINARY_DIR})
+  target_link_libraries(git2-test PRIVATE git2-c++ GTest::gtest_main fmt::fmt)
+  target_include_directories(git2-test
+    PRIVATE
+      ${CMAKE_CURRENT_SOURCE_DIR}/tests
+      ${CMAKE_CURRENT_BINARY_DIR})
 
   target_compile_options(git2-stress-test PRIVATE ${ADDITIONAL_WALL_FLAGS})
-	target_link_libraries(git2-stress-test PRIVATE git2-c++ GTest::gtest_main fmt::fmt)
-	target_include_directories(git2-stress-test
-		PRIVATE
-			${CMAKE_CURRENT_SOURCE_DIR}/${TEST_EXE_TEST_SUBDIR}
-			${CMAKE_CURRENT_BINARY_DIR})
+  target_link_libraries(git2-stress-test PRIVATE git2-c++ GTest::gtest_main fmt::fmt)
+  target_include_directories(git2-stress-test
+    PRIVATE
+      ${CMAKE_CURRENT_SOURCE_DIR}/tests
+      ${CMAKE_CURRENT_BINARY_DIR})
 
-	if (COV_CUTDOWN_OS)
-		message(STATUS "git2-test: removing some tests on cutdown OS")
-		target_compile_options(git2-test PRIVATE -DCUTDOWN_OS=1)
+  if (COV_CUTDOWN_OS)
+    message(STATUS "git2-test: removing some tests on cutdown OS")
+    target_compile_options(git2-test PRIVATE -DCUTDOWN_OS=1)
     target_compile_options(git2-stress-test PRIVATE -DCUTDOWN_OS=1)
-	endif()
+  endif()
 
   add_test(NAME git2-c++ COMMAND git2-test "--gtest_output=xml:${TEST_REPORT_DIR}/libgit2-c++/${TEST_REPORT_FILE}")
   add_test(NAME git2-stress COMMAND git2-stress-test "--gtest_output=xml:${TEST_REPORT_DIR}/libgit2-c++-stress/${TEST_REPORT_FILE}")
@@ -80,16 +80,16 @@ endif()
 
 install(
   TARGETS git2-c++
-  COMPONENT libgit2-c++
+  COMPONENT libgit2_cxx
 )
 
 install(
   DIRECTORY include/
   TYPE INCLUDE
-  COMPONENT libgit2-c++
+  COMPONENT libgit2_cxx
 )
 
-cpack_add_component(libgit2-c++
+cpack_add_component(libgit2_cxx
   DISPLAY_NAME "libgit2-c++"
   GROUP devel
 )
