@@ -20,7 +20,7 @@ namespace git::testing {
 
 		bool is_empty = false;
 		{
-			emulate_oom here{OOM_STR_THRESHOLD};
+			emulate_oom_as_threshold here{OOM_STR_THRESHOLD};
 			is_empty = obj.strid().empty();
 		}
 		ASSERT_TRUE(is_empty);
@@ -41,7 +41,7 @@ namespace git::testing {
 
 		bool is_empty = false;
 		{
-			emulate_oom here{OOM_STR_THRESHOLD};
+			emulate_oom_as_threshold here{OOM_STR_THRESHOLD};
 			is_empty = readme_id.strid().empty();
 		}
 		ASSERT_TRUE(is_empty);
@@ -57,7 +57,7 @@ namespace git::testing {
 
 		std::optional<std::string> actual;
 		{
-			emulate_oom here{OOM_STR_THRESHOLD};
+			emulate_oom_as_threshold here{OOM_STR_THRESHOLD};
 			actual = cfg.get_string("my.value");
 		}
 		ASSERT_FALSE(actual);
@@ -73,7 +73,7 @@ namespace git::testing {
 
 		std::optional<std::filesystem::path> actual;
 		{
-			emulate_oom here{OOM_STR_THRESHOLD};
+			emulate_oom_as_threshold here{OOM_STR_THRESHOLD};
 			actual = cfg.get_path("my.value");
 		}
 		ASSERT_FALSE(actual);
@@ -83,7 +83,7 @@ namespace git::testing {
 		auto const start = setup::test_dir() / "gitdir/subdir/"sv;
 		bool is_empty = false;
 		{
-			emulate_oom here{OOM_STR_THRESHOLD};
+			emulate_oom_as_threshold here{OOM_STR_THRESHOLD};
 			is_empty = git::repository::discover(start).empty();
 		}
 		ASSERT_TRUE(is_empty);

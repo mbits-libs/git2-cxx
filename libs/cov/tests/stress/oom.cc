@@ -154,7 +154,7 @@ namespace cov::testing {
 
 		bool reserved = false;
 		{
-			emulate_oom here{20 * sizeof(size_t)};
+			emulate_oom_as_threshold here{20 * sizeof(size_t)};
 			reserved = block.reserve_offsets(21);
 		}
 		ASSERT_FALSE(reserved);
@@ -166,7 +166,7 @@ namespace cov::testing {
 
 		bool reserved = false;
 		{
-			emulate_oom here{200};
+			emulate_oom_as_threshold here{200};
 			reserved = block.reserve_data(201);
 		}
 		ASSERT_FALSE(reserved);
@@ -191,7 +191,7 @@ namespace cov::testing {
 		    .insert("short_20"sv);
 
 		{
-			emulate_oom here{OOM_STR_THRESHOLD};
+			emulate_oom_as_threshold here{OOM_STR_THRESHOLD};
 			bld.insert("short_21"sv)
 			    .insert("short_22"sv)
 			    .insert("short_23"sv)

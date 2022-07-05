@@ -1,56 +1,56 @@
 configure_file(src/version.in.hh ${CMAKE_CURRENT_BINARY_DIR}/include/cov/version.hh @ONLY)
 
 set(SOURCES
-	src/hash/md5.cc
-	src/hash/sha1.cc
-	src/io/db_object-error.cc
-	src/io/db_object.cc
-	src/io/file.cc
-	src/io/line_coverage.cc
-	src/io/read_stream.cc
-	src/io/report_files.cc
-	src/io/report.cc
-	src/io/safe_stream.cc
-	src/io/strings.cc
-	src/ref/internal.hh
-	src/ref/reference_list.cc
-	src/ref/reference.cc
-	src/ref/references.cc
-	src/branch-tag.hh
-	src/branch.cc
-	src/counted.cc
-	src/db.cc
-	src/discover.cc
-	src/format.cc
-	src/init.cc
-	src/path-utils.hh
-	src/streams.cc
-	src/tag.cc
-	src/zstream.cc
-	include/cov/hash/hash.hh
-	include/cov/hash/md5.hh
-	include/cov/hash/sha1.hh
-	include/cov/io/db_object.hh
-	include/cov/io/file.hh
-	include/cov/io/line_coverage.hh
-	include/cov/io/read_stream.hh
-	include/cov/io/report_files.hh
-	include/cov/io/report.hh
-	include/cov/io/safe_stream.hh
-	include/cov/io/strings.hh
-	include/cov/io/types.hh
-	include/cov/branch.hh
-	include/cov/counted.hh
-	include/cov/db.hh
-	include/cov/discover.hh
-	include/cov/format.hh
-	include/cov/init.hh
-	include/cov/object.hh
-	include/cov/reference.hh
-	include/cov/report.hh
-	include/cov/streams.hh
-	include/cov/tag.hh
-	include/cov/zstream.hh
+  src/hash/md5.cc
+  src/hash/sha1.cc
+  src/io/db_object-error.cc
+  src/io/db_object.cc
+  src/io/file.cc
+  src/io/line_coverage.cc
+  src/io/read_stream.cc
+  src/io/report_files.cc
+  src/io/report.cc
+  src/io/safe_stream.cc
+  src/io/strings.cc
+  src/ref/internal.hh
+  src/ref/reference_list.cc
+  src/ref/reference.cc
+  src/ref/references.cc
+  src/branch-tag.hh
+  src/branch.cc
+  src/counted.cc
+  src/db.cc
+  src/discover.cc
+  src/format.cc
+  src/init.cc
+  src/path-utils.hh
+  src/streams.cc
+  src/tag.cc
+  src/zstream.cc
+  include/cov/hash/hash.hh
+  include/cov/hash/md5.hh
+  include/cov/hash/sha1.hh
+  include/cov/io/db_object.hh
+  include/cov/io/file.hh
+  include/cov/io/line_coverage.hh
+  include/cov/io/read_stream.hh
+  include/cov/io/report_files.hh
+  include/cov/io/report.hh
+  include/cov/io/safe_stream.hh
+  include/cov/io/strings.hh
+  include/cov/io/types.hh
+  include/cov/branch.hh
+  include/cov/counted.hh
+  include/cov/db.hh
+  include/cov/discover.hh
+  include/cov/format.hh
+  include/cov/init.hh
+  include/cov/object.hh
+  include/cov/reference.hh
+  include/cov/report.hh
+  include/cov/streams.hh
+  include/cov/tag.hh
+  include/cov/zstream.hh
 )
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})
 
@@ -58,54 +58,55 @@ add_library(libcov STATIC ${SOURCES})
 target_compile_options(libcov PRIVATE ${ADDITIONAL_WALL_FLAGS})
 target_link_options(libcov PRIVATE ${ADDITIONAL_LINK_FLAGS})
 target_include_directories(libcov PUBLIC
-	${CMAKE_CURRENT_SOURCE_DIR}/include
-	${CMAKE_CURRENT_BINARY_DIR}/include)
+  ${CMAKE_CURRENT_SOURCE_DIR}/include
+  ${CMAKE_CURRENT_BINARY_DIR}/include)
 target_link_libraries(libcov PUBLIC git2-c++ OpenSSL::OpenSSL fmt::fmt date::date)
 
 set_target_properties(libcov PROPERTIES FOLDER libs OUTPUT_NAME cov)
 
 if (COV_TESTING)
-	enable_testing()
+  enable_testing()
 
-	find_package(GTest REQUIRED CONFIG HINTS)
+  find_package(GTest REQUIRED CONFIG HINTS)
 
-	file(GLOB TEST_SRCS_CC tests/*.cc tests/format/*.cc)
-	file(GLOB TEST_SRCS_CPP tests/*.cpp)
-	file(GLOB TEST_SRCS_CXX tests/*.cxx)
-	file(GLOB STRESS_TEST_SRCS_CC tests/stress/*.cc)
-	source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/tests FILES
-		${TEST_SRCS_CC}
-		${TEST_SRCS_CPP}
-		${TEST_SRCS_CXX}
-		${STRESS_TEST_SRCS_CC})
+  file(GLOB TEST_SRCS_CC tests/*.cc tests/format/*.cc)
+  file(GLOB TEST_SRCS_CPP tests/*.cpp)
+  file(GLOB TEST_SRCS_CXX tests/*.cxx)
+  file(GLOB STRESS_TEST_SRCS_CC tests/stress/*.cc)
+  source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/tests FILES
+    ${TEST_SRCS_CC}
+    ${TEST_SRCS_CPP}
+    ${TEST_SRCS_CXX}
+    ${STRESS_TEST_SRCS_CC})
 
-	add_executable(cov-test ${TEST_SRCS_CC} ${TEST_SRCS_CPP} ${TEST_SRCS_CXX})
-	add_executable(cov-stress-test ${STRESS_TEST_SRCS_CC} tests/setup.cc ../git2-c++/tests/stress/new.cc)
+  add_executable(cov-test ${TEST_SRCS_CC} ${TEST_SRCS_CPP} ${TEST_SRCS_CXX})
+  add_executable(cov-stress-test ${STRESS_TEST_SRCS_CC} tests/setup.cc ../git2-c++/tests/stress/new.cc)
 
-	set_target_properties(cov-test PROPERTIES FOLDER tests)
-	target_compile_options(cov-test PRIVATE ${ADDITIONAL_WALL_FLAGS})
-	target_link_libraries(cov-test libcov GTest::gmock_main)
-	target_include_directories(cov-test
-		PRIVATE
-			${CMAKE_CURRENT_SOURCE_DIR}/${TEST_EXE_TEST_SUBDIR}
-			${CMAKE_CURRENT_BINARY_DIR})
+  set_target_properties(cov-test cov-stress-test PROPERTIES FOLDER tests)
 
-	target_compile_options(cov-stress-test PRIVATE ${ADDITIONAL_WALL_FLAGS})
-	target_link_libraries(cov-stress-test PRIVATE libcov GTest::gtest_main)
-	target_include_directories(cov-stress-test
-		PRIVATE
-			${CMAKE_CURRENT_SOURCE_DIR}/${TEST_EXE_TEST_SUBDIR}
-			${CMAKE_CURRENT_SOURCE_DIR}/../git2-c++/tests/stress
-			${CMAKE_CURRENT_BINARY_DIR})
+  target_compile_options(cov-test PRIVATE ${ADDITIONAL_WALL_FLAGS})
+  target_link_libraries(cov-test libcov GTest::gmock_main)
+  target_include_directories(cov-test
+    PRIVATE
+      ${CMAKE_CURRENT_SOURCE_DIR}/tests
+      ${CMAKE_CURRENT_BINARY_DIR})
 
-	if (COV_CUTDOWN_OS)
-		message(STATUS "cov-test: removing some tests on cutdown OS")
-		target_compile_options(cov-test PRIVATE -DCUTDOWN_OS=1)
-		target_compile_options(cov-stress-test PRIVATE -DCUTDOWN_OS=1)
-	endif()
+  target_compile_options(cov-stress-test PRIVATE ${ADDITIONAL_WALL_FLAGS})
+  target_link_libraries(cov-stress-test PRIVATE libcov GTest::gtest_main)
+  target_include_directories(cov-stress-test
+    PRIVATE
+      ${CMAKE_CURRENT_SOURCE_DIR}/tests
+      ${CMAKE_CURRENT_SOURCE_DIR}/../git2-c++/tests/stress
+      ${CMAKE_CURRENT_BINARY_DIR})
 
-	add_test(NAME cov COMMAND cov-test "--gtest_output=xml:${TEST_REPORT_DIR}/libcov/${TEST_REPORT_FILE}")
-	add_test(NAME cov-stress COMMAND cov-stress-test "--gtest_output=xml:${TEST_REPORT_DIR}/libcov-stress/${TEST_REPORT_FILE}")
+  if (COV_CUTDOWN_OS)
+    message(STATUS "cov-test: removing some tests on cutdown OS")
+    target_compile_options(cov-test PRIVATE -DCUTDOWN_OS=1)
+    target_compile_options(cov-stress-test PRIVATE -DCUTDOWN_OS=1)
+  endif()
+
+  add_test(NAME cov COMMAND cov-test "--gtest_output=xml:${TEST_REPORT_DIR}/libcov/${TEST_REPORT_FILE}")
+  add_test(NAME cov-stress COMMAND cov-stress-test "--gtest_output=xml:${TEST_REPORT_DIR}/libcov-stress/${TEST_REPORT_FILE}")
 endif()
 
 install(
@@ -120,7 +121,7 @@ install(
 )
 
 cpack_add_component(libcov
-  DISPLAY_NAME "libgit2-c++"
-  DEPENDS libgit2-c++
+  DISPLAY_NAME "libcov"
+  DEPENDS libgit2_cxx
   GROUP devel
 )

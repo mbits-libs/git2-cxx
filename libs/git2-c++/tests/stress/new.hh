@@ -5,11 +5,20 @@
 
 #include <cstddef>
 
-void set_oom(bool value, size_t threshold = 0);
+void set_oom_as_threshold(size_t threshold);
+void set_oom_as_limit(size_t limit);
+void reset_oom();
 
-struct emulate_oom {
-	emulate_oom(size_t threshold) { set_oom(true, threshold); }
-	~emulate_oom() { set_oom(false); }
+struct emulate_oom_as_threshold {
+	emulate_oom_as_threshold(size_t threshold) {
+		set_oom_as_threshold(threshold);
+	}
+	~emulate_oom_as_threshold() { reset_oom(); }
+};
+
+struct emulate_oom_as_limit {
+	emulate_oom_as_limit(size_t limit) { set_oom_as_limit(limit); }
+	~emulate_oom_as_limit() { reset_oom(); }
 };
 
 #ifdef _WIN32
@@ -18,10 +27,15 @@ struct emulate_oom {
 #define OOM_STR_THRESHOLD 24u
 #endif
 
-#define OOM_BEGIN(THRESHOLD)             \
-	try {                                \
-		{                                \
-			emulate_oom here{THRESHOLD}; \
+#define OOM_BEGIN(THRESHOLD)                          \
+	try {                                             \
+		{                                             \
+			emulate_oom_as_threshold here{THRESHOLD}; \
+			{
+#define OOM_LIMIT(LIMIT)                      \
+	try {                                     \
+		{                                     \
+			emulate_oom_as_limit here{LIMIT}; \
 			{
 #define OOM_END                                \
 	}                                          \
