@@ -85,6 +85,22 @@ namespace cov::testing {
 		ASSERT_EQ("first line\nsecond line\n"sv, data);
 	}
 
+	TEST(stream, no_tmpname) {
+		auto const outname = setup::test_dir() / "subdir/file.txt"sv;
+		{
+			// cannot create a directory, if it is a file already
+			remove_all(setup::test_dir() / "subdir"sv);
+			create_directories(setup::test_dir());
+			io::fopen(outname.parent_path(), "w");
+		}
+
+		try {
+			io::safe_stream{outname, false};
+			FAIL() << "Expecting an exception.";
+		} catch (...) {
+		}
+	}
+
 	TEST(stream, unsecured) {
 		auto const outname = prep_file("unsecured.txt"sv);
 		ASSERT_FALSE(outname.empty());

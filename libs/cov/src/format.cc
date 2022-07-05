@@ -546,7 +546,7 @@ namespace cov::placeholder {
 		return std::visit(visitor{*this, out, ctx}, fmt);
 	}
 
-	report_view::width_cleaner::~width_cleaner() {
+	report_view::width_cleaner::~width_cleaner() noexcept {
 		ctx.current_witdh = std::nullopt;
 	}
 }  // namespace cov::placeholder
@@ -574,7 +574,9 @@ namespace cov {
 		return CB(cur, end, ARG)
 
 		unsigned hex(char c) {
-			switch (c) {
+			// there are definitely test going through here, that lend at
+			// "return 16", however they do not trigger line counters
+			switch (c) {  // GCOV_EXCL_LINE -- test-resistant
 				case '0':
 				case '1':
 				case '2':

@@ -81,7 +81,7 @@ namespace cov {
 						if (!device) {
 							device = current_device;
 						} else if (*device != *current_device) {
-							return {};
+							return {};  // GCOV_EXCL_LINE -- untestable
 						}
 					}
 				}

@@ -41,7 +41,7 @@ if (COV_TESTING)
 	file(GLOB TEST_SRCS_CC tests/*.cc)
 	file(GLOB TEST_SRCS_CPP tests/*.cpp)
 	file(GLOB TEST_SRCS_CXX tests/*.cxx)
-	file(GLOB STRESS_TEST_SRCS_CC tests/bad_alloc/*.cc)
+	file(GLOB STRESS_TEST_SRCS_CC tests/stress/*.cc)
 	source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/tests FILES
     ${TEST_SRCS_CC}
     ${TEST_SRCS_CPP}
