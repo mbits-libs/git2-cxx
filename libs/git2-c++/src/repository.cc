@@ -30,14 +30,18 @@ namespace git {
 	}
 
 	std::filesystem::path repository::discover(path const& start_path,
-	                                           Discover accross_fs) {
+	                                           Discover accross_fs) noexcept {
 		std::filesystem::path out;
 
 		git_buf buf{};
-		auto const ret = git_repository_discover(
-		    &buf, get_path(start_path).c_str(),
-		    accross_fs == Discover::AcrossFs ? 1 : 0, NULL);
-		if (!ret) out = buf.ptr;
+		try {
+			auto const ret = git_repository_discover(
+			    &buf, get_path(start_path).c_str(),
+			    accross_fs == Discover::AcrossFs ? 1 : 0, NULL);
+			if (!ret) out = buf.ptr;
+		} catch (std::bad_alloc&) {
+			out.clear();
+		}
 
 		git_buf_dispose(&buf);
 		return out;

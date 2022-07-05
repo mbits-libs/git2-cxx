@@ -11,7 +11,9 @@ namespace git {
 	GIT_PTR_FREE(git_blob);
 
 	struct blob : object_ptr<git_blob, GIT_OBJECT_BLOB> {
+		// GCOV_EXCL_START - ctor seems to be inlined away
 		using object_ptr<git_blob, GIT_OBJECT_BLOB>::object_ptr;
+		// GCOV_EXCL_STOP
 
 		static blob lookup(repository_handle repo,
 		                   std::string_view id) noexcept;

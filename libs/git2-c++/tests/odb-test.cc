@@ -54,6 +54,20 @@ namespace git::testing {
 		    std::string(static_cast<size_t>(GIT_OID_HEXSZ), '\0');
 	};
 
+	TEST_P(hasher, write) {
+		auto [expected, bytes] = GetParam();
+		auto const path = setup::test_dir() / "hasher-write"sv;
+		remove_all(path);
+		create_directories(path);
+		auto local_odb = git::odb::open(path);
+		git_oid oid;
+		auto const result = local_odb.write(
+		    &oid, git::bytes{bytes.data(), bytes.size()}, GIT_OBJECT_BLOB);
+		git_oid_fmt(actual.data(), &oid);
+		ASSERT_EQ(expected, actual);
+		ASSERT_TRUE(result);
+	}
+
 	TEST_P(hasher, hash) {
 		auto [expected, bytes] = GetParam();
 		git_oid oid;
