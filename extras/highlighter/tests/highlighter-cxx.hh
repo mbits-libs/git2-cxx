@@ -528,9 +528,11 @@ returned)"sv;)--=--"sv,
 #endif
 
 #ifdef MACRO
+#elifdef ANOTHER_MACRO
 #endif
 
 #ifndef MACRO
+#elifndef ANOTHER_MACRO
 #endif
 
 #line 234 "file.h"
@@ -611,21 +613,33 @@ returned)"sv;)--=--"sv,
 	                hl_line{152u,
 	                        {tok_cxx_meta{
 	                            text_span{0u, 1u},
+	                            tok_cxx_meta_identifier{text_span{1u, 8u}},
+	                            text_span{8u, 9u},
+	                            tok_cxx_macro_name{text_span{9u, 22u}}}}},
+	                hl_line{175u,
+	                        {tok_cxx_meta{
+	                            text_span{0u, 1u},
 	                            tok_cxx_meta_identifier{text_span{1u, 6u}}}}},
-	                hl_line{159u, {}},
-	                hl_line{160u,
+	                hl_line{182u, {}},
+	                hl_line{183u,
 	                        {tok_cxx_meta{
 	                            text_span{0u, 1u},
 	                            tok_cxx_meta_identifier{text_span{1u, 7u}},
 	                            text_span{7u, 8u},
 	                            tok_cxx_macro_name{text_span{8u, 13u}}}}},
-	                hl_line{174u,
+	                hl_line{197u,
+	                        {tok_cxx_meta{
+	                            text_span{0u, 1u},
+	                            tok_cxx_meta_identifier{text_span{1u, 9u}},
+	                            text_span{9u, 10u},
+	                            tok_cxx_macro_name{text_span{10u, 23u}}}}},
+	                hl_line{221u,
 	                        {tok_cxx_meta{
 	                            text_span{0u, 1u},
 	                            tok_cxx_meta_identifier{text_span{1u, 6u}}}}},
-	                hl_line{181u, {}},
+	                hl_line{228u, {}},
 	                hl_line{
-	                    182u,
+	                    229u,
 	                    {tok_cxx_meta{
 	                        text_span{0u, 1u},
 	                        tok_cxx_meta_identifier{text_span{1u, 5u}},
@@ -636,9 +650,9 @@ returned)"sv;)--=--"sv,
 	                            tok_cxx_string_delim{text_span{10u, 11u}},
 	                            text_span{11u, 17u},
 	                            tok_cxx_string_delim{text_span{17u, 18u}}}}}},
-	                hl_line{201u, {}},
+	                hl_line{248u, {}},
 	                hl_line{
-	                    202u,
+	                    249u,
 	                    {tok_cxx_meta{
 	                         text_span{0u, 1u},
 	                         tok_cxx_meta_identifier{text_span{1u, 6u}},
@@ -646,7 +660,7 @@ returned)"sv;)--=--"sv,
 	                         tok_cxx_identifier{text_span{7u, 8u}}},
 	                     text_span{8u, 23u}},
 	                },
-	                hl_line{226u, {}},
+	                hl_line{273u, {}},
 	            },
 	        },
 	    },
@@ -767,6 +781,117 @@ urn;
 	                     tok_cxx_punctuator{text_span{3u, 4u}}},
 	                },
 	                hl_line{56u, {tok_cxx_punctuator{text_span{0u, 1u}}}},
+	            },
+	        },
+	    },
+	    {
+	        "module-export.cpp"sv,
+	        R"(module ; 
+// global fragment
+
+export module name . that : song;
+// module fragment
+
+module :private;
+//private fragment
+)"sv,
+	        cxx_ctx,
+	        {
+	            .dict{},
+	            .lines{
+	                hl_line{0u,
+	                        {tok_cxx_meta{tok_cxx_keyword{text_span{0u, 6u}},
+	                                      text_span{6u, 7u},
+	                                      tok_cxx_punctuator{text_span{7u, 8u}},
+	                                      text_span{8u, 9u}}}},
+	                hl_line{10u, {tok_cxx_line_comment{text_span{0u, 18u}}}},
+	                hl_line{29u, {}},
+	                hl_line{30u,
+	                        {tok_cxx_meta{
+	                            tok_cxx_keyword{text_span{0u, 6u}},
+	                            text_span{6u, 7u},
+	                            tok_cxx_keyword{text_span{7u, 13u}},
+	                            text_span{13u, 14u},
+	                            tok_cxx_module_name{
+	                                tok_cxx_identifier{text_span{14u, 18u}},
+	                                text_span{18u, 19u},
+	                                tok_cxx_punctuator{text_span{19u, 20u}},
+	                                text_span{20u, 21u},
+	                                tok_cxx_identifier{text_span{21u, 25u}},
+	                                text_span{25u, 26u},
+	                                tok_cxx_punctuator{text_span{26u, 27u}},
+	                                text_span{27u, 28u},
+	                                tok_cxx_identifier{text_span{28u, 32u}}},
+	                            tok_cxx_punctuator{text_span{32u, 33u}}}}},
+	                hl_line{64u, {tok_cxx_line_comment{text_span{0u, 18u}}}},
+	                hl_line{83u, {}},
+	                hl_line{84u,
+	                        {tok_cxx_meta{
+	                            tok_cxx_keyword{text_span{0u, 6u}},
+	                            text_span{6u, 8u},
+	                            tok_cxx_keyword{text_span{8u, 15u}},
+	                            tok_cxx_punctuator{text_span{15u, 16u}}}}},
+	                hl_line{101u, {tok_cxx_line_comment{text_span{0u, 18u}}}},
+	                hl_line{120u, {}},
+	            },
+	        },
+	    },
+	    {
+	        "re-export.cpp"sv,
+	        R"(import <system>;
+import "local";
+import not.a.module
+export import some.module;
+export import :part;
+)"sv,
+	        cxx_ctx,
+	        {
+	            .dict{HL_CXX(local_header_name), HL_CXX(system_header_name)},
+	            .lines{
+	                hl_line{0u,
+	                        {tok_cxx_meta{
+	                            tok_cxx_keyword{text_span{0u, 6u}},
+	                            text_span{6u, 7u},
+	                            tok_cxx_system_header_name{text_span{7u, 15u}},
+	                            tok_cxx_punctuator{text_span{15u, 16u}}}}},
+	                hl_line{17u,
+	                        {tok_cxx_meta{
+	                            tok_cxx_keyword{text_span{0u, 6u}},
+	                            text_span{6u, 7u},
+	                            tok_cxx_local_header_name{text_span{7u, 14u}},
+	                            tok_cxx_punctuator{text_span{14u, 15u}}}}},
+	                hl_line{
+	                    33u,
+	                    {tok_cxx_identifier{text_span{0u, 6u}},
+	                     text_span{6u, 7u},
+	                     tok_cxx_known_ident_1{text_span{7u, 10u}},
+	                     tok_cxx_punctuator{text_span{10u, 11u}},
+	                     tok_cxx_identifier{text_span{11u, 12u}},
+	                     tok_cxx_punctuator{text_span{12u, 13u}},
+	                     tok_cxx_identifier{text_span{13u, 19u}}},
+	                },
+	                hl_line{53u,
+	                        {tok_cxx_meta{
+	                            tok_cxx_keyword{text_span{0u, 6u}},
+	                            text_span{6u, 7u},
+	                            tok_cxx_keyword{text_span{7u, 13u}},
+	                            text_span{13u, 14u},
+	                            tok_cxx_module_name{
+	                                tok_cxx_identifier{text_span{14u, 18u}},
+	                                tok_cxx_punctuator{text_span{18u, 19u}},
+	                                tok_cxx_identifier{text_span{19u, 25u}}},
+	                            tok_cxx_punctuator{text_span{25u, 26u}}}}},
+	                hl_line{80u,
+	                        {tok_cxx_meta{
+	                            tok_cxx_keyword{text_span{0u, 6u}},
+	                            text_span{6u, 7u},
+	                            tok_cxx_keyword{text_span{7u, 13u}},
+	                            text_span{13u, 14u},
+	                            tok_cxx_module_name{
+	                                tok_cxx_punctuator{text_span{14u, 15u}},
+	                                tok_cxx_identifier{text_span{15u, 19u}}},
+	                            tok_cxx_punctuator{text_span{19u, 20u}}}}},
+	                hl_line{101u, {}},
 	            },
 	        },
 	    },

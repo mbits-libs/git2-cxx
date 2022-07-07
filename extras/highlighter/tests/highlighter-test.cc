@@ -50,6 +50,7 @@ namespace highlighter::testing {
 			actual.lines.pop_back();
 		}
 
+		std::cout << ">> " << name << ":\n";
 		for (auto const& line : actual.lines) {
 			auto const length = length_of(line.contents);
 			auto const view = text.substr(line.start, length);
