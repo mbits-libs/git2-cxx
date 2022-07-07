@@ -14,7 +14,7 @@
   - [ ] Properly setup `access_install` directory
   - [ ] Work with 7zip binary
 - [x] Add highlighting API
-  - [x] Add hilite for C++ _(M⬆️P)_
+  - [x] Add hilite for C++ _(0.6.0-alpha)_
   - [ ] Add hilite for Python _(nice to have, M⬆️P)_
   - [ ] Add hilite for TypeScript _(nice to have, M⬆️P)_
 - [ ] Repository _(M⬆️P)_

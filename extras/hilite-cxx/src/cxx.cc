@@ -42,6 +42,8 @@ namespace hl::cxx::parser::callbacks {
 	          _is_raw_string(context) ? token::raw_string : token::string)
 	RULE_EMIT(punctuator, token::punctuator)
 	RULE_EMIT(pp_identifier, token::preproc_identifier)
+	RULE_EMIT(keyword, token::keyword)
+	RULE_EMIT(module_name, token::module_name)
 	RULE_EMIT(macro_name, token::macro_name)
 	RULE_EMIT(macro_arg, token::macro_arg)
 	RULE_EMIT(macro_va_args, token::macro_va_args)
@@ -68,85 +70,38 @@ namespace hl::cxx::parser::callbacks {
 #pragma warning(disable : 4307)  // C4307: '*': integral constant overflow
 #endif
 
-	constexpr static auto keywords = cell::token_set{"alignas"sv,
-	                                                 "const_cast"sv,
-	                                                 "for"sv,
-	                                                 "public"sv,
-	                                                 "thread_local"sv,
-	                                                 "alignof"sv,
-	                                                 "continue"sv,
-	                                                 "friend"sv,
-	                                                 "register"sv,
-	                                                 "throw"sv,
-	                                                 "asm"sv,
-	                                                 "decltype"sv,
-	                                                 "goto"sv,
-	                                                 "reinterpret_cast"sv,
-	                                                 "true"sv,
-	                                                 "auto"sv,
-	                                                 "default"sv,
-	                                                 "if"sv,
-	                                                 "requires"sv,
-	                                                 "try"sv,
-	                                                 "bool"sv,
-	                                                 "delete"sv,
-	                                                 "inline"sv,
-	                                                 "return"sv,
-	                                                 "typedef"sv,
-	                                                 "break"sv,
-	                                                 "do"sv,
-	                                                 "int"sv,
-	                                                 "short"sv,
-	                                                 "typeid"sv,
-	                                                 "case"sv,
-	                                                 "double"sv,
-	                                                 "long"sv,
-	                                                 "signed"sv,
-	                                                 "typename"sv,
-	                                                 "catch"sv,
-	                                                 "dynamic_cast"sv,
-	                                                 "mutable"sv,
-	                                                 "sizeof"sv,
-	                                                 "union"sv,
-	                                                 "char"sv,
-	                                                 "else"sv,
-	                                                 "namespace"sv,
-	                                                 "static"sv,
-	                                                 "unsigned"sv,
-	                                                 "char16_t"sv,
-	                                                 "enum"sv,
-	                                                 "new"sv,
-	                                                 "static_assert"sv,
-	                                                 "using"sv,
-	                                                 "char32_t"sv,
-	                                                 "explicit"sv,
-	                                                 "noexcept"sv,
-	                                                 "static_cast"sv,
-	                                                 "virtual"sv,
-	                                                 "class"sv,
-	                                                 "export"sv,
-	                                                 "nullptr"sv,
-	                                                 "struct"sv,
-	                                                 "void"sv,
-	                                                 "concept"sv,
-	                                                 "extern"sv,
-	                                                 "operator"sv,
-	                                                 "switch"sv,
-	                                                 "volatile"sv,
-	                                                 "const"sv,
-	                                                 "false"sv,
-	                                                 "private"sv,
-	                                                 "template"sv,
-	                                                 "wchar_t"sv,
-	                                                 "constexpr"sv,
-	                                                 "float"sv,
-	                                                 "protected"sv,
-	                                                 "this"sv,
-	                                                 "while"sv};
+	constexpr static auto keywords = cell::token_set{
+	    "alignas"sv,      "alignof"sv,      "asm"sv,
+	    "auto"sv,         "bool"sv,         "break"sv,
+	    "case"sv,         "catch"sv,        "char"sv,
+	    "char16_t"sv,     "char32_t"sv,     "char8_t"sv,
+	    "class"sv,        "co_await"sv,     "co_return"sv,
+	    "co_yield"sv,     "concept"sv,      "const_cast"sv,
+	    "const"sv,        "consteval"sv,    "constexpr"sv,
+	    "constinit"sv,    "continue"sv,     "decltype"sv,
+	    "default"sv,      "delete"sv,       "do"sv,
+	    "double"sv,       "dynamic_cast"sv, "else"sv,
+	    "enum"sv,         "explicit"sv,     "export"sv,
+	    "extern"sv,       "false"sv,        "float"sv,
+	    "for"sv,          "friend"sv,       "goto"sv,
+	    "if"sv,           "inline"sv,       "int"sv,
+	    "long"sv,         "mutable"sv,      "namespace"sv,
+	    "new"sv,          "noexcept"sv,     "nullptr"sv,
+	    "operator"sv,     "private"sv,      "protected"sv,
+	    "public"sv,       "register"sv,     "reinterpret_cast"sv,
+	    "requires"sv,     "return"sv,       "short"sv,
+	    "signed"sv,       "sizeof"sv,       "static_assert"sv,
+	    "static_cast"sv,  "static"sv,       "struct"sv,
+	    "switch"sv,       "template"sv,     "this"sv,
+	    "thread_local"sv, "throw"sv,        "true"sv,
+	    "try"sv,          "typedef"sv,      "typeid"sv,
+	    "typename"sv,     "union"sv,        "unsigned"sv,
+	    "using"sv,        "virtual"sv,      "void"sv,
+	    "volatile"sv,     "wchar_t"sv,      "while"sv};
 
 	constexpr static auto replacements = cell::token_set{
-	    "and_eq"sv, "or_eq"sv, "xor_eq"sv, "not_eq"sv, "and"sv,  "or"sv,
-	    "xor"sv,    "not"sv,   "bitand"sv, "bitor"sv,  "compl"sv};
+	    "and"sv,   "and_eq"sv, "bitand"sv, "bitor"sv, "compl"sv, "not"sv,
+	    "or_eq"sv, "xor_eq"sv, "not_eq"sv, "or"sv,    "xor"sv};
 
 	constexpr static auto cstdint = cell::token_set{
 	    "int8_t"sv,         "int16_t"sv,        "int32_t"sv,
@@ -553,72 +508,76 @@ namespace hl::cxx::parser {
 		return string_token{std::string_view(str, len)}[on_pp_identifier];
 	}
 
+	static constexpr auto operator""_kw(const char* str, size_t len) {
+		return string_token{std::string_view(str, len)}[on_keyword];
+	}
+
 	// clang-format off
 	// leave the rules in semi-readable state.
 	constexpr auto line_comment =
-		("//" >> *(ch - eol))						[on_line_comment]
-		;
+	  ("//" >> *(ch - eol))                    [on_line_comment]
+	  ;
 
 	constexpr auto block_comment =
-		(
-		"/*" >> *(
-			(ch - '*' - eol)
-			| ('*' >> !ch('/'))
-			| eol									[on_newline]
-			) >> "*/"
-		)											[on_block_comment]
-		;
+	  (
+	  "/*" >> *(
+	    (ch - '*' - eol)
+	    | ('*' >> !ch('/'))
+	    | eol                                  [on_newline]
+	    ) >> "*/"
+	  )                                        [on_block_comment]
+	  ;
 
 	constexpr auto SP_char =
-		inlspace									[on_ws]
-		| line_comment
-		| block_comment
-		;
+	  inlspace                                 [on_ws]
+	  | line_comment
+	  | block_comment
+	  ;
 
 	constexpr auto SP =
-		*SP_char
-		;
+	  *SP_char
+	  ;
 
 	constexpr auto mandatory_SP =
-		+SP_char
-		;
+	  +SP_char
+	  ;
 
 	constexpr auto UCN_value =
-		('u' >> repeat(4)(xdigit))
-		| ('U' >> repeat(8)(xdigit))
-		;
+	  ('u' >> repeat(4)(xdigit))
+	  | ('U' >> repeat(8)(xdigit))
+	  ;
 
 	constexpr auto nondigit =
-		'_'
-		| alpha
-		;
+	  '_'
+	  | alpha
+	  ;
 
 	constexpr auto ident_nondigit =
-		'_'
-		| alpha
-		| ('\\' >> UCN_value)						[on_ucn]
-		;
+	  '_'
+	  | alpha
+	  | ('\\' >> UCN_value)                    [on_ucn]
+	  ;
 
 	constexpr auto sign = ch("+-");
 
 	constexpr auto header_name =
-		('<' >> +(ch - eol - '>') >> '>')			[on_system_header]
-		| ('"' >> +(ch - eol - '"') >> '"')			[on_local_header]
-		;
+	  ('<' >> +(ch - eol - '>') >> '>')        [on_system_header]
+	  | ('"' >> +(ch - eol - '"') >> '"')      [on_local_header]
+	  ;
 
 	constexpr auto identifier =
-		ident_nondigit
-		>> *(ident_nondigit | digit)
-		;
+	  ident_nondigit
+	  >> *(ident_nondigit | digit)
+	  ;
 
 	constexpr auto pp_number =
-		-ch('.') >> digit >> *(
-			digit
-			| ident_nondigit
-			| ('\'' >> (digit | nondigit))
-			| (ch("eEpP") >> sign)
-			)
-		;
+	  -ch('.') >> digit >> *(
+	    digit
+	    | ident_nondigit
+	    | ('\'' >> (digit | nondigit))
+	    | (ch("eEpP") >> sign)
+	    )
+	  ;
 	// clang-format on
 
 	template <char C>
@@ -716,15 +675,15 @@ namespace hl::cxx::parser {
 	constexpr auto s_char = cxx_char_parser<'"'>{};
 
 	constexpr auto d_char =
-		ch - ch(" ()\\\t\v\f\r\n\"")
-		;
+	  ch - ch(" ()\\\t\v\f\r\n\"")
+	  ;
 
 	constexpr auto encoding_prefix =
-		lit("u8")
-		| "u"
-		| "U"
-		| "L"
-		;
+	  lit("u8")
+	  | "u"
+	  | "U"
+	  | "L"
+	  ;
 	// clang-format on
 
 	struct cxx_character_parser : cell::parser<cxx_character_parser> {
@@ -887,79 +846,80 @@ namespace hl::cxx::parser {
 	constexpr auto string_literal = cxx_string_parser{};
 
 	constexpr auto operators =
-	    lit("...") | "<=>" | "<<=" | ">>=" | "<<" | ">>" | "<:" | ":>" | "<%" |
-	    "%>" | "%:%:" | "%:" | "::" | "->*" | "->" | ".*" | "+=" | "-=" | "*=" |
-	    "/=" | "%=" | "^=" | "&=" | "|=" | "++" | "--" | "==" | "!=" | "<=" |
-	    ">=" | "&&" | "||" | "##" | ch("<>{}[]#()=;:?.~!+-*/%^&|,");
+	  lit("...") | "<=>" | "<<=" | ">>=" | "<<" | ">>" | "<:" | ":>" | "<%" |
+	  "%>" | "%:%:" | "%:" | "::" | "->*" | "->" | ".*" | "+=" | "-=" | "*=" |
+	  "/=" | "%=" | "^=" | "&=" | "|=" | "++" | "--" | "==" | "!=" | "<=" |
+	  ">=" | "&&" | "||" | "##" | ch("<>{}[]#()=;:?.~!+-*/%^&|,");
 
 	constexpr auto preprocessing_token =
-		character_literal							[on_character_literal]
-		| string_literal							[on_string_literal]
-		| identifier								[on_identifier]
-		| pp_number									[on_pp_number]
-		| operators									[on_punctuator]
-		;
+	  character_literal                        [on_character_literal]
+	  | string_literal                         [on_string_literal]
+	  | identifier                             [on_identifier]
+	  | pp_number                              [on_pp_number]
+	  | operators                              [on_punctuator]
+	  ;
 
 	constexpr auto mSP = mandatory_SP;
+	constexpr auto header_name_tokens = 
+	  string_literal
+	  | ('<'
+	    >> SP
+	    >> +((preprocessing_token - '>') >> SP)
+	    >> SP
+	    >> '>'
+	    )
+	  ;
 	constexpr auto __has_include_token =
-		"__has_include"_ident
-		>> SP
-		>> '('
-		>> SP >> (
-			header_name
-			| string_literal
-			| ('<'
-				>> SP
-				>> +((preprocessing_token - '>') >> SP)
-				>> SP
-				>> '>'
-				)
-			)
-		>> SP
-		>> ')'
-		;
+	  "__has_include"_ident
+	  >> SP
+	  >> '('
+	  >> SP >> (header_name | header_name_tokens)
+	  >> SP
+	  >> ')'
+	  ;
 
 	constexpr auto constant_expression =
-		+(
-			(
-			__has_include_token
-			| preprocessing_token
-			)
-			>> SP
-		)
-		;
+	  +(
+	    (
+	      __has_include_token
+	      | preprocessing_token
+	      )
+	    >> SP
+	    )
+	  ;
 
+	constexpr auto pp_tokens =
+	  preprocessing_token
+	  >> *(SP >> preprocessing_token)
+	  ;
 	constexpr auto opt_pp_tokens =
-		-(mSP
-			>> preprocessing_token
-			>> *(SP >> preprocessing_token)
-			)
-		>> SP
-		;
+	  -(mSP >> pp_tokens)
+	  >> SP
+	  ;
 	constexpr auto pp_define_arg_list =
-		( '('
-			>> SP
-			>> (
-				lit("...")							[on_macro_va_args]
-				| identifier						[on_macro_arg]
-					>> *(
-						SP
-						>> ','
-						>> SP
-						>> identifier				[on_macro_arg]
-						)
-					>> -(
-						SP
-						>> ','
-						>> SP
-						>> lit("...")				[on_macro_va_args]
-						)
-				| eps
-				)
-			>> SP
-			>> ')'
-			)										[on_pp_define_arg_list]
-		;
+	  ( '('
+	    >> SP
+	    >> (
+	      lit("...")                           [on_macro_va_args]
+	      | identifier                         [on_macro_arg]
+	        >> *(
+	          SP
+	          >> ','
+	          >> SP
+	          >> identifier                    [on_macro_arg]
+	          )
+	        >> -(
+	          SP
+	          >> ','
+	          >> SP
+	          >> lit("...")                    [on_macro_va_args]
+	          )
+	      | eps
+	      )
+	    >> SP
+	    >> ')'
+	    )                                      [on_pp_define_arg_list]
+	  ;
 	// clang-format on
 
 	template <typename Wrapped>
@@ -980,56 +940,74 @@ namespace hl::cxx::parser {
 	// clang-format off
 	constexpr auto pp_include = wrap([] {
 		static constexpr auto grammar =
-			"include"_pp_ident
-			>> SP
-			>> +((header_name | preprocessing_token) >> SP);
+		  "include"_pp_ident
+		  >> SP
+		  >> +((header_name | preprocessing_token) >> SP);
 		return (grammar);
 	});
 
 	constexpr auto pp_define = wrap([] {
 		static constexpr auto grammar =
-			"define"_pp_ident
-			>> mSP
-			>> identifier							[on_macro_name]
-			>> -pp_define_arg_list
-			>> SP
-			>> (*(preprocessing_token >> SP))		[on_replacement]
-			;
+		  "define"_pp_ident
+		  >> mSP
+		  >> identifier                      [on_macro_name]
+		  >> -pp_define_arg_list
+		  >> SP
+		  >> (*(preprocessing_token >> SP))  [on_replacement]
+		  ;
 		return (grammar);
 	});
 	constexpr auto pp_undef = wrap([] {
 		static constexpr auto grammar =
-			"undef"_pp_ident
-			>> mSP
-			>> identifier							[on_macro_name]
-			>> SP
-			;
+		  "undef"_pp_ident
+		  >> mSP
+		  >> identifier                      [on_macro_name]
+		  >> SP
+		  ;
 		return (grammar);
 	});
 	constexpr auto pp_if = wrap([] {
 		static constexpr auto grammar =
-			"if"_pp_ident
-			>> mSP
-			>> constant_expression
-			;
+		  "if"_pp_ident
+		  >> mSP
+		  >> constant_expression
+		  ;
 		return (grammar);
 	});
 	constexpr auto pp_ifdef = wrap([] {
 		static constexpr auto grammar =
-			"ifdef"_pp_ident
-			>> mSP
-			>> identifier							[on_macro_name]
-			>> SP
-			;
+		  "ifdef"_pp_ident
+		  >> mSP
+		  >> identifier                      [on_macro_name]
+		  >> SP
+		  ;
 		return (grammar);
 	});
 	constexpr auto pp_ifndef = wrap([] {
 		static constexpr auto grammar =
-			"ifndef"_pp_ident
-			>> mSP
-			>> identifier							[on_macro_name]
-			>> SP
-			;
+		  "ifndef"_pp_ident
+		  >> mSP
+		  >> identifier                      [on_macro_name]
+		  >> SP
+		  ;
+		return (grammar);
+	});
+	constexpr auto pp_elifdef = wrap([] {
+		static constexpr auto grammar =
+		  "elifdef"_pp_ident
+		  >> mSP
+		  >> identifier                      [on_macro_name]
+		  >> SP
+		  ;
+		return (grammar);
+	});
+	constexpr auto pp_elifndef = wrap([] {
+		static constexpr auto grammar =
+		  "elifndef"_pp_ident
+		  >> mSP
+		  >> identifier                      [on_macro_name]
+		  >> SP
+		  ;
 		return (grammar);
 	});
 
@@ -1038,20 +1016,22 @@ namespace hl::cxx::parser {
 
 	struct shorter_typename : cell::parser<shorter_typename> {
 		static constexpr auto parser =
-			pp_include
-			| pp_define
-			| pp_undef
-			| pp_ifdef
-			| pp_ifndef
-			| pp_if
-			| ("elif"_pp_ident >> mSP >> constant_expression)
-			| "else"_pp_ident >> SP
-			| "endif"_pp_ident >> SP
-			| ("line"_pp_ident >> mSP >> +(preprocessing_token >> SP))
-			| ("error"_pp_ident >> opt_pp_tokens)
-			| ("pragma"_pp_ident >> opt_pp_tokens)
-			| opt_pp_tokens
-			;
+		  pp_include
+		  | pp_define
+		  | pp_undef
+		  | pp_ifdef
+		  | pp_ifndef
+		  | pp_if
+		  | pp_elifdef
+		  | pp_elifndef
+		  | ("elif"_pp_ident >> mSP >> constant_expression)
+		  | "else"_pp_ident >> SP
+		  | "endif"_pp_ident >> SP
+		  | ("line"_pp_ident >> mSP >> +(preprocessing_token >> SP))
+		  | ("error"_pp_ident >> opt_pp_tokens)
+		  | ("pragma"_pp_ident >> opt_pp_tokens)
+		  | opt_pp_tokens
+		  ;
 
 		constexpr shorter_typename() = default;
 		template <typename Iterator, typename Context>
@@ -1062,20 +1042,62 @@ namespace hl::cxx::parser {
 
 	constexpr auto pp_control = shorter_typename{};
 
+	constexpr auto not_a_semicolon = preprocessing_token - ';';
+	constexpr auto module_name =
+	  not_a_semicolon
+	  >> *(SP >> not_a_semicolon)
+	  ;
+	constexpr auto pp_module_name =
+	  module_name                              [on_module_name]
+	  ;
+	constexpr auto pp_semi = SP >> (ch(';')[on_punctuator]) >> SP;
+	constexpr auto pp_module =
+	  -"export"_kw
+	  >> SP
+	  >> "module"_kw
+	  >> SP
+	  >> (
+	    (':' >> SP >> "private"_kw)
+	    | -pp_module_name
+	    )
+	  >> pp_semi
+	  ;
+	constexpr auto pp_import =
+	  -"export"_kw
+	  >> SP
+	  >> "import"_kw
+	  >> SP
+	  >> (
+	    (
+	      (header_name | header_name_tokens)
+	      >> opt_pp_tokens
+	      )
+	    | pp_module_name
+	    )
+	  >> pp_semi
+	  ;
+
 	constexpr auto control_line =
-		('#' >> SP >> pp_control)											[on_control_line]
-		;
+	  ('#' >> SP >> pp_control)
+	  | (ahead(pp_module) >> pp_module)
+	  | (ahead(pp_import) >> pp_import)
+	  ;
 
 	constexpr auto text_line = *(preprocessing_token >> SP);
-	constexpr auto line = SP >> (control_line | text_line) >> SP;
+	constexpr auto line =
+	  SP >> (
+	    control_line                           [on_control_line]
+	    | text_line
+	    ) >> SP
+	  ;
 	constexpr auto preprocessing_file =
-		*(
-			ahead(line >> eol)
-			>> line
-			>> eol		                                                    [on_newline]
-			)
-		>> -line
-		;
+	  *(
+	    ahead(line >> eol)
+	    >> line
+	    >> eol                                 [on_newline]
+	    )
+	  >> -line
+	  ;
 	// clang-format on
 
 	struct deleted_eol_parser : cell::parser<deleted_eol_parser> {

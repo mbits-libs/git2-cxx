@@ -219,6 +219,8 @@ namespace highlighter::testing {
 						return "\033[0;49;91m"sv;
 					case hl::escape_sequence:
 						return "\033[1;49;93m"sv;
+					case hl::module_name:
+						return "\033[2;49;91m"sv;
 					default: {
 						auto const it = dict.find(tok);
 						if (it != dict.end()) {
