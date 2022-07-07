@@ -5,13 +5,15 @@ set(SOURCES
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})
 
 set(DEPS)
-foreach(hilite cxx ps3 ts)
-  if (TARGET hilite-${hilite})
-    list(APPEND DEPS hilite-${hilite})
+foreach(hilite cxx py3 ts)
+  if (TARGET hilite_${hilite})
+    list(APPEND DEPS hilite_${hilite})
   endif()
 endforeach()
 if (NOT DEPS)
   list(APPEND DEPS hilite)
+else()
+  message(STATUS "Extras: ${DEPS}")
 endif()
 
 
