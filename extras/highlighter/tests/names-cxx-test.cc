@@ -1,7 +1,6 @@
 // Copyright (c) 2022 Marcin Zdun
 // This code is licensed under MIT license (see LICENSE for details)
 
-#include "hilite/cxx.hh"
 #include "support.hh"
 
 #include <fmt/format.h>
@@ -14,6 +13,8 @@
 #endif
 
 #ifdef HAS_CXX
+
+#include "hilite/cxx.hh"
 
 #undef HILITE_TOKENS
 #undef CXX_HILITE_TOKENS
