@@ -3,7 +3,7 @@ cpack_add_component_group(extras
   EXPANDED
 )
 
-add_subdirectory(hilite_cxx)
-add_subdirectory(hilite_py3)
-add_subdirectory(hilite_ts)
+add_subdirectory(hilite-cxx)
+add_subdirectory(hilite-py3)
+add_subdirectory(hilite-ts)
 add_subdirectory(highlighter)

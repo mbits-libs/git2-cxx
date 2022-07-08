@@ -6,8 +6,8 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})
 
 set(DEPS)
 foreach(hilite cxx py3 ts)
-  if (TARGET hilite_${hilite})
-    list(APPEND DEPS hilite_${hilite})
+  if (TARGET hilite-${hilite})
+    list(APPEND DEPS hilite-${hilite})
   endif()
 endforeach()
 if (NOT DEPS)
@@ -74,8 +74,15 @@ install(
   COMPONENT highlighter
 )
 
+set(_DEPS)
+
+foreach (DEP ${DEPS})
+  string(REPLACE "-" "_" _DEP ${DEP})
+  list(APPEND _DEPS "lib${_DEP}")
+endforeach()
+
 cpack_add_component(highlighter
   DISPLAY_NAME "libhighlighter"
-  DEPENDS ${DEPS}
+  DEPENDS ${_DEPS}
   GROUP extras
 )
