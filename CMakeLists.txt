@@ -30,11 +30,11 @@ if (COV_TESTING)
   find_package(GTest REQUIRED)
 
   set(COVERALLS_PREFIX cov_)
-  foreach(module libs/git2-c++ libs/cov libs/cell libs/hilite extras/highlighter)
+  foreach(module libs/git2-c++ libs/cov libs/cell libs/hilite/hilite libs/hilite/lighter)
     list(APPEND cov_COVERALLS_DIRS ${module}/include ${module}/src)
   endforeach()
   foreach(extra cxx py3 ts)
-    list(APPEND cov_COVERALLS_DIRS extras/hilite-${extra}/src)
+    list(APPEND cov_COVERALLS_DIRS libs/hilite/hilite-${extra}/src)
   endforeach()
   include(${PROJECT_SOURCE_DIR}/tools/coveralls/Coveralls.cmake)
 
@@ -104,4 +104,3 @@ endif()
 include(prepare_pack)
 
 add_subdirectory(libs)
-add_subdirectory(extras)

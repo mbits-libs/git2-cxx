@@ -1,7 +1,7 @@
 // Copyright (c) 2022 Marcin Zdun
 // This code is licensed under MIT license (see LICENSE for details)
 
-#include <hilite/highlighter.hh>
+#include <hilite/lighter.hh>
 
 #include <algorithm>
 #include <cell/tokens.hh>
@@ -13,21 +13,21 @@
 #define HAS_ANY_HILITE 0
 
 #ifdef __has_include
-#if __has_include("hilite/cxx.hh")
-#include "hilite/cxx.hh"
+#if __has_include("hilite/syntax/cxx.hh")
+#include "hilite/syntax/cxx.hh"
 #define HAS_CXX 1
 #undef HAS_ANY_HILITE
 #define HAS_ANY_HILITE 1
-#endif  // __has_include("hilite/cxx.hh")
-#if __has_include("hilite/py3.hh")
-#include "hilite/py3.hh"
+#endif  // __has_include("hilite/syntax/cxx.hh")
+#if __has_include("hilite/syntax/py3.hh")
+#include "hilite/syntax/py3.hh"
 #define HAS_PY3 1
 #undef HAS_ANY_HILITE
 #define HAS_ANY_HILITE 1
-#endif  // __has_include("hilite/py3.hh")
+#endif  // __has_include("hilite/syntax/py3.hh")
 #endif
 
-namespace highlighter {
+namespace lighter {
 	namespace {
 #define LIST_TOKENS(x) hl::x,
 		constexpr auto max_token_kind = std::max({HILITE_TOKENS(LIST_TOKENS)});
@@ -120,7 +120,7 @@ namespace highlighter {
 #pragma warning(pop)
 #endif
 
-		hl_iface const& locate_highlighter(
+		hl_iface const& locate_lighter(
 		    [[maybe_unused]] std::string_view as_filename) {
 #if HAS_ANY_HILITE
 			auto slash = as_filename.rfind('/');
@@ -250,6 +250,6 @@ namespace highlighter {
 
 	highlights highlights::from(std::string_view contents,
 	                            std::string_view as_filename) {
-		return tokenize(contents, locate_highlighter(as_filename));
+		return tokenize(contents, locate_lighter(as_filename));
 	}
-}  // namespace highlighter
+}  // namespace lighter

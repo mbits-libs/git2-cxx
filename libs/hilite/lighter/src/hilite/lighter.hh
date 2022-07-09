@@ -11,7 +11,7 @@
 #include <variant>
 #include <vector>
 
-namespace highlighter {
+namespace lighter {
 	struct text_span {
 		std::size_t begin;
 		std::size_t end;
@@ -107,4 +107,4 @@ namespace highlighter {
 		static highlights from(std::string_view contents,
 		                       std::string_view as_filename);
 	};
-}  // namespace highlighter
+}  // namespace lighter
