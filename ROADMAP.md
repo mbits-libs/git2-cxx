@@ -17,13 +17,13 @@
   - [x] Add hilite for C++ _(0.6.0-alpha)_
   - [ ] Add hilite for Python _(nice to have, M⬆️P)_
   - [ ] Add hilite for TypeScript _(nice to have, M⬆️P)_
-- [ ] Repository _(M⬆️P)_
+- [x] Repository _(0.7.0-alpha)_
   - config,
   - reports,
   - references,
   - formatting,
   - highlighting,
-  - diffing
+  - stats diffing
 - [ ] Add commands _(drop alpha)_
   - [ ] lngs baseline
   - [ ] `cov`, builtin and `libexec/cov` _(M⬆️P)_
@@ -33,13 +33,13 @@
   - [ ] `cov add`
     - [ ] coveralls _(separate M⬆️P)_
     - [ ] cobertura _(separate M⬆️P)_
-  - [ ] `cov add --amend`
-  - [ ] `cov tag` / `branch` / `checkout` _(only one M⬆️P)_
-  - [ ] `cov remove`
   - [ ] `cov log`
   - [ ] `cov show` _(only one M⬆️P)_
     - [ ] Report / component / directory view
     - [ ] File view
+  - [ ] `cov add --amend`
+  - [ ] `cov tag` / `branch` / `checkout` _(only one M⬆️P)_
+  - [ ] `cov remove`
   - [ ] Support for `less` _(optional, M⬆️P)_
   - _(⬆️FP)_
 - [ ] `cov serve`
