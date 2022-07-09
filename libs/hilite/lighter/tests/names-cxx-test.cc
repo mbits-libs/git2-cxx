@@ -7,14 +7,13 @@
 #include <gtest/gtest.h>
 
 #ifdef __has_include
-#if __has_include("hilite/cxx.hh")
+#if __has_include("hilite/syntax/cxx.hh")
+#include "hilite/syntax/cxx.hh"
 #define HAS_CXX 1
 #endif
 #endif
 
 #ifdef HAS_CXX
-
-#include "hilite/cxx.hh"
 
 #undef HILITE_TOKENS
 #undef CXX_HILITE_TOKENS
@@ -55,7 +54,7 @@
 	X(macro_va_args)            \
 	X(macro_replacement)
 
-namespace highlighter::testing {
+namespace lighter::testing {
 	using ::testing::TestWithParam;
 	using ::testing::ValuesIn;
 
@@ -92,6 +91,6 @@ namespace highlighter::testing {
 #undef STRINGIFY
 
 	INSTANTIATE_TEST_SUITE_P(tests, cxx, ::testing::ValuesIn(tests));
-}  // namespace highlighter::testing
+}  // namespace lighter::testing
 
 #endif  // defined(HAS_CXX)

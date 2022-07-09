@@ -5,7 +5,7 @@
 #include "cell/parser.hh"
 #include "support.hh"
 
-namespace highlighter::testing {
+namespace lighter::testing {
 	TEST(additional, compare_tokens) {
 		using hl::token_t;
 
@@ -45,4 +45,4 @@ namespace highlighter::testing {
 		cell::action_state off{};
 		ASSERT_FALSE(cell::action_state::enabled());
 	}
-}  // namespace highlighter::testing
+}  // namespace lighter::testing

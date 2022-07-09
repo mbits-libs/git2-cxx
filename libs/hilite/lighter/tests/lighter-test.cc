@@ -8,15 +8,15 @@
 #include <limits>
 
 #ifdef __has_include
-#if __has_include("hilite/cxx.hh")
+#if __has_include("hilite/syntax/cxx.hh")
 #define HAS_CXX 1
 #endif
-#if __has_include("hilite/py3.hh")
+#if __has_include("hilite/syntax/py3.hh")
 #define HAS_PY3 1
 #endif
 #endif
 
-namespace highlighter::testing {
+namespace lighter::testing {
 	using ::testing::TestWithParam;
 	using ::testing::ValuesIn;
 
@@ -37,9 +37,9 @@ namespace highlighter::testing {
 		}
 	};
 
-	class highlighter : public TestWithParam<hilite_test> {};
+	class lighter : public TestWithParam<hilite_test> {};
 
-	TEST_P(highlighter, colors) {
+	TEST_P(lighter, colors) {
 		auto const& [name, text, ctx, expected] = GetParam();
 		printer_state::setup(ctx.hl_macro, ctx.span_prefix);
 		auto actual = highlights::from(text, name);
@@ -121,13 +121,13 @@ int main() {
 	    },
 	};
 
-	INSTANTIATE_TEST_SUITE_P(none, highlighter, ::testing::ValuesIn(none));
-}  // namespace highlighter::testing
+	INSTANTIATE_TEST_SUITE_P(none, lighter, ::testing::ValuesIn(none));
+}  // namespace lighter::testing
 
 #ifdef HAS_CXX
-#include "highlighter-cxx.hh"
+#include "lighter-cxx.hh"
 #endif
 
 #ifdef HAS_PY3
-#include "highlighter-py3.hh"
+#include "lighter-py3.hh"
 #endif

@@ -2,12 +2,12 @@
 // This code is licensed under MIT license (see LICENSE for details)
 
 #pragma once
-#include "hilite/cxx.hh"
+#include "hilite/syntax/cxx.hh"
 
 #define HL_CXX(TOKEN) \
 	{ hl::cxx::TOKEN, #TOKEN##s }
 
-namespace highlighter::testing {
+namespace lighter::testing {
 	static hilite_ctx const cxx_ctx{"HL_CXX"sv, "cxx"sv};
 
 #define TOK_(x) using tok_cxx_##x = tok_<hl::cxx::token::x>;
@@ -905,5 +905,5 @@ export import :part;
 	     */
 	};
 
-	INSTANTIATE_TEST_SUITE_P(cxx, highlighter, ::testing::ValuesIn(cxx));
-}  // namespace highlighter::testing
+	INSTANTIATE_TEST_SUITE_P(cxx, lighter, ::testing::ValuesIn(cxx));
+}  // namespace lighter::testing

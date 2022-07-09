@@ -1,7 +1,7 @@
 // Copyright (c) 2022 Marcin Zdun
 // This code is licensed under MIT license (see LICENSE for details)
 
-#include "hilite/cxx.hh"
+#include "hilite/syntax/cxx.hh"
 #include "hilite/hilite_impl.hh"
 
 #include "cell/ascii.hh"

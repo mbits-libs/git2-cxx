@@ -60,7 +60,7 @@ target_link_options(libcov PRIVATE ${ADDITIONAL_LINK_FLAGS})
 target_include_directories(libcov PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}/include
   ${CMAKE_CURRENT_BINARY_DIR}/include)
-target_link_libraries(libcov PUBLIC git2-c++ OpenSSL::OpenSSL fmt::fmt date::date)
+target_link_libraries(libcov PUBLIC git2-c++ lighter fmt::fmt date::date PRIVATE OpenSSL::OpenSSL)
 
 set_target_properties(libcov PROPERTIES FOLDER libs OUTPUT_NAME cov)
 
@@ -92,7 +92,7 @@ if (COV_TESTING)
       ${CMAKE_CURRENT_BINARY_DIR})
 
   target_compile_options(cov-stress-test PRIVATE ${ADDITIONAL_WALL_FLAGS})
-  target_link_libraries(cov-stress-test PRIVATE libcov GTest::gtest_main)
+  target_link_libraries(cov-stress-test PRIVATE libcov GTest::gmock_main)
   target_include_directories(cov-stress-test
     PRIVATE
       ${CMAKE_CURRENT_SOURCE_DIR}/tests
@@ -122,6 +122,6 @@ install(
 
 cpack_add_component(libcov
   DISPLAY_NAME "libcov"
-  DEPENDS libgit2_cxx
+  DEPENDS git2_cxx lighter
   GROUP devel
 )

@@ -34,7 +34,7 @@
 	X(meta)              \
 	X(meta_identifier)
 
-namespace highlighter::testing {
+namespace lighter::testing {
 	using ::testing::TestWithParam;
 	using ::testing::ValuesIn;
 
@@ -71,4 +71,4 @@ namespace highlighter::testing {
 #undef STRINGIFY
 
 	INSTANTIATE_TEST_SUITE_P(tests, none, ::testing::ValuesIn(tests));
-}  // namespace highlighter::testing
+}  // namespace lighter::testing

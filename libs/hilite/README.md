@@ -1,12 +1,9 @@
-### `hilite`
-#### cell
-Cell is **`C`**`onst`**`E`**`xpr` **LL** parser inspired by Boost.Spirit X3.
+# Highlighting library
+## hilite
+This library sets up basic highlighting scheme, common "marker colors" and infrastructure for specific language tokenizer to produce colors. The `cell` part stands for **`C`**`onst`**`E`**`xpr` **LL** parser and is inspired by Boost.Spirit X3.
 
-#### hilite
-This library sets up basic highlighting scheme, common "marker colors" and infrastructure for specific language tokenizer to produce colors.
+## hilite-*
+Provides highlighting for any given language; wedged between `hilite` and `lighter`
 
-### `extras/hilite_*`
-provides highlighting for any given language; wedged between `hilite` and `highlighter`
-
-### `extras/highlighter`
-Highlighter is high-level API for text highlighting (also, here are all the `cell`/`hilite` tests live)
+## lighter
+Lighter is high-level API for text highlighting (also, here all the `cell`/`hilite`/`hilite-*` tests live)

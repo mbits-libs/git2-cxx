@@ -34,7 +34,7 @@ namespace hl::words {
 	}
 }  // namespace hl::words
 
-namespace highlighter::testing {
+namespace lighter::testing {
 	using namespace ::std::literals;
 
 	struct callback : hl::callback {
@@ -62,4 +62,4 @@ molestie nisi, ac pretium quam dictum at.)"sv,
 		    ""sv);
 		OOM_END;
 	}
-}  // namespace highlighter::testing
+}  // namespace lighter::testing

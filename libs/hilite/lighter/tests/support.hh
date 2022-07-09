@@ -3,12 +3,12 @@
 
 #pragma once
 
-#include <hilite/highlighter.hh>
 #include <hilite/hilite.hh>
+#include <hilite/lighter.hh>
 #include <iostream>
 #include <string_view>
 
-namespace highlighter {
+namespace lighter {
 	struct printer_state {
 		std::string_view hl_macro{};
 		std::string_view span_prefix{};
@@ -128,9 +128,9 @@ namespace highlighter {
 		}
 		*os << "},}";
 	}
-}  // namespace highlighter
+}  // namespace lighter
 
-namespace highlighter::testing {
+namespace lighter::testing {
 	using namespace std::literals;
 
 	template <unsigned tok>
@@ -277,4 +277,4 @@ namespace highlighter::testing {
 	}
 
 	using hl_line = highlights::line;
-}  // namespace highlighter::testing
+}  // namespace lighter::testing
