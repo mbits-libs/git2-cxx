@@ -2,6 +2,7 @@
 // This code is licensed under MIT license (see LICENSE for details)
 
 #include <gtest/gtest.h>
+#include <fstream>
 #include <git2/config.hh>
 #include "setup.hh"
 
@@ -248,4 +249,148 @@ submodule.bare.active=true)"sv,
 	};
 
 	INSTANTIATE_TEST_SUITE_P(repos, config, ValuesIn(repos));
+
+	struct config_global_test {
+		std::string_view name;
+		std::vector<std::pair<std::string_view, std::string_view>> files{};
+		std::vector<std::pair<std::string_view, std::string_view>> env{};
+		std::string_view expected;
+
+		friend std::ostream& operator<<(std::ostream& out,
+		                                config_global_test const& param) {
+			return out << param.name;
+		}
+	};
+
+	class config_global : public TestWithParam<config_global_test> {};
+
+	std::string_view view_of(char const* ptr) {
+		return ptr ? ptr : std::string_view{};
+	}
+	TEST_P(config_global, test_value) {
+		auto const& [_, files, env, expected] = GetParam();
+
+		auto const root = setup::test_dir() / "test_value"sv;
+		remove_all(root);
+
+		for (auto const& [filename, contents] : files) {
+			auto const file_path = setup::test_dir() / filename;
+			create_directories(file_path.parent_path());
+			std::ofstream out{file_path};
+			out.write(contents.data(),
+			          static_cast<std::streamsize>(contents.size()));
+		}
+
+		for (auto const& [name, value] : env) {
+#ifdef _WIN32
+			std::wstring var = std::filesystem::path{name}.native();
+			std::filesystem::path path{};
+			var.push_back(L'=');
+			if (!value.empty()) {
+				path = setup::test_dir() / value;
+				path.make_preferred();
+				var.append(path.native());
+			}
+			auto const result = _wputenv(var.c_str());
+			ASSERT_EQ(0, result) << "Variable: " << name;
+			if (value.empty()) {
+				ASSERT_EQ(nullptr, std::getenv(name.data()));
+			} else {
+				ASSERT_EQ(path.string(), view_of(std::getenv(name.data())));
+			}
+#else
+			if (value.empty()) {
+				auto const result = unsetenv(name.data());
+				ASSERT_EQ(0, result) << "Variable: " << name;
+				ASSERT_EQ(nullptr, std::getenv(name.data()));
+				continue;
+			}
+			auto const path = setup::test_dir() / value;
+			auto const result = setenv(name.data(), path.c_str(), 1);
+			ASSERT_EQ(0, result) << "Variable: " << name;
+			ASSERT_EQ(path.string(), std::getenv(name.data()));
+#endif
+		}
+
+		std::error_code ec{};
+		auto const cfg = git::config::open_default(".dotfile"sv, "dot"sv, ec);
+		ASSERT_FALSE(ec);
+		ASSERT_TRUE(cfg);
+
+		auto const value = cfg.get_string("test.value");
+		ASSERT_TRUE(value);
+		ASSERT_EQ(expected, *value);
+	}
+
+	static constexpr auto XDG_CONFIG_HOME = "XDG_CONFIG_HOME"sv;
+	static constexpr auto HOME = "HOME"sv;
+	static constexpr auto USERPROFILE = "USERPROFILE"sv;
+	static constexpr auto ProgramData = "ProgramData"sv;
+
+	static constexpr auto from_xdg_config = "[test]\nvalue=from xdg config"sv;
+	static constexpr auto from_home_xdg_config =
+	    "[test]\nvalue=from home/.config config"sv;
+	static constexpr auto from_user_profile =
+	    "[test]\nvalue=from user profile"sv;
+	static constexpr auto from_program_data =
+	    "[test]\nvalue=from program data"sv;
+
+	static config_global_test const env[] = {
+	    {
+	        .name = "Windows"sv,
+	        .files = {{"test-value/.dotfile"sv, from_user_profile},
+	                  {"test-value/data/.dotfile"sv, from_program_data}},
+	        .env = {{XDG_CONFIG_HOME, ""sv},
+	                {HOME, ""sv},
+	                {USERPROFILE, "test-value"sv},
+	                {ProgramData, "test-value/data"sv}},
+	        .expected = "from user profile"sv,
+	    },
+	    {
+	        .name = "XDG over $HOME"sv,
+	        .files = {{"test-value/actual/.config/dot/config"sv,
+	                   from_xdg_config},
+	                  {"test-value/home/.config/dot/config"sv,
+	                   from_home_xdg_config}},
+	        .env = {{XDG_CONFIG_HOME, "test-value/actual/.config"sv},
+	                {HOME, "test-value/home"sv},
+	                {USERPROFILE, ""sv},
+	                {ProgramData, ""sv}},
+	        .expected = "from xdg config"sv,
+	    },
+	    {
+	        .name = "$HOME if no XDG"sv,
+	        .files = {{"test-value/actual/.config/dot/config"sv,
+	                   from_xdg_config},
+	                  {"test-value/home/.config/dot/config"sv,
+	                   from_home_xdg_config}},
+	        .env = {{XDG_CONFIG_HOME, ""sv},
+	                {HOME, "test-value/home"sv},
+	                {USERPROFILE, ""sv},
+	                {ProgramData, ""sv}},
+	        .expected = "from home/.config config"sv,
+	    },
+	    {
+	        .name = "$HOME if no XDG"sv,
+	        .files = {{"test-value/data/.config"sv, from_program_data}},
+	        .env = {{XDG_CONFIG_HOME, ""sv},
+	                {HOME, ""sv},
+	                {USERPROFILE, ""sv},
+	                {ProgramData, "test-value/data"sv}},
+	        .expected = "from program data"sv,
+	    },
+#if 0
+	    {
+	        .name = ""sv,
+	        .files = {},
+	        .env = {{XDG_CONFIG_HOME, ""sv},
+	                {HOME, ""sv},
+	                {USERPROFILE, ""sv},
+	                {ProgramData, ""sv}},
+	        .expected = ""sv,
+	    },
+#endif
+	};
+
+	INSTANTIATE_TEST_SUITE_P(env, config_global, ValuesIn(env));
 }  // namespace git::testing

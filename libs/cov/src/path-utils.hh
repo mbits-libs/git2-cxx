@@ -36,7 +36,7 @@ namespace cov {
 			constexpr auto heads_dir_prefix = "refs/heads/"sv;
 			constexpr auto tags_dir_prefix = "refs/tags/"sv;
 			constexpr auto config = "config"sv;
-			constexpr auto dotconfig = ".covconfig"sv;
+			constexpr auto dot_config = ".covconfig"sv;
 			constexpr auto HEAD = "HEAD"sv;
 
 			constexpr char core_gitdir[] = "core.gitdir";

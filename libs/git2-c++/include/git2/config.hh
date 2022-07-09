@@ -22,12 +22,27 @@ namespace git {
 	struct config : ptr<git_config> {
 		using ptr<git_config>::ptr;
 
-		static config create() noexcept;
+		static config create() noexcept {
+			std::error_code ec{};
+			return create(ec);
+		}
+		static config create(std::error_code& ec) noexcept;
+		
+		static config open_default(std::string_view dot_name,
+		                           std::string_view app,
+		                           std::error_code& ec);
 
 		int add_file_ondisk(char const* path,
 		                    git_config_level_t level = GIT_CONFIG_LEVEL_LOCAL,
 		                    const git_repository* repo = nullptr,
 		                    int force = 1) const noexcept;
+		int add_file_ondisk(std::filesystem::path const& path,
+		                    git_config_level_t level = GIT_CONFIG_LEVEL_LOCAL,
+		                    const git_repository* repo = nullptr,
+		                    int force = 1) const noexcept;
+		int add_local_config(std::filesystem::path const& directory,
+		                     const git_repository* repo = nullptr,
+		                     int force = 1) const;
 		int set_unsigned(char const* name, unsigned value) const noexcept;
 		int set_bool(char const* name, bool value) const noexcept;
 		int set_string(char const* name, char const* value) const noexcept;

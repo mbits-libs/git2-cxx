@@ -2,6 +2,7 @@
 // This code is licensed under MIT license (see LICENSE for details)
 
 #include <gtest/gtest.h>
+#include <fstream>
 #include <git2/commit.hh>
 #include <git2/config.hh>
 #include "../setup.hh"
@@ -78,6 +79,33 @@ namespace git::testing {
 		}
 		ASSERT_FALSE(actual);
 	}
+
+#ifndef _WIN32
+	TEST(oom, config_default) {
+		auto const home = setup::test_dir() / "home"sv;
+
+		unsetenv("USERPROFILE");
+		unsetenv("ProgramData");
+		unsetenv("XDG_CONFIG_HOME");
+		setenv("HOME", home.c_str(), 1);
+
+		{
+			static constexpr auto from_home_xdg_config =
+			    "[test]\nvalue=from home/.config config"sv;
+			create_directories(home / ".config/dot"sv);
+			std::ofstream out{home / ".config/dot/config"sv};
+			out.write(
+			    from_home_xdg_config.data(),
+			    static_cast<std::streamsize>(from_home_xdg_config.size()));
+		}
+
+		std::error_code ignore{};
+		OOM_BEGIN(100)
+		auto const cfg =
+		    git::config::open_default(".dotfile"sv, "dot"sv, ignore);
+		OOM_END
+	}
+#endif
 
 	TEST(oom, repository_discover) {
 		auto const start = setup::test_dir() / "gitdir/subdir/"sv;

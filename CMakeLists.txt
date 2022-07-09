@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 3.20)
 project (cov
   DESCRIPTION "Code coverage presented localy"
-  VERSION 0.7.0
+  VERSION 0.7.1
   LANGUAGES CXX
 )
 
@@ -48,6 +48,7 @@ conan_basic_setup()
 if (MSVC)
   set(ADDITIONAL_WALL_FLAGS
       /D_CRT_SECURE_NO_WARNINGS
+      /D_CRT_NONSTDC_NO_WARNINGS
       /utf-8
       /permissive-
       /Zc:__cplusplus

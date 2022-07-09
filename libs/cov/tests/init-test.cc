@@ -10,26 +10,6 @@
 #include "setup.hh"
 
 namespace cov::testing {
-	struct entry_t {
-		std::string filename;
-		file_type type;
-
-		bool operator==(entry_t const& other) const noexcept {
-			return filename == other.filename && type == other.type;
-		}
-
-		bool operator<(entry_t const& other) const noexcept {
-			if (filename == other.filename) return type < other.type;
-			return filename < other.filename;
-		}
-
-		friend std::ostream& operator<<(std::ostream& out,
-		                                entry_t const& entry) {
-			return out << "{\"" << entry.filename << "\", "
-			           << static_cast<int>(entry.type) << '}';
-		}
-	};
-
 	std::optional<std::string> core_gitdir(path const& base_dir) {
 		auto config = git::config::create();
 		if (config.add_file_ondisk(
