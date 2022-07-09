@@ -18,12 +18,12 @@
   - [ ] Add hilite for Python _(nice to have, M⬆️P)_
   - [ ] Add hilite for TypeScript _(nice to have, M⬆️P)_
 - [x] Repository _(0.7.0-alpha)_
-  - config,
-  - reports,
-  - references,
-  - formatting,
-  - highlighting,
-  - stats diffing
+  - [x] config,
+  - [ ] reports,
+  - [ ] references,
+  - [ ] formatting,
+  - [ ] highlighting,
+  - [ ] stats diffing
 - [ ] Add commands _(drop alpha)_
   - [ ] lngs baseline
   - [ ] `cov`, builtin and `libexec/cov` _(M⬆️P)_

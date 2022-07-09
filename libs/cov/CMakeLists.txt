@@ -24,6 +24,7 @@ set(SOURCES
   src/format.cc
   src/init.cc
   src/path-utils.hh
+  src/repository.cc
   src/streams.cc
   src/tag.cc
   src/zstream.cc
@@ -48,6 +49,7 @@ set(SOURCES
   include/cov/object.hh
   include/cov/reference.hh
   include/cov/report.hh
+  include/cov/repository.hh
   include/cov/streams.hh
   include/cov/tag.hh
   include/cov/zstream.hh
