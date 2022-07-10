@@ -4,17 +4,12 @@
 #pragma once
 #include <cov/discover.hh>
 #include <cov/init.hh>
+#include <cov/reference.hh>
 #include <git2/config.hh>
 
 namespace cov {
 	struct repository {
 		~repository();
-
-		std::filesystem::path const& commondir() const noexcept {
-			return commondir_;
-		}
-
-		git::config const& config() const noexcept { return cfg_; }
 
 		static std::filesystem::path discover(
 		    std::filesystem::path const& current_dir,
@@ -36,6 +31,14 @@ namespace cov {
 			return repository{common, ec};
 		}
 
+		std::filesystem::path const& commondir() const noexcept {
+			return commondir_;
+		}
+
+		git::config const& config() const noexcept { return cfg_; }
+		ref_ptr<references> const& refs() const noexcept { return refs_; }
+		ref_ptr<object> dwim(std::string_view) const;
+
 	protected:
 		repository() = default;
 		explicit repository(std::filesystem::path const& common, std::error_code&);
@@ -43,5 +46,6 @@ namespace cov {
 	private:
 		std::filesystem::path commondir_{};
 		git::config cfg_{};
+		ref_ptr<references> refs_{};
 	};
 }  // namespace cov
