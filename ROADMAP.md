@@ -20,7 +20,7 @@
 - [x] Repository _(0.7.0-alpha)_
   - [x] config,
   - [ ] reports,
-  - [ ] references,
+  - [x] references,
   - [ ] formatting,
   - [ ] highlighting,
   - [ ] stats diffing
