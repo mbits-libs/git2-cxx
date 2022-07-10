@@ -58,16 +58,16 @@ namespace cov::testing {
 		          setup::get_path(covdir));
 	}
 
-	TEST_F(repository, init) {
+	TEST_F(repository, good_init) {
 		git::init init{};
 
-		run_setup(make_setup(remove_all("iniside_git"sv),
-		                     init_git_workspace("iniside_git"sv)));
+		run_setup(make_setup(remove_all("inside_git"sv),
+		                     init_git_workspace("inside_git"sv)));
 
 		std::error_code ec{};
 		auto const repo = cov::repository::init(
-		    setup::test_dir() / "iniside_git/.git/.covdata"sv,
-		    setup::test_dir() / "iniside_git/.git"sv, ec);
+		    setup::test_dir() / "inside_git/.git/.covdata"sv,
+		    setup::test_dir() / "inside_git/.git"sv, ec);
 		ASSERT_FALSE(ec);
 
 		auto const& commondir = repo.commondir();
@@ -96,6 +96,37 @@ namespace cov::testing {
 		auto dir = repo.config().get_string("core.gitdir");
 		ASSERT_TRUE(dir);
 		ASSERT_EQ(gitdir, *dir);
+	}
+
+	TEST_F(repository, init_existing) {
+		git::init init{};
+
+		run_setup(make_setup(
+		    remove_all("inside_git"sv), init_git_workspace("inside_git"sv),
+		    init_repo("inside_git/.git/.covdata"sv, "inside_git/.git"sv)));
+
+		std::error_code ec{};
+		auto const repo = cov::repository::init(
+		    setup::test_dir() / "inside_git/.git/.covdata"sv,
+		    setup::test_dir() / "inside_git/.git"sv, ec);
+		ASSERT_TRUE(ec);
+	}
+
+	TEST_F(repository, open_no_git) {
+		git::init init{};
+
+		run_setup(make_setup(
+		    remove_all("inside_git"sv), init_git_workspace("inside_git"sv),
+		    init_repo("inside_git/.git/.covdata"sv, "inside_git/.git"sv)));
+		{
+			auto f = io::fopen(setup::test_dir() / "inside_git/.git/.covdata/config"sv,
+			          "w");
+		}
+
+		std::error_code ec{};
+		auto const repo = cov::repository::open(
+		    setup::test_dir() / "inside_git/.git/.covdata"sv, ec);
+		ASSERT_TRUE(ec);
 	}
 
 	TEST_F(repository, git_missing) {
@@ -473,6 +504,7 @@ It has two lines.
 		ASSERT_TRUE(is_a<cov::blob>(blob_obj));
 		ASSERT_EQ(obj_blob, blob_obj->type());
 		auto blob = as_a<cov::blob>(blob_obj);
+		ASSERT_TRUE(blob);
 		ASSERT_EQ(cov::origin::cov, blob->origin());
 		ASSERT_TRUE(blob->peek());
 
@@ -483,5 +515,68 @@ It has two lines.
 
 		git_oid new_one{};
 		ASSERT_FALSE(repo.write(new_one, blob));
+
+		auto unlinked = blob->peel_and_unlink();
+		ASSERT_TRUE(unlinked);
+		ASSERT_FALSE(blob->peek());
+	}
+
+	TEST_F(repository, blob_in_git) {
+		git::init init{};
+		git_oid file_id{};
+
+		run_setup(make_setup(
+		    remove_all("repository"sv), init_git_workspace("repository"sv),
+		    init_repo("repository/.covdata"sv, "repository/.git"sv)));
+
+		std::error_code ec{};
+		static constexpr auto text = R"(This is text of the file.
+It has two lines.
+)"sv;
+
+		{
+			auto const odb = git::odb::open(
+			    setup::test_dir() / "repository/.git/objects"sv, ec);
+			ASSERT_FALSE(ec);
+			ASSERT_TRUE(odb);
+			ec = odb.write(&file_id, {text.data(), text.size()},
+			               GIT_OBJECT_BLOB);
+			ASSERT_EQ("750229e9588ba0f8a2d4c15d64bb089fe135734d"sv,
+			          setup::get_oid(file_id));
+		}
+
+		auto repo = cov::repository::open(
+		    setup::test_dir() / "repository/.covdata"sv, ec);
+		ASSERT_FALSE(ec);
+
+		auto blob = repo.lookup<cov::blob>(file_id, ec);
+		ASSERT_FALSE(ec);
+		ASSERT_TRUE(blob);
+		ASSERT_EQ(cov::origin::git, blob->origin());
+		ASSERT_TRUE(blob->peek());
+
+		auto data = blob->peek().raw();
+		auto view = std::string_view{reinterpret_cast<char const*>(data.data()),
+		                             data.size()};
+		ASSERT_EQ(text, view);
+	}
+
+	TEST_F(repository, nonexistent_blob) {
+		git::init init{};
+		git_oid file_id{};
+		git_oid_fromstr(&file_id, "750229e9588ba0f8a2d4c15d64bb089fe135734d");
+
+		run_setup(make_setup(
+		    remove_all("repository"sv), init_git_workspace("repository"sv),
+		    init_repo("repository/.covdata"sv, "repository/.git"sv)));
+
+		std::error_code ec{};
+		auto repo = cov::repository::open(
+		    setup::test_dir() / "repository/.covdata"sv, ec);
+		ASSERT_FALSE(ec);
+
+		auto blob = repo.lookup<cov::blob>(file_id, ec);
+		ASSERT_TRUE(ec);
+		ASSERT_FALSE(blob);
 	}
 }  // namespace cov::testing

@@ -19,11 +19,11 @@
   - [ ] Add hilite for TypeScript _(nice to have, M⬆️P)_
 - [x] Repository _(0.7.0-alpha)_
   - [x] config,
-  - [ ] reports,
+  - [x] reports and blobs,
   - [x] references,
+  - [ ] stats diffing,
   - [ ] formatting,
   - [ ] highlighting,
-  - [ ] stats diffing
 - [ ] Add commands _(drop alpha)_
   - [ ] lngs baseline
   - [ ] `cov`, builtin and `libexec/cov` _(M⬆️P)_
@@ -51,3 +51,4 @@
     - [ ] Latest report / report list
   - [ ] Report / component / directory view
   - [ ] File view _(M⬆️P)_
+- [ ] Add report object cache

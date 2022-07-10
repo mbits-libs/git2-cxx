@@ -8,7 +8,9 @@
 #include <cov/hash/md5.hh>
 #include <cov/io/file.hh>
 #include <cov/io/strings.hh>
+#include <cov/repository.hh>
 #include <cov/tag.hh>
+#include <fstream>
 #include "../setup.hh"
 #include "new.hh"
 
@@ -202,5 +204,57 @@ namespace cov::testing {
 		auto const result = bld.build();
 		ASSERT_NE(result.size(), result.locate_or("short_18"sv, result.size()));
 		ASSERT_EQ(result.size(), result.locate_or("short_22"sv, result.size()));
+	}
+
+#ifdef _WIN32
+	void setpath(char const* name, std::filesystem::path const& value) {
+		std::wstring var = std::filesystem::path{name}.native();
+		std::filesystem::path path{};
+		var.push_back(L'=');
+		if (!value.empty()) {
+			path = value;
+			path.make_preferred();
+			var.append(path.native());
+		}
+		_wputenv(var.c_str());
+	}
+
+	inline void unsetenv(char const* name) {
+		std::string var = name;
+		var.push_back(L'=');
+		_putenv(var.c_str());
+	}
+#else
+	void setpath(char const* name, std::filesystem::path const& value) {
+		setenv(name, value.c_str(), 1);
+	}
+#endif
+
+	TEST(oom, open_config) {
+		auto const home = setup::test_dir() / "home"sv;
+		auto const repo_dir = setup::test_dir() / "repo"sv;
+
+		unsetenv("USERPROFILE");
+		unsetenv("ProgramData");
+		unsetenv("XDG_CONFIG_HOME");
+		setpath("HOME", home.c_str());
+
+		std::error_code ignore{};
+		{
+			static constexpr auto from_home_xdg_config =
+			    "[test]\nvalue=from home/.config config"sv;
+			create_directories(home / ".config/dot"sv);
+			std::ofstream out{home / ".config/dot/config"sv};
+			out.write(
+			    from_home_xdg_config.data(),
+			    static_cast<std::streamsize>(from_home_xdg_config.size()));
+			remove_all(repo_dir);
+			create_directories(repo_dir);
+			init_repository(repo_dir, {}, ignore);
+		}
+
+		OOM_LIMIT(400)
+		auto const cfg = cov::repository::open(repo_dir, ignore);
+		OOM_END
 	}
 }  // namespace cov::testing
