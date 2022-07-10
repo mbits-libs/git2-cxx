@@ -15,6 +15,7 @@ namespace cov {
 		virtual bool write(git_oid&, ref_ptr<object> const&) = 0;
 
 	private:
+		friend struct repository;
 		virtual ref_ptr<object> lookup_object(git_oid const& id) = 0;
 	};
 
