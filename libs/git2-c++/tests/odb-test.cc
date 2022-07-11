@@ -49,7 +49,13 @@ namespace git::testing {
 	};
 
 	struct hasher : TestWithParam<hasher_param> {
-		git::odb const odb = git::odb::create();
+		git::odb create() {
+			std::error_code ec{};
+			auto result = git::odb::create(ec);
+			if (ec) throw ec;
+			return result;
+		}
+		git::odb const odb = create();
 		std::string actual =
 		    std::string(static_cast<size_t>(GIT_OID_HEXSZ), '\0');
 	};
@@ -59,13 +65,15 @@ namespace git::testing {
 		auto const path = setup::test_dir() / "hasher-write"sv;
 		remove_all(path);
 		create_directories(path);
-		auto local_odb = git::odb::open(path);
+		std::error_code ec{};
+		auto local_odb = git::odb::open(path, ec);
+		ASSERT_FALSE(ec);
 		git_oid oid;
 		auto const result = local_odb.write(
 		    &oid, git::bytes{bytes.data(), bytes.size()}, GIT_OBJECT_BLOB);
 		git_oid_fmt(actual.data(), &oid);
 		ASSERT_EQ(expected, actual);
-		ASSERT_TRUE(result);
+		ASSERT_FALSE(result);
 	}
 
 	TEST_P(hasher, hash) {
@@ -105,8 +113,10 @@ namespace git::testing {
 
 	TEST_P(exists, hash) {
 		auto [repo, hash, expected] = GetParam();
+		std::error_code ec{};
 		git::odb const odb =
-		    git::odb::open(setup::test_dir() / setup::make_path(repo));
+		    git::odb::open(setup::test_dir() / setup::make_path(repo), ec);
+		ASSERT_FALSE(ec);
 		git_oid oid;
 		ASSERT_EQ(0, git_oid_fromstrn(&oid, hash.data(), hash.length()));
 

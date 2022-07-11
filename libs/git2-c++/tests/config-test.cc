@@ -38,7 +38,7 @@ namespace git::testing {
 		auto const& param = GetParam();
 		auto const repo = get_repo_config(param.repo);
 		auto cfg = git::config::create();
-		ASSERT_EQ(0, cfg.add_file_ondisk(repo.c_str())) << repo;
+		ASSERT_FALSE(cfg.add_file_ondisk(repo.c_str())) << repo;
 
 		std::string entries;
 		cfg.foreach ([&entries](git_config_entry const* entry) {
@@ -55,7 +55,7 @@ namespace git::testing {
 		auto cfg = git::config::create();
 		auto const repo =
 		    setup::get_path(setup::test_dir() / "config.unsigned");
-		ASSERT_EQ(0, cfg.add_file_ondisk(repo.c_str())) << repo;
+		ASSERT_FALSE(cfg.add_file_ondisk(repo.c_str())) << repo;
 		cfg.set_unsigned(test_name, 3456);
 		ASSERT_EQ(3456u, *cfg.get_unsigned(test_name));
 		ASSERT_TRUE(*cfg.get_bool(test_name));
@@ -78,7 +78,7 @@ namespace git::testing {
 		auto cfg = git::config::create();
 		auto const repo =
 		    setup::get_path(setup::test_dir() / "config.unsigned_limits");
-		ASSERT_EQ(0, cfg.add_file_ondisk(repo.c_str())) << repo;
+		ASSERT_FALSE(cfg.add_file_ondisk(repo.c_str())) << repo;
 		cfg.set_string(test_name, "-20");
 		if constexpr (sizeof(int64_t) > sizeof(unsigned)) {
 			constexpr auto value =
@@ -97,7 +97,7 @@ namespace git::testing {
 	TEST(config, string) {
 		auto cfg = git::config::create();
 		auto const repo = setup::get_path(setup::test_dir() / "config.string");
-		ASSERT_EQ(0, cfg.add_file_ondisk(repo.c_str())) << repo;
+		ASSERT_FALSE(cfg.add_file_ondisk(repo.c_str())) << repo;
 		cfg.set_string(test_name, "3456"s);
 		ASSERT_EQ(3456u, *cfg.get_unsigned(test_name));
 		ASSERT_TRUE(*cfg.get_bool(test_name));
@@ -120,7 +120,7 @@ namespace git::testing {
 		auto cfg = git::config::create();
 		auto const repo =
 		    setup::get_path(setup::test_dir() / "config.string_true");
-		ASSERT_EQ(0, cfg.add_file_ondisk(repo.c_str())) << repo;
+		ASSERT_FALSE(cfg.add_file_ondisk(repo.c_str())) << repo;
 		cfg.set_string(test_name, "true"s);
 		ASSERT_FALSE(cfg.get_unsigned(test_name));
 		ASSERT_TRUE(*cfg.get_bool(test_name));
@@ -143,7 +143,7 @@ namespace git::testing {
 		auto cfg = git::config::create();
 		auto const repo =
 		    setup::get_path(setup::test_dir() / "config.string_false");
-		ASSERT_EQ(0, cfg.add_file_ondisk(repo.c_str())) << repo;
+		ASSERT_FALSE(cfg.add_file_ondisk(repo.c_str())) << repo;
 		cfg.set_string(test_name, "false"s);
 		ASSERT_FALSE(cfg.get_unsigned(test_name));
 		ASSERT_FALSE(*cfg.get_bool(test_name));
@@ -165,7 +165,7 @@ namespace git::testing {
 	TEST(config, boolean) {
 		auto cfg = git::config::create();
 		auto const repo = setup::get_path(setup::test_dir() / "config.boolean");
-		ASSERT_EQ(0, cfg.add_file_ondisk(repo.c_str())) << repo;
+		ASSERT_FALSE(cfg.add_file_ondisk(repo.c_str())) << repo;
 		cfg.set_bool(test_name, true);
 		ASSERT_FALSE(cfg.get_unsigned(test_name));
 		ASSERT_TRUE(*cfg.get_bool(test_name));
@@ -187,7 +187,7 @@ namespace git::testing {
 	TEST(config, path) {
 		auto cfg = git::config::create();
 		auto const repo = setup::get_path(setup::test_dir() / "config.path");
-		ASSERT_EQ(0, cfg.add_file_ondisk(repo.c_str())) << repo;
+		ASSERT_FALSE(cfg.add_file_ondisk(repo.c_str())) << repo;
 		cfg.set_path(test_name, "dir/subdir"sv);
 		ASSERT_FALSE(cfg.get_unsigned(test_name));
 		auto const bool_opt = cfg.get_bool(test_name);
@@ -213,7 +213,7 @@ namespace git::testing {
 		auto cfg = git::config::create();
 		auto const repo =
 		    setup::get_path(setup::test_dir() / "config.delete_entry");
-		ASSERT_EQ(0, cfg.add_file_ondisk(repo.c_str())) << repo;
+		ASSERT_FALSE(cfg.add_file_ondisk(repo.c_str())) << repo;
 		cfg.set_string(test_name, "a value"s);
 		{
 			auto const entry = cfg.get_entry(test_name);

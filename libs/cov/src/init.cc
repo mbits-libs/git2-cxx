@@ -25,13 +25,20 @@ namespace cov {
 			}
 		};
 
-		int init_config(path const& base_dir, path const& git_dir) {
-			auto cfg = git::config::create();
-			if (!cfg) return -1;
+		std::error_code init_config(path const& base_dir, path const& git_dir) {
+			std::error_code ec{};
+			auto cfg = git::config::create(ec);
+			if (!cfg) return ec;
 
-			if (auto err = cfg.add_file_ondisk(
-			        get_path(base_dir / names::config).c_str()))
-				return err;
+			if ((ec = cfg.add_file_ondisk(
+			         get_path(base_dir / names::config).c_str()))) {
+				// GCOV_EXCL_START -- untestable, git_add_file_ondisk returns
+				// error, if the stat failed, not due to ENOENT/ENOTDIR;
+				// however, this would require messing with covdata directory,
+				// which would be detected by create_directories below
+				return ec;
+				// GCOV_EXCL_STOP
+			}
 
 			return cfg.set_path(names::core_gitdir,
 			                    rel_path(git_dir, base_dir));
@@ -61,10 +68,9 @@ namespace cov {
 			if (ec) return result;
 		}
 
-		if (auto const err = init_config(base_dir, git_dir)) {
+		if ((ec = init_config(base_dir, git_dir))) {
 			// GCOV_EXCL_START -- untestable without a create_directories
 			// already reporting an error
-			ec = git::make_error_code(err);
 			return result;
 			// GCOV_EXCL_STOP
 		}

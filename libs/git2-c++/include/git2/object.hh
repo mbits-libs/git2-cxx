@@ -25,8 +25,8 @@ namespace git {
 		}
 
 		template <class Peeled>
-		Peeled peel() const noexcept {
-			return git::create_object<Peeled>(git_object_peel, get_object(),
+		Peeled peel(std::error_code& ec) const noexcept {
+			return git::create_object<Peeled>(ec, git_object_peel, get_object(),
 			                                  Peeled::OBJECT_TYPE);
 		}
 

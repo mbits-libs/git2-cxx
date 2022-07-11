@@ -134,7 +134,7 @@ namespace git {
 
 	config config::create(std::error_code& ec) noexcept {
 		git_config* out{};
-		ec = git::make_error_code(git_config_new(&out));
+		ec = as_error(git_config_new(&out));
 
 		config ptr{out};
 		if (ec) ptr = nullptr;
@@ -149,64 +149,68 @@ namespace git {
 
 		auto result = create();
 		if (!result) return result;
-		int error = 0;
 
 		auto const [xdg, global] = get_global_path(dot_name, app);
 		auto const system = get_system_path(app);
 		auto const program_data = get_program_data_path(dot_name);
 
 		if (!system.empty())
-			error = result.add_file_ondisk(  // GCOV_EXCL_LINE
+			ec = result.add_file_ondisk(  // GCOV_EXCL_LINE
 			    system, GIT_CONFIG_LEVEL_SYSTEM);
-		if (!error && !xdg.empty())
-			error = result.add_file_ondisk(xdg, GIT_CONFIG_LEVEL_XDG);
-		if (!error && !global.empty())
-			error = result.add_file_ondisk(global, GIT_CONFIG_LEVEL_GLOBAL);
-		if (!error && !program_data.empty())
-			error = result.add_file_ondisk(program_data,
-			                               GIT_CONFIG_LEVEL_PROGRAMDATA);
+		if (!ec && !xdg.empty())
+			ec = result.add_file_ondisk(xdg, GIT_CONFIG_LEVEL_XDG);
+		if (!ec && !global.empty())
+			ec = result.add_file_ondisk(global, GIT_CONFIG_LEVEL_GLOBAL);
+		if (!ec && !program_data.empty())
+			ec = result.add_file_ondisk(program_data,
+			                            GIT_CONFIG_LEVEL_PROGRAMDATA);
 
-		if (error) result = nullptr;
-		ec = git::make_error_code(error);
+		if (ec) result = nullptr;
 		return result;
 	}
 
-	int config::add_file_ondisk(const char* path,
-	                            git_config_level_t level,
-	                            const git_repository* repo,
-	                            int force) const noexcept {
-		return git_config_add_file_ondisk(get(), path, level, repo, force);
+	std::error_code config::add_file_ondisk(const char* path,
+	                                        git_config_level_t level,
+	                                        const git_repository* repo,
+	                                        int force) const noexcept {
+		return as_error(
+		    git_config_add_file_ondisk(get(), path, level, repo, force));
 	}
 
-	int config::add_file_ondisk(std::filesystem::path const& path,
-	                            git_config_level_t level,
-	                            const git_repository* repo,
-	                            int force) const noexcept {
+	std::error_code config::add_file_ondisk(std::filesystem::path const& path,
+	                                        git_config_level_t level,
+	                                        const git_repository* repo,
+	                                        int force) const noexcept {
 		auto const generic = path.generic_u8string();
 		return add_file_ondisk(PATH_C_STR(generic), level, repo, force);
 	}
 
-	int config::add_local_config(std::filesystem::path const& directory,
-	                             const git_repository* repo,
-	                             int force) const {
+	std::error_code config::add_local_config(
+	    std::filesystem::path const& directory,
+	    const git_repository* repo,
+	    int force) const {
 		return add_file_ondisk(directory / names::config,
 		                       GIT_CONFIG_LEVEL_LOCAL, repo, force);
 	}
 
-	int config::set_unsigned(const char* name, unsigned value) const noexcept {
-		return git_config_set_int64(get(), name, value);
+	std::error_code config::set_unsigned(const char* name,
+	                                     unsigned value) const noexcept {
+		return as_error(git_config_set_int64(get(), name, value));
 	}
 
-	int config::set_bool(char const* name, bool value) const noexcept {
-		return git_config_set_bool(get(), name, value ? 1 : 0);
+	std::error_code config::set_bool(char const* name,
+	                                 bool value) const noexcept {
+		return as_error(git_config_set_bool(get(), name, value ? 1 : 0));
 	}
 
-	int config::set_string(const char* name, const char* value) const noexcept {
-		return git_config_set_string(get(), name, value);
+	std::error_code config::set_string(const char* name,
+	                                   const char* value) const noexcept {
+		return as_error(git_config_set_string(get(), name, value));
 	}
 
-	int config::set_path(char const* name,
-	                     std::filesystem::path const& value) const noexcept {
+	std::error_code config::set_path(
+	    char const* name,
+	    std::filesystem::path const& value) const noexcept {
 		auto const generic = value.generic_u8string();
 		return set_string(name, PATH_C_STR(generic));
 	}
@@ -303,7 +307,7 @@ namespace git {
 		return out;
 	}
 
-	int config::delete_entry(const char* name) const noexcept {
-		return git_config_delete_entry(get(), name);
+	std::error_code config::delete_entry(const char* name) const noexcept {
+		return as_error(git_config_delete_entry(get(), name));
 	}
 }  // namespace git

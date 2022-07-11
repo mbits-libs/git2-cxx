@@ -17,11 +17,13 @@ namespace git {
 		using ptr<git_odb>::ptr;
 		// GCOV_EXCL_STOP
 
-		static odb create();
-		static odb open(std::filesystem::path const&);
+		static odb create(std::error_code& ec);
+		static odb open(std::filesystem::path const&, std::error_code& ec);
 		static void hash(git_oid*, bytes const&, git_object_t) noexcept;
 		bool exists(git_oid const&) const noexcept;
-		bool write(git_oid*, bytes const&, git_object_t) const noexcept;
+		std::error_code write(git_oid*,
+		                      bytes const&,
+		                      git_object_t) const noexcept;
 
 	private:
 		friend struct repository;

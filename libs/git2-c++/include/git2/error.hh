@@ -41,7 +41,11 @@ namespace git {
 	std::error_category const& category();
 
 	inline std::error_code make_error_code(int git_error) {
+		if (!git_error) return {};
 		return std::error_code(git_error, git::category());
+	}
+	inline std::error_code as_error(int git_error) {
+		return git::make_error_code(git_error);
 	}
 	inline std::error_code make_error_code(errc git_error) {
 		return std::error_code(static_cast<int>(git_error), git::category());

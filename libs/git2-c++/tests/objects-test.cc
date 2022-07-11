@@ -12,23 +12,30 @@ namespace git::testing {
 	using namespace ::std::literals;
 
 	TEST(objects, commit) {
-		auto const repo = setup::open_repo();
+		std::error_code ec{};
+		auto const repo = setup::open_repo(ec);
+		ASSERT_FALSE(ec);
 		ASSERT_TRUE(repo);
-		auto const initial = git::commit::lookup(repo, setup::hash::commit);
+		auto const initial = git::commit::lookup(repo, setup::hash::commit, ec);
+		ASSERT_FALSE(ec);
 		ASSERT_TRUE(initial);
-		ASSERT_EQ(1655575188ull, initial.commit_time_utc());
+		ASSERT_EQ(sys_seconds{1655575188s}, initial.commit_time_utc());
 
 		{
-			auto const tree = initial.tree();
+			auto const tree = initial.tree(ec);
+			ASSERT_FALSE(ec);
 			ASSERT_TRUE(tree);
 			ASSERT_EQ(setup::hash::tree, tree.strid());
 		}
 	}
 
 	TEST(objects, tree) {
-		auto const repo = setup::open_repo();
+		std::error_code ec{};
+		auto const repo = setup::open_repo(ec);
+		ASSERT_FALSE(ec);
 		ASSERT_TRUE(repo);
-		auto const dir = git::tree::lookup(repo, setup::hash::tree);
+		auto const dir = git::tree::lookup(repo, setup::hash::tree, ec);
+		ASSERT_FALSE(ec);
 		ASSERT_TRUE(dir);
 		ASSERT_EQ(1ull, dir.count());
 		auto const readme = dir.entry_byindex(0);
@@ -40,18 +47,23 @@ namespace git::testing {
 		ASSERT_TRUE(copy);
 		ASSERT_EQ(setup::hash::README, copy.strid());
 
-		auto const readme_id = dir.entry_bypath("README.md");
+		auto const readme_id = dir.entry_bypath("README.md", ec);
+		ASSERT_FALSE(ec);
 		ASSERT_TRUE(readme_id);
 		ASSERT_EQ(setup::hash::README, readme_id.strid());
 
-		auto const subdir = dir.tree_bypath("subdir");
+		auto const subdir = dir.tree_bypath("subdir", ec);
+		ASSERT_TRUE(ec);
 		ASSERT_FALSE(subdir);
 	}
 
 	TEST(objects, blob) {
-		auto const repo = setup::open_repo();
+		std::error_code ec{};
+		auto const repo = setup::open_repo(ec);
+		ASSERT_FALSE(ec);
 		ASSERT_TRUE(repo);
-		auto const readme = git::blob::lookup(repo, setup::hash::README);
+		auto const readme = git::blob::lookup(repo, setup::hash::README, ec);
+		ASSERT_FALSE(ec);
 		ASSERT_TRUE(readme);
 		auto const content = readme.raw();
 		auto const view = std::string_view{
@@ -59,7 +71,8 @@ namespace git::testing {
 		ASSERT_EQ(view, "# Testing repos\n"sv);
 
 #if !defined(_WIN32) || !defined(CUTDOWN_OS)
-		auto buf = readme.filtered("README.md");
+		auto buf = readme.filtered("README.md", ec);
+		ASSERT_FALSE(ec);
 		auto const data = git::bytes{buf};
 		auto const filtered_view = std::string_view{
 		    reinterpret_cast<char const*>(data.data()), data.size()};

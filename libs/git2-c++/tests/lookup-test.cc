@@ -15,22 +15,38 @@ namespace git::testing {
 		git_oid oid;
 		git_oid_fromstrn(&oid, hash.data(), hash.length());
 
-		auto const repo = setup::open_repo();
+		std::error_code ec{};
+		auto const repo = setup::open_repo(ec);
+		ASSERT_FALSE(ec);
 		ASSERT_TRUE(repo);
 
 		{
-			auto const raw = ObjectType::lookup(repo, oid);
+			auto const raw = ObjectType::lookup(repo, oid, ec);
+			ASSERT_FALSE(ec);
 			ASSERT_TRUE(raw);
 			ASSERT_EQ(hash, raw.strid());
 		}
 
-		auto const obj = ObjectType::lookup(repo, hash);
+		auto const obj = ObjectType::lookup(repo, hash, ec);
+		ASSERT_FALSE(ec);
 		ASSERT_TRUE(obj);
 		ASSERT_EQ(hash, obj.strid());
 
 		{ ASSERT_EQ(0, git_oid_cmp(&oid, &obj.oid())); }
 	}
 
+	TEST(lookup, nothing) {
+		static constexpr auto hash = "nothing"sv;
+
+		std::error_code ec{};
+		auto const repo = setup::open_repo(ec);
+		ASSERT_FALSE(ec);
+		ASSERT_TRUE(repo);
+
+		auto const obj = git::commit::lookup(repo, hash, ec);
+		ASSERT_TRUE(ec);
+		ASSERT_FALSE(obj);
+	}
 	TEST(lookup, commit) { do_lookup<git::commit>(setup::hash::commit); }
 	TEST(lookup, tree) { do_lookup<git::tree>(setup::hash::tree); }
 	TEST(lookup, blob) { do_lookup<git::blob>(setup::hash::README); }

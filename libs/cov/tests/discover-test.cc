@@ -37,11 +37,14 @@ namespace cov::testing {
 			                 << ec.category().name() << ')';
 		}
 
+		std::error_code ec{};
 		auto const repo =
-		    setup::get_path(discover_repository(setup::test_dir() / location));
+		    setup::get_path(discover_repository(setup::test_dir() / location, ec));
 		if (expected.empty()) {
+			ASSERT_TRUE(ec);
 			ASSERT_TRUE(repo.empty());
 		} else {
+			ASSERT_FALSE(ec);
 			ASSERT_EQ(setup::get_path(canonical(setup::test_dir() / expected)),
 			          repo);
 		}

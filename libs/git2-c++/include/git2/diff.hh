@@ -52,9 +52,9 @@ namespace git {
 
 		deltas_type deltas() const noexcept { return {get()}; }
 
-		int find_similar(
+		std::error_code find_similar(
 		    git_diff_find_options const* opts = nullptr) const noexcept {
-			return git_diff_find_similar(get(), opts);
+			return as_error(git_diff_find_similar(get(), opts));
 		}
 	};
 }  // namespace git
