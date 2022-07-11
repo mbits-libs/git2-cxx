@@ -16,9 +16,13 @@ namespace git {
 		// GCOV_EXCL_STOP
 
 		static blob lookup(repository_handle repo,
-		                   std::string_view id) noexcept;
-		static blob lookup(repository_handle repo, git_oid const& id) noexcept;
+		                   std::string_view id,
+		                   std::error_code& ec) noexcept;
+		static blob lookup(repository_handle repo,
+		                   git_oid const& id,
+		                   std::error_code& ec) noexcept;
 		bytes raw() const noexcept;
-		git_buf filtered(char const* as_path) const noexcept;
+		git_buf filtered(char const* as_path,
+		                 std::error_code& ec) const noexcept;
 	};
 }  // namespace git

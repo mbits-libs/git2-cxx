@@ -3,111 +3,16 @@
 
 #include <gtest/gtest.h>
 #include <cov/db.hh>
+#include <cov/hash/sha1.hh>
 #include <cov/io/types.hh>
 #include <cov/report.hh>
 #include <filesystem>
 #include <map>
+#include "db-helper.hh"
 #include "path-utils.hh"
 
 namespace cov::testing {
 	using namespace std::literals;
-
-	using line_cvg = std::map<unsigned, unsigned>;
-
-	struct file {
-		std::string_view name;
-		bool dirty{}, modified{};
-		line_cvg lines{};
-		unsigned finish{};
-
-		report_entry_builder build(io::v1::coverage_stats const& stats,
-		                           git_oid const& lines_id) const {
-			report_entry_builder bldr{};
-			bldr.set_path(name)
-			    .set_dirty(dirty)
-			    .set_modifed(modified)
-			    .set_stats(stats)
-			    .set_line_coverage(lines_id);
-			return bldr;
-		}
-	};
-
-	struct git {
-		git_oid commit{};
-		std::string branch{};
-		std::string author_name{};
-		std::string author_email{};
-		std::string committer_name{};
-		std::string committer_email{};
-		std::string message{};
-		sys_seconds commit_time_utc{};
-	};
-
-	struct report {
-		git_oid parent{};
-		sys_seconds add_time_utc{};
-		git head{};
-		std::vector<file> files{};
-	};
-
-	ref_ptr<line_coverage> from_lines(line_cvg const& lines,
-	                                  unsigned finish = 0) {
-		size_t need = finish ? 1 : 0 + lines.size();
-		unsigned prev_line = 0;
-		for (auto&& [line, count] : lines) {
-			auto const nulls = line - prev_line - 1;
-			if (nulls) need += 1;
-			prev_line = line;
-		}
-
-		std::vector<io::v1::coverage> result{};
-		result.reserve(need);
-
-#ifdef __GNUC__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wconversion"
-#endif
-		prev_line = 0;
-		for (auto&& [line, count] : lines) {
-			auto const nulls = line - prev_line - 1;
-			if (nulls) result.push_back({.value = nulls, .is_null = 1});
-			result.push_back({.value = count, .is_null = 0});
-			prev_line = line;
-		}
-		if (finish) result.push_back({.value = finish, .is_null = 1});
-#ifdef __GNUC__
-#pragma GCC diagnostic pop
-#endif
-
-		return line_coverage_create(std::move(result));
-	}
-
-	line_cvg from_coverage(std::vector<io::v1::coverage> const& lines,
-	                       unsigned& finish) {
-		line_cvg result{};
-		unsigned line = 0;
-		for (auto&& cvg : lines) {
-			if (cvg.is_null) {
-				line += cvg.value;
-				continue;
-			}
-			line++;
-			result[line] = cvg.value;
-		}
-
-		finish = 0;
-		if (!lines.empty() && lines.back().is_null) finish = lines.back().value;
-
-		return result;
-	}
-
-	io::v1::coverage_stats stats(std::vector<io::v1::coverage> const& lines) {
-		auto result = io::v1::coverage_stats::init();
-		for (auto&& cvg : lines) {
-			result += cvg;
-		}
-		return result;
-	}
 
 	TEST(db, full_report) {
 		git_oid report_id{};
@@ -329,5 +234,36 @@ namespace cov::testing {
 		auto none_ref = make_ref<none>();
 		ASSERT_TRUE(none_ref);
 		ASSERT_FALSE(backend->write(report_id, none_ref));
+	}
+
+	TEST(db, failed_z_stream) {
+		git_oid oid{};
+
+		static constexpr auto text = "not a z-stream"sv;
+
+		auto sha = hash::sha1::once({text.data(), text.size()}).str();
+		git_oid_fromstr(&oid, sha.c_str());
+		sha.insert(2, 1, '/');
+
+		{
+			std::error_code ec{};
+			path_info::op(make_setup(remove_all("failed_z_stream"sv),
+			                         create_directories("failed_z_stream"sv)),
+			              ec);
+			ASSERT_FALSE(ec) << "   Error: " << ec.message() << " ("
+			                 << ec.category().name() << ')';
+
+			auto const path = setup::test_dir() / ("failed_z_stream/" + sha);
+			create_directories(path.parent_path());
+			auto f = io::fopen(path, "w");
+			f.store(text.data(), text.size());
+		}
+
+		auto backend =
+		    loose_backend_create(setup::test_dir() / "failed_z_stream"sv);
+		ASSERT_TRUE(backend);
+
+		auto obj = backend->lookup<none>(oid);
+		ASSERT_FALSE(obj);
 	}
 }  // namespace cov::testing

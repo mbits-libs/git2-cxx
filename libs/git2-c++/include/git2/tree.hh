@@ -20,16 +20,17 @@ namespace git {
 	struct basic_treeish : object_ptr<GitObject, ObjectType> {
 		using object_ptr<GitObject, ObjectType>::object_ptr;
 
-		blob blob_bypath(const char* path) const noexcept {
-			return bypath<blob>(path);
+		blob blob_bypath(const char* path, std::error_code& ec) const noexcept {
+			return bypath<blob>(path, ec);
 		}
-		inline tree tree_bypath(const char* path) const noexcept;
+		inline tree tree_bypath(const char* path,
+		                        std::error_code& ec) const noexcept;
 
 	protected:
 		template <typename Result>
-		Result bypath(const char* path) const noexcept {
+		Result bypath(const char* path, std::error_code& ec) const noexcept {
 			auto* obj = this->get_object();
-			return git::create_object<Result>(git_object_lookup_bypath, obj,
+			return git::create_object<Result>(ec, git_object_lookup_bypath, obj,
 			                                  path, Result::OBJECT_TYPE);
 		}
 
@@ -70,21 +71,33 @@ namespace git {
 		using basic_treeish<git_tree, GIT_OBJECT_TREE>::operator bool;
 
 		static tree lookup(repository_handle repo,
-		                   std::string_view id) noexcept;
-		static tree lookup(repository_handle repo, git_oid const& id) noexcept;
+		                   std::string_view id,
+		                   std::error_code& ec) noexcept;
+		static tree lookup(repository_handle repo,
+		                   git_oid const& id,
+		                   std::error_code& ec) noexcept;
 
 		size_t count() const noexcept;
 		tree_entry_handle entry_byindex(size_t) const noexcept;
-		tree_entry entry_bypath(const char* path) const noexcept;
+		tree_entry entry_bypath(const char* path,
+		                        std::error_code& ec) const noexcept;
 
 		diff diff_to(tree const& new_tree,
 		             repository_handle repo,
-		             git_diff_options const* opts = nullptr) const noexcept;
+		             std::error_code& ec) const noexcept {
+			return diff_to(new_tree, repo, nullptr, ec);
+		}
+
+		diff diff_to(tree const& new_tree,
+		             repository_handle repo,
+		             git_diff_options const* opts,
+		             std::error_code& ec) const noexcept;
 	};
 
 	template <class GitObject, git_object_t ObjectType>
 	inline tree basic_treeish<GitObject, ObjectType>::tree_bypath(
-	    const char* path) const noexcept {
-		return this->bypath<tree>(path);
+	    const char* path,
+	    std::error_code& ec) const noexcept {
+		return this->bypath<tree>(path, ec);
 	}
 }  // namespace git

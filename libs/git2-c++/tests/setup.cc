@@ -77,8 +77,8 @@ namespace git::testing::setup {
 	}
 #endif
 
-	git::repository open_repo() {
-		return git::repository::open(test_dir() / make_path("bare.git/"sv));
+	git::repository open_repo(std::error_code& ec) {
+		return git::repository::open(test_dir() / make_path("bare.git/"sv), ec);
 	}
 
 	namespace {

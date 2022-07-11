@@ -42,27 +42,30 @@ namespace cov {
 		}
 	}  // namespace
 
-#define TRY(DIRNAME)                                                  \
-	do {                                                              \
-		auto local = (DIRNAME);                                       \
-		if (is_valid_path(local)) return weakly_canonical(local);     \
-		auto covlink = read_covlink(local);                           \
-		if (covlink) {                                                \
-			local = std::move(*covlink);                              \
-			if (is_valid_path(local)) return weakly_canonical(local); \
-		}                                                             \
+#define TRY(DIRNAME)                                                      \
+	do {                                                                  \
+		auto local = (DIRNAME);                                           \
+		if (is_valid_path(local)) return weakly_canonical(local, ec);     \
+		auto covlink = read_covlink(local);                               \
+		if (covlink) {                                                    \
+			local = std::move(*covlink);                                  \
+			if (is_valid_path(local)) return weakly_canonical(local, ec); \
+		}                                                                 \
 	} while (0)
 
 	std::filesystem::path discover_repository(
 	    std::filesystem::path const& current_dir,
-	    discover across_fs) {
-		if (is_valid_path(current_dir)) return weakly_canonical(current_dir);
+	    discover across_fs,
+	    std::error_code& ec) {
+		if (is_valid_path(current_dir))
+			return weakly_canonical(current_dir, ec);
 
 		TRY(current_dir / names::covdata_dir);
 		if (auto const git_dir = git::repository::discover(
-		        current_dir, across_fs == discover::across_fs
-		                         ? git::Discover::AcrossFs
-		                         : git::Discover::WithinFs);
+		        current_dir,
+		        across_fs == discover::across_fs ? git::Discover::AcrossFs
+		                                         : git::Discover::WithinFs,
+		        ec);
 		    !git_dir.empty()) {
 			TRY(git_dir / names::covdata_dir);
 		}
@@ -86,10 +89,11 @@ namespace cov {
 					}
 				}
 			}
-			if (is_valid_path(dirname)) return weakly_canonical(dirname);
+			if (is_valid_path(dirname)) return weakly_canonical(dirname, ec);
 			TRY(dirname / names::covdata_dir);
 		}
 
+		ec = make_error_code(git::errc::notfound);
 		return {};
 	}
 

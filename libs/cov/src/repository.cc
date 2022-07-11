@@ -13,7 +13,7 @@ namespace cov {
 		                        std::error_code& ec) {
 			auto result =
 			    git::config::open_default(names::dot_config, "cov"sv, ec);
-			if (!ec) ec = git::make_error_code(result.add_local_config(common));
+			if (!ec) ec = result.add_local_config(common);
 			if (ec) result = nullptr;
 			return result;
 		}

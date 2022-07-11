@@ -282,7 +282,7 @@ namespace git::testing::renames {
 		};
 	}  // namespace
 
-	repository open_repo() {
+	repository open_repo(std::error_code& ec) {
 		using namespace std::filesystem;
 
 		std::error_code ignore{};
@@ -309,6 +309,6 @@ namespace git::testing::renames {
 			          static_cast<std::streamsize>(nfo.content.size()));
 		}
 
-		return git::repository::open(setup::test_dir() / "renames/.git"sv);
+		return git::repository::open(setup::test_dir() / "renames/.git"sv, ec);
 	}
 }  // namespace git::testing::renames

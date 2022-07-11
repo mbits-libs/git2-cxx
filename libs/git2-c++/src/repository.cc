@@ -16,30 +16,46 @@ namespace git {
 #endif
 	}  // namespace
 
-	repository repository::open(path const& p) {
+	repository repository::init(path const& p,
+	                            bool is_bare,
+	                            std::error_code& ec) {
 		return git::create_handle<repository>(
+		    ec,
+		    [](git_repository** out, path const& forwarded,
+		       bool forwarded_is_bare) {
+			    return git_repository_init(out, get_path(forwarded).c_str(),
+			                               forwarded_is_bare ? 1 : 0);
+		    },
+		    p, is_bare);
+	}
+
+	repository repository::open(path const& p, std::error_code& ec) {
+		return git::create_handle<repository>(
+		    ec,
 		    [](git_repository** out, path const& forwarded) {
 			    return git_repository_open(out, get_path(forwarded).c_str());
 		    },
 		    p);
 	}
 
-	repository repository::wrap(const git::odb& odb) {
-		return git::create_handle<repository>(git_repository_wrap_odb,
+	repository repository::wrap(const git::odb& odb, std::error_code& ec) {
+		return git::create_handle<repository>(ec, git_repository_wrap_odb,
 		                                      odb.get());
 	}
 
 	std::filesystem::path repository::discover(path const& start_path,
-	                                           Discover accross_fs) noexcept {
+	                                           Discover accross_fs,
+	                                           std::error_code& ec) noexcept {
 		std::filesystem::path out;
 
 		git_buf buf{};
 		try {
-			auto const ret = git_repository_discover(
+			ec = as_error(git_repository_discover(
 			    &buf, get_path(start_path).c_str(),
-			    accross_fs == Discover::AcrossFs ? 1 : 0, NULL);
-			if (!ret) out = buf.ptr;
+			    accross_fs == Discover::AcrossFs ? 1 : 0, NULL));
+			if (!ec) out = buf.ptr;
 		} catch (std::bad_alloc&) {
+			ec = make_error_code(std::errc::not_enough_memory);
 			out.clear();
 		}
 

@@ -5,13 +5,21 @@
 
 #include <cov/init.hh>
 #include <cov/io/file.hh>
+#include <git2/repository.hh>
 #include "setup.hh"
 
 namespace cov::testing {
 	using namespace ::std::literals;
 	using namespace ::std::filesystem;
 
-	enum class path_kind { remove_all, create_directories, touch, init_repo };
+	enum class path_kind {
+		remove_all,
+		create_directories,
+		touch,
+		init_repo,
+		init_git_workspace,
+		init_bare_git
+	};
 
 	struct path_info {
 		std::string_view name;
@@ -29,6 +37,12 @@ namespace cov::testing {
 				case path_kind::init_repo:
 					init_repository(setup::test_dir() / name,
 					                setup::test_dir() / second, ec);
+					return;
+				case path_kind::init_git_workspace:
+					git::repository::init(setup::test_dir() / name, false, ec);
+					return;
+				case path_kind::init_bare_git:
+					git::repository::init(setup::test_dir() / name, true, ec);
 					return;
 				case path_kind::touch: {
 					auto path = setup::test_dir() / name;
@@ -74,6 +88,14 @@ namespace cov::testing {
 	consteval path_info init_repo(std::string_view name,
 	                              std::string_view git = {}) {
 		return {name, path_kind::init_repo, git};
+	}
+
+	consteval path_info init_bare_git(std::string_view name) {
+		return {name, path_kind::init_bare_git};
+	}
+
+	consteval path_info init_git_workspace(std::string_view name) {
+		return {name, path_kind::init_git_workspace};
 	}
 
 	struct entry_t {

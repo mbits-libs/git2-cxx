@@ -16,10 +16,12 @@ namespace git {
 #endif
 	}  // namespace
 
-	odb odb::create() { return create_handle<odb>(git_odb_new); }
+	odb odb::create(std::error_code& ec) {
+		return create_handle<odb>(ec, git_odb_new);
+	}
 
-	odb odb::open(std::filesystem::path const& path) {
-		return create_handle<odb>(git_odb_open, get_path(path).c_str());
+	odb odb::open(std::filesystem::path const& path, std::error_code& ec) {
+		return create_handle<odb>(ec, git_odb_open, get_path(path).c_str());
 	}
 
 	void odb::hash(git_oid* out,
@@ -32,9 +34,10 @@ namespace git {
 		return !!git_odb_exists(get(), &id);
 	}
 
-	bool odb::write(git_oid* out,
-	                bytes const& data,
-	                git_object_t type) const noexcept {
-		return !git_odb_write(out, get(), data.data(), data.size(), type);
+	std::error_code odb::write(git_oid* out,
+	                           bytes const& data,
+	                           git_object_t type) const noexcept {
+		return as_error(
+		    git_odb_write(out, get(), data.data(), data.size(), type));
 	}
 }  // namespace git

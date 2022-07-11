@@ -19,12 +19,16 @@ namespace git {
 		}
 	}  // namespace
 
-	blob blob::lookup(repository_handle repo, std::string_view id) noexcept {
-		return repo.lookup<blob>(id);
+	blob blob::lookup(repository_handle repo,
+	                  std::string_view id,
+	                  std::error_code& ec) noexcept {
+		return repo.lookup<blob>(id, ec);
 	}
 
-	blob blob::lookup(repository_handle repo, git_oid const& id) noexcept {
-		return repo.lookup<blob>(id);
+	blob blob::lookup(repository_handle repo,
+	                  git_oid const& id,
+	                  std::error_code& ec) noexcept {
+		return repo.lookup<blob>(id, ec);
 	}
 
 	bytes blob::raw() const noexcept {
@@ -34,10 +38,11 @@ namespace git {
 		return {data, size};
 	}
 
-	git_buf blob::filtered(char const* as_path) const noexcept {
+	git_buf blob::filtered(char const* as_path,
+	                       std::error_code& ec) const noexcept {
 		git_buf buf{};
 		git_blob_filter_options options = GIT_BLOB_FILTER_OPTIONS_INIT;
-		git_blob_filter(&buf, get(), as_path, &options);
+		ec = as_error(git_blob_filter(&buf, get(), as_path, &options));
 		return buf;
 	}
 }  // namespace git

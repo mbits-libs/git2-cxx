@@ -20,20 +20,27 @@ namespace git::testing {
 	    "4e9be2749a866125dac0bb7fbe26c5a1ca667aac"sv;
 
 	TEST(diff, tree2tree) {
-		auto repo = renames::open_repo();
+		std::error_code ec{};
+		auto repo = renames::open_repo(ec);
+		ASSERT_FALSE(ec);
 		ASSERT_TRUE(repo);
 
-		auto older = commit::lookup(repo, old_commit);
-		auto newer = commit::lookup(repo, new_commit);
+		auto older = commit::lookup(repo, old_commit, ec);
+		ASSERT_FALSE(ec);
+		auto newer = commit::lookup(repo, new_commit, ec);
+		ASSERT_FALSE(ec);
 		ASSERT_TRUE(older) << "     SHA: " << old_commit;
 		ASSERT_TRUE(newer) << "     SHA: " << new_commit;
 
-		auto old_tree = older.tree();
-		auto new_tree = newer.tree();
+		auto old_tree = older.tree(ec);
+		ASSERT_FALSE(ec);
+		auto new_tree = newer.tree(ec);
+		ASSERT_FALSE(ec);
 		ASSERT_TRUE(old_tree);
 		ASSERT_TRUE(new_tree);
 
-		auto diff = old_tree.diff_to(new_tree, repo);
+		auto diff = old_tree.diff_to(new_tree, repo, ec);
+		ASSERT_FALSE(ec);
 		ASSERT_TRUE(diff);
 		ASSERT_FALSE(diff.find_similar());
 

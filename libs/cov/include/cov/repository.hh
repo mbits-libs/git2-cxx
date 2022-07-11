@@ -13,8 +13,14 @@ namespace cov {
 
 		static std::filesystem::path discover(
 		    std::filesystem::path const& current_dir,
-		    discover across_fs = discover::within_fs) {
-			return discover_repository(current_dir, across_fs);
+		    discover across_fs, std::error_code& ec) {
+			return discover_repository(current_dir, across_fs, ec);
+		}
+
+		static std::filesystem::path discover(
+		    std::filesystem::path const& current_dir,
+		    std::error_code& ec) {
+			return discover(current_dir, discover::within_fs, ec);
 		}
 
 		static repository init(std::filesystem::path const& base,
@@ -40,8 +46,9 @@ namespace cov {
 		ref_ptr<object> dwim(std::string_view) const;
 
 	protected:
-		repository() = default;
-		explicit repository(std::filesystem::path const& common, std::error_code&);
+		repository();
+		explicit repository(std::filesystem::path const& common,
+		                    std::error_code&);
 
 	private:
 		std::filesystem::path commondir_{};

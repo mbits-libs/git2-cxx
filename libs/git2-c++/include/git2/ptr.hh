@@ -3,6 +3,7 @@
 
 #pragma once
 #include <git2/types.h>
+#include <git2/error.hh>
 #include <memory>
 
 namespace git {
@@ -77,7 +78,8 @@ namespace git {
 	          typename GitStructPtr,
 	          typename OpenFunction,
 	          typename... Args>
-	inline GitObject create_handle_lowlevel(OpenFunction&& open_function,
+	inline GitObject create_handle_lowlevel(std::error_code& ec,
+	                                        OpenFunction&& open_function,
 	                                        Args&&... args) {
 		using pointer = typename GitObject::pointer;
 
@@ -87,25 +89,30 @@ namespace git {
 		if (ret != 0) {
 			GitObject{git::cast<pointer>(out)};
 			out = nullptr;
+			ec = as_error(ret);
+		} else {
+			ec.clear();
 		}
 
 		return GitObject{git::cast<pointer>(out)};
 	}
 
 	template <typename GitObject, typename OpenFunction, typename... Args>
-	inline GitObject create_object(OpenFunction&& open_function,
+	inline GitObject create_object(std::error_code& ec,
+	                               OpenFunction&& open_function,
 	                               Args&&... args) {
 		return git::create_handle_lowlevel<GitObject, git_object*>(
-		    std::forward<OpenFunction>(open_function),
+		    ec, std::forward<OpenFunction>(open_function),
 		    std::forward<Args>(args)...);
 	}
 
 	template <typename GitObject, typename OpenFunction, typename... Args>
-	inline GitObject create_handle(OpenFunction&& open_function,
+	inline GitObject create_handle(std::error_code& ec,
+	                               OpenFunction&& open_function,
 	                               Args&&... args) {
 		return git::create_handle_lowlevel<GitObject,
 		                                   typename GitObject::pointer>(
-		    std::forward<OpenFunction>(open_function),
+		    ec, std::forward<OpenFunction>(open_function),
 		    std::forward<Args>(args)...);
 	}
 }  // namespace git

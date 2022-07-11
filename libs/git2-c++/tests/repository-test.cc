@@ -45,8 +45,10 @@ namespace git::testing {
 	class repository : public TestWithParam<repo_param> {};
 
 	TEST(repository, submodules) {
+		std::error_code ec{};
 		auto const repo =
-		    git::repository::open(make_absolute("gitdir/.git/"sv));
+		    git::repository::open(make_absolute("gitdir/.git/"sv), ec);
+		ASSERT_FALSE(ec);
 		ASSERT_TRUE(repo);
 		bool seen_bare = false;
 		bool seen_something_else = false;
@@ -68,12 +70,15 @@ namespace git::testing {
 		auto [start_path, expected, kind] = GetParam();
 		auto const start =
 		    make_absolute(start_path, kind == repo_kind::failing);
-		auto const result = git::repository::discover(start);
+		std::error_code ec{};
+		auto const result = git::repository::discover(start, ec);
 		if (expected.discovered == std::string_view{}) {
+			ASSERT_TRUE(ec);
 			ASSERT_EQ(get_path(result), std::string{});
 			return;
 		}
 
+		ASSERT_FALSE(ec);
 		ASSERT_EQ(get_path(result),
 		          get_path(make_absolute(expected.discovered,
 		                                 kind == repo_kind::failing)));
@@ -83,17 +88,21 @@ namespace git::testing {
 		auto [start_path, expected, kind] = GetParam();
 		auto const start =
 		    make_absolute(start_path, kind == repo_kind::failing);
-		auto const result = git::repository::discover(start);
+		std::error_code ec{};
+		auto const result = git::repository::discover(start, ec);
 		if (expected.discovered == std::string_view{}) {
+			ASSERT_TRUE(ec);
 			ASSERT_EQ(get_path(result), std::string{});
 		} else {
+			ASSERT_FALSE(ec);
 			ASSERT_EQ(get_path(result),
 			          get_path(make_absolute(expected.discovered,
 			                                 kind == repo_kind::failing)));
 		}
 
 		if (!result.empty()) {
-			auto const repo = git::repository::open(result);
+			auto const repo = git::repository::open(result, ec);
+			ASSERT_FALSE(ec);
 			ASSERT_TRUE(repo);
 		}
 	}
@@ -102,18 +111,23 @@ namespace git::testing {
 		auto [start_path, expected, kind] = GetParam();
 		auto const start =
 		    make_absolute(start_path, kind == repo_kind::failing);
-		auto const result = git::repository::discover(start);
+		std::error_code ec{};
+		auto const result = git::repository::discover(start, ec);
 		if (expected.discovered == std::string_view{}) {
+			ASSERT_TRUE(ec);
 			ASSERT_EQ(get_path(result), std::string{});
 		} else {
+			ASSERT_FALSE(ec);
 			ASSERT_EQ(get_path(result),
 			          get_path(make_absolute(expected.discovered,
 			                                 kind == repo_kind::failing)));
 		}
 
 		if (!result.empty()) {
-			auto const db = git::odb::open(result);
-			auto const repo = git::repository::wrap(db);
+			auto const db = git::odb::open(result, ec);
+			ASSERT_FALSE(ec);
+			auto const repo = git::repository::wrap(db, ec);
+			ASSERT_FALSE(ec);
 			ASSERT_TRUE(db);
 			ASSERT_TRUE(repo);
 		}
@@ -123,17 +137,21 @@ namespace git::testing {
 		auto [start_path, expected, kind] = GetParam();
 		auto const start =
 		    make_absolute(start_path, kind == repo_kind::failing);
-		auto const result = git::repository::discover(start);
+		std::error_code ec{};
+		auto const result = git::repository::discover(start, ec);
 		if (expected.discovered == std::string_view{}) {
+			ASSERT_TRUE(ec);
 			ASSERT_EQ(get_path(result), std::string{});
 		} else {
+			ASSERT_FALSE(ec);
 			ASSERT_EQ(get_path(result),
 			          get_path(make_absolute(expected.discovered,
 			                                 kind == repo_kind::failing)));
 		}
 		if (result.empty()) return;
 
-		auto const repo = git::repository::open(result);
+		auto const repo = git::repository::open(result, ec);
+		ASSERT_FALSE(ec);
 		ASSERT_TRUE(repo);
 		auto const view = repo.workdir();
 		if (kind == repo_kind::bare) {
@@ -148,17 +166,21 @@ namespace git::testing {
 		auto [start_path, expected, kind] = GetParam();
 		auto const start =
 		    make_absolute(start_path, kind == repo_kind::failing);
-		auto const result = git::repository::discover(start);
+		std::error_code ec{};
+		auto const result = git::repository::discover(start, ec);
 		if (expected.discovered == std::string_view{}) {
+			ASSERT_TRUE(ec);
 			ASSERT_EQ(get_path(result), std::string{});
 		} else {
+			ASSERT_FALSE(ec);
 			ASSERT_EQ(get_path(result),
 			          get_path(make_absolute(expected.discovered,
 			                                 kind == repo_kind::failing)));
 		}
 		if (result.empty()) return;
 
-		auto const repo = git::repository::open(result);
+		auto const repo = git::repository::open(result, ec);
+		ASSERT_FALSE(ec);
 		ASSERT_TRUE(repo);
 		auto const common = repo.commondir();
 		ASSERT_EQ(get_path(result), common);

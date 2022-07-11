@@ -29,24 +29,35 @@ namespace git {
 		}
 
 		template <typename SubmoduleCallback>
-		void submodule_foreach(SubmoduleCallback cb) const {
-			git_submodule_foreach(this->get(),
-			                      submodule_callback<SubmoduleCallback>,
-			                      reinterpret_cast<void*>(&cb));
+		std::error_code submodule_foreach(SubmoduleCallback cb) const {
+			return as_error(git_submodule_foreach(
+			    this->get(), submodule_callback<SubmoduleCallback>,
+			    reinterpret_cast<void*>(&cb)));
 		}
 
 		template <typename ObjectType>
-		ObjectType lookup(std::string_view id) const noexcept {
+		ObjectType lookup(std::string_view id,
+		                  std::error_code& ec) const noexcept {
 			git_oid oid;
-			if (git_oid_fromstrn(&oid, id.data(), id.length())) return {};
+			if (auto const err =
+			        git_oid_fromstrn(&oid, id.data(), id.length())) {
+				ec = as_error(err);
+				return {};
+			}
 
-			return lookup<ObjectType>(oid, (id.length() + 1) / 2);
+			return lookup<ObjectType>(oid, (id.length() + 1) / 2, ec);
 		}
 
 		template <typename ObjectType>
 		ObjectType lookup(git_oid const& id,
-		                  size_t prefix = GIT_OID_RAWSZ) const noexcept {
-			return git::create_object<ObjectType>(git_object_lookup_prefix,
+		                  std::error_code& ec) const noexcept {
+			return lookup<ObjectType>(id, GIT_OID_RAWSZ, ec);
+		}
+		template <typename ObjectType>
+		ObjectType lookup(git_oid const& id,
+		                  size_t prefix,
+		                  std::error_code& ec) const noexcept {
+			return git::create_object<ObjectType>(ec, git_object_lookup_prefix,
 			                                      this->get(), &id, prefix,
 			                                      ObjectType::OBJECT_TYPE);
 		}
@@ -81,11 +92,21 @@ namespace git {
 		using basic_repository<ptr<git_repository>>::basic_repository;
 		// GCOV_EXCL_STOP
 
-		static repository open(std::filesystem::path const& path);
-		static repository wrap(const git::odb& odb);
+		static repository init(std::filesystem::path const& path,
+		                       bool is_bare,
+		                       std::error_code& ec);
+		static repository open(std::filesystem::path const& path,
+		                       std::error_code& ec);
+		static repository wrap(const git::odb& odb, std::error_code& ec);
+		static std::filesystem::path discover(
+		    std::filesystem::path const& start_pathstart_path,
+		    Discover accross_fs,
+		    std::error_code& ec) noexcept;
 		static std::filesystem::path discover(
 		    std::filesystem::path const& start_path,
-		    Discover accross_fs = Discover::WithinFs) noexcept;
+		    std::error_code& ec) noexcept {
+			return discover(start_path, Discover::WithinFs, ec);
+		}
 
 		operator repository_handle() const noexcept {
 			return repository_handle{get()};

@@ -19,7 +19,7 @@ namespace git::testing::setup {
 	std::filesystem::path test_dir();
 	std::string get_path(path const& p);
 	path make_path(std::string_view utf8);
-	git::repository open_repo();
+	git::repository open_repo(std::error_code& ec);
 
 	namespace hash {
 		static constexpr auto commit =

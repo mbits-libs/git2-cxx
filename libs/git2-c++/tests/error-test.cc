@@ -38,20 +38,19 @@ namespace git::testing {
 		ASSERT_FALSE(git::make_error_code(git2).message().empty());
 	}
 
-	TEST(error, GIT_OK_has_message) {
-		ASSERT_EQ("git::errc{0}", git::make_error_code(GIT_OK).message());
+	TEST(error, unknown_has_message) {
+		ASSERT_EQ("git::errc{100}", git::make_error_code(100).message());
 	}
 
 	TEST(error, category_has_name) {
 		ASSERT_STREQ(git::category().name(),
-		             git::make_error_code(GIT_OK).category().name());
+		             git::make_error_code(GIT_ERROR).category().name());
 		// same pointer:
 		ASSERT_EQ(git::category().name(),
-		          git::make_error_code(GIT_OK).category().name());
+		          git::make_error_code(GIT_ERROR).category().name());
 	}
 
 	static constexpr error_param errors[] = {
-	    {GIT_OK, errc{}},
 	    {GIT_ERROR, errc::error},
 	    {GIT_ENOTFOUND, errc::notfound},
 	    {GIT_EEXISTS, errc::exists},
