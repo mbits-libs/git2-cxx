@@ -184,7 +184,7 @@ namespace cell {
 		}
 
 		static constexpr bool isdigit(int ch) {
-			// GCOV_EXCL_START -- some inline artifact?
+			// GCOV_EXCL_START[GCC] -- some inline artifact?
 			assert(0 == (ch & ~UCHAR_MAX));
 			// GCOV_EXCL_STOP
 			return (ascii_char_types[ch] & BOOST_CC_DIGIT) ? true : false;

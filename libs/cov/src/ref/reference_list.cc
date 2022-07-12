@@ -22,7 +22,7 @@ namespace cov {
 				auto const rel = rel_path(entry.path(), root_);
 				auto item = source_->lookup(get_path(rel));
 				if (item) return item;
-			}
+			}  // GCOV_EXCL_LINE[WIN32]
 
 			return {};
 		}

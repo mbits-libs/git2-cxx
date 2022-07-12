@@ -105,3 +105,12 @@ endif()
 include(prepare_pack)
 
 add_subdirectory(libs)
+
+
+if (CMAKE_GENERATOR MATCHES "Visual Studio" AND TARGET cov_coveralls_test)
+  add_dependencies(cov_coveralls_test
+    git2-test git2-stress-test
+    cov-test cov-stress-test
+    lighter-test lighter-stress-test
+  )
+endif()

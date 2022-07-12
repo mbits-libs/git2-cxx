@@ -154,7 +154,7 @@ namespace cov::placeholder {
 				    report.author_email(),
 				    report.commit_time_utc(),
 				};
-			} else {
+			} else {  // GCOV_EXCL_LINE[WIN32]
 				return {
 				    report.committer_name(),
 				    report.committer_email(),

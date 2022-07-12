@@ -81,7 +81,7 @@ namespace cov {
 			ec = std::make_error_code(error ? static_cast<std::errc>(error)
 			                                : std::errc::permission_denied);
 			return result;
-		} else {
+		} else {  // GCOV_EXCL_LINE[WIN32]
 			static constexpr auto ref = "ref: refs/heads/main\n"sv;
 			touch.store(ref.data(), ref.size());
 		}

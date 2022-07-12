@@ -428,8 +428,9 @@ namespace hl::cxx::parser::callbacks {
 #endif
 
 	auto find_eol_end(const std::string_view& sv, size_t pos) {
-		auto const len =  // GCOV_EXCL_LINE -- matched was visited, len was not
-		    sv.size();
+		// GCOV_EXCL_START[GCC] - matched was visited, len was not
+		auto const len = sv.size();
+		// GCOV_EXCL_STOP
 		bool matched = false;
 		if (pos < len && sv[pos] == '\r') {
 			++pos;

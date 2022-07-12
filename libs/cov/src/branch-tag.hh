@@ -73,7 +73,7 @@ namespace cov {
 					if (!ref) return {};
 					if (!Policy::right_reference(ref)) continue;
 					return type::from(std::move(ref));
-				}
+				}  // GCOV_EXCL_LINE[WIN32]
 			}
 
 		private:
