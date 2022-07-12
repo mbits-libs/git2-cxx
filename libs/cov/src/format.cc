@@ -305,8 +305,9 @@ namespace cov::placeholder {
 					        .append(ctx.translate(months,
 					                              translatable::months_ago));
 					return yrs;
-				} else
+				} else {  // GCOV_EXCL_LINE[WIN32]
 					return ctx.translate(years, translatable::years_ago);
+				}
 			}
 			return ctx.translate((days + 183_d) / 365_d,
 			                     translatable::years_ago);
@@ -520,17 +521,16 @@ namespace cov::placeholder {
 			if (clr == color::rating || clr == color::bg_rating) {
 				auto const mark = apply_mark(*stats, ctx.client->marks);
 				if (clr == color::rating)
-					clr = mark == cov::translatable::mark_failing
-					          ? color::red
-					          : mark == cov::translatable::mark_incomplete
-					                ? color::yellow
-					                : color::green;
+					clr = mark == cov::translatable::mark_failing ? color::red
+					      : mark == cov::translatable::mark_incomplete
+					          ? color::yellow
+					          : color::green;
 				else
 					clr = mark == cov::translatable::mark_failing
 					          ? color::bg_red
-					          : mark == cov::translatable::mark_incomplete
-					                ? color::bg_yellow
-					                : color::bg_green;
+					      : mark == cov::translatable::mark_incomplete
+					          ? color::bg_yellow
+					          : color::bg_green;
 			}
 			out = format_str(
 			    out,
@@ -576,7 +576,7 @@ namespace cov {
 		unsigned hex(char c) {
 			// there are definitely test going through here, that lend at
 			// "return 16", however they do not trigger line counters
-			switch (c) {  // GCOV_EXCL_LINE -- test-resistant
+			switch (c) {  // GCOV_EXCL_LINE[GCC] -- test-resistant
 				case '0':
 				case '1':
 				case '2':

@@ -41,7 +41,7 @@ namespace git {
 				return out;
 			} catch (std::bad_alloc&) {
 				return {};
-			}
+			}  // GCOV_EXCL_LINE[WIN32]
 		}
 
 	protected:

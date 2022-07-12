@@ -73,7 +73,7 @@ namespace cell {
 			while (it != e__ && it->hashed == probe.hashed &&
 			       it->key != probe.key) {
 				++it;  // GCOV_EXCL_LINE
-			}
+			}          // GCOV_EXCL_LINE
 			return (it != e__ && it->hashed == probe.hashed) ? it : e__;
 		}
 

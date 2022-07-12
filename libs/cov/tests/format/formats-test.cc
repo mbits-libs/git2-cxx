@@ -28,6 +28,7 @@ namespace cov::testing {
 			std::string head{"feat/task-1"s};
 			sys_seconds commit{};
 			sys_seconds add{};
+			std::optional<ph::rating> marks{};
 		} tweaks{};
 
 		friend std::ostream& operator<<(std::ostream& out,
@@ -90,10 +91,11 @@ namespace cov::testing {
 
 	TEST_P(format, print) {
 		auto const& [_, tmplt, expected, tweaks] = GetParam();
-		auto const& [report_id, stats, head, commit, add] = tweaks;
+		auto const& [report_id, stats, head, commit, add, marks] = tweaks;
 		auto fmt = formatter::from(tmplt);
 
 		ph::context ctx = context(head);
+		if (marks) ctx.marks = *marks;
 		git_oid id{};
 		git_oid_fromstr(&id, report_id.empty()
 		                         ? "112233445566778899aabbccddeeff0012345678"
@@ -163,6 +165,29 @@ namespace cov::testing {
 	        "442211335 100/300 33% (fail) - from [36109a1c3] Subject, isn't it? <Johnny Appleseed>"sv,
 	        {.report = "442211335566778899aabbccddeeff0012345678"sv,
 	         .stats = io::v1::coverage_stats{1250, 300, 100}},
+	    },
+	    {
+	        "nothing to judge"sv,
+	        "%hr%d %pC/%pR %pP (%pr) - from [%hc] %s <%an>"sv,
+	        "442211335 0/0  0% (fail) - from [36109a1c3] Subject, isn't it? <Johnny Appleseed>"sv,
+	        {.report = "442211335566778899aabbccddeeff0012345678"sv,
+	         .stats = io::v1::coverage_stats{1250, 0, 0}},
+	    },
+	    {
+	        "broken rating (bad passing)"sv,
+	        "%hr%d %pC/%pR %pP (%pr) - from [%hc] %s <%an>"sv,
+	        "442211335 300/300 100% (fail) - from [36109a1c3] Subject, isn't it? <Johnny Appleseed>"sv,
+	        {.report = "442211335566778899aabbccddeeff0012345678"sv,
+	         .stats = io::v1::coverage_stats{1250, 300, 300},
+	         .marks{ph::rating{.incomplete{75, 100}, .passing{90, 0}}}},
+	    },
+	    {
+	        "broken rating (bad incomplete)"sv,
+	        "%hr%d %pC/%pR %pP (%pr) - from [%hc] %s <%an>"sv,
+	        "442211335 300/300 100% (fail) - from [36109a1c3] Subject, isn't it? <Johnny Appleseed>"sv,
+	        {.report = "442211335566778899aabbccddeeff0012345678"sv,
+	         .stats = io::v1::coverage_stats{1250, 300, 300},
+	         .marks{ph::rating{.incomplete{75, 0}, .passing{9, 10}}}},
 	    },
 	    {
 	        "HEAD (unwrapped)"sv,

@@ -121,10 +121,27 @@ namespace cov {
 	}
 
 	template <Counted derived, Counted base>
+	inline bool is_a(ref_ptr<base>& var) {
+		return is_a<derived>(var.get());
+	}
+
+	template <Counted derived, Counted base>
 	inline ref_ptr<derived> as_a(ref_ptr<base> const& var) {
 		auto ptr = as_a<derived>(var.get());
 		if (ptr) ptr->acquire();
 		return ref_ptr{ptr};
+	}
+
+	template <Counted derived, Counted base>
+	inline ref_ptr<derived> as_a(ref_ptr<base>& var) {
+		auto ptr = as_a<derived>(var.get());
+		if (ptr) ptr->acquire();
+		return ref_ptr{ptr};
+	}
+
+	template <Counted same>
+	inline ref_ptr<same> as_a(ref_ptr<same>&& var) {
+		return var;
 	}
 
 	template <Counted Object, typename... Args>

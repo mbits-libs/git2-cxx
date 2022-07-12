@@ -244,6 +244,7 @@ namespace cov::testing {
 	    good("MAPPED"sv),
 	    good("refs/name"sv),
 	    good("refs/heads/main"sv),
+	    good("refs/tags/v0.1.0-{-"sv),
 	    good("refs/tags/v0.1.0-alpha"sv),
 	    good("refs/tags/v0.1.0-alpha.lock.owner"sv),
 	};

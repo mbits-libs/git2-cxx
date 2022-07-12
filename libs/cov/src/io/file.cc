@@ -19,20 +19,17 @@ namespace cov::io {
 #pragma warning(disable : 4996)
 #endif
 		std::unique_ptr<wchar_t[]> heap;
-		wchar_t buff[20];
-		wchar_t* ptr = buff;
-		auto len = mode ? strlen(mode) : 0;
-		if (len >= sizeof(buff)) {
-			heap.reset(new (std::nothrow) wchar_t[len + 1]);
-			if (!heap) return nullptr;
-			ptr = heap.get();
-		}
+		// 10 characters is an overkill, this will std::abort on a first ASSERT
+		// inside libc...
+		wchar_t buff[10];
+		wchar_t* dst = buff;
+		auto len = std::min(strlen(mode), size_t{9u});
+		buff[len] = 0;
 
-		auto dst = ptr;
-		while (*dst++ = *mode++)
-			;
+		while (len--)
+			*dst++ = *mode++;
 
-		return ::_wfopen(file.native().c_str(), ptr);
+		return ::_wfopen(file.native().c_str(), buff);
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
@@ -73,8 +70,10 @@ namespace cov::io {
 		while (true) {
 			auto ret = std::fread(buffer, 1, sizeof(buffer), get());
 			if (!ret) {
+				// GCOV_EXCL_START[WIN32]
 				if (!std::feof(get())) out.clear();
 				break;
+				// GCOV_EXCL_STOP
 			}
 			auto it = std::find(buffer, buffer + ret, '\n');
 			if (it == std::end(buffer)) {
@@ -88,7 +87,7 @@ namespace cov::io {
 			    static_cast<std::make_signed_t<size_t>>(ret - new_length) - 1;
 			if (rewind > 0) std::fseek(get(), to_long(-rewind), SEEK_CUR);
 			break;
-		}
+		}  // GCOV_EXCL_LINE[WIN32]
 
 		return out;
 	}

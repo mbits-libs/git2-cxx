@@ -256,4 +256,33 @@ namespace cov::testing {
 		ASSERT_TRUE(result);
 		ASSERT_EQ(tested_text, stream.view());
 	}
+
+	TEST(report, stats_calc) {
+		static constexpr io::v1::coverage_stats stats{
+		    .total = 1'000'000,
+		    .relevant = 1'000'000,
+		    .covered = 657'823,
+		};
+
+		static constexpr std::tuple<unsigned char,
+		                            std::tuple<unsigned, unsigned, unsigned>>
+		    tests[] = {
+		        {0u, {66u, 0u, 1u}},
+		        {1u, {65u, 8u, 10u}},
+		        {2u, {65u, 78u, 100u}},
+		        {3u, {65u, 782u, 1000u}},
+		        {4u, {65u, 7823u, 10000u}},
+		        {5u, {65u, 78230u, 100000u}},
+		        {6u, {65u, 782300u, 1000000u}},
+		        {7u, {65u, 7823000u, 10000000u}},
+		        {8u, {65u, 78230000u, 100000000u}},
+		        {9u, {65u, 782300000u, 1000000000u}},
+		    };
+
+		for (auto const& [digits, expected] : tests) {
+			auto const actual = stats.calc(digits);
+			EXPECT_EQ(expected, actual)
+			    << "Digits: " << static_cast<unsigned>(digits);
+		}
+	}
 }  // namespace cov::testing

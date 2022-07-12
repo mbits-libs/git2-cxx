@@ -130,18 +130,19 @@ namespace cov::io {
 			    unsigned char digit = 0) const noexcept {
 				if (!relevant) return {0, 0, 1};
 
-				unsigned divider = 1;
+				std::uintmax_t divider = 1;
 				while (digit) {
 					divider *= 10;
 					--digit;
 				}
-				unsigned out = covered * 100 * divider;
+				auto out = covered * 100 * divider;
 
 				// round towards the nearest whole
 				out += relevant / 2;
 				out /= relevant;
 
-				return {out / divider, out % divider, divider};
+				return {
+					static_cast<unsigned>(out / divider), static_cast<unsigned>(out % divider), static_cast<unsigned>(divider)};
 			}
 		};
 

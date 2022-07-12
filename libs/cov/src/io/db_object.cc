@@ -50,7 +50,7 @@ namespace cov::io {
 			file_header hdr{.magic = magic, .version = v1::VERSION};
 			if (!out.store(hdr)) return false;
 			return handler->store(value, out);
-		}
+		}  // GCOV_EXCL_LINE[WIN32]
 
 		return false;
 	}

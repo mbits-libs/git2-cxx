@@ -73,7 +73,7 @@ namespace cov::io::handlers {
 		if (!in.skip((header.entries_offset -
 		              (header.strings_offset + header.strings_size)) *
 		             sizeof(uint32_t)))
-			return {};
+			return {};  // GCOV_EXCL_LINE[WIN32]
 
 		std::vector<std::unique_ptr<report_entry>> result(header.entries_count);
 		std::vector<std::byte> buffer{};

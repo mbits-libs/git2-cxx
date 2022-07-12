@@ -41,7 +41,7 @@ namespace cov::io {
 			offsets_.reserve(length);
 		} catch (std::bad_alloc&) {
 			return false;
-		}
+		} // GCOV_EXCL_LINE[WIN32]
 
 		return offsets_.capacity() >= length;
 	}
@@ -52,7 +52,7 @@ namespace cov::io {
 		} catch (std::bad_alloc&) {
 			update_();  // pointer MIGHT have changed...
 			return false;
-		}
+		}  // GCOV_EXCL_LINE[WIN32]
 
 		update_();
 		return data_.capacity() >= length;
