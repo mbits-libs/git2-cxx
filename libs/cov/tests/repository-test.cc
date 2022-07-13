@@ -119,8 +119,8 @@ namespace cov::testing {
 		    remove_all("inside_git"sv), init_git_workspace("inside_git"sv),
 		    init_repo("inside_git/.git/.covdata"sv, "inside_git/.git"sv)));
 		{
-			auto f = io::fopen(setup::test_dir() / "inside_git/.git/.covdata/config"sv,
-			          "w");
+			auto f = io::fopen(
+			    setup::test_dir() / "inside_git/.git/.covdata/config"sv, "w");
 		}
 
 		std::error_code ec{};
@@ -305,7 +305,7 @@ namespace cov::testing {
 			ASSERT_TRUE(backend->write(files_id, cvg_files));
 
 			auto cvg_report = report_create(
-			    rprt.parent, files_id, rprt.head.commit, rprt.head.branch,
+			    {}, rprt.parent, files_id, rprt.head.commit, rprt.head.branch,
 			    rprt.head.author_name, rprt.head.author_email,
 			    rprt.head.committer_name, rprt.head.committer_email,
 			    rprt.head.message, rprt.head.commit_time_utc, rprt.add_time_utc,
@@ -336,7 +336,7 @@ namespace cov::testing {
 		ASSERT_EQ(rprt.add_time_utc, cvg_report->add_time_utc());
 
 		auto cvg_files =
-		    repo.lookup<cov::report_files>(*cvg_report->file_list(), ec);
+		    repo.lookup<cov::report_files>(cvg_report->file_list(), ec);
 		ASSERT_TRUE(cvg_files);
 		auto& entries = cvg_files->entries();
 		ASSERT_EQ(rprt.files.size(), entries.size());
@@ -350,7 +350,7 @@ namespace cov::testing {
 			ASSERT_EQ(file.modified, entry->is_modified());
 
 			auto cvg_lines =
-			    repo.lookup<cov::line_coverage>(*entry->line_coverage(), ec);
+			    repo.lookup<cov::line_coverage>(entry->line_coverage(), ec);
 			ASSERT_TRUE(cvg_files);
 			unsigned finish{0};
 			auto const cvg = from_coverage(cvg_lines->coverage(), finish);
@@ -429,7 +429,7 @@ namespace cov::testing {
 			ASSERT_TRUE(repo.write(files_id, cvg_files));
 
 			auto cvg_report = report_create(
-			    rprt.parent, files_id, rprt.head.commit, rprt.head.branch,
+			    {}, rprt.parent, files_id, rprt.head.commit, rprt.head.branch,
 			    rprt.head.author_name, rprt.head.author_email,
 			    rprt.head.committer_name, rprt.head.committer_email,
 			    rprt.head.message, rprt.head.commit_time_utc, rprt.add_time_utc,
@@ -455,7 +455,7 @@ namespace cov::testing {
 		ASSERT_EQ(rprt.add_time_utc, cvg_report->add_time_utc());
 
 		auto cvg_files =
-		    repo.lookup<cov::report_files>(*cvg_report->file_list(), ec);
+		    repo.lookup<cov::report_files>(cvg_report->file_list(), ec);
 		ASSERT_TRUE(cvg_files);
 		auto& entries = cvg_files->entries();
 		ASSERT_EQ(rprt.files.size(), entries.size());
@@ -469,7 +469,7 @@ namespace cov::testing {
 			ASSERT_EQ(file.modified, entry->is_modified());
 
 			auto cvg_lines =
-			    repo.lookup<cov::line_coverage>(*entry->line_coverage(), ec);
+			    repo.lookup<cov::line_coverage>(entry->line_coverage(), ec);
 			ASSERT_TRUE(cvg_files);
 			unsigned finish{0};
 			auto const cvg = from_coverage(cvg_lines->coverage(), finish);

@@ -46,7 +46,7 @@ namespace cov::testing {
 		dbo.add_handler<io::OBJECT::COVERAGE, io::handlers::line_coverage>();
 
 		std::error_code ec{};
-		auto const result = dbo.load(stream, ec);
+		auto const result = dbo.load({}, stream, ec);
 		ASSERT_FALSE(ec) << "   Error: " << ec.message() << " ("
 		                 << ec.category().name() << ')';
 		ASSERT_TRUE(result);
@@ -69,7 +69,7 @@ namespace cov::testing {
 		dbo.add_handler<io::OBJECT::COVERAGE, io::handlers::line_coverage>();
 
 		std::error_code ec{};
-		auto const result = dbo.load(stream, ec);
+		auto const result = dbo.load({}, stream, ec);
 		ASSERT_FALSE(ec) << "   Error: " << ec.message() << " ("
 		                 << ec.category().name() << ')';
 
@@ -98,7 +98,7 @@ namespace cov::testing {
 		dbo.add_handler<io::OBJECT::COVERAGE, io::handlers::line_coverage>();
 
 		std::error_code ec{};
-		auto const result = dbo.load(stream, ec);
+		auto const result = dbo.load({}, stream, ec);
 		ASSERT_FALSE(result);
 		ASSERT_EQ(ec, io::errc::bad_syntax);
 	}

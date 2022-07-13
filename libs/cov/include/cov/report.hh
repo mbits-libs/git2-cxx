@@ -8,12 +8,16 @@
 #include <string_view>
 
 namespace cov {
-	struct report : object {
+	struct object_with_id : object {
+		virtual git_oid const& oid() const noexcept = 0;
+	};
+
+	struct report : object_with_id {
 		obj_type type() const noexcept override { return obj_report; };
 		bool is_report() const noexcept final { return true; }
-		virtual git_oid const* parent_report() const noexcept = 0;
-		virtual git_oid const* file_list() const noexcept = 0;
-		virtual git_oid const* commit() const noexcept = 0;
+		virtual git_oid const& parent_report() const noexcept = 0;
+		virtual git_oid const& file_list() const noexcept = 0;
+		virtual git_oid const& commit() const noexcept = 0;
 		virtual std::string_view branch() const noexcept = 0;
 		virtual std::string_view author_name() const noexcept = 0;
 		virtual std::string_view author_email() const noexcept = 0;
@@ -25,7 +29,8 @@ namespace cov {
 		virtual io::v1::coverage_stats const& stats() const noexcept = 0;
 	};
 
-	ref_ptr<report> report_create(git_oid const& parent_report,
+	ref_ptr<report> report_create(git_oid const& oid,
+	                              git_oid const& parent_report,
 	                              git_oid const& file_list,
 	                              git_oid const& commit,
 	                              std::string const& branch,
@@ -46,8 +51,8 @@ namespace cov {
 		virtual bool is_modified() const noexcept = 0;
 		virtual std::string_view path() const noexcept = 0;
 		virtual io::v1::coverage_stats const& stats() const noexcept = 0;
-		virtual git_oid const* contents() const noexcept = 0;
-		virtual git_oid const* line_coverage() const noexcept = 0;
+		virtual git_oid const& contents() const noexcept = 0;
+		virtual git_oid const& line_coverage() const noexcept = 0;
 	};
 
 	struct report_entry_builder {

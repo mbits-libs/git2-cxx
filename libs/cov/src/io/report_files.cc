@@ -21,11 +21,11 @@ namespace cov::io::handlers {
 			io::v1::coverage_stats const& stats() const noexcept override {
 				return data_.stats;
 			}
-			git_oid const* contents() const noexcept override {
-				return &data_.contents;
+			git_oid const& contents() const noexcept override {
+				return data_.contents;
 			}
-			git_oid const* line_coverage() const noexcept override {
-				return &data_.line_coverage;
+			git_oid const& line_coverage() const noexcept override {
+				return data_.line_coverage;
 			}
 
 		private:
@@ -54,6 +54,7 @@ namespace cov::io::handlers {
 
 	ref_ptr<counted> report_files::load(uint32_t,
 	                                    uint32_t,
+	                                    git_oid const&,
 	                                    read_stream& in,
 	                                    std::error_code& ec) const {
 		ec = make_error_code(errc::bad_syntax);
@@ -142,8 +143,6 @@ namespace cov::io::handlers {
 		for (auto const& entry_ptr : entries) {
 			auto& in = *entry_ptr;
 
-			if (!in.contents() || !in.line_coverage()) return false;
-
 			auto const path = stg.locate_or(in.path(), stg.size() + 1);
 			auto const path30 = uint_30(path);
 			if (path != path30 || path30 > stg.size()) return false;
@@ -153,8 +152,8 @@ namespace cov::io::handlers {
 			    .is_dirty = in.is_dirty() ? 1u : 0u,
 			    .is_modified = in.is_modified() ? 1u : 0u,
 			    .stats = in.stats(),
-			    .contents = *in.contents(),
-			    .line_coverage = *in.line_coverage(),
+			    .contents = in.contents(),
+			    .line_coverage = in.line_coverage(),
 			};
 
 			if (!out.store(entry)) return false;

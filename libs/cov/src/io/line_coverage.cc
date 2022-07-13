@@ -22,6 +22,7 @@ namespace cov::io::handlers {
 
 	ref_ptr<counted> line_coverage::load(uint32_t,
 	                                     uint32_t,
+	                                     git_oid const&,
 	                                     read_stream& in,
 	                                     std::error_code& ec) const {
 		ec = make_error_code(errc::bad_syntax);

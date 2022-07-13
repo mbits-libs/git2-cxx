@@ -136,7 +136,7 @@ namespace cov::placeholder {
 
 		iterator format_percentage(iterator out,
 		                           io::v1::coverage_stats const& stats) {
-			return fmt::format_to(out, "{:>2}%", std::get<0>(stats.calc(0)));
+			return fmt::format_to(out, "{:>2}%", stats.calc(0).whole);
 		}
 
 		static auto apply_mark(io::v1::coverage_stats const& stats,

@@ -93,12 +93,22 @@ namespace cov::io {
 
 		struct coverage;
 
+		struct coverage_diff {
+			int32_t total;
+			int32_t relevant;
+			int32_t covered;
+
+			bool operator==(coverage_diff const&) const noexcept = default;
+		};
+
 		struct coverage_stats {
 			uint32_t total;
 			uint32_t relevant;
 			uint32_t covered;
 
 			static coverage_stats init() { return {0, 0, 0}; }
+
+			bool operator==(coverage_stats const&) const noexcept = default;
 
 			coverage_stats& operator+=(coverage_stats const& rhs) noexcept {
 				total = add_u32(total, rhs.total);
@@ -126,25 +136,89 @@ namespace cov::io {
 				                       coverage_stats{});
 			}
 
-			std::tuple<unsigned, unsigned, unsigned> calc(
-			    unsigned char digit = 0) const noexcept {
+			template <typename Int = unsigned>
+			struct ratio {
+				Int whole;
+				unsigned fraction;
+				unsigned digits;
+
+				auto operator<=>(ratio const&) const noexcept = default;
+			};
+
+			static constexpr std::uintmax_t pow10(std::uintmax_t value,
+			                                      unsigned digits) noexcept {
+				if (!value) return value;
+				while (digits) {
+					value *= 10;
+					--digits;
+				}
+				return value;
+			}
+
+			constexpr ratio<> calc(unsigned char digits = 0) const noexcept {
 				if (!relevant) return {0, 0, 1};
 
-				std::uintmax_t divider = 1;
-				while (digit) {
-					divider *= 10;
-					--digit;
-				}
+				auto const divider = pow10(1, digits);
 				auto out = covered * 100 * divider;
 
 				// round towards the nearest whole
 				out += relevant / 2;
 				out /= relevant;
 
-				return {
-					static_cast<unsigned>(out / divider), static_cast<unsigned>(out % divider), static_cast<unsigned>(divider)};
+				return {static_cast<unsigned>(out / divider),
+				        static_cast<unsigned>(out % divider), digits};
 			}
 		};
+
+		inline auto diff(std::unsigned_integral auto newer,
+		                 std::unsigned_integral auto older) {
+			using Unsigned =
+			    std::common_type_t<decltype(newer), decltype(older)>;
+			using Signed = std::make_signed_t<Unsigned>;
+			static constexpr auto ceil =
+			    static_cast<Unsigned>(std::numeric_limits<Signed>::max());
+			auto const neg = newer < older;
+			auto const abs = static_cast<Signed>(
+			    std::min(neg ? older - newer : newer - older, ceil));
+			return neg ? -abs : abs;
+		}
+
+		inline coverage_diff diff(coverage_stats const& newer,
+		                          coverage_stats const& older) {
+			return {
+			    .total = diff(newer.total, older.total),
+			    .relevant = diff(newer.relevant, older.relevant),
+			    .covered = diff(newer.covered, older.covered),
+			};
+		}
+
+		inline coverage_stats::ratio<int> diff(
+		    coverage_stats::ratio<> const& newer,
+		    coverage_stats::ratio<> const& older) {
+			auto const digits = std::max(newer.digits, older.digits);
+			auto const multiplier = coverage_stats::pow10(1, digits);
+
+			auto const newer_back =
+			    coverage_stats::pow10(newer.whole, newer.digits) +
+			    newer.fraction;
+			auto const newer_val =
+			    coverage_stats::pow10(newer_back, digits - newer.digits);
+			auto const older_back =
+			    coverage_stats::pow10(older.whole, older.digits) +
+			    older.fraction;
+			auto const older_val =
+			    coverage_stats::pow10(older_back, digits - older.digits);
+
+			static constexpr auto ceil = static_cast<std::uintmax_t>(
+			    std::numeric_limits<std::intmax_t>::max());
+			auto const neg = newer_val < older_val;
+			auto const abs = std::min(
+			    neg ? older_val - newer_val : newer_val - older_val, ceil);
+
+			auto const ret = static_cast<int>(abs / multiplier);
+			return {neg ? -ret : ret, static_cast<unsigned>(abs % multiplier),
+			        digits};
+		}
 
 		/*
 		    REPORT:

@@ -18,7 +18,8 @@ namespace cov::testing {
 	using namespace ::std::literals;
 	namespace ph = placeholder;
 
-	ref_ptr<cov::report> make_report(std::string const& message,
+	ref_ptr<cov::report> make_report(git_oid const& id,
+	                                 std::string const& message,
 	                                 sys_seconds commit,
 	                                 sys_seconds add) {
 		git_oid parent_id{}, commit_id{}, zero{};
@@ -26,7 +27,7 @@ namespace cov::testing {
 		git_oid_fromstr(&commit_id, "36109a1c35e0d5cf3e5e68d896c8b1b4be565525");
 
 		io::v1::coverage_stats const default_stats{1250, 300, 299};
-		return report_create(parent_id, zero, commit_id, "develop"s,
+		return report_create(id, parent_id, zero, commit_id, "develop"s,
 		                     "Johnny Appleseed"s, "johnny@appleseed.com"s,
 		                     "Johnny Committer"s, "committer@appleseed.com"s,
 		                     message, commit, add, default_stats);
@@ -105,12 +106,12 @@ namespace cov::testing {
 		        },
 		};
 
-		auto const report =
-		    make_report({message.data(), message.size()}, ctx.now, ctx.now);
 		git_oid id{};
 		git_oid_fromstr(&id, "112233445566778899aabbccddeeff0012345678");
+		auto const report =
+		    make_report(id, {message.data(), message.size()}, ctx.now, ctx.now);
 
-		auto view = ph::report_view::from(*report, &id);
+		auto view = ph::report_view::from(*report);
 		auto fmt = formatter::from(
 		    "%Hr%d %pC/%pR %pP (%pr) - from [%Hc] %s <%an %al %ae>%n%B"sv);
 

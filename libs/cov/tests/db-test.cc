@@ -87,8 +87,8 @@ namespace cov::testing {
 			ASSERT_TRUE(backend->write(files_id, cvg_files));
 
 			auto cvg_report = report_create(
-			    rprt.parent, files_id, rprt.head.commit, rprt.head.branch,
-			    rprt.head.author_name, rprt.head.author_email,
+			    git_oid{}, rprt.parent, files_id, rprt.head.commit,
+			    rprt.head.branch, rprt.head.author_name, rprt.head.author_email,
 			    rprt.head.committer_name, rprt.head.committer_email,
 			    rprt.head.message, rprt.head.commit_time_utc, rprt.add_time_utc,
 			    total);
@@ -111,7 +111,7 @@ namespace cov::testing {
 			ASSERT_EQ(rprt.head.commit_time_utc, cvg_report->commit_time_utc());
 			ASSERT_EQ(rprt.add_time_utc, cvg_report->add_time_utc());
 			auto cvg_files =
-			    backend->lookup<cov::report_files>(*cvg_report->file_list());
+			    backend->lookup<cov::report_files>(cvg_report->file_list());
 			ASSERT_TRUE(cvg_files);
 			auto& entries = cvg_files->entries();
 			ASSERT_EQ(rprt.files.size(), entries.size());
@@ -124,8 +124,8 @@ namespace cov::testing {
 				ASSERT_EQ(file.dirty, entry->is_dirty());
 				ASSERT_EQ(file.modified, entry->is_modified());
 
-				auto cvg_lines = backend->lookup<cov::line_coverage>(
-				    *entry->line_coverage());
+				auto cvg_lines =
+				    backend->lookup<cov::line_coverage>(entry->line_coverage());
 				ASSERT_TRUE(cvg_files);
 				unsigned finish{0};
 				auto const cvg = from_coverage(cvg_lines->coverage(), finish);
@@ -205,8 +205,8 @@ namespace cov::testing {
 		ASSERT_TRUE(backend);
 
 		{
-			auto cvg_report =
-			    report_create({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {});
+			auto cvg_report = report_create({}, {}, {}, {}, {}, {}, {}, {}, {},
+			                                {}, {}, {}, {});
 			ASSERT_TRUE(cvg_report);
 			ASSERT_TRUE(backend->write(report_id, cvg_report));
 		}

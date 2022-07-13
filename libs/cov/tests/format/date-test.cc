@@ -56,14 +56,14 @@ namespace cov::testing {
 		git_oid_fromstr(&commit_id, "36109a1c35e0d5cf3e5e68d896c8b1b4be565525");
 
 		auto report =
-		    report_create(parent_id, zero, commit_id, "develop"s,
+		    report_create(id, parent_id, zero, commit_id, "develop"s,
 		                  "Johnny Appleseed"s, "johnny@appleseed.com"s,
 		                  "Johnny Committer"s, "committer@appleseed.com"s,
 		                  "Subject, isn't it?\n\nBody para 1\n\nBody para 2\n"s,
 		                  commit, add, {1250, 300, 299});
 		ASSERT_TRUE(report);
 
-		auto view = ph::report_view::from(*report, &id);
+		auto view = ph::report_view::from(*report);
 		auto actual = fmt.format(view, ctx);
 		ASSERT_EQ(expected, actual);
 	}  // namespace cov::testing

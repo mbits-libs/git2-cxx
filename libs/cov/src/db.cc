@@ -32,7 +32,7 @@ namespace cov {
 	class loose_backend : public counted_impl<backend> {
 	public:
 		loose_backend(std::filesystem::path const&);
-		ref_ptr<object> lookup_object(git_oid const& id) override;
+		ref_ptr<object> lookup_object(git_oid const& id) const override;
 		bool write(git_oid& id, ref_ptr<object> const& obj) override;
 
 	private:
@@ -47,7 +47,7 @@ namespace cov {
 		io_.add_handler<io::OBJECT::COVERAGE, io::handlers::line_coverage>();
 	}
 
-	ref_ptr<object> loose_backend::lookup_object(git_oid const& id) {
+	ref_ptr<object> loose_backend::lookup_object(git_oid const& id) const {
 		char buffer[GIT_OID_HEXSZ + 1];
 		if (git_oid_pathfmt(buffer, &id)) return {};
 		std::vector<std::byte> bytes;
@@ -57,7 +57,7 @@ namespace cov {
 
 		io::bytes_read_stream stream{{bytes.data(), bytes.size()}};
 		std::error_code ec{};
-		auto result = io_.load(stream, ec);
+		auto result = io_.load(id, stream, ec);
 		if (!result || ec || !result->is_object()) return {};
 
 		return ref_ptr{static_cast<cov::object*>(result.unlink())};
