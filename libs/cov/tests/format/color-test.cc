@@ -39,6 +39,7 @@ namespace cov::testing {
 	class format_color : public TestWithParam<color_test> {
 	protected:
 		ref_ptr<cov::report> make_report(
+		    git_oid const& id,
 		    std::optional<io::v1::coverage_stats> const& stats) const {
 			git_oid parent_id{}, commit_id{}, zero{};
 			git_oid_fromstr(&parent_id,
@@ -48,7 +49,7 @@ namespace cov::testing {
 
 			io::v1::coverage_stats const default_stats{1250, 300, 299};
 			return report_create(
-			    parent_id, zero, commit_id, "develop"s, "Johnny Appleseed"s,
+			    id, parent_id, zero, commit_id, "develop"s, "Johnny Appleseed"s,
 			    "johnny@appleseed.com"s, "Johnny Committer"s,
 			    "committer@appleseed.com"s,
 			    "Subject, isn't it?\n\nBody para 1\n\nBody para 2\n"s, feb29,
@@ -75,10 +76,10 @@ namespace cov::testing {
 
 		git_oid id{};
 		git_oid_fromstr(&id, "112233445566778899aabbccddeeff0012345678");
-		auto report = make_report(tweaks.stats);
+		auto report = make_report(id, tweaks.stats);
 		ASSERT_TRUE(report);
 
-		auto view = ph::report_view::from(*report, &id);
+		auto view = ph::report_view::from(*report);
 		auto actual = fmt.format(view, ctx);
 		std::fputs(actual.c_str(), stdout);
 		std::fputc('\n', stdout);
@@ -105,10 +106,10 @@ namespace cov::testing {
 
 		git_oid id{};
 		git_oid_fromstr(&id, "112233445566778899aabbccddeeff0012345678");
-		auto report = make_report(tweaks.stats);
+		auto report = make_report(id, tweaks.stats);
 		ASSERT_TRUE(report);
 
-		auto view = ph::report_view::from(*report, &id);
+		auto view = ph::report_view::from(*report);
 		auto actual = fmt.format(view, ctx);
 		std::fputs(actual.c_str(), stdout);
 		std::fputc('\n', stdout);

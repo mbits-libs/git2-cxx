@@ -16,7 +16,7 @@ namespace cov {
 
 	private:
 		friend struct repository;
-		virtual ref_ptr<object> lookup_object(git_oid const& id) = 0;
+		virtual ref_ptr<object> lookup_object(git_oid const& id) const = 0;
 	};
 
 	ref_ptr<backend> loose_backend_create(std::filesystem::path const&);

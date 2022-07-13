@@ -9,6 +9,8 @@
 #include <git2/config.hh>
 #include <git2/odb.hh>
 #include <git2/repository.hh>
+#include <map>
+#include <vector>
 
 namespace git {
 	struct blob;
@@ -31,12 +33,51 @@ namespace cov {
 		static ref_ptr<blob> wrap(git::blob&& ref, cov::origin);
 	};
 
+	struct file_diff {
+		enum kind { normal, renamed, copied, added, deleted };
+		enum initial { initial_add_all, initial_with_self };
+		struct {
+			io::v1::coverage_stats::ratio<> current{};
+			io::v1::coverage_stats::ratio<int> diff{};
+		} coverage;
+		struct {
+			io::v1::coverage_stats current{};
+			io::v1::coverage_diff diff{};
+		} stats;
+	};
+
+	struct file_stats {
+		std::string filename{};
+		io::v1::coverage_stats current{};
+		io::v1::coverage_stats previous{};
+		std::string previous_name{};
+		file_diff::kind diff_kind{};
+
+		bool operator==(file_stats const&) const noexcept = default;
+
+		file_diff diff(unsigned char digits = 2) const noexcept {
+			auto const curr = current.calc(digits);
+			auto const prev = previous.calc(digits);
+			return {
+			    .coverage = {.current = curr, .diff = io::v1::diff(curr, prev)},
+			    .stats = {.current = current,
+			              .diff = io::v1::diff(current, previous)},
+			};
+		}
+	};
+
+	struct commit_file_diff {
+		std::string previous_name{};
+		file_diff::kind diff_kind{};
+	};
+
 	struct repository {
 		~repository();
 
 		static std::filesystem::path discover(
 		    std::filesystem::path const& current_dir,
-		    discover across_fs, std::error_code& ec) {
+		    discover across_fs,
+		    std::error_code& ec) {
 			return discover_repository(current_dir, across_fs, ec);
 		}
 
@@ -68,7 +109,7 @@ namespace cov {
 		ref_ptr<references> const& refs() const noexcept { return refs_; }
 		ref_ptr<object> dwim(std::string_view) const;
 		template <typename Object>
-		ref_ptr<Object> lookup(git_oid const& id, std::error_code& ec) {
+		ref_ptr<Object> lookup(git_oid const& id, std::error_code& ec) const {
 			return as_a<Object>(lookup_object(id, ec));
 		}
 		bool write(git_oid&, ref_ptr<object> const&);
@@ -76,12 +117,32 @@ namespace cov {
 			return git_.write(out, bytes);
 		}
 
+		std::map<std::string, commit_file_diff> diff_betwen_commits(
+		    git_oid const& newer,
+		    git_oid const& older,
+		    std::error_code& ec,
+		    git_diff_find_options const* opts = nullptr) const;
+
+		std::vector<file_stats> diff_betwen_reports(
+		    ref_ptr<report> const& newer,
+		    ref_ptr<report> const& older,
+		    std::error_code& ec,
+		    git_diff_find_options const* opts = nullptr) const;
+
+		std::vector<file_stats> diff_with_parent(
+		    ref_ptr<report> const& current,
+		    std::error_code& ec,
+		    git_diff_find_options const* opts = nullptr,
+		    file_diff::initial initial_policy =
+		        file_diff::initial_with_self) const;
+
 	protected:
 		repository();
 		explicit repository(std::filesystem::path const& common,
 		                    std::error_code&);
 
-		ref_ptr<object> lookup_object(git_oid const& id, std::error_code&);
+		ref_ptr<object> lookup_object(git_oid const& id,
+		                              std::error_code&) const;
 
 	private:
 		struct git_repo {
@@ -89,8 +150,10 @@ namespace cov {
 			void open(std::filesystem::path const& common,
 			          git::config const& cfg,
 			          std::error_code&);
-			ref_ptr<blob> lookup(git_oid const& id, std::error_code&);
+			ref_ptr<blob> lookup(git_oid const& id, std::error_code&) const;
 			bool write(git_oid&, git::bytes const&);
+
+			git::repository_handle repo() const noexcept { return git_; }
 
 		private:
 			git::repository git_{};

@@ -10,6 +10,7 @@ namespace cov::io::handlers {
 	struct report : db_handler_for<cov::report> {
 		ref_ptr<counted> load(uint32_t magic,
 		                      uint32_t version,
+		                      git_oid const& id,
 		                      read_stream& in,
 		                      std::error_code& ec) const override;
 		bool store(ref_ptr<counted> const& obj,

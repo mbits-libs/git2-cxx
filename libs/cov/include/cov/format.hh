@@ -180,7 +180,7 @@ namespace cov::placeholder {
 		}
 		static git_commit_view from(cov::report const& report) noexcept {
 			return {
-			    .id = report.commit(),
+			    .id = &report.commit(),
 			    .branch = report.branch(),
 			    .message = report.message(),
 			    .author = git_person::from(report, who::author),
@@ -214,11 +214,10 @@ namespace cov::placeholder {
 		iterator format_with(iterator out,
 		                     internal_context& ctx,
 		                     placeholder::format const& fmt) const;
-		static report_view from(cov::report const& report,
-		                        git_oid const* id) noexcept {
+		static report_view from(cov::report const& report) noexcept {
 			return {
-			    .id = id,
-			    .parent = report.parent_report(),
+			    .id = &report.oid(),
+			    .parent = &report.parent_report(),
 			    .date = report.add_time_utc(),
 			    .git = git_commit_view::from(report),
 			    .stats = &report.stats(),

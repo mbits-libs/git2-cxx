@@ -60,7 +60,7 @@ namespace cov::testing {
 		dbo.add_handler<io::OBJECT::FILES, io::handlers::report_files>();
 
 		std::error_code ec{};
-		auto const result = dbo.load(stream, ec);
+		auto const result = dbo.load({}, stream, ec);
 		ASSERT_FALSE(ec) << "   Error: " << ec.message() << " ("
 		                 << ec.category().name() << ')';
 		ASSERT_TRUE(result);
@@ -101,7 +101,7 @@ namespace cov::testing {
 		dbo.add_handler<io::OBJECT::FILES, io::handlers::report_files>();
 
 		std::error_code ec{};
-		auto const result = dbo.load(stream, ec);
+		auto const result = dbo.load({}, stream, ec);
 		ASSERT_FALSE(ec) << "   Error: " << ec.message() << " ("
 		                 << ec.category().name() << ')';
 
@@ -154,7 +154,7 @@ namespace cov::testing {
 		dbo.add_handler<io::OBJECT::FILES, io::handlers::report_files>();
 
 		std::error_code ec{};
-		auto const result = dbo.load(stream, ec);
+		auto const result = dbo.load({}, stream, ec);
 		ASSERT_FALSE(result);
 		ASSERT_EQ(ec, io::errc::bad_syntax);
 	}
@@ -187,7 +187,7 @@ namespace cov::testing {
 		dbo.add_handler<io::OBJECT::FILES, io::handlers::report_files>();
 
 		std::error_code ec{};
-		auto const result = dbo.load(stream, ec);
+		auto const result = dbo.load({}, stream, ec);
 		ASSERT_FALSE(result);
 		ASSERT_EQ(ec, io::errc::bad_syntax);
 	}
@@ -220,7 +220,7 @@ namespace cov::testing {
 		dbo.add_handler<io::OBJECT::FILES, io::handlers::report_files>();
 
 		std::error_code ec{};
-		auto const result = dbo.load(stream, ec);
+		auto const result = dbo.load({}, stream, ec);
 		ASSERT_FALSE(result);
 		ASSERT_EQ(ec, io::errc::bad_syntax);
 	}

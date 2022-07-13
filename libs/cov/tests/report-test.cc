@@ -80,15 +80,14 @@ namespace cov::testing {
 	};
 
 	struct report_impl : counted_impl<cov::report> {
-		git_oid const* parent_report() const noexcept override {
-			return &state.parent_report;
+		git_oid const& oid() const noexcept override { return state.oid; }
+		git_oid const& parent_report() const noexcept override {
+			return state.parent_report;
 		}
-		git_oid const* file_list() const noexcept override {
-			return &state.file_list;
+		git_oid const& file_list() const noexcept override {
+			return state.file_list;
 		}
-		git_oid const* commit() const noexcept override {
-			return &state.commit;
-		}
+		git_oid const& commit() const noexcept override { return state.commit; }
 		std::string_view branch() const noexcept override {
 			return state.branch;
 		}
@@ -118,6 +117,7 @@ namespace cov::testing {
 		}
 
 		struct state_type {
+			git_oid oid;
 			git_oid parent_report;
 			git_oid file_list;
 			git_oid commit;
@@ -141,7 +141,7 @@ namespace cov::testing {
 		dbo.add_handler<io::OBJECT::REPORT, io::handlers::report>();
 
 		std::error_code ec{};
-		auto const result = dbo.load(stream, ec);
+		auto const result = dbo.load({}, stream, ec);
 		ASSERT_FALSE(ec) << "   Error: " << ec.message() << " ("
 		                 << ec.category().name() << ')';
 		ASSERT_TRUE(result);
@@ -162,9 +162,9 @@ namespace cov::testing {
 		ASSERT_EQ(1250u, rprt->stats().total);
 		ASSERT_EQ(300u, rprt->stats().relevant);
 		ASSERT_EQ(299u, rprt->stats().covered);
-		ASSERT_TRUE(git_oid_is_zero(rprt->parent_report()));
-		ASSERT_TRUE(git_oid_is_zero(rprt->file_list()));
-		ASSERT_TRUE(git_oid_is_zero(rprt->commit()));
+		ASSERT_TRUE(git_oid_is_zero(&rprt->parent_report()));
+		ASSERT_TRUE(git_oid_is_zero(&rprt->file_list()));
+		ASSERT_TRUE(git_oid_is_zero(&rprt->commit()));
 	}
 
 	TEST(report, load_partial) {
@@ -176,7 +176,7 @@ namespace cov::testing {
 		dbo.add_handler<io::OBJECT::REPORT, io::handlers::report>();
 
 		std::error_code ec{};
-		auto const result = dbo.load(stream, ec);
+		auto const result = dbo.load({}, stream, ec);
 		ASSERT_TRUE(ec);
 		ASSERT_FALSE(result);
 	}
@@ -221,7 +221,7 @@ namespace cov::testing {
 		dbo.add_handler<io::OBJECT::REPORT, io::handlers::report>();
 
 		std::error_code ec{};
-		auto const result = dbo.load(stream, ec);
+		auto const result = dbo.load({}, stream, ec);
 		ASSERT_TRUE(ec);
 		ASSERT_FALSE(result);
 	}
@@ -234,6 +234,7 @@ namespace cov::testing {
 
 		auto const obj = make_ref<report_impl>();
 		obj->state = {
+		    .oid = {},
 		    .parent_report = {},
 		    .file_list = {},
 		    .commit = {},
@@ -265,18 +266,13 @@ namespace cov::testing {
 		};
 
 		static constexpr std::tuple<unsigned char,
-		                            std::tuple<unsigned, unsigned, unsigned>>
+		                            io::v1::coverage_stats::ratio<>>
 		    tests[] = {
-		        {0u, {66u, 0u, 1u}},
-		        {1u, {65u, 8u, 10u}},
-		        {2u, {65u, 78u, 100u}},
-		        {3u, {65u, 782u, 1000u}},
-		        {4u, {65u, 7823u, 10000u}},
-		        {5u, {65u, 78230u, 100000u}},
-		        {6u, {65u, 782300u, 1000000u}},
-		        {7u, {65u, 7823000u, 10000000u}},
-		        {8u, {65u, 78230000u, 100000000u}},
-		        {9u, {65u, 782300000u, 1000000000u}},
+		        {0u, {66u, 0u, 0u}},        {1u, {65u, 8u, 1u}},
+		        {2u, {65u, 78u, 2u}},       {3u, {65u, 782u, 3u}},
+		        {4u, {65u, 7823u, 4u}},     {5u, {65u, 78230u, 5u}},
+		        {6u, {65u, 782300u, 6u}},   {7u, {65u, 7823000u, 7u}},
+		        {8u, {65u, 78230000u, 8u}}, {9u, {65u, 782300000u, 9u}},
 		    };
 
 		for (auto const& [digits, expected] : tests) {

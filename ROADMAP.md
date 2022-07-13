@@ -21,15 +21,20 @@
   - [x] config,
   - [x] reports and blobs,
   - [x] references,
-  - [ ] stats diffing,
-  - [ ] formatting,
-  - [ ] highlighting,
+  - [x] stats diffing,
+  - ~~formatting~~,
+  - ~~highlighting~~,
 - [ ] Add commands _(drop alpha)_
   - [ ] lngs baseline
   - [ ] `cov`, builtin and `libexec/cov` _(M⬆️P)_
     - [ ] aliases inside config
   - [ ] `cov init` _(each is a M⬆️P)_
   - [ ] `cov config`
+  - [ ] `cov module`
+    - _[module "libraries"]_\
+    _name=..._\
+    _dir=..._\
+    _dir=..._
   - [ ] `cov add`
     - [ ] coveralls _(separate M⬆️P)_
     - [ ] cobertura _(separate M⬆️P)_

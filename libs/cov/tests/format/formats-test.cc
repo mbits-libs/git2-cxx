@@ -70,6 +70,7 @@ namespace cov::testing {
 		}
 
 		ref_ptr<cov::report> make_report(
+		    git_oid const& id,
 		    std::string const& message,
 		    sys_seconds commit,
 		    sys_seconds add,
@@ -81,7 +82,7 @@ namespace cov::testing {
 			                "36109a1c35e0d5cf3e5e68d896c8b1b4be565525");
 
 			io::v1::coverage_stats const default_stats{1250, 300, 299};
-			return report_create(parent_id, zero, commit_id, "develop"s,
+			return report_create(id, parent_id, zero, commit_id, "develop"s,
 			                     "Johnny Appleseed"s, "johnny@appleseed.com"s,
 			                     "Johnny Committer"s,
 			                     "committer@appleseed.com"s, message, commit,
@@ -101,6 +102,7 @@ namespace cov::testing {
 		                         ? "112233445566778899aabbccddeeff0012345678"
 		                         : report_id.data());
 		auto report = make_report(
+		    id,
 		    "Subject, isn't it?\n\nLorem ipsum dolor sit amet, consectetur "
 		    "adipiscing elit. Praesent facilisis\nfeugiat nibh in sodales. "
 		    "Nullam non velit lectus. Morbi finibus risus vel\nrutrum "
@@ -125,7 +127,7 @@ namespace cov::testing {
 		    commit, add, stats);
 		ASSERT_TRUE(report);
 
-		auto view = ph::report_view::from(*report, &id);
+		auto view = ph::report_view::from(*report);
 		auto actual = fmt.format(view, ctx);
 		ASSERT_EQ(expected, actual);
 	}  // namespace cov::testing
@@ -339,18 +341,18 @@ namespace cov::testing {
 		ph::context ctx = context({});
 		git_oid id{};
 		git_oid_fromstr(&id, "112233445566778899aabbccddeeff0012345678");
-		auto report = make_report(
-		    R"(Subject line
+		auto report = make_report(id,
+		                          R"(Subject line
 
 This-line-is-too-long-to-be-properly-wrapped. However, this line is perfectly wrappable)"s,
-		    feb29, feb29, std::nullopt);
+		                          feb29, feb29, std::nullopt);
 		ASSERT_TRUE(report);
 		static constexpr auto expected =
 		    R"(      This-line-is-too-long-to-be-properly-wrapped.
       However, this line is
       perfectly wrappable)"sv;
 
-		auto view = ph::report_view::from(*report, &id);
+		auto view = ph::report_view::from(*report);
 		auto actual = fmt.format(view, ctx);
 		ASSERT_EQ(expected, actual);
 	}
@@ -361,19 +363,19 @@ This-line-is-too-long-to-be-properly-wrapped. However, this line is perfectly wr
 		ph::context ctx = context({});
 		git_oid id{};
 		git_oid_fromstr(&id, "112233445566778899aabbccddeeff0012345678");
-		auto report = make_report(
-		    R"(Subject line
+		auto report = make_report(id,
+		                          R"(Subject line
 
 1234567890123456789012345 1234 56789 1234567890 987
 5643 21.)"s,
-		    feb29, feb29, std::nullopt);
+		                          feb29, feb29, std::nullopt);
 		ASSERT_TRUE(report);
 		static constexpr auto expected =
 		    R"(     1234567890123456789012345
      1234 56789 1234567890 987
      5643 21.)"sv;
 
-		auto view = ph::report_view::from(*report, &id);
+		auto view = ph::report_view::from(*report);
 		auto actual = fmt.format(view, ctx);
 		ASSERT_EQ(expected, actual);
 	}

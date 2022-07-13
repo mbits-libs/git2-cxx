@@ -8,7 +8,8 @@
 namespace cov::io::handlers {
 	namespace {
 		struct impl : counted_impl<cov::report> {
-			explicit impl(git_oid const& parent_report,
+			explicit impl(git_oid const& oid,
+			              git_oid const& parent_report,
 			              git_oid const& file_list,
 			              git_oid const& commit,
 			              std::string const& branch,
@@ -20,7 +21,8 @@ namespace cov::io::handlers {
 			              sys_seconds commit_time_utc,
 			              sys_seconds add_time_utc,
 			              io::v1::coverage_stats const& stats)
-			    : parent_report_{parent_report}
+			    : oid_{oid}
+			    , parent_report_{parent_report}
 			    , file_list_{file_list}
 			    , commit_{commit}
 			    , branch_{branch}
@@ -33,13 +35,14 @@ namespace cov::io::handlers {
 			    , add_time_utc_{add_time_utc}
 			    , stats_{stats} {}
 
-			git_oid const* parent_report() const noexcept override {
-				return &parent_report_;
+			git_oid const& oid() const noexcept override { return oid_; }
+			git_oid const& parent_report() const noexcept override {
+				return parent_report_;
 			}
-			git_oid const* file_list() const noexcept override {
-				return &file_list_;
+			git_oid const& file_list() const noexcept override {
+				return file_list_;
 			}
-			git_oid const* commit() const noexcept override { return &commit_; }
+			git_oid const& commit() const noexcept override { return commit_; }
 			std::string_view branch() const noexcept override {
 				return branch_;
 			}
@@ -69,6 +72,7 @@ namespace cov::io::handlers {
 			}
 
 		private:
+			git_oid oid_;
 			git_oid parent_report_;
 			git_oid file_list_;
 			git_oid commit_;
@@ -86,6 +90,7 @@ namespace cov::io::handlers {
 
 	ref_ptr<counted> report::load(uint32_t,
 	                              uint32_t,
+	                              git_oid const& id,
 	                              read_stream& in,
 	                              std::error_code& ec) const {
 		ec = make_error_code(errc::bad_syntax);
@@ -119,7 +124,7 @@ namespace cov::io::handlers {
 		     message = at(header.commit.message);
 
 		ec.clear();
-		return report_create(header.parent_report, header.file_list,
+		return report_create(id, header.parent_report, header.file_list,
 		                     header.commit.commit_id, branch, author_name,
 		                     author_email, committer_name, committer_email,
 		                     message, header.commit.committed.to_seconds(),
@@ -161,8 +166,8 @@ namespace cov::io::handlers {
 		};
 
 		v1::report hdr{
-		    .parent_report = *obj->parent_report(),
-		    .file_list = *obj->file_list(),
+		    .parent_report = obj->parent_report(),
+		    .file_list = obj->file_list(),
 		    .added = time_stamp(obj->add_time_utc()),
 		    .stats = obj->stats(),
 		    .commit =
@@ -173,7 +178,7 @@ namespace cov::io::handlers {
 		            .committer = {.name = locate(obj->committer_name()),
 		                          .email = locate(obj->committer_email())},
 		            .message = locate(obj->message()),
-		            .commit_id = *obj->commit(),
+		            .commit_id = obj->commit(),
 		            .committed = time_stamp(obj->commit_time_utc()),
 		        },
 		    .strings_offset = 0u,
@@ -192,7 +197,8 @@ namespace cov::io::handlers {
 }  // namespace cov::io::handlers
 
 namespace cov {
-	ref_ptr<report> report_create(git_oid const& parent_report,
+	ref_ptr<report> report_create(git_oid const& id,
+	                              git_oid const& parent_report,
 	                              git_oid const& file_list,
 	                              git_oid const& commit,
 	                              std::string const& branch,
@@ -205,8 +211,8 @@ namespace cov {
 	                              sys_seconds add_time_utc,
 	                              io::v1::coverage_stats const& stats) {
 		return make_ref<io::handlers::impl>(
-		    parent_report, file_list, commit, branch, author_name, author_email,
-		    committer_name, committer_email, message, commit_time_utc,
-		    add_time_utc, stats);
+		    id, parent_report, file_list, commit, branch, author_name,
+		    author_email, committer_name, committer_email, message,
+		    commit_time_utc, add_time_utc, stats);
 	}
 }  // namespace cov

@@ -2,10 +2,13 @@
 // This code is licensed under MIT license (see LICENSE for details)
 
 #include <cov/branch.hh>
+#include <cov/report.hh>
 #include <cov/repository.hh>
 #include <cov/tag.hh>
 #include <git2/blob.hh>
+#include <git2/commit.hh>
 #include <git2/error.hh>
+#include <git2/repository.hh>
 #include "path-utils.hh"
 
 namespace cov {
@@ -64,7 +67,7 @@ namespace cov {
 	}
 
 	ref_ptr<blob> repository::git_repo::lookup(git_oid const& id,
-	                                           std::error_code& ec) {
+	                                           std::error_code& ec) const {
 		if (auto blob = git_.lookup<git::blob>(id, ec))
 			return cov::blob::wrap(std::move(blob), origin::git);
 		if (auto blob = local_.lookup<git::blob>(id, ec))
@@ -99,7 +102,7 @@ namespace cov {
 	}
 
 	ref_ptr<object> repository::lookup_object(git_oid const& id,
-	                                          std::error_code& ec) {
+	                                          std::error_code& ec) const {
 		if (auto report = db_->lookup_object(id)) return report;
 		if (auto blob = git_.lookup(id, ec)) return blob;
 
@@ -111,4 +114,176 @@ namespace cov {
 		return db_->write(out, obj);
 	}
 
+	std::map<std::string, commit_file_diff> repository::diff_betwen_commits(
+	    git_oid const& new_commit,
+	    git_oid const& old_commit,
+	    std::error_code& ec,
+	    git_diff_find_options const* opts) const {
+		auto const newer = git::commit::lookup(git_.repo(), new_commit, ec);
+		if (ec) return {};
+		auto const new_tree = newer.tree(ec);
+		if (ec) return {};
+
+		auto const older = git::commit::lookup(git_.repo(), old_commit, ec);
+		if (ec) return {};
+		auto const old_tree = older.tree(ec);
+		if (ec) return {};
+
+		auto const diff = old_tree.diff_to(new_tree, git_.repo(), ec);
+		if (ec) return {};
+
+		ec = diff.find_similar(opts);
+		if (ec) return {};
+
+		std::map<std::string, commit_file_diff> result{};
+		for (auto const& delta : diff.deltas()) {
+			if (delta.status != GIT_DELTA_RENAMED &&
+			    delta.status != GIT_DELTA_COPIED) {
+				continue;
+			}
+			auto const kind = delta.status == GIT_DELTA_RENAMED
+			                      ? file_diff::renamed
+			                      : file_diff::copied;
+			result[delta.new_file.path] = {.previous_name = delta.old_file.path,
+			                               .diff_kind = kind};
+		}
+		return result;
+	}
+
+#define PATH_AND_STATS .filename = std::move(path), .current = entry->stats()
+#define RENAMED_PREV(UNUSED) \
+	.previous_name = it->second.previous_name, .diff_kind = it->second.diff_kind
+#define NO_PREV(KIND) .previous_name = {}, .diff_kind = file_diff::KIND
+
+#define FIND_IN_POOL(KEY, GET_PREV)         \
+	auto prev = pool.find(KEY);             \
+	if (prev != pool.end()) {               \
+		prev->second.second = true;         \
+		result.push_back({                  \
+		    PATH_AND_STATS,                 \
+		    .previous = prev->second.first, \
+		    GET_PREV(normal),               \
+		});                                 \
+		continue;                           \
+	}                                       \
+                                            \
+	result.push_back({                      \
+	    PATH_AND_STATS,                     \
+	    .previous = {},                     \
+	    GET_PREV(added),                    \
+	});
+
+	static bool path_sort_less(file_stats const& left,
+	                           file_stats const& right) {
+		if (auto cmp = left.filename <=> right.filename; cmp != 0)
+			return cmp < 0;
+		// GCOV_EXCL_START
+		[[unlikely]];
+		if (auto cmp = left.previous_name <=> right.previous_name; cmp != 0)
+			return cmp < 0;
+		// equivalent:
+		return false;
+		// GCOV_EXCL_STOP
+	}
+
+	std::vector<file_stats> repository::diff_betwen_reports(
+	    ref_ptr<report> const& newer,
+	    ref_ptr<report> const& older,
+	    std::error_code& ec,
+	    git_diff_find_options const* opts) const {
+		auto const renames = [&, this, opts] {
+			std::error_code ignore{};
+			return this->diff_betwen_commits(newer->commit(), older->commit(),
+			                                 ignore, opts);
+		}();
+
+		auto const new_files =
+		    lookup<cov::report_files>(newer->file_list(), ec);
+		if (ec) return {};
+		auto const old_files =
+		    lookup<cov::report_files>(older->file_list(), ec);
+		if (ec) return {};
+
+		std::map<std::string, std::pair<io::v1::coverage_stats, bool>> pool{};
+
+		for (auto const& entry : old_files->entries()) {
+			auto const path = entry->path();
+			pool[{path.data(), path.size()}] = {entry->stats(), false};
+		}
+
+		std::vector<file_stats> result{};
+		for (auto const& entry : new_files->entries()) {
+			auto const path_view = entry->path();
+			auto path = std::string{path_view.data(), path_view.size()};
+			auto it = renames.find(path);
+			if (it != renames.end()) {
+				// this is the name and kind to use for pool lookup...
+				FIND_IN_POOL(it->second.previous_name, RENAMED_PREV);
+				// GCOV_EXCL_START
+				// It's highly unlikely to have both a rename and old name
+				// missing from the pool
+				[[unlikely]];
+				continue;
+				// GCOV_EXCL_STOP
+			} // GCOV_EXCL_LINE[WIN32]
+
+			FIND_IN_POOL(path, NO_PREV);
+		}
+
+		for (auto const& [path, info] : pool) {
+			auto const& [stats, used] = info;
+			if (used) continue;
+
+			result.push_back({
+			    .filename = path,
+			    .current = {},
+			    .previous = stats,
+			    NO_PREV(deleted),
+			});
+		}
+
+		std::stable_sort(result.begin(), result.end(), path_sort_less);
+		return result;
+	}
+
+	std::vector<file_stats> repository::diff_with_parent(
+	    ref_ptr<report> const& current,
+	    std::error_code& ec,
+	    git_diff_find_options const* opts,
+	    file_diff::initial initial_policy) const {
+		auto const& parent_oid = current->parent_report();
+		ref_ptr<report> parent{};
+		if (!git_oid_is_zero(&parent_oid)) {
+			std::error_code ignore{};
+			parent = lookup<report>(parent_oid, ignore);
+		}
+
+		if (parent) return diff_betwen_reports(current, parent, ec, opts);
+
+		if (initial_policy == file_diff::initial_with_self)
+			return diff_betwen_reports(current, current, ec);
+
+		auto const files = lookup<cov::report_files>(current->file_list(), ec);
+		if (ec) return {};
+
+		std::vector<file_stats> result{};
+		for (auto const& entry : files->entries()) {
+			auto const path = entry->path();
+
+			result.push_back({
+			    .filename = {path.data(), path.size()},
+			    .current = entry->stats(),
+			    .previous = {},
+			    NO_PREV(added),
+			});
+		}
+
+		std::stable_sort(result.begin(), result.end(), path_sort_less);
+		return result;
+	}
+
+#undef PATH_AND_STATS
+#undef RENAMED_PREV
+#undef NO_PREV
+#undef FIND_IN_POOL
 }  // namespace cov

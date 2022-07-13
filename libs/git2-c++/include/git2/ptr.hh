@@ -84,14 +84,11 @@ namespace git {
 		using pointer = typename GitObject::pointer;
 
 		GitStructPtr out{nullptr};
-		auto const ret = open_function(&out, std::forward<Args>(args)...);
+		ec = as_error(open_function(&out, std::forward<Args>(args)...));
 
-		if (ret != 0) {
+		if (ec) {
 			GitObject{git::cast<pointer>(out)};
 			out = nullptr;
-			ec = as_error(ret);
-		} else {
-			ec.clear();
 		}
 
 		return GitObject{git::cast<pointer>(out)};
