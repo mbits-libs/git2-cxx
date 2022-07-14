@@ -9,13 +9,13 @@ static POLICY policy = POLICY::USE_EVERYTHING;
 static size_t argument = 0;
 
 void set_oom_as_threshold(size_t threshold) {
-	std::printf("threshold: %zu\n", threshold);
+	fprintf(stderr, "threshold: %zu\n", threshold);
 	policy = POLICY::THRESHOLD;
 	argument = threshold;
 }
 
 void set_oom_as_limit(size_t limit) {
-	std::printf("limit: %zu\n", limit);
+	fprintf(stderr, "limit: %zu\n", limit);
 	policy = POLICY::LIMIT;
 	argument = limit;
 }

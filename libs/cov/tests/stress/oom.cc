@@ -11,6 +11,7 @@
 #include <cov/repository.hh>
 #include <cov/tag.hh>
 #include <fstream>
+#include <git2/global.hh>
 #include "../setup.hh"
 #include "new.hh"
 
@@ -232,6 +233,8 @@ namespace cov::testing {
 #endif
 
 	TEST(oom, open_config) {
+		git::init global{};
+
 		auto const home = setup::test_dir() / "home"sv;
 		auto const repo_dir = setup::test_dir() / "repo"sv;
 
