@@ -10,13 +10,8 @@
 - [x] Idea of references, tags and "branches" _(0.3.0-alpha)_
 - [x] Report format for `log` _(0.4.1-alpha)_
 - [x] Add diff to `git2-c++` with file movement _(0.5.0-alpha)_
-- [ ] 💸 Cleanup initalization for `data-tz`
-  - [ ] Properly setup `access_install` directory
-  - [ ] Work with 7zip binary
 - [x] Add highlighting API
   - [x] Add hilite for C++ _(0.6.0-alpha)_
-  - [ ] Add hilite for Python _(nice to have, M⬆️P)_
-  - [ ] Add hilite for TypeScript _(nice to have, M⬆️P)_
 - [x] Repository _(0.7.0-alpha)_
   - [x] config,
   - [x] reports and blobs,
@@ -56,4 +51,11 @@
     - [ ] Latest report / report list
   - [ ] Report / component / directory view
   - [ ] File view _(M⬆️P)_
+---
 - [ ] Add report object cache
+- [ ] Highlight partial C++ strings
+- [ ] Add hilite for Python
+- [ ] Add hilite for TypeScript
+- [ ] 💸 Cleanup initalization for `data-tz`
+  - [ ] Properly setup `access_install` directory
+  - [ ] Work with 7zip binary

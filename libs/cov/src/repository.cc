@@ -224,8 +224,7 @@ namespace cov {
 				// missing from the pool
 				[[unlikely]];
 				continue;
-				// GCOV_EXCL_STOP
-			} // GCOV_EXCL_LINE[WIN32]
+			}  // GCOV_EXCL_STOP
 
 			FIND_IN_POOL(path, NO_PREV);
 		}

@@ -44,7 +44,7 @@ namespace lighter::testing {
 		printer_state::setup(ctx.hl_macro, ctx.span_prefix);
 		auto actual = highlights::from(text, name);
 		printer_state::get().dict = &actual.dict;
-		ASSERT_EQ(expected, actual);
+		EXPECT_EQ(expected, actual);
 
 		if (!actual.lines.empty() && actual.lines.back().contents.empty()) {
 			actual.lines.pop_back();

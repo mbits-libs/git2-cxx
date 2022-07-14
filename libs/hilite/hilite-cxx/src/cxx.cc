@@ -443,18 +443,14 @@ namespace hl::cxx::parser::callbacks {
 		return matched ? pos : std::string_view::npos;
 	}
 
-	size_t find_del_eol(const std::string_view& sv, size_t pos = 0) {
-		while (true) {
-			auto slash = sv.find('\\', pos);
-			if (slash == std::string_view::npos) return std::string_view::npos;
-			auto end = find_eol_end(sv, slash + 1);
-			if (end != std::string_view::npos) return end;
-			++slash;
-		}
+	size_t find_del_eol_in_ident(const std::string_view& sv, size_t pos = 0) {
+		auto slash = sv.find('\\', pos);
+		if (slash == std::string_view::npos) return std::string_view::npos;
+		return find_eol_end(sv, slash + 1);
 	}
 
-	std::string remove_deleted_eols(const std::string_view& sv) {
-		auto pos = find_del_eol(sv);
+	std::string remove_deleted_eols_in_ident(const std::string_view& sv) {
+		auto pos = find_del_eol_in_ident(sv);
 		auto prev = decltype(pos){};
 		if (pos == std::string_view::npos) return {};
 
@@ -469,7 +465,7 @@ namespace hl::cxx::parser::callbacks {
 			out.append(sv.data() + prev, sv.data() + until);
 
 			prev = pos;
-			pos = find_del_eol(sv, pos);
+			pos = find_del_eol_in_ident(sv, pos);
 		}
 
 		out.append(sv.data() + prev, sv.data() + sv.length());
@@ -479,7 +475,7 @@ namespace hl::cxx::parser::callbacks {
 	RULE_MAP(identifier) {
 		auto ident_view = _view(context);
 
-		const auto ident_str = remove_deleted_eols(ident_view);
+		const auto ident_str = remove_deleted_eols_in_ident(ident_view);
 		if (!ident_str.empty()) ident_view = ident_str;
 
 		auto const ident = cell::set_entry{ident_view};
@@ -650,14 +646,19 @@ namespace hl::cxx::parser {
 					}
 					break;
 				case '0':
-					if ((*odigit).parse(first, last, ctx)) {
-						if (cell::action_state::enabled()) {
-							_setrange(save, first, ctx);
-							on_escaped(ctx);
-						}
-						return true;
+				case '1':
+				case '2':
+				case '3':
+				case '4':
+				case '5':
+				case '6':
+				case '7':
+					repeat(0, 2)(odigit).parse(first, last, ctx);
+					if (cell::action_state::enabled()) {
+						_setrange(save, first, ctx);
+						on_escaped(ctx);
 					}
-					break;
+					return true;
 				default:
 					if (cell::action_state::enabled()) {
 						_setrange(save, first, ctx);
