@@ -54,7 +54,8 @@ namespace cov::testing {
 		auto const covdir = cov::repository::discover(
 		    setup::test_dir() / "repository/discover/subdir"sv, ec);
 		ASSERT_FALSE(ec);
-		ASSERT_EQ(setup::get_path(setup::test_dir() / "repository/actual"sv),
+		ASSERT_EQ(setup::get_path(
+		              canonical(setup::test_dir() / "repository/actual"sv)),
 		          setup::get_path(covdir));
 	}
 
@@ -140,7 +141,8 @@ namespace cov::testing {
 		auto const covdir =
 		    cov::repository::discover(setup::test_dir() / "repository"sv, ec);
 		ASSERT_FALSE(ec);
-		ASSERT_EQ(setup::get_path(setup::test_dir() / "repository/.covdata"sv),
+		ASSERT_EQ(setup::get_path(
+		              canonical(setup::test_dir() / "repository/.covdata"sv)),
 		          setup::get_path(covdir));
 
 		auto const repo = cov::repository::open(covdir, ec);
@@ -158,7 +160,8 @@ namespace cov::testing {
 		auto const covdir =
 		    cov::repository::discover(setup::test_dir() / "repository"sv, ec);
 		ASSERT_FALSE(ec);
-		ASSERT_EQ(setup::get_path(setup::test_dir() / "repository/.covdata"sv),
+		ASSERT_EQ(setup::get_path(
+		              canonical(setup::test_dir() / "repository/.covdata"sv)),
 		          setup::get_path(covdir));
 
 		auto const repo = cov::repository::open(covdir, ec);
@@ -186,7 +189,8 @@ namespace cov::testing {
 		auto const covdir =
 		    cov::repository::discover(setup::test_dir() / "repository"sv, ec);
 		ASSERT_FALSE(ec);
-		ASSERT_EQ(setup::get_path(setup::test_dir() / "repository/.covdata"sv),
+		ASSERT_EQ(setup::get_path(
+		              canonical(setup::test_dir() / "repository/.covdata"sv)),
 		          setup::get_path(covdir));
 
 		auto const repo = cov::repository::open(covdir, ec);
@@ -213,7 +217,8 @@ namespace cov::testing {
 		auto const covdir =
 		    cov::repository::discover(setup::test_dir() / "repository"sv, ec);
 		ASSERT_FALSE(ec);
-		ASSERT_EQ(setup::get_path(setup::test_dir() / "repository/.covdata"sv),
+		ASSERT_EQ(setup::get_path(
+		              canonical(setup::test_dir() / "repository/.covdata"sv)),
 		          setup::get_path(covdir));
 
 		auto const repo = cov::repository::open(covdir, ec);

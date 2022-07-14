@@ -147,7 +147,7 @@ namespace git {
 	                            std::error_code& ec) {
 		ec.clear();
 
-		auto result = create();
+		auto result = create(ec);
 		if (!result) return result;
 
 		auto const [xdg, global] = get_global_path(dot_name, app);
