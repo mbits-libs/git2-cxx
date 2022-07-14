@@ -19,7 +19,7 @@ namespace git::testing {
 		auto const initial = git::commit::lookup(repo, setup::hash::commit, ec);
 		ASSERT_FALSE(ec);
 		ASSERT_TRUE(initial);
-		ASSERT_EQ(sys_seconds{1655575188s}, initial.commit_time_utc());
+		ASSERT_EQ(sys_seconds{1657784107s}, initial.commit_time_utc());
 
 		{
 			auto const tree = initial.tree(ec);
@@ -68,7 +68,7 @@ namespace git::testing {
 		auto const content = readme.raw();
 		auto const view = std::string_view{
 		    reinterpret_cast<char const*>(content.data()), content.size()};
-		ASSERT_EQ(view, "# Testing repos\n"sv);
+		ASSERT_EQ("# Testing repos\n\nChange from this commit\n"sv, view);
 
 #if !defined(_WIN32) || !defined(CUTDOWN_OS)
 		auto buf = readme.filtered("README.md", ec);
@@ -76,7 +76,8 @@ namespace git::testing {
 		auto const data = git::bytes{buf};
 		auto const filtered_view = std::string_view{
 		    reinterpret_cast<char const*>(data.data()), data.size()};
-		ASSERT_EQ(filtered_view, "# Testing repos\n"sv);
+		ASSERT_EQ("# Testing repos\n\nChange from this commit\n"sv,
+		          filtered_view);
 		git_buf_dispose(&buf);
 #endif
 	}

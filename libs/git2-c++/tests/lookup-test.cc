@@ -47,6 +47,32 @@ namespace git::testing {
 		ASSERT_TRUE(ec);
 		ASSERT_FALSE(obj);
 	}
+
+	TEST(lookup, commit_info) {
+		std::error_code ec{};
+		auto const repo = setup::open_repo(ec);
+		ASSERT_FALSE(ec);
+		ASSERT_TRUE(repo);
+
+		auto const obj = git::commit::lookup(repo, setup::hash::commit, ec);
+		ASSERT_FALSE(ec);
+		ASSERT_TRUE(obj);
+
+		auto const author = obj.author();
+		auto const committer = obj.committer();
+
+		ASSERT_EQ("Johnny Appleseed"sv, author.name);
+		ASSERT_EQ("johnny@ppleseed.com"sv, author.email);
+		ASSERT_EQ(1657784056s, author.when.time_since_epoch());
+
+		ASSERT_EQ("Committer Bot"sv, committer.name);
+		ASSERT_EQ("bot@ppleseed.com"sv, committer.email);
+		ASSERT_EQ(1657784107s, committer.when.time_since_epoch());
+
+		ASSERT_EQ("Commit with author and commiter differing\n"sv,
+		          std::string_view{obj.message_raw()});
+	}
+
 	TEST(lookup, commit) { do_lookup<git::commit>(setup::hash::commit); }
 	TEST(lookup, tree) { do_lookup<git::tree>(setup::hash::tree); }
 	TEST(lookup, blob) { do_lookup<git::blob>(setup::hash::README); }
