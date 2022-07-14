@@ -25,4 +25,26 @@ namespace git {
 	sys_seconds commit::commit_time_utc() const noexcept {
 		return sys_seconds{std::chrono::seconds{git_commit_time(get())}};
 	}
+
+	commit::signature commit::committer() const noexcept {
+		auto action = git_commit_committer(get());
+		return {
+		    .name = action->name,
+		    .email = action->email,
+		    .when = sys_seconds{std::chrono::seconds{action->when.time}},
+		};
+	}
+
+	commit::signature commit::author() const noexcept {
+		auto action = git_commit_author(get());
+		return {
+		    .name = action->name,
+		    .email = action->email,
+		    .when = sys_seconds{std::chrono::seconds{action->when.time}},
+		};
+	}
+
+	char const* commit::message_raw() const noexcept {
+		return git_commit_message_raw(get());
+	}
 }  // namespace git

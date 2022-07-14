@@ -23,11 +23,11 @@ namespace git::testing::setup {
 
 	namespace hash {
 		static constexpr auto commit =
-		    "ed631389fc343f7788bf414c2b3e77749a15deb6"sv;
+		    "b3f67d63bd1c87427805eba4aa028bfa43587f78"sv;
 		static constexpr auto tree =
-		    "71bb790a4e8eb02b82f948dfb13d9369b768d047"sv;
+		    "18983d0294c54064191fc6f20b158ab11747c27d"sv;
 		static constexpr auto README =
-		    "d85c6a23a700aa20fda7cfae8eaa9e80ea22dde0"sv;
+		    "915365304fffc2cd8fe5b8e2b28cfcf94fdcf9de"sv;
 	}  // namespace hash
 }  // namespace git::testing::setup
 
