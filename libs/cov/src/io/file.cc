@@ -70,7 +70,7 @@ namespace cov::io {
 		while (true) {
 			auto ret = std::fread(buffer, 1, sizeof(buffer), get());
 			if (!ret) {
-				// GCOV_EXCL_START[WIN32]
+				// GCOV_EXCL_START
 				if (!std::feof(get())) out.clear();
 				break;
 				// GCOV_EXCL_STOP

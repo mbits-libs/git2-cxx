@@ -126,7 +126,7 @@ namespace cov::testing {
 		ASSERT_EQ(299u, entry.stats().covered);
 	}
 
-	TEST(report_files, load_partial) {
+	TEST(report_files, load_partial_1_not_enough_entries) {
 		static constexpr auto s =
 		    "list\x00\x00\x01\x00"
 
@@ -159,7 +159,7 @@ namespace cov::testing {
 		ASSERT_EQ(ec, io::errc::bad_syntax);
 	}
 
-	TEST(report_files, load_partial_2) {
+	TEST(report_files, load_partial_2_bad_strings) {
 		static constexpr auto s =
 		    "list\x00\x00\x01\x00"
 
@@ -192,7 +192,7 @@ namespace cov::testing {
 		ASSERT_EQ(ec, io::errc::bad_syntax);
 	}
 
-	TEST(report_files, load_partial_3) {
+	TEST(report_files, load_partial_3_entry_too_small) {
 		static constexpr auto s =
 		    "list\x00\x00\x01\x00"
 
@@ -214,6 +214,28 @@ namespace cov::testing {
 
 		    "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
 		    "\x00\x00\x00\x00"sv;
+		io::bytes_read_stream stream{git::bytes{s.data(), s.size()}};
+
+		io::db_object dbo{};
+		dbo.add_handler<io::OBJECT::FILES, io::handlers::report_files>();
+
+		std::error_code ec{};
+		auto const result = dbo.load({}, stream, ec);
+		ASSERT_FALSE(result);
+		ASSERT_EQ(ec, io::errc::bad_syntax);
+	}
+
+	TEST(report_files, load_partial_4_entries_beyond_stream) {
+		static constexpr auto s =
+		    "list\x00\x00\x01\x00"
+
+		    "\x00\x00\x00\x00"
+		    "\x03\x00\x00\x00"
+		    "\xFF\x00\x00\x00"
+		    "\x01\x00\x00\x00"
+		    "\x0E\x00\x00\x00"
+
+		    "file path\0\0\0"sv;
 		io::bytes_read_stream stream{git::bytes{s.data(), s.size()}};
 
 		io::db_object dbo{};

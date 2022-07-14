@@ -366,7 +366,7 @@ continued to next line)"sv,
 	    },
 	    {
 	        "strings.c++"sv,
-	        R"(u8"oct: \033[m; hex: \x1B[m;"sv;
+	        R"(u8"oct: \033[m; another octs: \5 \23 \76 \664 hex: \x1B[m;"sv;
 u"banana: \uD83C\uDF4C"sv;
 U"banana: \U0001F34C"sv;
 "split\
@@ -383,15 +383,23 @@ U"banana: \U0001F34C"sv;
 	                         tok_cxx_string_delim{text_span{2u, 3u}},
 	                         text_span{3u, 8u},
 	                         tok_cxx_escape_sequence{text_span{8u, 12u}},
-	                         text_span{12u, 21u},
-	                         tok_cxx_escape_sequence{text_span{21u, 25u}},
-	                         text_span{25u, 28u},
-	                         tok_cxx_string_delim{text_span{28u, 29u}},
-	                         tok_cxx_string_udl{text_span{29u, 31u}}},
-	                     tok_cxx_punctuator{text_span{31u, 32u}}},
+	                         text_span{12u, 30u},
+	                         tok_cxx_escape_sequence{text_span{30u, 32u}},
+	                         text_span{32u, 33u},
+	                         tok_cxx_escape_sequence{text_span{33u, 36u}},
+	                         text_span{36u, 37u},
+	                         tok_cxx_escape_sequence{text_span{37u, 40u}},
+	                         text_span{40u, 41u},
+	                         tok_cxx_escape_sequence{text_span{41u, 45u}},
+	                         text_span{45u, 51u},
+	                         tok_cxx_escape_sequence{text_span{51u, 55u}},
+	                         text_span{55u, 58u},
+	                         tok_cxx_string_delim{text_span{58u, 59u}},
+	                         tok_cxx_string_udl{text_span{59u, 61u}}},
+	                     tok_cxx_punctuator{text_span{61u, 62u}}},
 	                },
 	                hl_line{
-	                    33u,
+	                    63u,
 	                    {tok_cxx_string{
 	                         tok_cxx_string_encoding{text_span{0u, 1u}},
 	                         tok_cxx_string_delim{text_span{1u, 2u}},
@@ -405,7 +413,7 @@ U"banana: \U0001F34C"sv;
 	                     tok_cxx_punctuator{text_span{25u, 26u}}},
 	                },
 	                hl_line{
-	                    60u,
+	                    90u,
 	                    {tok_cxx_string{
 	                         tok_cxx_string_encoding{text_span{0u, 1u}},
 	                         tok_cxx_string_delim{text_span{1u, 2u}},
@@ -416,17 +424,59 @@ U"banana: \U0001F34C"sv;
 	                         tok_cxx_string_udl{text_span{21u, 23u}}},
 	                     tok_cxx_punctuator{text_span{23u, 24u}}},
 	                },
-	                hl_line{85u,
+	                hl_line{115u,
 	                        {tok_cxx_string{
 	                            tok_cxx_string_delim{text_span{0u, 1u}},
 	                            text_span{1u, 6u},
 	                            tok_cxx_deleted_newline{text_span{6u, 7u}}}}},
 	                hl_line{
-	                    93u,
+	                    123u,
 	                    {tok_cxx_string{
 	                         text_span{0u, 7u},
 	                         tok_cxx_string_delim{text_span{7u, 8u}}},
 	                     tok_cxx_punctuator{text_span{8u, 9u}}},
+	                },
+	            },
+	        },
+	    },
+	    {
+	        "bad-strings.c++"sv,
+	        R"(u8"starts here\\\
+continues here
+does not end here"sv;
+R"delim(and that is it)"sv,
+	        cxx_ctx,
+	        {
+	            .dict{HL_CXX(deleted_newline)},
+	            .lines{
+	                hl_line{
+	                    0u,
+	                    {tok_cxx_identifier{text_span{0u, 2u}},
+	                     text_span{2u, 14u},
+	                     tok_cxx_escape_sequence{text_span{14u, 16u}},
+	                     tok_cxx_deleted_newline{text_span{16u, 17u}}},
+	                },
+	                hl_line{
+	                    18u,
+	                    {tok_cxx_identifier{text_span{0u, 9u}},
+	                     text_span{9u, 10u},
+	                     tok_cxx_identifier{text_span{10u, 14u}}},
+	                },
+	                hl_line{
+	                    33u,
+	                    {tok_cxx_identifier{text_span{0u, 4u}},
+	                     text_span{4u, 5u},
+	                     tok_cxx_known_ident_1{text_span{5u, 8u}},
+	                     text_span{8u, 9u},
+	                     tok_cxx_identifier{text_span{9u, 12u}},
+	                     text_span{12u, 13u},
+	                     tok_cxx_identifier{text_span{13u, 17u}},
+	                     text_span{17u, 21u}},
+	                },
+	                hl_line{
+	                    55u,
+	                    {tok_cxx_identifier{text_span{0u, 1u}},
+	                     text_span{1u, 22u}},
 	                },
 	            },
 	        },
@@ -523,6 +573,8 @@ returned)"sv;)--=--"sv,
 #define MACRO
 #	undef MACRO
 
+#define ARG_LESS() X
+
 #if expression
 #else
 #endif
@@ -542,7 +594,8 @@ returned)"sv;)--=--"sv,
 	        cxx_ctx,
 	        {
 	            .dict{HL_CXX(local_header_name), HL_CXX(system_header_name),
-	                  HL_CXX(macro_name), HL_CXX(macro_replacement)},
+	                  HL_CXX(macro_name), HL_CXX(macro_arg_list),
+	                  HL_CXX(macro_replacement)},
 	            .lines{
 	                hl_line{0u,
 	                        {tok_cxx_meta{
@@ -592,54 +645,65 @@ returned)"sv;)--=--"sv,
 	                hl_line{110u,
 	                        {tok_cxx_meta{
 	                            text_span{0u, 1u},
+	                            tok_cxx_meta_identifier{text_span{1u, 7u}},
+	                            text_span{7u, 8u},
+	                            tok_cxx_macro_name{text_span{8u, 16u}},
+	                            tok_cxx_macro_arg_list{text_span{16u, 18u}},
+	                            text_span{18u, 19u},
+	                            tok_cxx_identifier{tok_cxx_macro_replacement{
+	                                text_span{19u, 20u}}}}}},
+	                hl_line{131u, {}},
+	                hl_line{132u,
+	                        {tok_cxx_meta{
+	                            text_span{0u, 1u},
 	                            tok_cxx_meta_identifier{text_span{1u, 3u}},
 	                            text_span{3u, 4u},
 	                            tok_cxx_identifier{text_span{4u, 14u}}}}},
-	                hl_line{125u,
+	                hl_line{147u,
 	                        {tok_cxx_meta{
 	                            text_span{0u, 1u},
 	                            tok_cxx_meta_identifier{text_span{1u, 5u}}}}},
-	                hl_line{131u,
+	                hl_line{153u,
 	                        {tok_cxx_meta{
 	                            text_span{0u, 1u},
 	                            tok_cxx_meta_identifier{text_span{1u, 6u}}}}},
-	                hl_line{138u, {}},
-	                hl_line{139u,
+	                hl_line{160u, {}},
+	                hl_line{161u,
 	                        {tok_cxx_meta{
 	                            text_span{0u, 1u},
 	                            tok_cxx_meta_identifier{text_span{1u, 6u}},
 	                            text_span{6u, 7u},
 	                            tok_cxx_macro_name{text_span{7u, 12u}}}}},
-	                hl_line{152u,
+	                hl_line{174u,
 	                        {tok_cxx_meta{
 	                            text_span{0u, 1u},
 	                            tok_cxx_meta_identifier{text_span{1u, 8u}},
 	                            text_span{8u, 9u},
 	                            tok_cxx_macro_name{text_span{9u, 22u}}}}},
-	                hl_line{175u,
+	                hl_line{197u,
 	                        {tok_cxx_meta{
 	                            text_span{0u, 1u},
 	                            tok_cxx_meta_identifier{text_span{1u, 6u}}}}},
-	                hl_line{182u, {}},
-	                hl_line{183u,
+	                hl_line{204u, {}},
+	                hl_line{205u,
 	                        {tok_cxx_meta{
 	                            text_span{0u, 1u},
 	                            tok_cxx_meta_identifier{text_span{1u, 7u}},
 	                            text_span{7u, 8u},
 	                            tok_cxx_macro_name{text_span{8u, 13u}}}}},
-	                hl_line{197u,
+	                hl_line{219u,
 	                        {tok_cxx_meta{
 	                            text_span{0u, 1u},
 	                            tok_cxx_meta_identifier{text_span{1u, 9u}},
 	                            text_span{9u, 10u},
 	                            tok_cxx_macro_name{text_span{10u, 23u}}}}},
-	                hl_line{221u,
+	                hl_line{243u,
 	                        {tok_cxx_meta{
 	                            text_span{0u, 1u},
 	                            tok_cxx_meta_identifier{text_span{1u, 6u}}}}},
-	                hl_line{228u, {}},
+	                hl_line{250u, {}},
 	                hl_line{
-	                    229u,
+	                    251u,
 	                    {tok_cxx_meta{
 	                        text_span{0u, 1u},
 	                        tok_cxx_meta_identifier{text_span{1u, 5u}},
@@ -650,9 +714,9 @@ returned)"sv;)--=--"sv,
 	                            tok_cxx_string_delim{text_span{10u, 11u}},
 	                            text_span{11u, 17u},
 	                            tok_cxx_string_delim{text_span{17u, 18u}}}}}},
-	                hl_line{248u, {}},
+	                hl_line{270u, {}},
 	                hl_line{
-	                    249u,
+	                    271u,
 	                    {tok_cxx_meta{
 	                         text_span{0u, 1u},
 	                         tok_cxx_meta_identifier{text_span{1u, 6u}},
@@ -660,7 +724,7 @@ returned)"sv;)--=--"sv,
 	                         tok_cxx_identifier{text_span{7u, 8u}}},
 	                     text_span{8u, 23u}},
 	                },
-	                hl_line{273u, {}},
+	                hl_line{295u, {}},
 	            },
 	        },
 	    },
@@ -892,6 +956,39 @@ export import :part;
 	                                tok_cxx_identifier{text_span{15u, 19u}}},
 	                            tok_cxx_punctuator{text_span{19u, 20u}}}}},
 	                hl_line{101u, {}},
+	            },
+	        },
+	    },
+	    {
+	        "known-idents.cpp"sv,
+	        R"(and not or_eq xor
+uintmax_t int32_t byte declval
+)"sv,
+	        cxx_ctx,
+	        {
+	            .dict{},
+	            .lines{
+	                hl_line{
+	                    0u,
+	                    {tok_cxx_known_ident_1{text_span{0u, 3u}},
+	                     text_span{3u, 4u},
+	                     tok_cxx_known_ident_1{text_span{4u, 7u}},
+	                     text_span{7u, 8u},
+	                     tok_cxx_known_ident_1{text_span{8u, 13u}},
+	                     text_span{13u, 14u},
+	                     tok_cxx_known_ident_1{text_span{14u, 17u}}},
+	                },
+	                hl_line{
+	                    18u,
+	                    {tok_cxx_known_ident_2{text_span{0u, 9u}},
+	                     text_span{9u, 10u},
+	                     tok_cxx_known_ident_2{text_span{10u, 17u}},
+	                     text_span{17u, 18u},
+	                     tok_cxx_known_ident_2{text_span{18u, 22u}},
+	                     text_span{22u, 23u},
+	                     tok_cxx_known_ident_2{text_span{23u, 30u}}},
+	                },
+	                hl_line{49u, {}},
 	            },
 	        },
 	    },
