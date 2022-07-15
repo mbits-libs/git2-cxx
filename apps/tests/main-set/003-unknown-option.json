@@ -1,0 +1,10 @@
+{
+    "args": [
+        "--versions"
+    ],
+    "expected": [
+        2,
+        "",
+        "usage: cov [-h] [-C <path>] <command> [<args>]\ncov: error: unrecognized argument: --versions\n"
+    ]
+}

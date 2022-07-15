@@ -34,7 +34,8 @@ namespace cov {
 			if (!ec) ec = result.add_local_config(common);
 			if (ec) result = nullptr;
 			return result;
-		}
+		}  // GCOV_EXCL_LINE[GCC] -- oom.open_config fires inside here...
+
 		git::repository open_companion_git(std::filesystem::path const& common,
 		                                   git::config const& cfg,
 		                                   std::error_code& ec) {

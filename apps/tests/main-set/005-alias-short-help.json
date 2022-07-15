@@ -1,0 +1,17 @@
+{
+    "working-directory": "$DATA",
+    "mkdirs": [
+        "$DATA/recurse/.covdata/objects/coverage"
+    ],
+    "args": [
+        "-C",
+        "recurse",
+        "second",
+        "-h"
+    ],
+    "expected": [
+        0,
+        "",
+        "'second' is aliased to 'third -B'"
+    ]
+}

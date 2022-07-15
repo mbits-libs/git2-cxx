@@ -56,20 +56,18 @@ set(SOURCES
 )
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})
 
-add_library(libcov STATIC ${SOURCES})
-target_compile_options(libcov PRIVATE ${ADDITIONAL_WALL_FLAGS})
-target_link_options(libcov PRIVATE ${ADDITIONAL_LINK_FLAGS})
-target_include_directories(libcov PUBLIC
+add_library(cov-api STATIC ${SOURCES})
+target_compile_options(cov-api PRIVATE ${ADDITIONAL_WALL_FLAGS})
+target_link_options(cov-api PRIVATE ${ADDITIONAL_LINK_FLAGS})
+target_include_directories(cov-api PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}/include
   ${CMAKE_CURRENT_BINARY_DIR}/include)
-target_link_libraries(libcov PUBLIC git2-c++ lighter fmt::fmt date::date PRIVATE OpenSSL::OpenSSL)
+target_link_libraries(cov-api PUBLIC git2-c++ fmt::fmt date::date PRIVATE OpenSSL::OpenSSL)
 
-set_target_properties(libcov PROPERTIES FOLDER libs OUTPUT_NAME cov)
+set_target_properties(cov-api PROPERTIES FOLDER libs)
 
 if (COV_TESTING)
   enable_testing()
-
-  find_package(GTest REQUIRED CONFIG HINTS)
 
   file(GLOB TEST_SRCS_CC tests/*.cc tests/format/*.cc)
   file(GLOB TEST_SRCS_CPP tests/*.cpp)
@@ -87,14 +85,14 @@ if (COV_TESTING)
   set_target_properties(cov-test cov-stress-test PROPERTIES FOLDER tests)
 
   target_compile_options(cov-test PRIVATE ${ADDITIONAL_WALL_FLAGS})
-  target_link_libraries(cov-test libcov GTest::gmock_main)
+  target_link_libraries(cov-test cov-api GTest::gmock_main)
   target_include_directories(cov-test
     PRIVATE
       ${CMAKE_CURRENT_SOURCE_DIR}/tests
       ${CMAKE_CURRENT_BINARY_DIR})
 
   target_compile_options(cov-stress-test PRIVATE ${ADDITIONAL_WALL_FLAGS})
-  target_link_libraries(cov-stress-test PRIVATE libcov GTest::gmock_main)
+  target_link_libraries(cov-stress-test PRIVATE cov-api GTest::gmock_main)
   target_include_directories(cov-stress-test
     PRIVATE
       ${CMAKE_CURRENT_SOURCE_DIR}/tests
@@ -112,7 +110,7 @@ if (COV_TESTING)
 endif()
 
 install(
-  TARGETS libcov
+  TARGETS cov-api
   COMPONENT libcov
 )
 
@@ -123,7 +121,7 @@ install(
 )
 
 cpack_add_component(libcov
-  DISPLAY_NAME "libcov"
+  DISPLAY_NAME "libcov-api"
   DEPENDS git2_cxx lighter
   GROUP devel
 )

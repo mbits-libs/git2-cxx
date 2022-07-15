@@ -1,0 +1,10 @@
+{
+    "args": [
+        "--help"
+    ],
+    "expected": [
+        0,
+        "usage: cov [-h] [-C <path>] <command> [<args>]\n\noptional arguments:\n -h, --help                      show this help message and exit\n -v, --version                   shows version information and exits\n -C <path>                       runs as if cov was started in <path> instead of the current working directory\n --list-cmds <spec>[,<spec>,...] lists known commands from requested groups\n\ncommon commands:\n init                            creates a new cov repo\n config                          shows and/or sets various settings\n module                          defines file groups\n add                             appends a report to repo\n remove                          removes a particual report from repo\n log                             prints a list of reports\n show                            shows a specific report\n serve                           starts a local webserver with reports\n",
+        ""
+    ]
+}

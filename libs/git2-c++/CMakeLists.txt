@@ -37,8 +37,6 @@ set_target_properties(git2-c++ PROPERTIES FOLDER libs)
 if (COV_TESTING)
   enable_testing()
 
-  find_package(GTest REQUIRED CONFIG HINTS)
-
   file(GLOB TEST_SRCS_CC tests/*.cc)
   file(GLOB TEST_SRCS_CPP tests/*.cpp)
   file(GLOB TEST_SRCS_CXX tests/*.cxx)

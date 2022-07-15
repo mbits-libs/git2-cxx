@@ -1,9 +1,18 @@
 #include "new.hh"
 #include <cstdio>
 #include <cstdlib>
+#include <exception>
 #include <new>
 
 enum POLICY { USE_EVERYTHING, THRESHOLD, LIMIT };
+
+struct terminator {
+	static void abort() {
+		fprintf(stderr, "\nKilled by std::terminate()\n");
+		std::abort();
+	}
+	terminator() { std::set_terminate(abort); }
+} install_terminate{};
 
 static POLICY policy = POLICY::USE_EVERYTHING;
 static size_t argument = 0;

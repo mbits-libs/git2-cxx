@@ -1,0 +1,17 @@
+{
+    "working-directory": "$DATA",
+    "mkdirs": [
+        "$DATA/recurse/.covdata/objects/coverage"
+    ],
+    "args": [
+        "-C",
+        "recurse",
+        "first",
+        "-D"
+    ],
+    "expected": [
+        0,
+        "Hello, \"init -A -B -C -D\"!\n",
+        ""
+    ]
+}
