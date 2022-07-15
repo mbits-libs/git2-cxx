@@ -1,11 +1,11 @@
 cmake_minimum_required (VERSION 3.20)
 project (cov
   DESCRIPTION "Code coverage presented localy"
-  VERSION 0.7.2
+  VERSION 0.8.0
   LANGUAGES CXX
 )
 
-set(PROJECT_VERSION_STABILITY "-alpha" # or "-beta", or "-rc.1", or "-rc.2", or ""
+set(PROJECT_VERSION_STABILITY "-beta" # or "-alpha", or "-rc.1", or "-rc.2", or ""
     CACHE STRING "" FORCE)
 
 set(COV_TESTING ON CACHE BOOL "Compile and/or run self-tests")
@@ -20,9 +20,11 @@ list(APPEND CMAKE_MODULE_PATH "${PROJECT_BINARY_DIR}/conan" "${PROJECT_SOURCE_DI
 list(APPEND CMAKE_PREFIX_PATH "${PROJECT_BINARY_DIR}/conan")
 
 set(CONAN_CMAKE_SILENT_OUTPUT ON)
+find_package(Python3 COMPONENTS Interpreter REQUIRED)
 find_package(libgit2 REQUIRED)
 find_package(fmt REQUIRED)
 find_package(date REQUIRED)
+find_package(args REQUIRED)
 
 if (COV_TESTING)
   enable_testing()
@@ -30,7 +32,20 @@ if (COV_TESTING)
   find_package(GTest REQUIRED)
 
   set(COVERALLS_PREFIX cov_)
-  foreach(module libs/git2-c++ libs/cov libs/cell libs/hilite/hilite libs/hilite/lighter)
+  set(cov_COVERALLS_DIRS
+    apps/builtins
+    apps/cov
+  )
+
+  foreach(module
+    libs/git2-c++
+    libs/cov
+    libs/cell
+    libs/hilite/hilite
+    libs/hilite/lighter
+    libs/app
+    libs/cov-rt
+  )
     list(APPEND cov_COVERALLS_DIRS ${module}/include ${module}/src)
   endforeach()
   foreach(extra cxx py3 ts)
@@ -104,7 +119,14 @@ endif()
 
 include(prepare_pack)
 
+set(BINARY_DIR bin)
+set(ROOT_DIR "..")
+set(SHARE_DIR share/cov-${PROJECT_VERSION_SHORT})
+set(CORE_DIR libexec/cov)
+set(CORE_ROOT_DIR "../..")
+
 add_subdirectory(libs)
+add_subdirectory(apps)
 
 
 if (CMAKE_GENERATOR MATCHES "Visual Studio" AND TARGET cov_coveralls_test)
@@ -112,5 +134,6 @@ if (CMAKE_GENERATOR MATCHES "Visual Studio" AND TARGET cov_coveralls_test)
     git2-test git2-stress-test
     cov-test cov-stress-test
     lighter-test lighter-stress-test
+    cov
   )
 endif()

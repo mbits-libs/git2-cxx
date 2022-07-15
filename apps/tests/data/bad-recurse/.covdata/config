@@ -1,0 +1,6 @@
+[alias]
+    first = second -C
+    second = third -B
+    third = fourth -A
+    start-bad = finish-worse
+    finish-worse = 

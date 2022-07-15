@@ -1,0 +1,16 @@
+{
+    "working-directory": "$DATA",
+    "mkdirs": [
+        "$DATA/bad-recurse/.covdata/objects/coverage"
+    ],
+    "args": [
+        "-C",
+        "bad-recurse",
+        "start-bad"
+    ],
+    "expected": [
+        22,
+        "",
+        "empty alias for 'finish-worse'"
+    ]
+}

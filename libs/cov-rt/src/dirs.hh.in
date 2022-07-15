@@ -1,0 +1,31 @@
+// Copyright (c) 2022 Marcin Zdun
+// This code is licensed under MIT license (see LICENSE for details)
+
+#pragma once
+
+#include <args/parser.hpp>
+#include <filesystem>
+#include <string_view>
+
+namespace cov::app {
+	using namespace std::literals;
+
+	struct directory_info {
+		constexpr static const auto bin = "@BINARY_DIR@"sv;
+		constexpr static const auto root = "@ROOT_DIR@"sv;
+		constexpr static const auto core = "@CORE_DIR@"sv;
+		constexpr static const auto core_root = "@CORE_ROOT_DIR@"sv;
+		constexpr static const auto share = "@SHARE_DIR@"sv;
+		constexpr static const auto site = "@SHARE_DIR@/site"sv;
+		constexpr static const auto prefix = "@CMAKE_INSTALL_PREFIX@"sv;
+		constexpr static const auto build = "@PROJECT_BINARY_DIR@"sv;
+		constexpr static const auto source = "@PROJECT_SOURCE_DIR@"sv;
+	};
+
+	namespace platform {
+		std::filesystem::path exec_path();
+		int run_tool(std::filesystem::path const& tooldir,
+					 std::string_view tool,
+					 args::arglist args);
+	}
+}  // namespace cov::app

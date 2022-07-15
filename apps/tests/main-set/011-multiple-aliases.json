@@ -1,0 +1,16 @@
+{
+    "working-directory": "$DATA",
+    "mkdirs": [
+        "$DATA/recurse/.covdata/objects/coverage"
+    ],
+    "args": [
+        "-C",
+        "recurse",
+        "name"
+    ],
+    "expected": [
+        0,
+        "cov-echo name B\n",
+        ""
+    ]
+}

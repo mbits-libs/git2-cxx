@@ -13,7 +13,8 @@ endforeach()
 if (NOT DEPS)
   list(APPEND DEPS hilite)
 else()
-  message(STATUS "Syntax: ${DEPS}")
+string(REPLACE ";" ", " DEP_LIST "${DEPS}")
+  message(STATUS "Syntax: ${DEP_LIST}")
 endif()
 
 
@@ -25,8 +26,6 @@ set_target_properties(lighter PROPERTIES FOLDER libs/hilite)
 
 if (COV_TESTING)
   enable_testing()
-
-  find_package(GTest REQUIRED CONFIG HINTS)
 
   file(GLOB TEST_SRCS_CC tests/*.cc)
   file(GLOB TEST_SRCS_CPP tests/*.cpp)

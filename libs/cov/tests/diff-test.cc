@@ -406,7 +406,4 @@ namespace cov::testing {
 	};
 
 	INSTANTIATE_TEST_SUITE_P(tests, diff, ::testing::ValuesIn(tests));
-
-	/*
-	 */
 }  // namespace cov::testing

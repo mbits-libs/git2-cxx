@@ -1,0 +1,20 @@
+{
+    "working-directory": "$DATA",
+    "mkdirs": [
+        "$DATA/bad-recurse/.covdata/objects/coverage"
+    ],
+    "args": [
+        "-C",
+        "bad-recurse",
+        "first",
+        "-D"
+    ],
+    "check": {
+        "stderr": "begin"
+    },
+    "expected": [
+        1,
+        "",
+        "usage: cov [-h] [-C <path>] <command> [<args>]\ncov: \"fourth\" is not a cov command\n\n"
+    ]
+}
