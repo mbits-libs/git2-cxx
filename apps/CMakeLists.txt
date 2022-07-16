@@ -28,17 +28,12 @@ target_include_directories(cov PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
 )
-target_link_libraries(cov PRIVATE cov-rt)
+target_link_libraries(cov PRIVATE cov-rt app_main)
 set_target_properties(cov PROPERTIES FOLDER apps)
-
-install(TARGETS cov
-    RUNTIME DESTINATION ${BINARY_DIR}
-    COMPONENT main_exec
-)
 
 function(setup_cov_core COV_TOOL)
 	set_target_properties(cov-${COV_TOOL} PROPERTIES FOLDER apps/core)
-	target_link_libraries(cov-${COV_TOOL} PRIVATE app)
+	target_link_libraries(cov-${COV_TOOL} PRIVATE app_main)
     target_link_options(cov-${COV_TOOL} PRIVATE ${ADDITIONAL_LINK_FLAGS})
 	target_compile_options(cov-${COV_TOOL} PRIVATE ${ADDITIONAL_WALL_FLAGS})
 
@@ -100,7 +95,7 @@ if (COV_TESTING)
     add_test(
         NAME cov-exec
         COMMAND "${Python3_EXECUTABLE}"
-            "${CMAKE_CURRENT_SOURCE_DIR}/tests/exe_driver.py"
+            "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_driver.py"
             --target "$<TARGET_FILE:cov>"
             --tests "${CMAKE_CURRENT_SOURCE_DIR}/tests/main-set"
             --data-dir "${CMAKE_CURRENT_SOURCE_DIR}/tests/data"
@@ -108,7 +103,25 @@ if (COV_TESTING)
             --install "${CMAKE_CURRENT_SOURCE_DIR}/tests/copy"
             --install-with "$<TARGET_FILE:cov-echo>"
             )
+
+
+  if (CMAKE_GENERATOR MATCHES "Visual Studio" AND TARGET cov_coveralls_test)
+    add_dependencies(cov_coveralls_test
+      cov-echo
+    )
+  endif()
 endif()
+
+install(TARGETS cov
+    RUNTIME DESTINATION ${BINARY_DIR}
+    COMPONENT main_exec
+)
+
+install(
+  DIRECTORY ${PROJECT_BINARY_DIR}/share/
+  DESTINATION share/
+  COMPONENT main_exec
+)
 
 cpack_add_component(main_exec
   DISPLAY_NAME "Main executable"
@@ -124,15 +137,3 @@ cpack_add_component_group(apps
   DISPLAY_NAME "Executables"
   EXPANDED
 )
-
-install(
-  DIRECTORY ${PROJECT_BINARY_DIR}/share/
-  DESTINATION share/
-  COMPONENT libapp
-)
-
-if (CMAKE_GENERATOR MATCHES "Visual Studio" AND TARGET cov_coveralls_test)
-  add_dependencies(cov_coveralls_test
-    cov-echo
-  )
-endif()

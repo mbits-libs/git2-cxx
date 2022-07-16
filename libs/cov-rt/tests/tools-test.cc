@@ -89,11 +89,8 @@ namespace cov::app::testing {
 		git::init globals{};
 
 		static constexpr app::builtin_tool mock[] = {
-		    {"first"sv, nullptr},
-		    {"second"sv, nullptr},
-		    {"third"sv, nullptr},
-		    {"fourth"sv, nullptr},
-			{"fifth"sv, nullptr},
+		    {"first"sv, nullptr},  {"second"sv, nullptr}, {"third"sv, nullptr},
+		    {"fourth"sv, nullptr}, {"fifth"sv, nullptr},
 		};
 
 		app::tools runner{git::config::create(), mock};
@@ -122,8 +119,12 @@ namespace cov::app::testing {
 		    {"tool"sv, throwing_builtin},
 		};
 
+		str::strings<covlng> str{};
+		str.setup_path_manager({});
+
 		app::tools runner{git::config::create(), mock};
 		std::string ignore;
-		ASSERT_THROW(runner.handle(mock[0].name, ignore, {}, {}), std::string);
+		ASSERT_THROW(runner.handle(mock[0].name, ignore, {}, {}, str),
+		             std::string);
 	}
 }  // namespace cov::app::testing

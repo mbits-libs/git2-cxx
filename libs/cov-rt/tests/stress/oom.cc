@@ -38,10 +38,13 @@ namespace cov::app::testing {
 		cfg.add_file_ondisk(setup::test_dir() / "a-config"sv);
 		tools handler{std::move(cfg), {}};
 
+		str::strings<covlng> str{};
+		str.setup_path_manager({});
+
 		std::string actual;
 
 		OOM_LIMIT(100)
-		handler.handle("tool"sv, actual, {}, {});
+		handler.handle("tool"sv, actual, {}, {}, str);
 		OOM_END
 	}
 
@@ -94,7 +97,7 @@ namespace cov::app::testing {
 		};
 
 		OOM_BEGIN(100)
-		root::parser{args::from_main(2, argv), {}};
+		root::parser{args::from_main(2, argv), {}, {}, {}};
 		OOM_END
 		printf("not exited...\n");
 	}
@@ -182,7 +185,7 @@ namespace cov::app::testing {
 		     nullptr},
 		};
 
-		auto parser = root::parser{args::from_main(2, argv), mock};
+		auto parser = root::parser{args::from_main(2, argv), mock, {}, {}};
 
 		OOM_BEGIN(2048)
 		parser.parse();
@@ -199,7 +202,7 @@ namespace cov::app::testing {
 		    nullptr,
 		};
 
-		auto parser = root::parser{args::from_main(2, argv), {}};
+		auto parser = root::parser{args::from_main(2, argv), {}, {}, {}};
 
 		OOM_BEGIN(384)
 		parser.parse();

@@ -9,6 +9,19 @@
     "expected": [
         1,
         "",
-        "usage: cov [-h] [-C <dir>] <command> [<args>]\ncov: \"definitely-not-a-tool\" is not a cov command\n\ncommon commands:\n init   creates a new cov repo\n config shows and/or sets various settings\n module defines file groups\n add    appends a report to repo\n remove removes a particular report from repo\n log    prints a list of reports\n show   shows a specific report\n serve  starts a local webserver with reports\n"
+        [
+            "usage: cov [-h] [-C <dir>] <command> [<args>]",
+            "cov: \"definitely-not-a-tool\" is not a cov command",
+            "",
+            "common commands:",
+            " init   creates a new cov repo",
+            " config shows and/or sets various settings",
+            " module defines file groups",
+            " add    appends a report to repo",
+            " remove removes a particular report from repo",
+            " log    prints a list of reports",
+            " show   shows a specific report",
+            " serve  starts a local webserver with reports\n"
+        ]
     ]
 }

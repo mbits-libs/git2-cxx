@@ -4,6 +4,7 @@
 #pragma once
 
 #include <args/parser.hpp>
+#include <cov/app/cov_tr.hh>
 #include <filesystem>
 #include <git2/config.hh>
 #include <set>
@@ -21,13 +22,15 @@ namespace cov::app {
 		    : cfg_{std::move(cfg)}, builtins_{builtins} {}
 
 		static std::filesystem::path get_sysroot();
+		static std::filesystem::path get_locale_dir();
 		static git::config cautiously_open_config(
 		    std::filesystem::path const& current_directory);
 
 		int handle(std::string_view tool,
 		           std::string& aliased,
 		           args::arglist args,
-		           std::filesystem::path const& sysroot) const;
+		           std::filesystem::path const& sysroot,
+		           CovStrings const& tr) const;
 
 		std::set<std::string> list_aliases() const;
 		std::set<std::string> list_builtins() const;

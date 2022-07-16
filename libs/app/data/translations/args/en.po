@@ -7,8 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cov 0.8.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-16 15:23+0200\n"
-"PO-Revision-Date: 2022-07-16 15:35+0200\n"
+"POT-Creation-Date: 2022-07-16 17:09+0200\n"
+"PO-Revision-Date: 2022-07-16 22:25+0200\n"
+"Last-Translator: \n"
 "Language-Team: \n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
@@ -22,10 +23,20 @@ msgctxt "DEF_META"
 msgid "<arg>"
 msgstr "<arg>"
 
+#. Name of a directory argument
+msgctxt "DIR_META"
+msgid "<dir>"
+msgstr "<dir>"
+
 #. Error message template; placeholder 0 will get the name of program, placeholder 1 an actual message
 msgctxt "ERROR_MSG"
 msgid "{0}: error: {1}"
 msgstr "{0}: error: {1}"
+
+#. Name of a file argument
+msgctxt "FILE_META"
+msgid "<file>"
+msgstr "<file>"
 
 #. Description for the -h/--help argument
 msgctxt "HELP_DESCRIPTION"
@@ -66,6 +77,11 @@ msgstr "argument {0}: expected one argument"
 msgctxt "OPTIONALS"
 msgid "optional arguments"
 msgstr "optional arguments"
+
+#. Name of a file or directory argument
+msgctxt "PATH_META"
+msgid "<path>"
+msgstr "<path>"
 
 #. Header for list of positional arguments
 msgctxt "POSITIONALS"

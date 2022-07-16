@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cov 0.8.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-16 17:09+0200\n"
+"POT-Creation-Date: 2022-07-16 22:35+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,9 +22,19 @@ msgctxt "DEF_META"
 msgid "<arg>"
 msgstr ""
 
+#. Name of a directory argument
+msgctxt "DIR_META"
+msgid "<dir>"
+msgstr ""
+
 #. Error message template; placeholder 0 will get the name of program, placeholder 1 an actual message
 msgctxt "ERROR_MSG"
 msgid "{0}: error: {1}"
+msgstr ""
+
+#. Name of a file argument
+msgctxt "FILE_META"
+msgid "<file>"
 msgstr ""
 
 #. Description for the -h/--help argument
@@ -67,6 +77,11 @@ msgctxt "OPTIONALS"
 msgid "optional arguments"
 msgstr ""
 
+#. Name of a file or directory argument
+msgctxt "PATH_META"
+msgid "<path>"
+msgstr ""
+
 #. Header for list of positional arguments
 msgctxt "POSITIONALS"
 msgid "positional arguments"
@@ -86,3 +101,4 @@ msgstr ""
 msgctxt "USAGE"
 msgid "usage: "
 msgstr ""
+

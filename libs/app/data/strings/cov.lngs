@@ -1,0 +1,46 @@
+[
+    project("cov"),
+	namespace("cov::app::str::root"),
+    version("0.8.1"),
+    serial(1)
+] strings {
+	[help("Short usage description"), id(-1)]
+	USAGE = "[-h] [-C <dir>] <command> [<args>]";
+	[help("Description for the -v/--version argument"), id(-1)]
+	VERSION_DESCRIPTION = "shows version information and exits";
+	[help("Description for the -C argument"), id(-1)]
+	CWD_DESCRIPTION = "runs as if cov was started in <dir> instead of the current working directory";
+	[help("Description for the --list-cmds argument"), id(-1)]
+	LIST_CMDS_DESCRIPTION = "lists known commands from requested groups";
+	[help("Name of a command group argument"), id(-1)]
+	SPECS_MULTI_META = "<spec>[,<spec>,...]";
+
+	[help("Answer for --version option"), id(-1)]
+	VERSION_IS = "cov version {}";
+	[help("Answer for --help option for alias tool"), id(-1)]
+	HELP_ALIAS = "'{}' is aliased to '{}'";
+	[help("Error mesage for a tool, which was not recognized"), id(-1)]
+	ERROR_TOOL_NOT_RECOGNIZED = "\"{}\" is not a cov command";
+	[help("Error message for alias, which is not properly created"), id(-1)]
+	ERROR_ALIAS = "empty alias for '{}'";
+
+	[help("Help group title for common tools"), id(-1)]
+	HELP_GROUP_COMMON = "common commands";
+
+	[help("Description for the init tool"), id(-1)]
+	HELP_DESCRIPTION_INIT = "creates a new cov repo";
+	[help("Description for the config tool"), id(-1)]
+	HELP_DESCRIPTION_CONFIG = "shows and/or sets various settings";
+	[help("Description for the module tool"), id(-1)]
+	HELP_DESCRIPTION_MODULE = "defines file groups";
+	[help("Description for the add tool"), id(-1)]
+	HELP_DESCRIPTION_ADD = "appends a report to repo";
+	[help("Description for the remove tool"), id(-1)]
+	HELP_DESCRIPTION_REMOVE = "removes a particular report from repo";
+	[help("Description for the log tool"), id(-1)]
+	HELP_DESCRIPTION_LOG = "prints a list of reports";
+	[help("Description for the show tool"), id(-1)]
+	HELP_DESCRIPTION_SHOW = "shows a specific report";
+	[help("Description for the serve tool"), id(-1)]
+	HELP_DESCRIPTION_SERVE = "starts a local webserver with reports";
+}

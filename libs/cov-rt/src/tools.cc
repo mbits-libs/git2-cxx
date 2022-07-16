@@ -80,6 +80,35 @@ namespace cov::app {
 		return sysroot;
 	}  // GCOV_EXCL_LINE
 
+	std::filesystem::path tools::get_locale_dir() {
+		static constexpr auto locale = "locale"sv;
+
+		std::error_code ec{};
+
+		auto locale_dir = platform::exec_path();
+		if (!locale_dir.empty()) {
+			locale_dir = locale_dir.parent_path().parent_path() /
+			             directory_info::share / locale;
+			ec.clear();
+			if (!is_directory(locale_dir, ec) || ec) {
+				[[unlikely]];        // GCOV_EXCL_LINE
+				locale_dir.clear();  // GCOV_EXCL_LINE
+			}
+		}
+
+		if (locale_dir.empty()) {
+			// GCOV_EXCL_START
+			[[unlikely]];
+			locale_dir =
+			    path{directory_info::prefix} / directory_info::share / locale;
+			ec.clear();
+			if (!is_directory(locale_dir, ec) || ec) locale_dir.clear();
+			// GCOV_EXCL_STOP
+		}
+
+		return locale_dir;
+	}  // GCOV_EXCL_LINE
+
 	git::config tools::cautiously_open_config(
 	    std::filesystem::path const& current_directory) {
 		std::error_code ec{};
@@ -103,13 +132,15 @@ namespace cov::app {
 	int tools::handle(std::string_view tool,
 	                  std::string& aliased,
 	                  args::arglist args,
-	                  std::filesystem::path const& sysroot) const {
+	                  std::filesystem::path const& sysroot,
+	                  CovStrings const& tr) const {
 		auto cmd = resolve(cfg_, tool);
 		if (!cmd) return handle_resolved(tool, args, sysroot, builtins_);
 
 		for (decltype(args.size()) index = 0; index < args.size(); ++index) {
 			if (args[index] == "-h"sv || args[index] == "--help"sv) {
-				fmt::print(stderr, _("'{}' is aliased to '{}'"), tool, *cmd);
+				fmt::print(stderr, fmt::runtime(tr(covlng::HELP_ALIAS)), tool,
+				           *cmd);
 				return 0;
 			}
 		}
@@ -120,7 +151,7 @@ namespace cov::app {
 			auto new_args = split_command(*cmd);
 
 			if (new_args.empty()) {
-				fmt::print(stderr, _("empty alias for '{}'"), tool);
+				fmt::print(stderr, fmt::runtime(tr(covlng::ERROR_ALIAS)), tool);
 				return -EINVAL;
 			}
 			aliased = new_args.front();

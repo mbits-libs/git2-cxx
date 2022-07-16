@@ -1,43 +1,51 @@
 // Copyright (c) 2022 Marcin Zdun
 // This code is licensed under MIT license (see LICENSE for details)
 
+#include <fmt/format.h>
 #include <cov/app/root_command.hh>
 #include <cov/app/tr.hh>
 #include <cov/version.hh>
-
-#include <fmt/format.h>
-/*#include <cov/app/dirs.hh>
-#include <filesystem>
-#include <git2/global.hh>*/
 
 using namespace std::literals;
 
 namespace cov::app::root {
 	namespace {
+		struct help_command {
+			std::string_view name;
+			covlng description;
+		};
+
+		struct help_group {
+			covlng name;
+			std::span<help_command const> commands;
+		};
+
 		static constexpr help_command common_commands[] = {
-		    {"init"sv, _("creates a new cov repo")},
-		    {"config"sv, _("shows and/or sets various settings")},
-		    {"module"sv, _("defines file groups")},
-		    {"add"sv, _("appends a report to repo")},
-		    {"remove"sv, _("removes a particual report from repo")},
-		    {"log"sv, _("prints a list of reports")},
-		    {"show"sv, _("shows a specific report")},
-		    {"serve"sv, _("starts a local webserver with reports")},
+		    {"init"sv, covlng::HELP_DESCRIPTION_INIT},
+		    {"config"sv, covlng::HELP_DESCRIPTION_CONFIG},
+		    {"module"sv, covlng::HELP_DESCRIPTION_MODULE},
+		    {"add"sv, covlng::HELP_DESCRIPTION_ADD},
+		    {"remove"sv, covlng::HELP_DESCRIPTION_REMOVE},
+		    {"log"sv, covlng::HELP_DESCRIPTION_LOG},
+		    {"show"sv, covlng::HELP_DESCRIPTION_SHOW},
+		    {"serve"sv, covlng::HELP_DESCRIPTION_SERVE},
 		};
 
 		static constexpr help_group known_commands[] = {
-		    {_("common commands"), common_commands},
+		    {covlng::HELP_GROUP_COMMON, common_commands},
 		};
 
 		std::string as_str(std::string_view view) {
 			return {view.data(), view.size()};
 		}
 
-		void copy_commands(args::chunk& chunk, help_group const& group) {
-			chunk.title.assign(group.name);
+		void copy_commands(args::chunk& chunk,
+		                   help_group const& group,
+		                   CovStrings const& tr) {
+			chunk.title.assign(tr(group.name));
 			chunk.items.reserve(group.commands.size());
 			for (auto [name, description] : group.commands)
-				chunk.items.push_back({as_str(name), as_str(description)});
+				chunk.items.push_back({as_str(name), as_str(tr(description))});
 		}
 
 		[[noreturn]] void show_help(args::parser& p) {
@@ -45,7 +53,7 @@ namespace cov::app::root {
 			commands.reserve(commands.size() + std::size(known_commands));
 			for (auto const& group : known_commands) {
 				commands.emplace_back();
-				copy_commands(commands.back(), group);
+				copy_commands(commands.back(), group, parser::tr(p));
 			}
 
 			p.short_help();
@@ -53,8 +61,11 @@ namespace cov::app::root {
 			std::exit(0);
 		}  // GCOV_EXCL_LINE[WIN32] -- covered in oom.cov_help
 
-		[[noreturn]] void show_version() {
-			fmt::print(_("cov version {}\n"), cov::version::ui);
+		[[noreturn]] void show_version(args::parser& p) {
+			//
+			fmt::print(fmt::runtime(parser::tr(p)(covlng::VERSION_IS)),
+			           cov::version::ui);
+			std::fputc('\n', stdout);
 			std::exit(0);
 		}  // GCOV_EXCL_LINE[WIN32]
 
@@ -77,41 +88,50 @@ namespace cov::app::root {
 	}  // namespace
 
 	parser::parser(args::args_view const& arguments,
-	               std::span<builtin_tool const> const& builtins)
-	    : parser_{setup_parser(arguments)}, builtins_{builtins} {}
+	               std::span<builtin_tool const> const& builtins,
+	               std::filesystem::path const& locale_dir,
+	               std::span<std::string const> const& langs)
+	    : parser_{setup_parser(arguments, locale_dir, langs)}
+	    , builtins_{builtins} {}
 
-	args::parser parser::setup_parser(args::args_view const& arguments) {
+	::args::parser parser::setup_parser(
+	    ::args::args_view const& arguments,
+	    std::filesystem::path const& locale_dir,
+	    std::span<std::string const> const& langs) {
+		using args = str::args::lng;
+
 		auto const wrap_list_commands = [this](std::string_view groups) {
 			return list_commands(this->builtins_, groups);
 		};
 
-		args::parser parser{{}, arguments, &null_tr_};
+		tr_.setup_path_manager(locale_dir);
+		tr_.open_first_of(langs);
 
-		parser.usage(_("[-h] [-C <path>] <command> [<args>]"));
+		::args::parser parser{{}, arguments, tr_.args()};
+
+		parser.usage(tr_(covlng::USAGE));
 
 		parser.provide_help(false);
 		parser.custom(show_help, "h", "help")
-		    .help(_("show this help message and exit"))
+		    .help(tr_(args::HELP_DESCRIPTION))
 		    .opt();
 
 		parser.custom(show_version, "v", "version")
-		    .help(_("shows version information and exits"))
+		    .help(tr_(covlng::VERSION_DESCRIPTION))
 		    .opt();
 
 		parser.custom(change_dir, "C")
-		    .meta(_("<path>"))
-		    .help(_("runs as if cov was started in <path> instead of the "
-		            "current "
-		            "working directory"))
+		    .meta(tr_(args::DIR_META))
+		    .help(tr_(covlng::CWD_DESCRIPTION))
 		    .opt();
 
 		parser.custom(wrap_list_commands, "list-cmds")
-		    .meta(_("<spec>[,<spec>,...]"))
-		    .help(_("lists known commands from requested groups"))
+		    .meta(tr_(covlng::SPECS_MULTI_META))
+		    .help(tr_(covlng::LIST_CMDS_DESCRIPTION))
 		    .opt();
 
 		return parser;
-	}
+	}  // GCOV_EXCL_LINE[GCC]
 
 	args::args_view parser::parse() {
 		auto const unparsed = parser_.parse(args::parser::allow_subcommands);
@@ -129,13 +149,14 @@ namespace cov::app::root {
 		commands.reserve(std::size(known_commands));
 		for (auto const& group : known_commands) {
 			commands.emplace_back();
-			copy_commands(commands.back(), group);
+			copy_commands(commands.back(), group, tr_);
 		}
 
 		parser_.short_help(stderr);
 
 		auto prn = args::printer{stderr};
-		auto msg = fmt::format(_("\"{}\" is not a cov command"), tool);
+		auto msg = fmt::format(
+		    fmt::runtime(tr_(covlng::ERROR_TOOL_NOT_RECOGNIZED)), tool);
 		prn.format_paragraph(fmt::format("{}: {}", parser_.program(), msg), 0);
 		prn.format_list(commands);
 	}
