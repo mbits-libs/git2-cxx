@@ -22,7 +22,7 @@
 - [ ] Add commands _(drop alpha)_
   - [x] `cov`, builtin and `libexec/cov` _(0.8.0-beta)_
     - [x] aliases inside config
-  - [ ] lngs baseline _(M⬆️P)_
+  - [x] lngs baseline _(0.8.1-beta)_
   - [ ] `cov init` _(each is a M⬆️P)_
   - [ ] `cov config`
   - [ ] `cov module`
