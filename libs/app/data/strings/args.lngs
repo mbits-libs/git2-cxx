@@ -1,0 +1,35 @@
+[
+    project("cov"),
+	namespace("cov::app::str::args"),
+    version("0.8.1"),
+    serial(1)
+] strings {
+	[help("Synopsis header; please note there is one space at the end of this entry"), id(-1)]
+	USAGE = "usage: ";
+	[help("Default name of an argument"), id(-1)]
+	DEF_META = "<arg>";
+	[help("Header for list of positional arguments"), id(-1)]
+	POSITIONALS = "positional arguments";
+	[help("Header for list of optional arguments"), id(-1)]
+	OPTIONALS = "optional arguments";
+	[help("Description for the -h/--help argument"), id(-1)]
+	HELP_DESCRIPTION = "shows this help message and exits";
+	[help("Error message for an unrecognized argument; the placeholder will contain the name of the argument"), id(-1)]
+	UNRECOGNIZED = "unrecognized argument: {0}";
+	[help("Error message for a missing argument"), id(-1)]
+	NEEDS_PARAM = "argument {0}: expected one argument";
+	[help("Error message for unneeded value"), id(-1)]
+	NEEDS_NO_PARAM = "argument {0}: value was not expected";
+	[help("Error message for a numeric argument, when parsing failed"), id(-1)]
+	NEEDS_NUMBER = "argument {0}: expected a number";
+	[help("Error message for a numeric argument, when parsing would get outside of representable bounds"), id(-1)]
+	NEEDED_NUMBER_EXCEEDED = "argument {0}: number outside of expected bounds";
+	[help("Error message for a list of arguments, when parsing failed"), id(-1)]
+	NEEDS_ENUM_UNKNOWN = "argument {0}: value {1} is not recognized";
+	[help("Help message presenting a list of possible values for a list-type argument"), id(-1)]
+	NEEDS_ENUM_KNOWN_VALUES = "known values for {0}: {1}";
+	[help("Error message for a missing required argument"), id(-1)]
+	REQUIRED = "argument {0} is required";
+	[help("Error message template; placeholder 0 will get the name of program, placeholder 1 an actual message"), id(-1)]
+	ERROR_MSG = "{0}: error: {1}";
+}
