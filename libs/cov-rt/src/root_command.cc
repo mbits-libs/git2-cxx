@@ -125,7 +125,8 @@ namespace cov::app::root {
 	}
 
 	void parser::noent(std::string_view tool) const {
-		auto commands = args::fmt_list(std::size(known_commands));
+		args::fmt_list commands{};
+		commands.reserve(std::size(known_commands));
 		for (auto const& group : known_commands) {
 			commands.emplace_back();
 			copy_commands(commands.back(), group);
