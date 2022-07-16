@@ -11,7 +11,7 @@ target_link_options(app PRIVATE ${ADDITIONAL_LINK_FLAGS})
 target_include_directories(app PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}/include
   ${CMAKE_CURRENT_BINARY_DIR}/include)
-target_link_libraries(app PUBLIC cov-api lighter mbits::args)
+target_link_libraries(app PUBLIC cov-api lighter lngs mbits::args)
 
 set_target_properties(app PROPERTIES FOLDER libs)
 
