@@ -1,0 +1,4 @@
+pl polski
+en English
+it italiana
+ja 日本語

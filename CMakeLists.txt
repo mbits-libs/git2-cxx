@@ -5,8 +5,12 @@ project (cov
   LANGUAGES CXX
 )
 
+set(PROJECT_VERSION_SHORT "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}")
 set(PROJECT_VERSION_STABILITY "-beta" # or "-alpha", or "-rc.1", or "-rc.2", or ""
     CACHE STRING "" FORCE)
+
+set(STRINGS args)
+set(LANGUAGES pl en)
 
 set(COV_TESTING ON CACHE BOOL "Compile and/or run self-tests")
 set(COV_CUTDOWN_OS OFF CACHE BOOL "Run tests on cutdown OS (e.g. GitHub docker)")
@@ -25,6 +29,11 @@ find_package(libgit2 REQUIRED)
 find_package(fmt REQUIRED)
 find_package(date REQUIRED)
 find_package(args REQUIRED)
+find_program(LNGS lngs)
+
+if (LNGS)
+  message(STATUS "lngs is ${LNGS}")
+endif()
 
 if (COV_TESTING)
   enable_testing()

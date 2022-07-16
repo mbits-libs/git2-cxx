@@ -14,7 +14,7 @@ endforeach()
 
 string(REPLACE ";" ", " BUILTIN_LIST "${BUILTINS}")
 message(STATUS "Builtins: ${BUILTIN_LIST}")
-include(builtins.cmake)
+include(builtins)
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})
 source_group(TREE ${CMAKE_CURRENT_BINARY_DIR} FILES ${CMAKE_CURRENT_BINARY_DIR}/cov/builtins.hh)
@@ -64,6 +64,20 @@ function(add_cov_core COV_TOOL)
     )
 endfunction()
 
+########################################################
+
+add_custom_target(copy-langs ALL)
+add_dependencies(cov copy-langs)
+set_target_properties(copy-langs PROPERTIES FOLDER apps/strings)
+
+foreach(STRING_FILE ${STRINGS})
+    foreach(LANG_ID ${LANGUAGES})
+        add_dependencies(copy-langs "${STRING_FILE}.${LANG_ID}")
+    endforeach()
+endforeach()
+
+########################################################
+
 if (COV_TESTING)
     enable_testing()
 
@@ -109,6 +123,12 @@ cpack_add_component(tools
 cpack_add_component_group(apps
   DISPLAY_NAME "Executables"
   EXPANDED
+)
+
+install(
+  DIRECTORY ${PROJECT_BINARY_DIR}/share/
+  DESTINATION share/
+  COMPONENT libapp
 )
 
 if (CMAKE_GENERATOR MATCHES "Visual Studio" AND TARGET cov_coveralls_test)

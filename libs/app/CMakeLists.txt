@@ -1,8 +1,14 @@
 set(SOURCES
-    src/tr.cc
+  src/tr.cc
 
-    include/cov/app/tr.hh
+  include/cov/app/tr.hh
 )
+
+string(REPLACE ";" ", " STRING_LIST "${STRINGS}")
+message(STATUS "Strings: ${STRING_LIST}")
+string(REPLACE ";" ", " LANGUAGE_LIST "${LANGUAGES}")
+message(STATUS "Languages: ${LANGUAGE_LIST}")
+include(strings)
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})
 
 add_library(app STATIC ${SOURCES})
@@ -11,7 +17,7 @@ target_link_options(app PRIVATE ${ADDITIONAL_LINK_FLAGS})
 target_include_directories(app PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}/include
   ${CMAKE_CURRENT_BINARY_DIR}/include)
-target_link_libraries(app PUBLIC cov-api lighter lngs mbits::args)
+target_link_libraries(app PUBLIC cov-api lighter liblngs mbits::args)
 
 set_target_properties(app PROPERTIES FOLDER libs)
 
