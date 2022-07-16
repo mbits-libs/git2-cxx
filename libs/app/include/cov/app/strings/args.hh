@@ -10,30 +10,38 @@ namespace cov::app::str::args {
         USAGE = 1001,
         /// <arg> (Default name of an argument)
         DEF_META = 1002,
+        /// <file> (Name of a file argument)
+        FILE_META = 1003,
+        /// <dir> (Name of a directory argument)
+        DIR_META = 1004,
+        /// <path> (Name of a file or directory argument)
+        PATH_META = 1005,
         /// positional arguments (Header for list of positional arguments)
-        POSITIONALS = 1003,
+        POSITIONALS = 1006,
         /// optional arguments (Header for list of optional arguments)
-        OPTIONALS = 1004,
+        OPTIONALS = 1007,
         /// shows this help message and exits (Description for the -h/--help argument)
-        HELP_DESCRIPTION = 1005,
+        HELP_DESCRIPTION = 1008,
         /// unrecognized argument: {0} (Error message for an unrecognized argument; the placeholder will contain the name of the argument)
-        UNRECOGNIZED = 1006,
+        UNRECOGNIZED = 1009,
         /// argument {0}: expected one argument (Error message for a missing argument)
-        NEEDS_PARAM = 1007,
+        NEEDS_PARAM = 1010,
         /// argument {0}: value was not expected (Error message for unneeded value)
-        NEEDS_NO_PARAM = 1008,
+        NEEDS_NO_PARAM = 1011,
         /// argument {0}: expected a number (Error message for a numeric argument, when parsing failed)
-        NEEDS_NUMBER = 1009,
+        NEEDS_NUMBER = 1012,
         /// argument {0}: number outside of expected bounds (Error message for a numeric argument, when parsing would get outside of representable bounds)
-        NEEDED_NUMBER_EXCEEDED = 1010,
+        NEEDED_NUMBER_EXCEEDED = 1013,
         /// argument {0}: value {1} is not recognized (Error message for a list of arguments, when parsing failed)
-        NEEDS_ENUM_UNKNOWN = 1011,
+        NEEDS_ENUM_UNKNOWN = 1014,
         /// known values for {0}: {1} (Help message presenting a list of possible values for a list-type argument)
-        NEEDS_ENUM_KNOWN_VALUES = 1012,
+        NEEDS_ENUM_KNOWN_VALUES = 1015,
         /// argument {0} is required (Error message for a missing required argument)
-        REQUIRED = 1013,
+        REQUIRED = 1016,
         /// {0}: error: {1} (Error message template; placeholder 0 will get the name of program, placeholder 1 an actual message)
-        ERROR_MSG = 1014,
+        ERROR_MSG = 1017,
+        /// cannot open {0} (Needed file was not found)
+        FILE_NOT_FOUND = 1018,
     }; // enum class lng
 
     struct Resource {

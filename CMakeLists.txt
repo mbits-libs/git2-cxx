@@ -9,7 +9,7 @@ set(PROJECT_VERSION_SHORT "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}")
 set(PROJECT_VERSION_STABILITY "-beta" # or "-alpha", or "-rc.1", or "-rc.2", or ""
     CACHE STRING "" FORCE)
 
-set(STRINGS args)
+set(STRINGS args cov)
 set(LANGUAGES pl en)
 
 set(COV_TESTING ON CACHE BOOL "Compile and/or run self-tests")

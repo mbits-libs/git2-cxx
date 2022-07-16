@@ -17,7 +17,13 @@
     ],
     "expected": [
         0,
-        "first\ninit\nname\nsecond\nthird\n",
+        [
+            "first",
+            "init",
+            "name",
+            "second",
+            "third\n"
+        ],
         ""
     ]
 }

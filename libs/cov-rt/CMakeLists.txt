@@ -5,6 +5,7 @@ set(SOURCES
   src/split_command.cc
   src/tools.cc
 
+  include/cov/app/cov_tr.hh
   include/cov/app/root_command.hh
   include/cov/app/split_command.hh
   include/cov/app/tools.hh

@@ -23,6 +23,7 @@
   - [x] `cov`, builtin and `libexec/cov` _(0.8.0-beta)_
     - [x] aliases inside config
   - [x] lngs baseline _(0.8.1-beta)_
+    - [ ] `wmain` and spawn w/UTF8 on Windows
   - [ ] `cov init` _(each is a M⬆️P)_
   - [ ] `cov config`
   - [ ] `cov module`

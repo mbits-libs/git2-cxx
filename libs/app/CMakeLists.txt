@@ -19,10 +19,15 @@ target_include_directories(app PUBLIC
   ${CMAKE_CURRENT_BINARY_DIR}/include)
 target_link_libraries(app PUBLIC cov-api lighter liblngs mbits::args)
 
-set_target_properties(app PROPERTIES FOLDER libs)
+add_library(app_main STATIC src/main.cc)
+target_compile_options(app_main PRIVATE ${ADDITIONAL_WALL_FLAGS})
+target_link_options(app_main PRIVATE ${ADDITIONAL_LINK_FLAGS})
+target_link_libraries(app_main PUBLIC app)
+
+set_target_properties(app app_main PROPERTIES FOLDER libs)
 
 install(
-  TARGETS app
+  TARGETS app app_main
   COMPONENT libapp
 )
 

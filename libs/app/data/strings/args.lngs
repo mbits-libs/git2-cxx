@@ -8,6 +8,12 @@
 	USAGE = "usage: ";
 	[help("Default name of an argument"), id(-1)]
 	DEF_META = "<arg>";
+	[help("Name of a file argument"), id(-1)]
+	FILE_META = "<file>";
+	[help("Name of a directory argument"), id(-1)]
+	DIR_META = "<dir>";
+	[help("Name of a file or directory argument"), id(-1)]
+	PATH_META = "<path>";
 	[help("Header for list of positional arguments"), id(-1)]
 	POSITIONALS = "positional arguments";
 	[help("Header for list of optional arguments"), id(-1)]
@@ -32,4 +38,6 @@
 	REQUIRED = "argument {0} is required";
 	[help("Error message template; placeholder 0 will get the name of program, placeholder 1 an actual message"), id(-1)]
 	ERROR_MSG = "{0}: error: {1}";
+	[help("Needed file was not found"), id(-1)]
+	FILE_NOT_FOUND = "cannot open {0}";
 }

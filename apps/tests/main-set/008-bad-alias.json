@@ -15,6 +15,10 @@
     "expected": [
         1,
         "",
-        "usage: cov [-h] [-C <path>] <command> [<args>]\ncov: \"fourth\" is not a cov command\n\n"
+        [
+            "usage: cov [-h] [-C <dir>] <command> [<args>]",
+            "cov: \"fourth\" is not a cov command",
+            "\n"
+        ]
     ]
 }

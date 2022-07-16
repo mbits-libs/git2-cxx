@@ -1,6 +1,7 @@
 # Copyright (c) 2022 Marcin Zdun
 # This code is licensed under MIT license (see LICENSE for details)
 
+from pprint import pprint
 import argparse
 import json
 import os
@@ -10,6 +11,9 @@ import subprocess
 import sys
 import shutil
 from difflib import unified_diff
+
+if os.name == 'nt':
+    sys.stdout.reconfigure(encoding='utf-8')
 
 flds = ['Return code', 'Standard out', 'Standard err']
 streams = ['stdin', 'stderr']
@@ -88,6 +92,12 @@ class Test:
         except KeyError:
             self.ok = False
             return
+
+        if self.expected is not None:
+            if not isinstance(self.expected[1], str):
+                self.expected[1] = '\n'.join(self.expected[1])
+            if not isinstance(self.expected[2], str):
+                self.expected[2] = '\n'.join(self.expected[2])
 
         try:
             self.patches = data['patches']
@@ -189,8 +199,19 @@ Diff:
     {repr(self.expected[ndx])}
   Actual:
     {repr(actual[ndx])}""")
+
+        env = {}
+        env['LANGUAGE'] = self.lang
+        for key in self.env:
+            value = self.env[key]
+            if value:
+                env[key] = value
+            elif key in env:
+                del env[key]
+
         expanded = [expand(arg) for arg in self.args]
-        print(' '.join([shlex.quote(arg) for arg in [target, *expanded]]))
+        print(' '.join(shlex.quote(arg) for arg in [
+              *['{}={}'.format(key, env[key]) for key in env], target, *expanded]))
 
     @staticmethod
     def load(filename, count):
@@ -208,9 +229,9 @@ if args.install is not None:
     if os.path.exists(os.path.join(root_dir, "libexec")):
         shutil.copytree(os.path.join(root_dir, "libexec"), os.path.join(
             args.install, 'libexec'), dirs_exist_ok=True)
-    if os.path.exists(os.path.join(root_dir, "shared")):
-        shutil.copytree(os.path.join(root_dir, "shared"), os.path.join(
-            args.install, 'shared'), dirs_exist_ok=True)
+    if os.path.exists(os.path.join(root_dir, "share")):
+        shutil.copytree(os.path.join(root_dir, "share"), os.path.join(
+            args.install, 'share'), dirs_exist_ok=True)
 
     for module in args.install_with:
         shutil.copy2(module, os.path.join(args.install, 'libexec', 'cov'))
@@ -234,6 +255,17 @@ while length > 9:
     digits += 1
     length = length // 10
 
+
+def to_lines(stream):
+    lines = stream.split('\n')
+    if len(lines) > 1 and lines[-1] == '':
+        lines = lines[:-1]
+        lines[-1] += '\n'
+    if len(lines) == 1:
+        return lines[0]
+    return lines
+
+
 had_errors = False
 counter = 0
 for filename in sorted(testsuite):
@@ -246,16 +278,19 @@ for filename in sorted(testsuite):
 
     actual = test.run()
     if test.expected is None:
-        test.data['expected'] = actual
+        test.data['expected'] = [actual[0], *
+                                 [to_lines(stream) for stream in actual[1:]]]
         with open(filename, "w") as f:
-            json.dump(test.data, f, separators=(", ", ": "))
+            json.dump(test.data, f, indent=4)
+            print(file=f)
         print(f"[{counter:>{digits}}/{len(testsuite)}] {test.name} saved")
         continue
 
     clipped = test.clip(actual)
 
     if isinstance(clipped, str):
-        print(f"[{counter:>{digits}}/{len(testsuite)}] {test.name} **FAILED** (unknown check '{clipped}')")
+        print(
+            f"[{counter:>{digits}}/{len(testsuite)}] {test.name} **FAILED** (unknown check '{clipped}')")
         had_errors = True
         continue
 
@@ -269,7 +304,8 @@ for filename in sorted(testsuite):
 
 
 if args.install is not None:
-    shutil.rmtree(args.install)
+    pass
+    # shutil.rmtree(args.install)
 
 if had_errors:
     sys.exit(1)
