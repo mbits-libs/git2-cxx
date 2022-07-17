@@ -18,6 +18,11 @@ msgstr ""
 "X-Generator: Poedit 2.4.2\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+#. Universal error message
+msgctxt "ARGUMENT_MSG"
+msgid "argument {0}: {1}"
+msgstr "argument {0}: {1}"
+
 #. Default name of an argument
 msgctxt "DEF_META"
 msgid "<arg>"
@@ -37,6 +42,11 @@ msgstr "{0}: error: {1}"
 msgctxt "FILE_META"
 msgid "<file>"
 msgstr "<file>"
+
+#. Needed file was not found
+msgctxt "FILE_NOT_FOUND"
+msgid "cannot open {0}"
+msgstr "cannot open {0}"
 
 #. Description for the -h/--help argument
 msgctxt "HELP_DESCRIPTION"

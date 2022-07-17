@@ -1,0 +1,29 @@
+[
+    project("cov"),
+	namespace("cov::app::str::cov_init"),
+    version("0.10.0"),
+    serial(1)
+] strings {
+    [help("Description for the --git-dir argument"), id(-1)]
+    ARG_GITDIR="points to connected Git repository; defaults to current repo";
+    [help("Description for the --force argument"), id(-1)]
+    ARG_FORCE="will re-init the repository with a fresh database";
+    [help("Description for the init's last argument"), id(-1)]
+    ARG_DIRECTORY="sets the directory to put the repository in; defaults to current directory";
+    [help("Name of the init's last argument; note this one does not have angle brackets"), id(-1)]
+    DIR_META = "directory";
+    [help("Error message for wrong initial directory"), id(-1)]
+	NOT_GIT = "not git repo: {0}";
+    [help("Error message for pre-exisiting repository"), id(-1)]
+    EXISTS="Cov repository already exists in {0}";
+    [help("Error message for removal of existing repository"), id(-1)]
+    CANNOT_REMOVE="Cannot remove Cov repository in {0}";
+    [help("Error message for filesystem issues with new repository"), id(-1)]
+    CANNOT_INITIALIZE="Cannot initialize Cov repository in {0}";
+    [help("Message for successful initialization"), id(-1)]
+    INITIALIZED="Initialized empty Cov repository in {0}";
+    [help("Message for successful re-initialization"), id(-1)]
+    REINITIALIZED="Reinitialized empty Cov repository in {0}";
+    [help("Message pointing to dependent git repository"), id(-1)]
+    USING_GIT="Using Git repository in {0}";
+}

@@ -3,7 +3,7 @@
 
 #include <fmt/format.h>
 #include <args/parser.hpp>
-#include <span>
+#include <cov/app/cov_init_tr.hh>
 
 namespace cov::app::builtin::init {
 	int handle(std::string_view tool, args::arglist args) {

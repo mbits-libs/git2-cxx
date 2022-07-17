@@ -1,0 +1,74 @@
+# Code coverage presented localy.
+# Copyright (C) 2022 midnightBITS
+# This file is distributed under the same license as the cov package.
+# Marcin Zdun <mzdun@midnightbits.com>, 2022.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: cov 0.10.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-07-17 18:31+0200\n"
+"PO-Revision-Date: 2022-07-17 18:35+0200\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.4.2\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. Description for the init's last argument
+msgctxt "ARG_DIRECTORY"
+msgid "sets the directory to put the repository in; defaults to current directory"
+msgstr "sets the directory to put the repository in; defaults to current directory"
+
+#. Description for the --force argument
+msgctxt "ARG_FORCE"
+msgid "will re-init the repository with a fresh database"
+msgstr "will re-init the repository with a fresh database"
+
+#. Description for the --git-dir argument
+msgctxt "ARG_GITDIR"
+msgid "points to connected Git repository; defaults to current repo"
+msgstr "points to connected Git repository; defaults to current repo"
+
+#. Error message for filesystem issues with new repository
+msgctxt "CANNOT_INITIALIZE"
+msgid "Cannot initialize Cov repository in {0}"
+msgstr "Cannot initialize Cov repository in {0}"
+
+#. Error message for removal of existing repository
+msgctxt "CANNOT_REMOVE"
+msgid "Cannot remove Cov repository in {0}"
+msgstr "Cannot remove Cov repository in {0}"
+
+#. Name of the init's last argument; note this one does not have angle brackets
+msgctxt "DIR_META"
+msgid "directory"
+msgstr "directory"
+
+#. Error message for pre-exisiting repository
+msgctxt "EXISTS"
+msgid "Cov repository already exists in {0}"
+msgstr "Cov repository already exists in {0}"
+
+#. Message for successful initialization
+msgctxt "INITIALIZED"
+msgid "Initialized empty Cov repository in {0}"
+msgstr "Initialized empty Cov repository in {0}"
+
+#. Error message for wrong initial directory
+msgctxt "NOT_GIT"
+msgid "not git repo: {0}"
+msgstr "not git repo: {0}"
+
+#. Message for successful re-initialization
+msgctxt "REINITIALIZED"
+msgid "Reinitialized empty Cov repository in {0}"
+msgstr "Reinitialized empty Cov repository in {0}"
+
+#. Message pointing to dependent git repository
+msgctxt "USING_GIT"
+msgid "Using Git repository in {0}"
+msgstr "Using Git repository in {0}"
