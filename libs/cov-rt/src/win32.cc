@@ -120,6 +120,21 @@ namespace cov::app::platform {
 
 			return length;
 		}
+
+		std::wstring from_utf8(std::string_view arg) {
+			if (arg.empty()) return {};
+
+			auto const length = static_cast<int>(arg.size());
+
+			auto size =
+			    MultiByteToWideChar(CP_UTF8, 0, arg.data(), length, nullptr, 0);
+			std::unique_ptr<wchar_t[]> out{new wchar_t[size + 1]};
+			MultiByteToWideChar(CP_UTF8, 0, arg.data(), length, out.get(),
+			                    size + 1);
+			out[size] = 0;
+			return {out.get(), static_cast<size_t>(size)};
+		}
+
 	}  // namespace
 
 	std::filesystem::path exec_path() {
@@ -132,13 +147,13 @@ namespace cov::app::platform {
 	int run_tool(std::filesystem::path const& tooldir,
 	             std::string_view tool,
 	             args::arglist args) {
-		auto const program = "cov-" + std::string(tool.data(), tool.size());
-		auto const program_file = program + ".exe";
+		auto const program = L"cov-" + from_utf8(tool);
+		auto const program_file = program + L".exe";
 
 		auto prog_path = tooldir / program_file;
 		prog_path.make_preferred();
 
-		auto length = arg_length(program);
+		auto length = arg_length(tool) + 8;
 		for (unsigned index = 0; index < args.size(); ++index)
 			length += 1 + arg_length(args[index]);
 
@@ -148,7 +163,7 @@ namespace cov::app::platform {
 		append_arg(arg_string, program);
 		for (unsigned index = 0; index < args.size(); ++index) {
 			append(arg_string, ' ');
-			append_arg(arg_string, args[index]);
+			append_arg(arg_string, from_utf8(args[index]));
 		}
 
 		append(arg_string, '\0');
@@ -163,7 +178,8 @@ namespace cov::app::platform {
 		if (!CreateProcessW(prog_path.c_str(), arg_string.data(), nullptr,
 		                    nullptr, 0, 0, nullptr, nullptr, &si, &pi)) {
 			auto const error = GetLastError();
-			if (error == ERROR_FILE_NOT_FOUND) return -ENOENT;
+			if (error == ERROR_FILE_NOT_FOUND || error == ERROR_PATH_NOT_FOUND)
+				return -ENOENT;
 
 			// GCOV_EXCL_START[WIN32]
 			[[unlikely]];
@@ -176,9 +192,6 @@ namespace cov::app::platform {
 		if (!GetExitCodeProcess(pi.hProcess, &retrun_code)) {
 			// GCOV_EXCL_START[WIN32]
 			[[unlikely]];
-			auto const error = GetLastError();
-			if (error == ERROR_FILE_NOT_FOUND) return -ENOENT;
-
 			return 128;
 			// GCOV_EXCL_STOP[WIN32]
 		}
@@ -188,4 +201,4 @@ namespace cov::app::platform {
 
 		return static_cast<int>(retrun_code);
 	}
-}  // namespace cov::app
+}  // namespace cov::app::platform

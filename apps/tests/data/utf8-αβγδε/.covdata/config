@@ -1,0 +1,4 @@
+[alias]
+    first = greek --ΠΑΝΤΌΓΡΑΜΜΑ 'Ξεσκεπάζω την ψυχοφθόρα σας βδελυγμία'
+    greek = polish --pangram 'Pchnąć w tę łódź jeża lub ośm skrzyń fig.'
+    polish = echo --iroha 'いろはにほへと ちりぬるを'
