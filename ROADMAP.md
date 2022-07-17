@@ -24,8 +24,8 @@
     - [x] aliases inside config
   - [x] lngs baseline _(0.9.0-beta)_
     - [x] `wmain` and spawn w/UTF8 on Windows
-  - [ ] `cov init` _(each is a M⬆️P)_
-  - [ ] `cov config`
+  - [ ] `cov init` _(0.10.0-beta)_
+  - [ ] `cov config` _(each is a M⬆️P)_
   - [ ] `cov module`
     - _[module "libraries"]_\
     _name=..._\
