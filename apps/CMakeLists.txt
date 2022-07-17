@@ -21,43 +21,15 @@ source_group(TREE ${CMAKE_CURRENT_BINARY_DIR} FILES ${CMAKE_CURRENT_BINARY_DIR}/
 
 list(APPEND SOURCES ${CMAKE_CURRENT_BINARY_DIR}/cov/builtins.hh)
 
-add_executable(cov ${SOURCES})
+add_cov_tool(cov ${SOURCES})
 target_compile_options(cov PRIVATE ${ADDITIONAL_WALL_FLAGS})
 target_link_options(cov PRIVATE ${ADDITIONAL_LINK_FLAGS})
 target_include_directories(cov PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
 )
-target_link_libraries(cov PRIVATE cov-rt app_main)
+target_link_libraries(cov PRIVATE cov-rt)
 set_target_properties(cov PROPERTIES FOLDER apps)
-
-function(setup_cov_core COV_TOOL)
-	set_target_properties(cov-${COV_TOOL} PROPERTIES FOLDER apps/core)
-	target_link_libraries(cov-${COV_TOOL} PRIVATE app_main)
-    target_link_options(cov-${COV_TOOL} PRIVATE ${ADDITIONAL_LINK_FLAGS})
-	target_compile_options(cov-${COV_TOOL} PRIVATE ${ADDITIONAL_WALL_FLAGS})
-
-	set_target_properties(cov-${COV_TOOL} PROPERTIES
-		RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CORE_DIR}"
-    )
-
-	foreach(BUILD_TYPE DEBUG RELEASE RELWITHDEBINFO MINSIZEREL)
-		set_target_properties(cov-${COV_TOOL} PROPERTIES
-			RUNTIME_OUTPUT_DIRECTORY_${BUILD_TYPE} "${CMAKE_BINARY_DIR}/${CORE_DIR}"
-        )
-	endforeach()
-endfunction()
-
-function(add_cov_core COV_TOOL)
-	add_executable(cov-${COV_TOOL} cov-${COV_TOOL}.cc)
-    source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES cov-${COV_TOOL}.cc)
-
-	setup_cov_core(${COV_TOOL})
-	install(TARGETS cov-${COV_TOOL}
-		RUNTIME DESTINATION ${CORE_DIR}
-        COMPONENT tools
-    )
-endfunction()
 
 ########################################################
 
@@ -76,7 +48,7 @@ endforeach()
 if (COV_TESTING)
     enable_testing()
 
-    add_executable(cov-echo tests/cov-echo.cc)
+    add_cov_tool(cov-echo tests/cov-echo.cc)
     target_compile_options(cov-echo PRIVATE ${ADDITIONAL_WALL_FLAGS})
     target_link_options(cov-echo PRIVATE ${ADDITIONAL_LINK_FLAGS})
     target_link_libraries(cov-echo PRIVATE fmt::fmt mbits::args)

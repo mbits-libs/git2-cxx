@@ -1,8 +1,6 @@
 // Copyright (c) 2022 Marcin Zdun
 // This code is licensed under MIT license (see LICENSE for details)
 
-#pragma once
-
 #include <cov/app/tr.hh>
 
 namespace cov::app::str {

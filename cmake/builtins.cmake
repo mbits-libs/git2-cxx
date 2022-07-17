@@ -37,3 +37,39 @@ file(GENERATE
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/cov/builtins.hh
     CONTENT ${__content}
 )
+
+function(add_cov_tool TARGET)
+  cmake_parse_arguments(PARSE_ARGV 1 COV "" "" "")
+  add_executable(${TARGET} ${COV_UNPARSED_ARGUMENTS})
+	target_link_libraries(${TARGET} PRIVATE app_main)
+  if (WIN32)
+    target_link_options(${TARGET} PRIVATE /ENTRY:wmainCRTStartup)
+  endif()
+endfunction()
+
+function(setup_cov_core COV_TOOL)
+	set_target_properties(cov-${COV_TOOL} PROPERTIES FOLDER apps/core)
+  target_link_options(cov-${COV_TOOL} PRIVATE ${ADDITIONAL_LINK_FLAGS})
+	target_compile_options(cov-${COV_TOOL} PRIVATE ${ADDITIONAL_WALL_FLAGS})
+
+	set_target_properties(cov-${COV_TOOL} PROPERTIES
+		RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CORE_DIR}"
+    )
+
+	foreach(BUILD_TYPE DEBUG RELEASE RELWITHDEBINFO MINSIZEREL)
+		set_target_properties(cov-${COV_TOOL} PROPERTIES
+			RUNTIME_OUTPUT_DIRECTORY_${BUILD_TYPE} "${CMAKE_BINARY_DIR}/${CORE_DIR}"
+        )
+	endforeach()
+endfunction()
+
+function(add_cov_external_tool COV_TOOL)
+  add_cov_tool(cov-${COV_TOOL} cov-${COV_TOOL}.cc)
+  source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES cov-${COV_TOOL}.cc)
+
+	setup_cov_core(${COV_TOOL})
+	install(TARGETS cov-${COV_TOOL}
+		RUNTIME DESTINATION ${CORE_DIR}
+        COMPONENT tools
+    )
+endfunction()

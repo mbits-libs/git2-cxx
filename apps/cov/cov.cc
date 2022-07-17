@@ -6,7 +6,6 @@
 #include <cov/app/tools.hh>
 #include <cov/builtins.hh>
 
-
 int tool(args::args_view const& arguments) {
 	using namespace cov::app;
 

@@ -69,10 +69,26 @@ namespace cov::app::root {
 			std::exit(0);
 		}  // GCOV_EXCL_LINE[WIN32]
 
-		void change_dir(args::parser& p, std::filesystem::path const& dirname) {
+#ifdef __cpp_lib_char8_t
+		template <typename CharTo, typename Source>
+		inline std::basic_string_view<CharTo> conv(Source const& view) {
+			return {reinterpret_cast<CharTo const*>(view.data()),
+			        view.length()};
+		}
+
+		inline std::filesystem::path make_path(std::string_view utf8) {
+			return conv<char8_t>(utf8);
+		}
+#else
+		inline std::filesystem::path make_path(std::string_view utf8) {
+			return std::filesystem::u8path(utf8);
+		}
+#endif
+
+		void change_dir(args::parser& p, std::string const& dirname_str) {
 			std::error_code ec;
-			std::filesystem::current_path(dirname, ec);
-			if (ec) p.error(dirname.string() + ": " + ec.message());
+			std::filesystem::current_path(make_path(dirname_str), ec);
+			if (ec) p.error(dirname_str + ": " + ec.message());
 		}
 
 		[[noreturn]] void list_commands(

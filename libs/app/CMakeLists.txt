@@ -24,6 +24,10 @@ target_compile_options(app_main PRIVATE ${ADDITIONAL_WALL_FLAGS})
 target_link_options(app_main PRIVATE ${ADDITIONAL_LINK_FLAGS})
 target_link_libraries(app_main PUBLIC app)
 
+if (WIN32)
+  target_compile_options(app_main PUBLIC /D_UNICODE /DUNICODE)
+endif()
+
 set_target_properties(app app_main PROPERTIES FOLDER libs)
 
 install(
