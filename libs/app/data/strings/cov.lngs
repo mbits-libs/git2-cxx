@@ -1,7 +1,7 @@
 [
     project("cov"),
 	namespace("cov::app::str::root"),
-    version("0.8.1"),
+    version("0.9.0"),
     serial(1)
 ] strings {
 	[help("Short usage description"), id(-1)]
