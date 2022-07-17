@@ -19,6 +19,11 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 "
 "|| n%100>14) ? 1 : 2);\n"
 
+#. Universal error message
+msgctxt "ARGUMENT_MSG"
+msgid "argument {0}: {1}"
+msgstr "argument {0}: {1}"
+
 #. Default name of an argument
 msgctxt "DEF_META"
 msgid "<arg>"
@@ -38,6 +43,11 @@ msgstr "{0}: błąd: {1}"
 msgctxt "FILE_META"
 msgid "<file>"
 msgstr "<plik>"
+
+#. Needed file was not found
+msgctxt "FILE_NOT_FOUND"
+msgid "cannot open {0}"
+msgstr "nie można otworzyć {0}"
 
 #. Description for the -h/--help argument
 msgctxt "HELP_DESCRIPTION"

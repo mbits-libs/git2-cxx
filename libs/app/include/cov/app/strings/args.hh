@@ -24,24 +24,26 @@ namespace cov::app::str::args {
         HELP_DESCRIPTION = 1008,
         /// unrecognized argument: {0} (Error message for an unrecognized argument; the placeholder will contain the name of the argument)
         UNRECOGNIZED = 1009,
+        /// argument {0}: {1} (Universal error message)
+        ARGUMENT_MSG = 1010,
         /// argument {0}: expected one argument (Error message for a missing argument)
-        NEEDS_PARAM = 1010,
+        NEEDS_PARAM = 1011,
         /// argument {0}: value was not expected (Error message for unneeded value)
-        NEEDS_NO_PARAM = 1011,
+        NEEDS_NO_PARAM = 1012,
         /// argument {0}: expected a number (Error message for a numeric argument, when parsing failed)
-        NEEDS_NUMBER = 1012,
+        NEEDS_NUMBER = 1013,
         /// argument {0}: number outside of expected bounds (Error message for a numeric argument, when parsing would get outside of representable bounds)
-        NEEDED_NUMBER_EXCEEDED = 1013,
+        NEEDED_NUMBER_EXCEEDED = 1014,
         /// argument {0}: value {1} is not recognized (Error message for a list of arguments, when parsing failed)
-        NEEDS_ENUM_UNKNOWN = 1014,
+        NEEDS_ENUM_UNKNOWN = 1015,
         /// known values for {0}: {1} (Help message presenting a list of possible values for a list-type argument)
-        NEEDS_ENUM_KNOWN_VALUES = 1015,
+        NEEDS_ENUM_KNOWN_VALUES = 1016,
         /// argument {0} is required (Error message for a missing required argument)
-        REQUIRED = 1016,
+        REQUIRED = 1017,
         /// {0}: error: {1} (Error message template; placeholder 0 will get the name of program, placeholder 1 an actual message)
-        ERROR_MSG = 1017,
+        ERROR_MSG = 1018,
         /// cannot open {0} (Needed file was not found)
-        FILE_NOT_FOUND = 1018,
+        FILE_NOT_FOUND = 1019,
     }; // enum class lng
 
     struct Resource {

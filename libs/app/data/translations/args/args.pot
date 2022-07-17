@@ -17,6 +17,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#. Universal error message
+msgctxt "ARGUMENT_MSG"
+msgid "argument {0}: {1}"
+msgstr ""
+
 #. Default name of an argument
 msgctxt "DEF_META"
 msgid "<arg>"
@@ -35,6 +40,11 @@ msgstr ""
 #. Name of a file argument
 msgctxt "FILE_META"
 msgid "<file>"
+msgstr ""
+
+#. Needed file was not found
+msgctxt "FILE_NOT_FOUND"
+msgid "cannot open {0}"
 msgstr ""
 
 #. Description for the -h/--help argument

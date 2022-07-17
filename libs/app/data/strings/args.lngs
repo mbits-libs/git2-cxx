@@ -22,6 +22,8 @@
 	HELP_DESCRIPTION = "shows this help message and exits";
 	[help("Error message for an unrecognized argument; the placeholder will contain the name of the argument"), id(-1)]
 	UNRECOGNIZED = "unrecognized argument: {0}";
+    [help("Universal error message"), id(-1)]
+    ARGUMENT_MSG = "argument {0}: {1}";
 	[help("Error message for a missing argument"), id(-1)]
 	NEEDS_PARAM = "argument {0}: expected one argument";
 	[help("Error message for unneeded value"), id(-1)]
