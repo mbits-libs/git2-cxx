@@ -45,4 +45,10 @@ namespace cov::app {
 		git::config cfg_;
 		std::span<builtin_tool const> builtins_;
 	};
+
+	namespace platform {
+		int run_tool(std::filesystem::path const& tooldir,
+		             std::string_view tool,
+		             args::arglist args);
+	}  // namespace platform
 }  // namespace cov::app

@@ -1,5 +1,3 @@
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/dirs.hh.in ${CMAKE_CURRENT_BINARY_DIR}/include/cov/app/dirs.hh @ONLY)
-
 set(SOURCES
   src/root_command.cc
   src/split_command.cc
@@ -17,9 +15,6 @@ elseif(WIN32)
 	list(APPEND SOURCES src/win32.cc)
 endif()
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})
-source_group(TREE ${CMAKE_CURRENT_BINARY_DIR} FILES ${CMAKE_CURRENT_BINARY_DIR}/include/cov/app/dirs.hh)
-
-list(APPEND SOURCES ${CMAKE_CURRENT_BINARY_DIR}/include/cov/app/dirs.hh)
 
 add_library(cov-rt STATIC ${SOURCES})
 target_compile_options(cov-rt PRIVATE ${ADDITIONAL_WALL_FLAGS})

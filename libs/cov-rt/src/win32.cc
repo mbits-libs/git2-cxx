@@ -13,9 +13,9 @@
 
 namespace cov::app::platform {
 	namespace {
-		using namespace std::literals;
-
-		void append(std::wstring& ws, wchar_t next) { ws.push_back(next); }
+		void append(std::wstring& ws, wchar_t next) {
+			ws.push_back(next);
+		}
 
 		template <size_t Length>
 		void append(std::wstring& ws, wchar_t const (&next)[Length]) {
@@ -136,13 +136,6 @@ namespace cov::app::platform {
 		}
 
 	}  // namespace
-
-	std::filesystem::path exec_path() {
-		wchar_t modpath[2048];
-		GetModuleFileNameW(nullptr, modpath,
-		                   sizeof(modpath) / sizeof(modpath[0]));
-		return modpath;
-	}
 
 	int run_tool(std::filesystem::path const& tooldir,
 	             std::string_view tool,

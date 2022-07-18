@@ -4,6 +4,7 @@
 #include <fmt/format.h>
 #include <cov/app/root_command.hh>
 #include <cov/app/tr.hh>
+#include <cov/app/dirs.hh>
 #include <cov/version.hh>
 
 using namespace std::literals;
@@ -88,7 +89,7 @@ namespace cov::app::root {
 		void change_dir(args::parser& p, std::string const& dirname_str) {
 			std::error_code ec;
 			std::filesystem::current_path(make_path(dirname_str), ec);
-			if (ec) p.error(dirname_str + ": " + ec.message());
+			if (ec) p.error(dirname_str + ": " + platform::con_to_u8(ec));
 		}
 
 		[[noreturn]] void list_commands(
@@ -105,48 +106,34 @@ namespace cov::app::root {
 
 	parser::parser(args::args_view const& arguments,
 	               std::span<builtin_tool const> const& builtins,
-	               std::filesystem::path const& locale_dir,
-	               std::span<std::string const> const& langs)
-	    : parser_{setup_parser(arguments, locale_dir, langs)}
-	    , builtins_{builtins} {}
-
-	::args::parser parser::setup_parser(
-	    ::args::args_view const& arguments,
-	    std::filesystem::path const& locale_dir,
-	    std::span<std::string const> const& langs) {
+	               str::translator_open_info const& langs)
+	    : base_parser<covlng>{langs, arguments}, builtins_{builtins} {
 		using args = str::args::lng;
 
 		auto const wrap_list_commands = [this](std::string_view groups) {
 			return list_commands(this->builtins_, groups);
 		};
 
-		tr_.setup_path_manager(locale_dir);
-		tr_.open_first_of(langs);
+		parser_.usage(tr_(covlng::USAGE));
 
-		::args::parser parser{{}, arguments, tr_.args()};
-
-		parser.usage(tr_(covlng::USAGE));
-
-		parser.provide_help(false);
-		parser.custom(show_help, "h", "help")
+		parser_.provide_help(false);
+		parser_.custom(show_help, "h", "help")
 		    .help(tr_(args::HELP_DESCRIPTION))
 		    .opt();
 
-		parser.custom(show_version, "v", "version")
+		parser_.custom(show_version, "v", "version")
 		    .help(tr_(covlng::VERSION_DESCRIPTION))
 		    .opt();
 
-		parser.custom(change_dir, "C")
+		parser_.custom(change_dir, "C")
 		    .meta(tr_(args::DIR_META))
 		    .help(tr_(covlng::CWD_DESCRIPTION))
 		    .opt();
 
-		parser.custom(wrap_list_commands, "list-cmds")
+		parser_.custom(wrap_list_commands, "list-cmds")
 		    .meta(tr_(covlng::SPECS_MULTI_META))
 		    .help(tr_(covlng::LIST_CMDS_DESCRIPTION))
 		    .opt();
-
-		return parser;
 	}  // GCOV_EXCL_LINE[GCC]
 
 	args::args_view parser::parse() {
@@ -171,8 +158,7 @@ namespace cov::app::root {
 		parser_.short_help(stderr);
 
 		auto prn = args::printer{stderr};
-		auto msg = fmt::format(
-		    fmt::runtime(tr_(covlng::ERROR_TOOL_NOT_RECOGNIZED)), tool);
+		auto msg = tr_.format(covlng::ERROR_TOOL_NOT_RECOGNIZED, tool);
 		prn.format_paragraph(fmt::format("{}: {}", parser_.program(), msg), 0);
 		prn.format_list(commands);
 	}
