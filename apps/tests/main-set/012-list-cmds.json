@@ -1,8 +1,4 @@
 {
-    "working-directory": "$DATA",
-    "mkdirs": [
-        "$DATA/recurse/.covdata/objects/coverage"
-    ],
     "env": {
         "HOME": null,
         "XDG_CONFIG_HOME": null,
@@ -25,5 +21,15 @@
             "third\n"
         ],
         ""
+    ],
+    "prepare": [
+        [
+            "cd",
+            "$DATA"
+        ],
+        [
+            "mkdirs",
+            "$DATA/recurse/.covdata/objects/coverage"
+        ]
     ]
 }

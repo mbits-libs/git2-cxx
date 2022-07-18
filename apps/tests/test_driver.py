@@ -1,15 +1,16 @@
 # Copyright (c) 2022 Marcin Zdun
 # This code is licensed under MIT license (see LICENSE for details)
 
-from pprint import pprint
 import argparse
 import json
 import os
 import re
 import shlex
+import shutil
+import stat
 import subprocess
 import sys
-import shutil
+import tempfile
 from difflib import unified_diff
 
 if os.name == 'nt':
@@ -28,25 +29,53 @@ parser.add_argument("--install-with", metavar="TOOL",
                     type=lambda s: s.split(';'), action='append', default=[])
 args = parser.parse_args()
 args.install_with = [item for groups in args.install_with for item in groups]
-args.data_dir = os.path.abspath(args.data_dir)
+args.data_dir = os.path.abspath(args.data_dir).replace('\\', '/')
+args.data_dir_alt = None
 
 target = args.target
 target_name = os.path.basename(target)
 version = args.version
 
+TEMP = tempfile.gettempdir().replace('\\', '/')
+TEMP_ALT = None
+
+if os.sep != '/':
+    TEMP_ALT = TEMP.replace('/', os.sep)
+    args.data_dir_alt = args.data_dir.replace('/', os.sep)
+print(TEMP_ALT, TEMP)
+
 
 def expand(input):
     return input\
+        .replace('$TMP', TEMP) \
         .replace('$DATA', args.data_dir) \
         .replace('$VERSION', args.version)
+
+
+def alt_sep(input, value, var):
+    split = input.split(value)
+    first = split[0]
+    split = split[1:]
+    for index in range(len(split)):
+        m = re.match(r'(\S+)(\s*.*)', split[index])
+        g2 = m.group(2)
+        if g2 is None:
+            g2 = ''
+        split[index] = '{}{}'.format(m.group(1).replace(os.sep, '/'), g2)
+    return var.join([first, *split])
 
 
 def fix(input, patches):
     if os.name == 'nt':
         input = input.replace(b'\r\n', b'\n')
     input = input.decode('UTF-8') \
+        .replace(TEMP, '$TEMP') \
         .replace(args.data_dir, '$DATA') \
         .replace(args.version, '$VERSION')
+
+    if TEMP_ALT is not None:
+        input = alt_sep(input, TEMP_ALT, '$TEMP')
+        input = alt_sep(input, args.data_dir_alt, '$DATA')
 
     if not len(patches):
         return input
@@ -71,6 +100,49 @@ def diff(expected, actual):
     expected = last_enter(expected).splitlines(keepends=True)
     actual = last_enter(actual).splitlines(keepends=True)
     return ''.join(list(unified_diff(expected, actual))[2:])
+
+
+def touch(args):
+    with open(args[0], "wb", encoding="utf-8") as f:
+        pass
+
+
+def git(args):
+    subprocess.run(["git", *args], shell=False)
+
+
+def cov(aditional):
+    subprocess.run([args.target, *aditional], shell=False)
+
+file_cache = {}
+rw_mask = stat.S_IWRITE | stat.S_IWGRP | stat.S_IWOTH
+ro_mask = 0o777 ^ rw_mask
+
+def make_RO(args):
+    print(f'{args}...')
+    mode = os.stat(args[0]).st_mode
+    print('{:03o} -> {:03o}'.format(mode, mode & ro_mask))
+    file_cache[args[0]] = mode
+    os.chmod(args[0], mode & ro_mask)
+    print('{:03o} -> {:03o}'.format(mode, os.stat(args[0]).st_mode))
+
+def make_RW(args):
+    try:
+        mode = file_cache[args[0]]
+    except KeyError:
+        mode = os.stat(args[0]).st_mode | rw_mask
+    os.chmod(args[0], mode)
+
+op_types = {
+    'mkdirs': (1, lambda args: os.makedirs(expand(args[0]), exist_ok=True)),
+    'rm': (1, lambda args: shutil.rmtree(expand(args[0]))),
+    'ro': (1, make_RO),
+    'rw': (1, make_RW),
+    'touch': (1, touch),
+    'cd': (1, lambda args: os.chdir(expand(args[0]))),
+    'git': (0, git),
+    'cov': (0, cov),
+}
 
 
 class Test:
@@ -112,14 +184,14 @@ class Test:
                 pass
 
         try:
-            self.working_directory = data['working-directory']
+            self.prepare = data['prepare']
         except KeyError:
-            self.working_directory = None
+            self.prepare = []
 
         try:
-            self.mkdirs = data['mkdirs']
+            self.cleanup = data['cleanup']
         except KeyError:
-            self.mkdirs = []
+            self.cleanup = []
 
         try:
             self.lang = data['lang']
@@ -131,15 +203,37 @@ class Test:
         except KeyError:
             self.env = []
 
-    def run(self):
-        current_directory = None
-        if self.working_directory is not None:
-            working_directory = expand(self.working_directory)
-            current_directory = os.getcwd()
-            os.chdir(working_directory)
+    @staticmethod    
+    def run_cmds(ops):
+        for op in ops:
+            orig = op
+            if isinstance(op, str):
+                op = shlex.split(op)
+            is_safe = False
+            try:
+                name = op[0]
+                if name[:5] == 'safe-':
+                    name = name[5:]
+                    is_safe = True
+                min_args, cb = op_types[name]
+                op = op[1:]
+                if len(op) < min_args:
+                    return None
+                cb([expand(o) for o in op])
+            except Exception as ex:
+                print('Problem while handling', orig)
+                print(ex)
+                if is_safe:
+                    continue
+                return None
+        return True
 
-        for dirname in self.mkdirs:
-            os.makedirs(expand(dirname), exist_ok=True)
+    def run(self):
+        current_directory = os.getcwd()
+
+        prep = Test.run_cmds(self.prepare)
+        if prep is None:
+            return None
 
         expanded = [expand(arg) for arg in self.args]
 
@@ -155,8 +249,11 @@ class Test:
         proc = subprocess.run([target, *expanded],
                               capture_output=True, env=env)
 
-        if current_directory is not None:
-            os.chdir(current_directory)
+        clean = Test.run_cmds(self.cleanup)
+        if clean is None:
+            return None
+
+        os.chdir(current_directory)
 
         return [proc.returncode,
                 fix(proc.stdout, self.patches),
@@ -274,32 +371,36 @@ for filename in sorted(testsuite):
     if not test.ok:
         continue
 
-    print(f"[{counter:>{digits}}/{len(testsuite)}] {test.name}")
+    print(f"\033[2;49;92m[{counter:>{digits}}/{len(testsuite)}]\033[m \033[2;49;30m{test.name}\033[m")
 
     actual = test.run()
+    if actual is None:
+        print(f"\033[2;49;92m[{counter:>{digits}}/{len(testsuite)}]\033[m \033[2;49;30m{test.name}\033[m \033[0;49;34mSKIPPED\033[m")
+        continue
+
     if test.expected is None:
         test.data['expected'] = [actual[0], *
                                  [to_lines(stream) for stream in actual[1:]]]
         with open(filename, "w") as f:
             json.dump(test.data, f, indent=4)
             print(file=f)
-        print(f"[{counter:>{digits}}/{len(testsuite)}] {test.name} saved")
+        print(f"\033[2;49;92m[{counter:>{digits}}/{len(testsuite)}]\033[m \033[2;49;30m{test.name}\033[m \033[0;49;34msaved\033[m")
         continue
 
     clipped = test.clip(actual)
 
     if isinstance(clipped, str):
         print(
-            f"[{counter:>{digits}}/{len(testsuite)}] {test.name} **FAILED** (unknown check '{clipped}')")
+            f"\033[2;49;92m[{counter:>{digits}}/{len(testsuite)}]\033[m \033[2;49;30m{test.name}\033[m \033[0;49;91mFAILED (unknown check '{clipped}')\033[m")
         had_errors = True
         continue
 
     if actual == test.expected or clipped == test.expected:
-        print(f"[{counter:>{digits}}/{len(testsuite)}] {test.name} PASSED")
+        print(f"\033[2;49;92m[{counter:>{digits}}/{len(testsuite)}]\033[m \033[2;49;30m{test.name}\033[m \033[2;49;92mPASSED\033[m")
         continue
 
     test.report(clipped)
-    print(f"[{counter:>{digits}}/{len(testsuite)}] {test.name} **FAILED**")
+    print(f"\033[2;49;92m[{counter:>{digits}}/{len(testsuite)}]\033[m \033[2;49;30m{test.name}\033[m \033[0;49;91mFAILED\033[m")
     had_errors = True
 
 

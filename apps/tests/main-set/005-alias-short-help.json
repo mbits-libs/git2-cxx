@@ -1,8 +1,4 @@
 {
-    "working-directory": "$DATA",
-    "mkdirs": [
-        "$DATA/recurse/.covdata/objects/coverage"
-    ],
     "args": [
         "-C",
         "recurse",
@@ -13,5 +9,15 @@
         0,
         "",
         "'second' is aliased to 'third -B'"
+    ],
+    "prepare": [
+        [
+            "cd",
+            "$DATA"
+        ],
+        [
+            "mkdirs",
+            "$DATA/recurse/.covdata/objects/coverage"
+        ]
     ]
 }
