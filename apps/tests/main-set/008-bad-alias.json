@@ -1,8 +1,4 @@
 {
-    "working-directory": "$DATA",
-    "mkdirs": [
-        "$DATA/bad-recurse/.covdata/objects/coverage"
-    ],
     "args": [
         "-C",
         "bad-recurse",
@@ -19,6 +15,16 @@
             "usage: cov [-h] [-C <dir>] <command> [<args>]",
             "cov: \"fourth\" is not a cov command",
             "\n"
+        ]
+    ],
+    "prepare": [
+        [
+            "cd",
+            "$DATA"
+        ],
+        [
+            "mkdirs",
+            "$DATA/bad-recurse/.covdata/objects/coverage"
         ]
     ]
 }

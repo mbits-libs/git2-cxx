@@ -1,8 +1,4 @@
 {
-    "working-directory": "$DATA",
-    "mkdirs": [
-        "$DATA/recurse/.covdata/objects/coverage"
-    ],
     "args": [
         "-C",
         "recurse",
@@ -12,5 +8,15 @@
         0,
         "cov-echo name B\n",
         ""
+    ],
+    "prepare": [
+        [
+            "cd",
+            "$DATA"
+        ],
+        [
+            "mkdirs",
+            "$DATA/recurse/.covdata/objects/coverage"
+        ]
     ]
 }
