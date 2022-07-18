@@ -1,0 +1,34 @@
+{
+    "lang": "pl",
+    "args": [
+        "definitely-not-a-tool"
+    ],
+    "expected": [
+        1,
+        "",
+        [
+            "u\u017cycie: cov [-h] [-C <katalog>] <polecenie> [<argumenty>]",
+            "cov: \"definitely-not-a-tool\" nie jest poleceniem cov",
+            "",
+            "typowe polecenia:",
+            " init   tworzy nowe repozytorium cov",
+            " config pokazuje i/lub ustawia r\u00f3\u017cne ustawienia",
+            " module definiuje grupy plik\u00f3w",
+            " report do\u0142\u0105cza raport do repozytorium",
+            " remove usuwa okre\u015blony raport z repozytorium",
+            " log    drukuje list\u0119 raport\u00f3w",
+            " show   pokazuje konkretny raport",
+            " serve  uruchamia lokalny serwer WWW raport\u00f3w\n"
+        ]
+    ],
+    "prepare": [
+        [
+            "cd",
+            "$DATA"
+        ],
+        [
+            "mkdirs",
+            "$DATA/bad-recurse/.covdata/objects/coverage"
+        ]
+    ]
+}

@@ -21,10 +21,10 @@ namespace git {
 	struct basic_repository : Holder {
 		using Holder::Holder;
 
-		std::optional<std::string_view> workdir() const {
+		std::optional<std::string_view> workdir() const noexcept {
 			return safe(git_repository_workdir(this->get()));
 		}
-		std::string_view commondir() const {
+		std::string_view commondir() const noexcept {
 			return git_repository_commondir(this->get());
 		}
 

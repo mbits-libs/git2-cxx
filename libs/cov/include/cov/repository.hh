@@ -105,6 +105,10 @@ namespace cov {
 			return commondir_;
 		}
 
+		std::string_view git_commondir() const noexcept {
+			return git_.repo().commondir();
+		}
+
 		git::config const& config() const noexcept { return cfg_; }
 		ref_ptr<references> const& refs() const noexcept { return refs_; }
 		ref_ptr<object> dwim(std::string_view) const;

@@ -17,7 +17,7 @@
             " init                            creates a new cov repo",
             " config                          shows and/or sets various settings",
             " module                          defines file groups",
-            " add                             appends a report to repo",
+            " report                          appends a report to repo",
             " remove                          removes a particular report from repo",
             " log                             prints a list of reports",
             " show                            shows a specific report",

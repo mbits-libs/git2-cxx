@@ -3,9 +3,10 @@
 
 #pragma once
 
+#include <args/parser.hpp>
+#include <cov/app/dirs.hh>
 #include <cov/app/strings/args.hh>
 #include <cov/app/tr.hh>
-#include <args/parser.hpp>
 
 namespace cov::app {
 	template <typename... Enum>
@@ -26,7 +27,16 @@ namespace cov::app {
 
 		[[noreturn]] void error(std::string const& msg) const {
 			parser_.error(msg);
+		}  // GCOV_EXCL_LINE[WIN32]
+
+		// GCOV_EXCL_START -- linked with CANNOT_INITIALIZE in init
+		[[noreturn]] void error(std::error_code const& ec) {
+			fmt::print("{}: {} error {}: {}\n", parser_.program(),
+			           ec.category().name(), ec.value(),
+			           platform::con_to_u8(ec));
+			std::exit(2);
 		}
+		// GCOV_EXCL_STOP
 
 	protected:
 		str::args_translator<Enum...> tr_;

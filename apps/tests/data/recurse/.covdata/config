@@ -1,7 +1,7 @@
 [alias]
     first = second -C
     second = third -B
-    third = init -A
+    third = init --help -A
 
 [alias]
 	name = echo name A

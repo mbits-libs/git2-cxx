@@ -1,0 +1,23 @@
+{
+    "lang": "pl",
+    "args": [
+        "-C",
+        "bad-recurse",
+        "start-bad"
+    ],
+    "expected": [
+        22,
+        "",
+        "pusty alias dla 'finish-worse'"
+    ],
+    "prepare": [
+        [
+            "cd",
+            "$DATA"
+        ],
+        [
+            "mkdirs",
+            "$DATA/bad-recurse/.covdata/objects/coverage"
+        ]
+    ]
+}

@@ -2,9 +2,9 @@
 // This code is licensed under MIT license (see LICENSE for details)
 
 #include <fmt/format.h>
+#include <cov/app/dirs.hh>
 #include <cov/app/root_command.hh>
 #include <cov/app/tr.hh>
-#include <cov/app/dirs.hh>
 #include <cov/version.hh>
 
 using namespace std::literals;
@@ -25,7 +25,7 @@ namespace cov::app::root {
 		    {"init"sv, covlng::HELP_DESCRIPTION_INIT},
 		    {"config"sv, covlng::HELP_DESCRIPTION_CONFIG},
 		    {"module"sv, covlng::HELP_DESCRIPTION_MODULE},
-		    {"add"sv, covlng::HELP_DESCRIPTION_ADD},
+		    {"report"sv, covlng::HELP_DESCRIPTION_ADD},
 		    {"remove"sv, covlng::HELP_DESCRIPTION_REMOVE},
 		    {"log"sv, covlng::HELP_DESCRIPTION_LOG},
 		    {"show"sv, covlng::HELP_DESCRIPTION_SHOW},
