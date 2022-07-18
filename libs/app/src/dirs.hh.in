@@ -24,6 +24,10 @@ namespace cov::app {
 
 	namespace platform {
 		std::filesystem::path exec_path();
+#ifdef _WIN32
+		std::string con_to_u8(std::error_code const& ec, unsigned int testable = /* CP_ACP */ 0 );
+#else
 		std::string con_to_u8(std::error_code const& ec);
+#endif
 	}
 }  // namespace cov::app

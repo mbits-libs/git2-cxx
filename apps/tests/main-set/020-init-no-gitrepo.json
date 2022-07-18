@@ -1,0 +1,38 @@
+{
+    "args": [
+        "init",
+        "--git-dir",
+        "$TMP/init-independent/repo.git",
+        "$TMP/init-independent/repo.covdata"
+    ],
+    "expected": [
+        2,
+        "",
+        [
+            "usage: cov init [-h] [--git-dir <dir>] [--force] [directory]",
+            "cov init: error: not git repo: $TEMP/init-independent/repo.git\n"
+        ]
+    ],
+    "prepare": [
+        [
+            "safe-rm",
+            "$TMP/init-independent"
+        ],
+        [
+            "mkdirs",
+            "$TMP/init-independent/repo.git"
+        ],
+        [
+            "mkdirs",
+            "$TMP/init-independent/repo.covdata"
+        ],
+        [
+            "cd",
+            "$TMP/init-independent/repo.git"
+        ],
+        [
+            "cd",
+            "$DATA"
+        ]
+    ]
+}

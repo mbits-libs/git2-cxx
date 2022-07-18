@@ -1,0 +1,30 @@
+{
+    "args": [
+        "init"
+    ],
+    "expected": [
+        1,
+        "Cov repository already exists in $TEMP/init-no-force/.git/.covdata\n",
+        ""
+    ],
+    "prepare": [
+        [
+            "safe-rm",
+            "$TMP/init-no-force"
+        ],
+        [
+            "mkdirs",
+            "$TMP/init-no-force/subdir"
+        ],
+        [
+            "cd",
+            "$TMP/init-no-force"
+        ],
+        "git init",
+        "cov init",
+        [
+            "cd",
+            "$TMP/init-no-force/subdir"
+        ]
+    ]
+}

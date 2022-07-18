@@ -7,7 +7,7 @@
     ],
     "expected": [
         0,
-        "Hello, \"init -A -B -C -D\"!\n",
+        "usage: cov init [-h] [--git-dir <dir>] [--force] [directory]\n\npositional arguments:\n directory       sets the directory to put the repository in; defaults to current directory\n\noptional arguments:\n -h, --help      shows this help message and exits\n --git-dir <dir> points to connected Git repository; defaults to current repo\n --force         will re-init the repository with a fresh database\n",
         ""
     ],
     "prepare": [

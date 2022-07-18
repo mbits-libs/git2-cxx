@@ -10,6 +10,11 @@
 #include <git2/repository.hh>
 #include "path-utils.hh"
 
+#ifdef _WIN32
+#define NOMINMAX
+#include <Windows.h>
+#endif
+
 namespace cov {
 	namespace {
 		struct init_transaction {
@@ -87,6 +92,17 @@ namespace cov {
 		}
 
 		// TODO: init_hilites
+
+#ifdef _WIN32
+		if (auto const last = base_dir.filename();
+		    !last.empty() && *last.c_str() == '.') {
+			auto const prev = GetFileAttributesW(base_dir.c_str());
+			if (prev != INVALID_FILE_ATTRIBUTES) {
+				SetFileAttributesW(base_dir.c_str(),
+				                   prev | FILE_ATTRIBUTE_HIDDEN);
+			}
+		}
+#endif
 
 		ec.clear();
 		tr.commit();

@@ -33,6 +33,12 @@ set_target_properties(cov PROPERTIES FOLDER apps)
 
 ########################################################
 
+# add_cov_ext(serve)
+
+print_cov_ext()
+
+########################################################
+
 add_custom_target(copy-langs ALL)
 add_dependencies(cov copy-langs)
 set_target_properties(copy-langs PROPERTIES FOLDER apps/strings)
@@ -76,6 +82,17 @@ if (COV_TESTING)
             --install-with "$<TARGET_FILE:cov-echo>"
             )
 
+    add_test(
+        NAME cov-exec-pl
+        COMMAND "${Python3_EXECUTABLE}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_driver.py"
+            --target "$<TARGET_FILE:cov>"
+            --tests "${CMAKE_CURRENT_SOURCE_DIR}/tests/messages-pl"
+            --data-dir "${CMAKE_CURRENT_SOURCE_DIR}/tests/data"
+            --version "${PROJECT_VERSION}${PROJECT_VERSION_STABILITY}${PROJECT_VERSION_BUILD_META}"
+            --install "${CMAKE_CURRENT_SOURCE_DIR}/tests/copy"
+            --install-with "$<TARGET_FILE:cov-echo>"
+            )
 
   if (CMAKE_GENERATOR MATCHES "Visual Studio" AND TARGET cov_coveralls_test)
     add_dependencies(cov_coveralls_test

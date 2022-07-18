@@ -19,15 +19,14 @@ namespace cov::app::platform {
 		return modpath;
 	}
 
-	std::string con_to_u8(std::error_code const& ec) {
+	std::string con_to_u8(std::error_code const& ec, unsigned int cp) {
 		auto const msg = ec.message();
-		auto const CP_OEM = CP_ACP;
 
 		auto const oem_length = static_cast<int>(msg.size());
 		auto const wide_size =
-		    MultiByteToWideChar(CP_OEM, 0, msg.data(), oem_length, nullptr, 0);
+		    MultiByteToWideChar(cp, 0, msg.data(), oem_length, nullptr, 0);
 		std::unique_ptr<wchar_t[]> wide{new wchar_t[wide_size]};
-		MultiByteToWideChar(CP_OEM, 0, msg.data(), oem_length, wide.get(),
+		MultiByteToWideChar(cp, 0, msg.data(), oem_length, wide.get(),
 		                    wide_size);
 		auto u8_size = WideCharToMultiByte(CP_UTF8, 0, wide.get(), wide_size,
 		                                   nullptr, 0, nullptr, nullptr);

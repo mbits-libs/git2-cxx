@@ -25,20 +25,21 @@
   - [x] lngs baseline _(0.9.0-beta)_
     - [x] `wmain` and spawn w/UTF8 on Windows
   - [ ] `cov init` _(0.10.0-beta)_
+    - [x] SetFileAttributes FILE_ATTRIBUTE_HIDDEN
   - [ ] `cov config` _(each is a M⬆️P)_
   - [ ] `cov module`
     - _[module "libraries"]_\
     _name=..._\
     _dir=..._\
     _dir=..._
-  - [ ] `cov add`
+  - [ ] `cov report`
     - [ ] coveralls _(separate M⬆️P)_
     - [ ] cobertura _(separate M⬆️P)_
   - [ ] `cov log`
   - [ ] `cov show` _(only one M⬆️P)_
     - [ ] Report / component / directory view
     - [ ] File view
-  - [ ] `cov add --amend`
+  - [ ] `cov report --amend`
   - [ ] `cov tag` / `branch` / `checkout` _(only one M⬆️P)_
   - [ ] `cov remove`
   - [ ] Support for `less` _(optional, M⬆️P)_

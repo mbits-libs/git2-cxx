@@ -1,13 +1,19 @@
 {
     "args": [
-        "definitely-not-a-tool"
+        "-C",
+        "bad-recurse",
+        "first",
+        "-D"
     ],
+    "check": {
+        "stderr": "begin"
+    },
     "expected": [
         1,
         "",
         [
             "usage: cov [-h] [-C <dir>] <command> [<args>]",
-            "cov: \"definitely-not-a-tool\" is not a cov command",
+            "cov: \"fourth\" is not a cov command",
             "",
             "common commands:",
             " init   creates a new cov repo",

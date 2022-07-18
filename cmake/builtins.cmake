@@ -47,8 +47,13 @@ function(add_cov_tool TARGET)
   endif()
 endfunction()
 
-function(setup_cov_core COV_TOOL)
-	set_target_properties(cov-${COV_TOOL} PROPERTIES FOLDER apps/core)
+set(CORE_EXT)
+
+function(setup_cov_ext COV_TOOL)
+  set(__CORE ${CORE_EXT} ${COV_TOOL})
+  set(CORE_EXT ${__CORE} PARENT_SCOPE)
+
+  set_target_properties(cov-${COV_TOOL} PROPERTIES FOLDER apps/core)
   target_link_options(cov-${COV_TOOL} PRIVATE ${ADDITIONAL_LINK_FLAGS})
 	target_compile_options(cov-${COV_TOOL} PRIVATE ${ADDITIONAL_WALL_FLAGS})
 
@@ -63,13 +68,19 @@ function(setup_cov_core COV_TOOL)
 	endforeach()
 endfunction()
 
-function(add_cov_external_tool COV_TOOL)
+macro(add_cov_ext COV_TOOL)
   add_cov_tool(cov-${COV_TOOL} cov-${COV_TOOL}.cc)
   source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES cov-${COV_TOOL}.cc)
 
-	setup_cov_core(${COV_TOOL})
+	setup_cov_ext(${COV_TOOL})
 	install(TARGETS cov-${COV_TOOL}
 		RUNTIME DESTINATION ${CORE_DIR}
         COMPONENT tools
     )
+endmacro()
+
+function(print_cov_ext)
+  set(__CORE ${CORE_EXT})
+  string(REPLACE ";" ", " CORE_LIST "${CORE_EXT}")
+  message(STATUS "Core extensions: ${CORE_LIST}")
 endfunction()
