@@ -15,7 +15,6 @@ extern "C" {
 
 namespace cov::app::platform {
 	namespace {
-		using namespace std::literals;
 		[[noreturn]] void spawn(std::filesystem::path const& tooldir,
 		                        std::string_view tool,
 		                        args::arglist args) {
@@ -44,29 +43,15 @@ namespace cov::app::platform {
 			// pass error result from execv:
 			_exit(-errno);
 		}  // GCOV_EXCL_STOP
-	}      // namespace
 
-	std::filesystem::path exec_path() {
-		std::error_code ec;
-		static constexpr std::string_view self_links[] = {
-		    "/proc/self/exe"sv,
-		    "/proc/curproc/file"sv,
-		    "/proc/curproc/exe"sv,
-		    "/proc/self/path/a.out"sv,
-		};
-		for (auto path : self_links) {
-			auto link = std::filesystem::read_symlink(path, ec);
-			if (!ec) return link;
+		static pid_t pid = -1;
+
+		// GCOV_EXCL_START[POSIX]
+		void forward_signal(int signo) {
+			kill(pid, signo);
 		}
-		[[unlikely]];  // GCOV_EXCL_LINE[POSIX]
-		return {};     // GCOV_EXCL_LINE[POSIX]
-	}
-
-	static pid_t pid = -1;
-
-	// GCOV_EXCL_START[POSIX]
-	void forward_signal(int signo) { kill(pid, signo); }
-	// GCOV_EXCL_STOP
+		// GCOV_EXCL_STOP
+	}  // namespace
 
 	int run_tool(std::filesystem::path const& tooldir,
 	             std::string_view tool,

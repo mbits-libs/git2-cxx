@@ -35,7 +35,12 @@ namespace cov::app {
 		                    std::span<builtin_tool const> const& builtins) {
 			for (auto const& builtin : builtins) {
 				if (builtin.name != tool) continue;
-				return builtin.tool(tool, args);
+				static constexpr auto tool_prefix = "cov "sv;
+				std::string name{};
+				name.reserve(tool_prefix.size() + tool.size());
+				name.append(tool_prefix);
+				name.append(tool);
+				return builtin.tool(name, args);
 			}  // GCOV_EXCL_LINE[WIN32]
 
 			return platform::run_tool(

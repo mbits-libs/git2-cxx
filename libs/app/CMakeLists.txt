@@ -1,8 +1,18 @@
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/dirs.hh.in ${CMAKE_CURRENT_BINARY_DIR}/include/cov/app/dirs.hh @ONLY)
+
 set(SOURCES
+  src/args.cc
   src/tr.cc
 
+  include/cov/app/args.hh
   include/cov/app/tr.hh
 )
+
+if (UNIX)
+	list(APPEND SOURCES src/posix.cc)
+elseif(WIN32)
+	list(APPEND SOURCES src/win32.cc)
+endif()
 
 string(REPLACE ";" ", " STRING_LIST "${STRINGS}")
 message(STATUS "Strings: ${STRING_LIST}")
@@ -10,6 +20,9 @@ string(REPLACE ";" ", " LANGUAGE_LIST "${LANGUAGES}")
 message(STATUS "Languages: ${LANGUAGE_LIST}")
 include(strings)
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})
+source_group(TREE ${CMAKE_CURRENT_BINARY_DIR} FILES ${CMAKE_CURRENT_BINARY_DIR}/include/cov/app/dirs.hh)
+
+list(APPEND SOURCES ${CMAKE_CURRENT_BINARY_DIR}/include/cov/app/dirs.hh)
 
 add_library(app STATIC ${SOURCES})
 target_compile_options(app PRIVATE ${ADDITIONAL_WALL_FLAGS})

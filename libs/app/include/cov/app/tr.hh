@@ -113,15 +113,43 @@ namespace cov::app::str {
 		}
 	};
 
+	struct translator_open_info {
+		std::filesystem::path locale_dir;
+		std::span<std::string const> langs;
+	};
+
 	template <typename Strings>
 	class translator : public Strings, private ::args::base_translator {
 	public:
+		explicit translator(str::translator_open_info const& langs) {
+			Strings::setup_path_manager(langs.locale_dir);
+			Strings::open_first_of(langs.langs);
+		}
+
 		using Strings::operator();
 		::args::base_translator const* args() const noexcept { return this; }
 
 		static translator const& from(
 		    ::args::base_translator const& args_transaltor) noexcept {
 			return static_cast<translator const&>(args_transaltor);
+		}
+
+		template <typename Enum, typename... Args>
+		std::string format(Enum id,
+		                   Args... args) const requires std::is_enum_v<Enum> {
+			return fmt::vformat((*this)(id), fmt::make_format_args(args...));
+		}
+
+		template <typename Enum, typename... Args>
+		void print(Enum id, Args... args) const requires std::is_enum_v<Enum> {
+			fmt::vprint((*this)(id), fmt::make_format_args(args...));
+		}
+
+		template <typename Enum, typename... Args>
+		void print(FILE* out,
+		           Enum id,
+		           Args... args) const requires std::is_enum_v<Enum> {
+			fmt::vprint(out, (*this)(id), fmt::make_format_args(args...));
 		}
 
 	private:

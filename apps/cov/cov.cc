@@ -9,9 +9,9 @@
 int tool(args::args_view const& arguments) {
 	using namespace cov::app;
 
-	auto const langs = ::lngs::system_locales();
-	root::parser parser{arguments, builtin::tools, tools::get_locale_dir(),
-	                    langs};
+	root::parser parser{arguments,
+	                    builtin::tools,
+	                    {tools::get_locale_dir(), ::lngs::system_locales()}};
 	auto [tool, args] = parser.parse();
 
 	std::string aliased_tool{};

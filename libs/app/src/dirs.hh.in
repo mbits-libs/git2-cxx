@@ -24,8 +24,6 @@ namespace cov::app {
 
 	namespace platform {
 		std::filesystem::path exec_path();
-		int run_tool(std::filesystem::path const& tooldir,
-					 std::string_view tool,
-					 args::arglist args);
+		std::string con_to_u8(std::error_code const& ec);
 	}
 }  // namespace cov::app
