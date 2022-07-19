@@ -1,0 +1,41 @@
+[
+    project("cov"),
+	namespace("cov::app::str::cov_config"),
+    version("0.11.0"),
+    serial(1)
+] strings {
+    [help("Name of a file options argument(s)"), id(-1)]
+    SCOPE_META = "<file-options>";
+    [help("Header for list of scopes"), id(-1)]
+    SCOPE_TITLE = "file options";
+    [help("Name for the situation, when neither local, global, nor system scopes were chosen."), id(-1)]
+    NO_SCOPE_META = "<no option>";
+    [help("Description for missing scope"), id(-1)]
+    NO_SCOPE_DESCRIPTION = "reads from all visible scopes at once, writes to .covdata/config";
+    [help("Description for the --local scope"), id(-1)]
+    SCOPE_LOCAL = "chooses .covdata/config";
+    [help("Description for the --global scope"), id(-1)]
+    SCOPE_GLOBAL = "chooses ~/.config/cov/config";
+    [help("Description for the --system scope"), id(-1)]
+    SCOPE_SYSTEM = "chooses $(prefix)/etc/covconfig";
+    [help("Description for the --file scope"), id(-1)]
+    SCOPE_FILE = "chooses given file";
+    [help("Description for the positional arguments (name and optional value)"), id(-1)]
+    NAME_VALUE = "when only name is given, reads its value; otherwise sets the new value";
+    [help("Description for the --add scope"), id(-1)]
+    ADD = "adds a new line to the option without altering any existing values";
+    [help("Description for the --get scope"), id(-1)]
+    GET = "prints the value matching the key name";
+    [help("Description for the --get-all scope"), id(-1)]
+    GET_ALL = "prints all values matching the key name";
+    [help("Description for the --unset scope"), id(-1)]
+    UNSET = "removes the value matching the key name if there is exactly one";
+    [help("Description for the --unset-all scope"), id(-1)]
+    UNSET_ALL = "removes all values matching the key name";
+    [help("Description for the --list scope"), id(-1)]
+    LIST_ENTRIES = "lists all variables in a config files";
+    [help("Error message for name/value pair, which seems to have a triplet"), id(-1)]
+    TOO_MANY_ARGUMENTS = "too many arguments";
+    [help("Error message for --add with only one option"), id(-1)]
+    ADD_VALUE_MISSING = "needs both <name> and <value>";
+}

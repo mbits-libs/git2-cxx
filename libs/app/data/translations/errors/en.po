@@ -1,0 +1,44 @@
+# Code coverage presented localy.
+# Copyright (C) 2022 midnightBITS
+# This file is distributed under the same license as the cov package.
+# Marcin Zdun <mzdun@midnightbits.com>, 2022.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: cov 0.11.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-07-21 06:33+0200\n"
+"PO-Revision-Date: 2022-07-21 06:35+0200\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.4.2\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. config_file.c:412, 442
+msgctxt "CONFIG_CANNOT_DELETE"
+msgid "could not find key '{}' to delete"
+msgstr "could not find key '{}' to delete"
+
+#. config.c:1456
+msgctxt "CONFIG_INVALID_NAME"
+msgid "invalid config item name '{}'"
+msgstr "invalid config item name '{}'"
+
+#. config_entries.c:191
+msgctxt "CONFIG_NON_UNIQUE_INCLUDED"
+msgid "entry is not unique due to being included"
+msgstr "entry is not unique due to being included"
+
+#. config_entries.c:186
+msgctxt "CONFIG_NON_UNIQUE_MULTIVAR"
+msgid "entry is not unique due to being a multivar"
+msgstr "entry is not unique due to being a multivar"
+
+#. Error message template; placeholder 0 will get the name of program, placeholder 1 the name of domain (such as "regex"), placeholder 2 an actual message
+msgctxt "DOMAIN_ERROR_MSG"
+msgid "{0}: {1} error: {2}"
+msgstr "{0}: {1} error: {2}"

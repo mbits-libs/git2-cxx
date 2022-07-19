@@ -16,34 +16,42 @@ namespace cov::app::str::args {
         DIR_META = 1004,
         /// <path> (Name of a file or directory argument)
         PATH_META = 1005,
+        /// <name> (Name of a, well, name argument, e.g. in cov config)
+        NAME_META = 1006,
+        /// <value> (Name of a value argument, e.g. in cov config)
+        VALUE_META = 1007,
         /// positional arguments (Header for list of positional arguments)
-        POSITIONALS = 1006,
+        POSITIONALS = 1008,
         /// optional arguments (Header for list of optional arguments)
-        OPTIONALS = 1007,
+        OPTIONALS = 1009,
         /// shows this help message and exits (Description for the -h/--help argument)
-        HELP_DESCRIPTION = 1008,
+        HELP_DESCRIPTION = 1010,
         /// unrecognized argument: {0} (Error message for an unrecognized argument; the placeholder will contain the name of the argument)
-        UNRECOGNIZED = 1009,
+        UNRECOGNIZED = 1011,
         /// argument {0}: {1} (Universal error message)
-        ARGUMENT_MSG = 1010,
+        ARGUMENT_MSG = 1012,
+        /// not allowed with argument {0} (Error message for conflicting arguments; used with ARGUMENT_MSG)
+        EXCLUSIVE = 1013,
         /// argument {0}: expected one argument (Error message for a missing argument)
-        NEEDS_PARAM = 1011,
+        NEEDS_PARAM = 1014,
         /// argument {0}: value was not expected (Error message for unneeded value)
-        NEEDS_NO_PARAM = 1012,
+        NEEDS_NO_PARAM = 1015,
         /// argument {0}: expected a number (Error message for a numeric argument, when parsing failed)
-        NEEDS_NUMBER = 1013,
+        NEEDS_NUMBER = 1016,
         /// argument {0}: number outside of expected bounds (Error message for a numeric argument, when parsing would get outside of representable bounds)
-        NEEDED_NUMBER_EXCEEDED = 1014,
+        NEEDED_NUMBER_EXCEEDED = 1017,
         /// argument {0}: value {1} is not recognized (Error message for a list of arguments, when parsing failed)
-        NEEDS_ENUM_UNKNOWN = 1015,
+        NEEDS_ENUM_UNKNOWN = 1018,
         /// known values for {0}: {1} (Help message presenting a list of possible values for a list-type argument)
-        NEEDS_ENUM_KNOWN_VALUES = 1016,
+        NEEDS_ENUM_KNOWN_VALUES = 1019,
         /// argument {0} is required (Error message for a missing required argument)
-        REQUIRED = 1017,
+        REQUIRED = 1020,
         /// {0}: error: {1} (Error message template; placeholder 0 will get the name of program, placeholder 1 an actual message)
-        ERROR_MSG = 1018,
+        ERROR_MSG = 1021,
         /// cannot open {0} (Needed file was not found)
-        FILE_NOT_FOUND = 1019,
+        FILE_NOT_FOUND = 1022,
+        /// Cannot find a Cov repository in {0} (Error message for tool called outside Cov repository)
+        CANNOT_FIND_COV = 1023,
     }; // enum class lng
 
     struct Resource {

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cov 0.11.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-16 17:09+0200\n"
-"PO-Revision-Date: 2022-07-16 22:25+0200\n"
+"POT-Creation-Date: 2022-07-19 17:34+0200\n"
+"PO-Revision-Date: 2022-07-19 17:36+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: en\n"
@@ -22,6 +22,11 @@ msgstr ""
 msgctxt "ARGUMENT_MSG"
 msgid "argument {0}: {1}"
 msgstr "argument {0}: {1}"
+
+#. Error message for tool called outside Cov repository
+msgctxt "CANNOT_FIND_COV"
+msgid "Cannot find a Cov repository in {0}"
+msgstr "Cannot find a Cov repository in {0}"
 
 #. Default name of an argument
 msgctxt "DEF_META"
@@ -38,6 +43,11 @@ msgctxt "ERROR_MSG"
 msgid "{0}: error: {1}"
 msgstr "{0}: error: {1}"
 
+#. Error message for conflicting arguments; used with ARGUMENT_MSG
+msgctxt "EXCLUSIVE"
+msgid "not allowed with argument {0}"
+msgstr "not allowed with argument {0}"
+
 #. Name of a file argument
 msgctxt "FILE_META"
 msgid "<file>"
@@ -52,6 +62,11 @@ msgstr "cannot open {0}"
 msgctxt "HELP_DESCRIPTION"
 msgid "shows this help message and exits"
 msgstr "shows this help message and exits"
+
+#. Name of a, well, name argument, e.g. in cov config
+msgctxt "NAME_META"
+msgid "<name>"
+msgstr "<name>"
 
 #. Error message for a numeric argument, when parsing would get outside of representable bounds
 msgctxt "NEEDED_NUMBER_EXCEEDED"
@@ -112,3 +127,8 @@ msgstr "unrecognized argument: {0}"
 msgctxt "USAGE"
 msgid "usage: "
 msgstr "usage: "
+
+#. Name of a value argument, e.g. in cov config
+msgctxt "VALUE_META"
+msgid "<value>"
+msgstr "<value>"
