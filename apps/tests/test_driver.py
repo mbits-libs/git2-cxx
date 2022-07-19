@@ -14,6 +14,9 @@ import tempfile
 from difflib import unified_diff
 
 if os.name == 'nt':
+    from ctypes import create_unicode_buffer, windll
+    GetLongPathName = windll.kernel32.GetLongPathNameW
+
     sys.stdout.reconfigure(encoding='utf-8')
 
 flds = ['Return code', 'Standard out', 'Standard err']
@@ -36,8 +39,14 @@ target = args.target
 target_name = os.path.basename(target)
 version = args.version
 
-TEMP = tempfile.gettempdir().replace('\\', '/')
+TEMP = os.path.abspath(tempfile.gettempdir().replace('\\', '/'))
 TEMP_ALT = None
+
+if os.name == 'nt':
+    BUFFER_SIZE = 2048
+    buffer = create_unicode_buffer(BUFFER_SIZE)
+    GetLongPathName(TEMP, buffer, BUFFER_SIZE)
+    TEMP = buffer.value
 
 if os.sep != '/':
     TEMP_ALT = TEMP.replace('/', os.sep)
@@ -68,10 +77,10 @@ def alt_sep(input, value, var):
 def fix(input, patches):
     if os.name == 'nt':
         input = input.replace(b'\r\n', b'\n')
-    input = input.decode('UTF-8') \
-        .replace(TEMP, '$TEMP') \
-        .replace(args.data_dir, '$DATA') \
-        .replace(args.version, '$VERSION')
+    input = input.decode('UTF-8')
+    input = alt_sep(input, TEMP, '$TEMP')
+    input = alt_sep(input, args.data_dir, '$DATA')
+    input = input.replace(args.version, '$VERSION')
 
     if TEMP_ALT is not None:
         input = alt_sep(input, TEMP_ALT, '$TEMP')
@@ -371,11 +380,11 @@ for filename in sorted(testsuite):
     if not test.ok:
         continue
 
-    print(f"\033[2;49;92m[{counter:>{digits}}/{len(testsuite)}]\033[m \033[2;49;30m{test.name}\033[m")
+    print(f"\033[2;49;92m[{counter:>{digits}}/{len(testsuite)}]\033[m \033[0;49;90m{test.name}\033[m")
 
     actual = test.run()
     if actual is None:
-        print(f"\033[2;49;92m[{counter:>{digits}}/{len(testsuite)}]\033[m \033[2;49;30m{test.name}\033[m \033[0;49;34mSKIPPED\033[m")
+        print(f"\033[2;49;92m[{counter:>{digits}}/{len(testsuite)}]\033[m \033[0;49;90m{test.name}\033[m \033[0;49;34mSKIPPED\033[m")
         continue
 
     if test.expected is None:
@@ -384,23 +393,23 @@ for filename in sorted(testsuite):
         with open(filename, "w") as f:
             json.dump(test.data, f, indent=4)
             print(file=f)
-        print(f"\033[2;49;92m[{counter:>{digits}}/{len(testsuite)}]\033[m \033[2;49;30m{test.name}\033[m \033[0;49;34msaved\033[m")
+        print(f"\033[2;49;92m[{counter:>{digits}}/{len(testsuite)}]\033[m \033[0;49;90m{test.name}\033[m \033[0;49;34msaved\033[m")
         continue
 
     clipped = test.clip(actual)
 
     if isinstance(clipped, str):
         print(
-            f"\033[2;49;92m[{counter:>{digits}}/{len(testsuite)}]\033[m \033[2;49;30m{test.name}\033[m \033[0;49;91mFAILED (unknown check '{clipped}')\033[m")
+            f"\033[2;49;92m[{counter:>{digits}}/{len(testsuite)}]\033[m \033[0;49;90m{test.name}\033[m \033[0;49;91mFAILED (unknown check '{clipped}')\033[m")
         had_errors = True
         continue
 
     if actual == test.expected or clipped == test.expected:
-        print(f"\033[2;49;92m[{counter:>{digits}}/{len(testsuite)}]\033[m \033[2;49;30m{test.name}\033[m \033[2;49;92mPASSED\033[m")
+        print(f"\033[2;49;92m[{counter:>{digits}}/{len(testsuite)}]\033[m \033[0;49;90m{test.name}\033[m \033[2;49;92mPASSED\033[m")
         continue
 
     test.report(clipped)
-    print(f"\033[2;49;92m[{counter:>{digits}}/{len(testsuite)}]\033[m \033[2;49;30m{test.name}\033[m \033[0;49;91mFAILED\033[m")
+    print(f"\033[2;49;92m[{counter:>{digits}}/{len(testsuite)}]\033[m \033[0;49;90m{test.name}\033[m \033[0;49;91mFAILED\033[m")
     had_errors = True
 
 
