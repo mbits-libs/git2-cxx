@@ -24,7 +24,7 @@
     - [x] aliases inside config
   - [x] lngs baseline _(0.9.0-beta)_
     - [x] `wmain` and spawn w/UTF8 on Windows
-  - [ ] `cov init` _(0.10.0-beta)_
+  - [x] `cov init` _(0.10.0-beta)_
     - [x] SetFileAttributes FILE_ATTRIBUTE_HIDDEN
   - [ ] `cov config` _(each is a M⬆️P)_
   - [ ] `cov module`
