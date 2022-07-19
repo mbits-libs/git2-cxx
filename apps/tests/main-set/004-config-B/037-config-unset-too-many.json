@@ -1,0 +1,11 @@
+{
+    "args": "config --file $TMP/config --unset group.key value",
+    "expected": [
+        2,
+        "",
+        [
+            "usage: cov config [-h] [<file>] [<name> [<value>] | --unset <name> | -l | --list]",
+            "cov config: error: argument --unset: too many arguments\n"
+        ]
+    ]
+}

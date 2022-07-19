@@ -1,0 +1,16 @@
+{
+    "args": "config --file $TMP/config --get-all group.key",
+    "expected": [
+        0,
+        [
+            "value 1",
+            "value 2",
+            "value 3\n"
+        ],
+        ""
+    ],
+    "prepare": [
+        "touch '$TMP/config' '[group]\nkey = value 1\nkey = value 2'",
+        "cov config --file $TMP/config --add group.key 'value 3'"
+    ]
+}

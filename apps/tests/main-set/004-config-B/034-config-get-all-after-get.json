@@ -1,0 +1,25 @@
+{
+    "env": {
+        "HOME": "$TMP/config-explicit/home",
+        "XDG_CONFIG_HOME": null,
+        "USERPROFILE": null
+    },
+    "args": "config --get key.name --get-all unimportant.item",
+    "expected": [
+        2,
+        "",
+        [
+            "usage: cov config [-h] [<file>] [<name> [<value>] | --unset <name> | -l | --list]",
+            "cov config: error: argument --get: not allowed with argument --get-all\n"
+        ]
+    ],
+    "prepare": [
+        "safe-rm $TMP/config-explicit",
+        "mkdirs $TMP/config-explicit/repo.git",
+        "mkdirs $TMP/config-explicit/repo.covdata",
+        "cd $TMP/config-explicit/repo.covdata",
+        "git init --bare $TMP/config-explicit/repo.git",
+        "cov init --git-dir $TMP/config-explicit/repo.git .",
+        "cd $TMP/config-explicit/repo.covdata"
+    ]
+}

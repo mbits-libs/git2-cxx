@@ -87,18 +87,20 @@ namespace cov {
 			return discover(current_dir, discover::within_fs, ec);
 		}
 
-		static repository init(std::filesystem::path const& base,
+		static repository init(std::filesystem::path const& sysroot,
+		                       std::filesystem::path const& base,
 		                       std::filesystem::path const& git_dir,
 		                       std::error_code& ec,
 		                       init_options const& options = {}) {
 			auto common = init_repository(base, git_dir, ec, options);
 			if (ec) return repository{};
-			return repository{common, ec};
+			return repository{sysroot, common, ec};
 		}
 
-		static repository open(std::filesystem::path const& common,
+		static repository open(std::filesystem::path const& sysroot,
+		                       std::filesystem::path const& common,
 		                       std::error_code& ec) {
-			return repository{common, ec};
+			return repository{sysroot, common, ec};
 		}
 
 		std::filesystem::path const& commondir() const noexcept {
@@ -142,7 +144,8 @@ namespace cov {
 
 	protected:
 		repository();
-		explicit repository(std::filesystem::path const& common,
+		explicit repository(std::filesystem::path const& sysroot,
+		                    std::filesystem::path const& common,
 		                    std::error_code&);
 
 		ref_ptr<object> lookup_object(git_oid const& id,

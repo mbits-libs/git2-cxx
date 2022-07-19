@@ -8,9 +8,9 @@
 
 namespace cov::app {
 	using initlng = str::cov_init::lng;
-	using IinitStrings = str::cov_init::Strings;
+	using InitStrings = str::cov_init::Strings;
 
 	template <>
 	struct lngs_traits<initlng>
-	    : base_lngs_traits<initlng, "cov_init", IinitStrings> {};
+	    : base_lngs_traits<initlng, "cov_init", InitStrings> {};
 }  // namespace cov::app

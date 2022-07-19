@@ -1,0 +1,16 @@
+{
+    "args": "config --local --list",
+    "expected": [
+        0,
+        "core.gitdir=../repo.git\n",
+        ""
+    ],
+    "prepare": [
+        "safe-rm $TMP/config-list-local",
+        "mkdirs $TMP/config-list-local/repo.git",
+        "mkdirs $TMP/config-list-local/repo.covdata",
+        "cd $TMP/config-list-local/repo.covdata",
+        "git init --bare $TMP/config-list-local/repo.git",
+        "cov init --git-dir $TMP/config-list-local/repo.git ."
+    ]
+}

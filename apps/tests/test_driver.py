@@ -30,8 +30,11 @@ parser.add_argument("--version", required=True, metavar="SEMVER")
 parser.add_argument("--install", metavar="DIR")
 parser.add_argument("--install-with", metavar="TOOL",
                     type=lambda s: s.split(';'), action='append', default=[])
+parser.add_argument("--run", metavar="TEST[,...]",
+                    type=lambda s: [int(x) for x in s.split(',')], action='append', default=[])
 args = parser.parse_args()
 args.install_with = [item for groups in args.install_with for item in groups]
+args.run = [item for groups in args.run for item in groups]
 args.data_dir = os.path.abspath(args.data_dir).replace('\\', '/')
 args.data_dir_alt = None
 
@@ -55,10 +58,11 @@ print(TEMP_ALT, TEMP)
 
 
 def expand(input):
-    return input\
-        .replace('$TMP', TEMP) \
-        .replace('$DATA', args.data_dir) \
+    return (
+        input.replace('$TMP', TEMP)
+        .replace('$DATA', args.data_dir)
         .replace('$VERSION', args.version)
+    )
 
 
 def alt_sep(input, value, var):
@@ -78,12 +82,12 @@ def fix(input, patches):
     if os.name == 'nt':
         input = input.replace(b'\r\n', b'\n')
     input = input.decode('UTF-8')
-    input = alt_sep(input, TEMP, '$TEMP')
+    input = alt_sep(input, TEMP, '$TMP')
     input = alt_sep(input, args.data_dir, '$DATA')
     input = input.replace(args.version, '$VERSION')
 
     if TEMP_ALT is not None:
-        input = alt_sep(input, TEMP_ALT, '$TEMP')
+        input = alt_sep(input, TEMP_ALT, '$TMP')
         input = alt_sep(input, args.data_dir_alt, '$DATA')
 
     if not len(patches):
@@ -112,8 +116,10 @@ def diff(expected, actual):
 
 
 def touch(args):
-    with open(args[0], "wb", encoding="utf-8") as f:
-        pass
+    os.makedirs(os.path.dirname(args[0]), exist_ok=True)
+    with open(args[0], "wb") as f:
+        if len(args) > 1:
+            f.write(args[1].encode('UTF-8'))
 
 
 def git(args):
@@ -123,9 +129,11 @@ def git(args):
 def cov(aditional):
     subprocess.run([args.target, *aditional], shell=False)
 
+
 file_cache = {}
 rw_mask = stat.S_IWRITE | stat.S_IWGRP | stat.S_IWOTH
 ro_mask = 0o777 ^ rw_mask
+
 
 def make_RO(args):
     print(f'{args}...')
@@ -135,12 +143,14 @@ def make_RO(args):
     os.chmod(args[0], mode & ro_mask)
     print('{:03o} -> {:03o}'.format(mode, os.stat(args[0]).st_mode))
 
+
 def make_RW(args):
     try:
         mode = file_cache[args[0]]
     except KeyError:
         mode = os.stat(args[0]).st_mode | rw_mask
     os.chmod(args[0], mode)
+
 
 op_types = {
     'mkdirs': (1, lambda args: os.makedirs(expand(args[0]), exist_ok=True)),
@@ -159,6 +169,8 @@ class Test:
         self.data = data
         self.ok = True
 
+        renovate = False
+
         name = os.path.splitext(os.path.basename(filename))[0].split('-')
         if int(name[0]) == count:
             name = name[1:]
@@ -168,6 +180,11 @@ class Test:
 
         try:
             call_args, expected = data['args'], data['expected']
+            if isinstance(call_args, str):
+                call_args = shlex.split(call_args)
+            else:
+                data['args'] = shlex.join(call_args)
+                renovate = True
             self.args = call_args
             self.expected = expected
         except KeyError:
@@ -194,11 +211,27 @@ class Test:
 
         try:
             self.prepare = data['prepare']
+            for cmd in self.prepare:
+                if not isinstance(cmd, str):
+                    for index in range(len(data['prepare'])):
+                        if not isinstance(data['prepare'][index], str):
+                            data['prepare'][index] = shlex.join(
+                                data['prepare'][index])
+                    renovate = True
+                    break
         except KeyError:
             self.prepare = []
 
         try:
             self.cleanup = data['cleanup']
+            for cmd in self.cleanup:
+                if not isinstance(cmd, str):
+                    for index in range(len(data['cleanup'])):
+                        if not isinstance(data['cleanup'][index], str):
+                            data['cleanup'][index] = shlex.join(
+                                data['cleanup'][index])
+                    renovate = True
+                    break
         except KeyError:
             self.cleanup = []
 
@@ -212,7 +245,14 @@ class Test:
         except KeyError:
             self.env = []
 
-    @staticmethod    
+        if renovate:
+            data['expected'] = [self.expected[0], *
+                                [to_lines(stream) for stream in self.expected[1:]]]
+            with open(filename, "w") as f:
+                json.dump(data, f, indent=4)
+                print(file=f)
+
+    @ staticmethod
     def run_cmds(ops):
         for op in ops:
             orig = op
@@ -251,7 +291,7 @@ class Test:
         for key in self.env:
             value = self.env[key]
             if value:
-                env[key] = value
+                env[key] = expand(value)
             elif key in env:
                 del env[key]
 
@@ -264,9 +304,11 @@ class Test:
 
         os.chdir(current_directory)
 
-        return [proc.returncode,
-                fix(proc.stdout, self.patches),
-                fix(proc.stderr, self.patches)]
+        return [
+            proc.returncode,
+            fix(proc.stdout, self.patches),
+            fix(proc.stderr, self.patches),
+        ]
 
     def clip(self, actual):
         clipped = [*actual]
@@ -319,7 +361,7 @@ Diff:
         print(' '.join(shlex.quote(arg) for arg in [
               *['{}={}'.format(key, env[key]) for key in env], target, *expanded]))
 
-    @staticmethod
+    @ staticmethod
     def load(filename, count):
         with open(filename) as f:
             return Test(json.load(f), filename, count)
@@ -348,10 +390,10 @@ if args.install is not None:
 print(target)
 print(args.data_dir)
 print(args.tests)
+print('version:', args.version)
 
 testsuite = []
 for root, dirs, files in os.walk(args.tests):
-    dirs[:] = []
     for filename in files:
         testsuite.append(os.path.join(root, filename))
 
@@ -372,19 +414,40 @@ def to_lines(stream):
     return lines
 
 
-had_errors = False
+class color:
+    reset = "\033[m"
+    counter = "\033[2;49;92m"
+    name = "\033[0;49;90m"
+    failed = "\033[0;49;91m"
+    passed = "\033[2;49;92m"
+    skipped = "\033[0;49;34m"
+
+
 counter = 0
+error_counter = 0
+run = args.run
+if not len(run):
+    run = list(range(1, len(testsuite)+1))
+else:
+    print("running:", ', '.join(str(x) for x in run))
 for filename in sorted(testsuite):
     counter += 1
+    if counter not in run:
+        continue
+
     test = Test.load(filename, counter)
     if not test.ok:
         continue
 
-    print(f"\033[2;49;92m[{counter:>{digits}}/{len(testsuite)}]\033[m \033[0;49;90m{test.name}\033[m")
+    print(
+        f"{color.counter}[{counter:>{digits}}/{len(testsuite)}]{color.reset} {color.name}{test.name}{color.reset}"
+    )
 
     actual = test.run()
     if actual is None:
-        print(f"\033[2;49;92m[{counter:>{digits}}/{len(testsuite)}]\033[m \033[0;49;90m{test.name}\033[m \033[0;49;34mSKIPPED\033[m")
+        print(
+            f"{color.counter}[{counter:>{digits}}/{len(testsuite)}]{color.reset} {color.name}{test.name}{color.reset} {color.skipped}SKIPPED{color.reset}"
+        )
         continue
 
     if test.expected is None:
@@ -393,29 +456,36 @@ for filename in sorted(testsuite):
         with open(filename, "w") as f:
             json.dump(test.data, f, indent=4)
             print(file=f)
-        print(f"\033[2;49;92m[{counter:>{digits}}/{len(testsuite)}]\033[m \033[0;49;90m{test.name}\033[m \033[0;49;34msaved\033[m")
+        print(
+            f"{color.counter}[{counter:>{digits}}/{len(testsuite)}]{color.reset} {color.name}{test.name}{color.reset} {color.skipped}saved{color.reset}"
+        )
         continue
 
     clipped = test.clip(actual)
 
     if isinstance(clipped, str):
         print(
-            f"\033[2;49;92m[{counter:>{digits}}/{len(testsuite)}]\033[m \033[0;49;90m{test.name}\033[m \033[0;49;91mFAILED (unknown check '{clipped}')\033[m")
-        had_errors = True
+            f"{color.counter}[{counter:>{digits}}/{len(testsuite)}]{color.reset} {color.name}{test.name}{color.reset} {color.failed}FAILED (unknown check '{clipped}'){color.reset}"
+        )
+        error_counter += 1
         continue
 
     if actual == test.expected or clipped == test.expected:
-        print(f"\033[2;49;92m[{counter:>{digits}}/{len(testsuite)}]\033[m \033[0;49;90m{test.name}\033[m \033[2;49;92mPASSED\033[m")
+        print(
+            f"{color.counter}[{counter:>{digits}}/{len(testsuite)}]{color.reset} {color.name}{test.name}{color.reset} {color.passed}PASSED{color.reset}"
+        )
         continue
 
     test.report(clipped)
-    print(f"\033[2;49;92m[{counter:>{digits}}/{len(testsuite)}]\033[m \033[0;49;90m{test.name}\033[m \033[0;49;91mFAILED\033[m")
-    had_errors = True
+    print(
+        f"{color.counter}[{counter:>{digits}}/{len(testsuite)}]{color.reset} {color.name}{test.name}{color.reset} {color.failed}FAILED{color.reset}"
+    )
+    error_counter += 1
 
 
 if args.install is not None:
-    pass
-    # shutil.rmtree(args.install)
+    shutil.rmtree(args.install)
 
-if had_errors:
+print(f"Failed {error_counter}/{counter}")
+if error_counter:
     sys.exit(1)

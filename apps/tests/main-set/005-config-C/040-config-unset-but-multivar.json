@@ -1,0 +1,14 @@
+{
+    "args": "config --file $TMP/config --unset group.key",
+    "expected": [
+        2,
+        "",
+        [
+            "usage: cov config [-h] [<file>] [<name> [<value>] | --unset <name> | -l | --list]",
+            "cov config: error: entry is not unique due to being a multivar\n"
+        ]
+    ],
+    "prepare": [
+        "touch '$TMP/config' '[group]\nkey = value 1\nkey = value 2'"
+    ]
+}

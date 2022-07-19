@@ -1,0 +1,30 @@
+{
+    "env": {
+        "HOME": "$TMP/config-list-any/home",
+        "XDG_CONFIG_HOME": null,
+        "USERPROFILE": null
+    },
+    "args": "config --list",
+    "expected": [
+        0,
+        [
+            "group.key=system",
+            "group.key=global",
+            "core.gitdir=../repo.git",
+            "group.key=local\n"
+        ],
+        ""
+    ],
+    "prepare": [
+        "safe-rm $TMP/config-list-any",
+        "mkdirs $TMP/config-list-any/repo.git",
+        "mkdirs $TMP/config-list-any/repo.covdata",
+        "cd $TMP/config-list-any/repo.covdata",
+        "git init --bare $TMP/config-list-any/repo.git",
+        "cov init --git-dir $TMP/config-list-any/repo.git .",
+        "touch '$DATA/../copy/etc/covconfig' '[group]\nkey = system\n'",
+        "touch '$TMP/config-list-any/home/.config/cov/config' '[group]\nkey = global\n'",
+        "cd $TMP/config-list-any/repo.covdata",
+        "cov config --local group.key local"
+    ]
+}

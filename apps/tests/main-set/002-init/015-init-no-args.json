@@ -1,0 +1,18 @@
+{
+    "args": "init",
+    "expected": [
+        0,
+        [
+            "Initialized empty Cov repository in $TMP/init-git-dir/.git/.covdata",
+            " Using Git repository in $TMP/init-git-dir/.git\n"
+        ],
+        ""
+    ],
+    "prepare": [
+        "safe-rm '$TMP/init-git-dir'",
+        "mkdirs '$TMP/init-git-dir/subdir'",
+        "cd '$TMP/init-git-dir'",
+        "git init",
+        "cd '$TMP/init-git-dir/subdir'"
+    ]
+}

@@ -1,0 +1,13 @@
+{
+    "lang": "pl",
+    "args": "-C recurse second -h",
+    "expected": [
+        0,
+        "",
+        "'second' jest aliasem 'third -B'"
+    ],
+    "prepare": [
+        "cd '$DATA'",
+        "mkdirs '$DATA/recurse/.covdata/objects/coverage'"
+    ]
+}

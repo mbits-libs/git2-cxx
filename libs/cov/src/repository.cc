@@ -27,10 +27,11 @@ namespace cov {
 			cov::origin origin_{};
 		};
 
-		git::config open_config(std::filesystem::path const& common,
+		git::config open_config(std::filesystem::path const& sysroot,
+		                        std::filesystem::path const& common,
 		                        std::error_code& ec) {
 			auto result =
-			    git::config::open_default(names::dot_config, "cov"sv, ec);
+			    git::config::open_default(sysroot, names::dot_config, "cov"sv, ec);
 			if (!ec) ec = result.add_local_config(common);
 			if (ec) result = nullptr;
 			return result;
@@ -83,9 +84,10 @@ namespace cov {
 	repository::repository() = default;
 	repository::~repository() = default;
 
-	repository::repository(std::filesystem::path const& common,
+	repository::repository(std::filesystem::path const& sysroot,
+	                       std::filesystem::path const& common,
 	                       std::error_code& ec)
-	    : commondir_{common}, cfg_{open_config(common, ec)} {
+	    : commondir_{common}, cfg_{open_config(sysroot, common, ec)} {
 		if (!common.empty()) {
 			if (!ec) refs_ = references::make_refs(common);
 			if (!ec) db_ = loose_backend_create(common / names::coverage_dir);

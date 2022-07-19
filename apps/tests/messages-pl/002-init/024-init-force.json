@@ -1,0 +1,20 @@
+{
+    "lang": "pl",
+    "args": "init --force",
+    "expected": [
+        0,
+        [
+            "Ponownie zainicjowano puste repozytorium Cov w $TMP/init-force/.git/.covdata",
+            " U\u017cywaj\u0105c repozytorium Git w $TMP/init-force/.git\n"
+        ],
+        ""
+    ],
+    "prepare": [
+        "safe-rm '$TMP/init-force'",
+        "mkdirs '$TMP/init-force/subdir'",
+        "cd '$TMP/init-force'",
+        "git init",
+        "cov init",
+        "cd '$TMP/init-force/subdir'"
+    ]
+}

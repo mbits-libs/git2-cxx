@@ -115,7 +115,6 @@ namespace git::testing {
 		auto const home = setup::test_dir() / "home"sv;
 
 		unsetenv("USERPROFILE");
-		unsetenv("ProgramData");
 		unsetenv("XDG_CONFIG_HOME");
 		setpath("HOME", home.c_str());
 
@@ -131,8 +130,8 @@ namespace git::testing {
 
 		std::error_code ignore{};
 		OOM_BEGIN(100)
-		auto const cfg =
-		    git::config::open_default(".dotfile"sv, "dot"sv, ignore);
+		auto const cfg = git::config::open_default(
+		    setup::test_dir() / "no-such"sv, ".dotfile"sv, "dot"sv, ignore);
 		OOM_END
 	}
 

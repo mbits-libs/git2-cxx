@@ -67,6 +67,7 @@ namespace cov::testing {
 
 		std::error_code ec{};
 		auto const repo = cov::repository::init(
+		    setup::test_dir() / "sysroot"sv,
 		    setup::test_dir() / "inside_git/.git/.covdata"sv,
 		    setup::test_dir() / "inside_git/.git"sv, ec);
 		ASSERT_FALSE(ec);
@@ -108,6 +109,7 @@ namespace cov::testing {
 
 		std::error_code ec{};
 		auto const repo = cov::repository::init(
+		    setup::test_dir() / "sysroot"sv,
 		    setup::test_dir() / "inside_git/.git/.covdata"sv,
 		    setup::test_dir() / "inside_git/.git"sv, ec);
 		ASSERT_TRUE(ec);
@@ -126,6 +128,7 @@ namespace cov::testing {
 
 		std::error_code ec{};
 		auto const repo = cov::repository::open(
+		    setup::test_dir() / "sysroot"sv,
 		    setup::test_dir() / "inside_git/.git/.covdata"sv, ec);
 		ASSERT_TRUE(ec);
 	}
@@ -145,7 +148,7 @@ namespace cov::testing {
 		              canonical(setup::test_dir() / "repository/.covdata"sv)),
 		          setup::get_path(covdir));
 
-		auto const repo = cov::repository::open(covdir, ec);
+		auto const repo = cov::repository::open(setup::test_dir() / "sysroot"sv, covdir, ec);
 		ASSERT_TRUE(ec);
 	}
 
@@ -164,7 +167,7 @@ namespace cov::testing {
 		              canonical(setup::test_dir() / "repository/.covdata"sv)),
 		          setup::get_path(covdir));
 
-		auto const repo = cov::repository::open(covdir, ec);
+		auto const repo = cov::repository::open(setup::test_dir() / "sysroot"sv, covdir, ec);
 		ASSERT_FALSE(ec);
 		ASSERT_TRUE(repo.refs());
 
@@ -193,7 +196,7 @@ namespace cov::testing {
 		              canonical(setup::test_dir() / "repository/.covdata"sv)),
 		          setup::get_path(covdir));
 
-		auto const repo = cov::repository::open(covdir, ec);
+		auto const repo = cov::repository::open(setup::test_dir() / "sysroot"sv, covdir, ec);
 		ASSERT_FALSE(ec);
 		ASSERT_TRUE(repo.refs());
 
@@ -221,7 +224,7 @@ namespace cov::testing {
 		              canonical(setup::test_dir() / "repository/.covdata"sv)),
 		          setup::get_path(covdir));
 
-		auto const repo = cov::repository::open(covdir, ec);
+		auto const repo = cov::repository::open(setup::test_dir() / "sysroot"sv, covdir, ec);
 		ASSERT_FALSE(ec);
 		ASSERT_TRUE(repo.refs());
 
@@ -324,6 +327,7 @@ namespace cov::testing {
 		// read
 		std::error_code ec{};
 		auto repo = cov::repository::open(
+		    setup::test_dir() / "sysroot"sv,
 		    setup::test_dir() / "repository/.covdata"sv, ec);
 		ASSERT_FALSE(ec);
 
@@ -408,6 +412,7 @@ namespace cov::testing {
 
 		std::error_code ec{};
 		auto repo = cov::repository::open(
+		    setup::test_dir() / "sysroot"sv,
 		    setup::test_dir() / "repository/.covdata"sv, ec);
 		ASSERT_FALSE(ec);
 
@@ -493,6 +498,7 @@ namespace cov::testing {
 
 		std::error_code ec{};
 		auto repo = cov::repository::open(
+		    setup::test_dir() / "sysroot"sv,
 		    setup::test_dir() / "repository/.covdata"sv, ec);
 		ASSERT_FALSE(ec);
 
@@ -551,6 +557,7 @@ It has two lines.
 		}
 
 		auto repo = cov::repository::open(
+		    setup::test_dir() / "sysroot"sv,
 		    setup::test_dir() / "repository/.covdata"sv, ec);
 		ASSERT_FALSE(ec);
 
@@ -577,6 +584,7 @@ It has two lines.
 
 		std::error_code ec{};
 		auto repo = cov::repository::open(
+		    setup::test_dir() / "sysroot"sv,
 		    setup::test_dir() / "repository/.covdata"sv, ec);
 		ASSERT_FALSE(ec);
 

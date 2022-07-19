@@ -323,6 +323,7 @@ namespace cov::testing {
 		git::init app{};
 		std::error_code ec{};
 		auto repo = cov::repository::open(
+		    setup::test_dir() / "sysroot"sv,
 		    setup::test_dir() / "diffs/.git/.covdata"sv, ec);
 		ASSERT_FALSE(ec) << ec.message();
 

@@ -1,0 +1,25 @@
+{
+    "args": "definitely-not-a-tool",
+    "expected": [
+        1,
+        "",
+        [
+            "usage: cov [-h] [-C <dir>] <command> [<args>]",
+            "cov: \"definitely-not-a-tool\" is not a cov command",
+            "",
+            "common commands:",
+            " init   creates a new cov repo",
+            " config shows and/or sets various settings",
+            " module defines file groups",
+            " report appends a report to repo",
+            " remove removes a particular report from repo",
+            " log    prints a list of reports",
+            " show   shows a specific report",
+            " serve  starts a local webserver with reports\n"
+        ]
+    ],
+    "prepare": [
+        "cd '$DATA'",
+        "mkdirs '$DATA/bad-recurse/.covdata/objects/coverage'"
+    ]
+}

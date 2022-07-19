@@ -27,6 +27,7 @@
   - [x] `cov init` _(0.10.0-beta)_
     - [x] SetFileAttributes FILE_ATTRIBUTE_HIDDEN
   - [x] `cov config` _(0.11.0-beta)_
+  - [ ] flatten strings files structure
   - [ ] `cov module` _(each is a M⬆️P)_
     - _[module "libraries"]_\
     _name=..._\

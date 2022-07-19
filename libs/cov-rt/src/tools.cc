@@ -17,7 +17,7 @@ namespace cov::app {
 		                                   std::string_view tool) {
 			std::optional<std::string> result{};
 
-			cfg.foreach ([tool, &result](git_config_entry const* entry) {
+			cfg.foreach_entry([tool, &result](git_config_entry const* entry) {
 				auto view = std::string_view{entry->name};
 				if (view.starts_with(prefix) &&
 				    view.substr(prefix.length()) == tool) {
@@ -115,9 +115,11 @@ namespace cov::app {
 	}  // GCOV_EXCL_LINE
 
 	git::config tools::cautiously_open_config(
+	    std::filesystem::path const& sysroot,
 	    std::filesystem::path const& current_directory) {
 		std::error_code ec{};
-		auto result = git::config::open_default(names::dot_config, "cov"sv, ec);
+		auto result =
+		    git::config::open_default(sysroot, names::dot_config, "cov"sv, ec);
 		if (ec) {
 			[[unlikely]];      // GCOV_EXCL_LINE
 			result = nullptr;  // GCOV_EXCL_LINE
@@ -188,7 +190,7 @@ namespace cov::app {
 	std::set<std::string> tools::list_aliases() const {
 		std::set<std::string, std::less<>> commands{};
 
-		cfg_.foreach ([&commands](git_config_entry const* entry) {
+		cfg_.foreach_entry([&commands](git_config_entry const* entry) {
 			auto name = std::string_view{entry->name};
 			if (name.starts_with(prefix)) {
 				auto const view = name.substr(prefix.size());
@@ -230,7 +232,7 @@ namespace cov::app {
 
 		/*
 		 * sysroot is one of:
-		 * - platform::exec_path().parent_path() / directory_info::root
+		 * - platform::sys_root()
 		 * - path{directory_info::prefix}
 		 */
 
@@ -276,4 +278,12 @@ namespace cov::app {
 		result.merge(app::list_tools(*this, groups, sysroot));
 		return result;
 	}
+
+	namespace platform {
+		std::filesystem::path const& sys_root() {
+			// dirname / ..
+			static auto const root = exec_path().parent_path().parent_path();
+			return root;
+		}
+	}  // namespace platform
 }  // namespace cov::app

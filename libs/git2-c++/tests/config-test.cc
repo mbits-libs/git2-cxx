@@ -9,8 +9,62 @@
 namespace git::testing {
 	using namespace ::std::literals;
 	using std::filesystem::path;
+	using ::testing::Test;
 	using ::testing::TestWithParam;
 	using ::testing::ValuesIn;
+	using ::testing::WithParamInterface;
+
+	std::string_view view_of(char const* ptr) {
+		return ptr ? ptr : std::string_view{};
+	}
+
+	class base_config_test : public Test {
+	protected:
+		void setup_env(
+		    std::vector<std::pair<std::string_view, std::string_view>> const&
+		        files,
+		    std::vector<std::pair<std::string_view, std::string_view>> const&
+		        env) {
+			for (auto const& [filename, contents] : files) {
+				auto const file_path = setup::test_dir() / filename;
+				create_directories(file_path.parent_path());
+				std::ofstream out{file_path};
+				out.write(contents.data(),
+				          static_cast<std::streamsize>(contents.size()));
+			}
+
+			for (auto const& [name, value] : env) {
+#ifdef _WIN32
+				std::wstring var = std::filesystem::path{name}.native();
+				std::filesystem::path path{};
+				var.push_back(L'=');
+				if (!value.empty()) {
+					path = setup::test_dir() / value;
+					path.make_preferred();
+					var.append(path.native());
+				}
+				auto const result = _wputenv(var.c_str());
+				ASSERT_EQ(0, result) << "Variable: " << name;
+				if (value.empty()) {
+					ASSERT_EQ(nullptr, std::getenv(name.data()));
+				} else {
+					ASSERT_EQ(path.string(), view_of(std::getenv(name.data())));
+				}
+#else
+				if (value.empty()) {
+					auto const result = unsetenv(name.data());
+					ASSERT_EQ(0, result) << "Variable: " << name;
+					ASSERT_EQ(nullptr, std::getenv(name.data()));
+					continue;
+				}
+				auto const path = setup::test_dir() / value;
+				auto const result = setenv(name.data(), path.c_str(), 1);
+				ASSERT_EQ(0, result) << "Variable: " << name;
+				ASSERT_EQ(path.string(), std::getenv(name.data()));
+#endif
+			}
+		}
+	};
 
 	namespace {
 		constexpr char test_name[] = "group.value";
@@ -41,7 +95,7 @@ namespace git::testing {
 		ASSERT_FALSE(cfg.add_file_ondisk(repo.c_str())) << repo;
 
 		std::string entries;
-		cfg.foreach ([&entries](git_config_entry const* entry) {
+		cfg.foreach_entry([&entries](git_config_entry const* entry) {
 			if (!entries.empty()) entries.push_back('\n');
 			entries.append(entry->name);
 			entries.push_back('=');
@@ -209,6 +263,76 @@ namespace git::testing {
 		ASSERT_FALSE(entry2);
 	}
 
+	TEST(config, add_strings) {
+		auto cfg = git::config::create();
+		auto const repo = setup::get_path(setup::test_dir() / "config.path");
+		std::filesystem::remove(repo);
+		ASSERT_FALSE(cfg.add_file_ondisk(repo.c_str())) << repo;
+		ASSERT_FALSE(cfg.set_multivar(test_name, "^$", "value 1"));
+		ASSERT_FALSE(cfg.set_multivar(test_name, "^$", "value 2"));
+		ASSERT_FALSE(cfg.set_multivar(test_name, "^$", "value 3"));
+
+		ASSERT_EQ("value 3", *cfg.get_string(test_name));
+		std::vector<std::string> actual{};
+		cfg.get_multivar_foreach(test_name, "^val",
+		                         [&](git_config_entry const* entry) {
+			                         actual.push_back(entry->value);
+			                         return 0;
+		                         });
+		std::vector<std::string> expected{"value 1", "value 2", "value 3"};
+		ASSERT_EQ(expected, actual);
+	}
+
+	TEST(config, replace_strings) {
+		auto cfg = git::config::create();
+		auto const repo = setup::get_path(setup::test_dir() / "config.path");
+		std::filesystem::remove(repo);
+		ASSERT_FALSE(cfg.add_file_ondisk(repo.c_str())) << repo;
+		ASSERT_FALSE(cfg.set_multivar(test_name, "^$", "value 1"));
+		ASSERT_FALSE(cfg.set_multivar(test_name, "^$", "value 2 here"));
+		ASSERT_FALSE(cfg.set_multivar(test_name, "^$", "value 3 here"));
+		ASSERT_FALSE(cfg.set_multivar(test_name, "^$", "value 4 here"));
+		ASSERT_FALSE(cfg.set_multivar(test_name, "^$", "value 3"));
+
+		ASSERT_FALSE(
+		    cfg.set_multivar(test_name, "^value [0-9] here$", "value 2"));
+
+		ASSERT_EQ("value 3", *cfg.get_string(test_name));
+		std::vector<std::string> actual{};
+		cfg.get_multivar_foreach(test_name, "^val",
+		                         [&](git_config_entry const* entry) {
+			                         actual.push_back(entry->value);
+			                         return 0;
+		                         });
+		std::vector<std::string> expected{"value 1", "value 2", "value 2",
+		                                  "value 2", "value 3"};
+		ASSERT_EQ(expected, actual);
+	}
+
+	TEST(config, remove_strings) {
+		auto cfg = git::config::create();
+		auto const repo = setup::get_path(setup::test_dir() / "config.path");
+		std::filesystem::remove(repo);
+		ASSERT_FALSE(cfg.add_file_ondisk(repo.c_str())) << repo;
+		ASSERT_FALSE(cfg.set_multivar(test_name, "^$", "value 1"));
+		ASSERT_FALSE(cfg.set_multivar(test_name, "^$", "value 2 here"));
+		ASSERT_FALSE(cfg.set_multivar(test_name, "^$", "value 3 here"));
+		ASSERT_FALSE(cfg.set_multivar(test_name, "^$", "value 4 here"));
+		ASSERT_FALSE(cfg.set_multivar(test_name, "^$", "value 3"));
+
+		ASSERT_FALSE(cfg.delete_multivar(test_name, "^value [0-9] here$"));
+
+		ASSERT_EQ("value 3", *cfg.get_string(test_name));
+		std::vector<std::string> actual{};
+		cfg.get_multivar_foreach(test_name, "^val",
+		                         [&](git_config_entry const* entry) {
+			                         actual.push_back(entry->value);
+			                         return 0;
+		                         });
+		std::vector<std::string> expected{"value 1", "value 3"};
+		ASSERT_EQ(expected, actual);
+	}
+
 	TEST(config, delete_entry) {
 		auto cfg = git::config::create();
 		auto const repo =
@@ -252,9 +376,16 @@ submodule.bare.active=true)"sv,
 
 	struct config_global_test {
 		std::string_view name;
+		std::string_view sysroot;
 		std::vector<std::pair<std::string_view, std::string_view>> files{};
 		std::vector<std::pair<std::string_view, std::string_view>> env{};
-		std::string_view expected;
+		struct {
+			std::string_view open_default{};
+			std::string_view open_global{};
+			std::string_view open_system{};
+			bool has_global{true};
+			bool has_system{true};
+		} expected{};
 
 		friend std::ostream& operator<<(std::ostream& out,
 		                                config_global_test const& param) {
@@ -262,132 +393,164 @@ submodule.bare.active=true)"sv,
 		}
 	};
 
-	class config_global : public TestWithParam<config_global_test> {};
-
-	std::string_view view_of(char const* ptr) {
-		return ptr ? ptr : std::string_view{};
-	}
-	TEST_P(config_global, test_value) {
-		auto const& [_, files, env, expected] = GetParam();
-
-		auto const root = setup::test_dir() / "test_value"sv;
-		remove_all(root);
-
-		for (auto const& [filename, contents] : files) {
-			auto const file_path = setup::test_dir() / filename;
-			create_directories(file_path.parent_path());
-			std::ofstream out{file_path};
-			out.write(contents.data(),
-			          static_cast<std::streamsize>(contents.size()));
+	class config_global : public base_config_test,
+	                      public WithParamInterface<config_global_test> {
+	protected:
+		void setup_env(
+		    std::vector<std::pair<std::string_view, std::string_view>> const&
+		        files,
+		    std::vector<std::pair<std::string_view, std::string_view>> const&
+		        env) {
+			remove_all(setup::test_dir() / "test_value"sv);
+			base_config_test::setup_env(files, env);
 		}
+	};
 
-		for (auto const& [name, value] : env) {
-#ifdef _WIN32
-			std::wstring var = std::filesystem::path{name}.native();
-			std::filesystem::path path{};
-			var.push_back(L'=');
-			if (!value.empty()) {
-				path = setup::test_dir() / value;
-				path.make_preferred();
-				var.append(path.native());
-			}
-			auto const result = _wputenv(var.c_str());
-			ASSERT_EQ(0, result) << "Variable: " << name;
-			if (value.empty()) {
-				ASSERT_EQ(nullptr, std::getenv(name.data()));
-			} else {
-				ASSERT_EQ(path.string(), view_of(std::getenv(name.data())));
-			}
-#else
-			if (value.empty()) {
-				auto const result = unsetenv(name.data());
-				ASSERT_EQ(0, result) << "Variable: " << name;
-				ASSERT_EQ(nullptr, std::getenv(name.data()));
-				continue;
-			}
-			auto const path = setup::test_dir() / value;
-			auto const result = setenv(name.data(), path.c_str(), 1);
-			ASSERT_EQ(0, result) << "Variable: " << name;
-			ASSERT_EQ(path.string(), std::getenv(name.data()));
-#endif
-		}
+#define ASSERT_SETUP(FILES, ENV)                        \
+	do {                                                \
+		setup_env(FILES, ENV);                          \
+		if (::testing::Test::HasFatalFailure()) return; \
+	} while (0)
+
+	TEST_P(config_global, test_default) {
+		auto const& [_, sysroot, files, env, expected] = GetParam();
+
+		ASSERT_SETUP(files, env);
 
 		std::error_code ec{};
-		auto const cfg = git::config::open_default(".dotfile"sv, "dot"sv, ec);
+		auto const cfg = git::config::open_default(setup::test_dir() / sysroot,
+		                                           ".dotfile"sv, "dot"sv, ec);
 		ASSERT_FALSE(ec);
 		ASSERT_TRUE(cfg);
 
 		auto const value = cfg.get_string("test.value");
 		ASSERT_TRUE(value);
-		ASSERT_EQ(expected, *value);
+		ASSERT_EQ(expected.open_default, *value);
+	}
+
+	TEST_P(config_global, test_system) {
+		auto const& [_, sysroot, files, env, expected] = GetParam();
+
+		ASSERT_SETUP(files, env);
+
+		std::error_code ec{};
+		auto const cfg =
+		    git::config::open_system(setup::test_dir() / sysroot, "dot"sv, ec);
+		if (expected.has_system) {
+			ASSERT_FALSE(ec);
+		}
+
+		if (!ec) {
+			ASSERT_TRUE(cfg);
+
+			auto const value = cfg.get_string("test.value");
+			if (expected.has_system) {
+				ASSERT_TRUE(value);
+				ASSERT_EQ(expected.open_system, *value);
+			} else {
+				ASSERT_FALSE(value);
+			}
+		}
+	}
+
+	TEST_P(config_global, test_global) {
+		auto const& [_, sysroot, files, env, expected] = GetParam();
+
+		ASSERT_SETUP(files, env);
+
+		std::error_code ec{};
+		auto const cfg =
+		    git::config::open_global(".dotfile"sv, "dot"sv, false, ec);
+		if (expected.has_global) {
+			ASSERT_FALSE(ec);
+		}
+
+		if (!ec) {
+			ASSERT_TRUE(cfg);
+
+			auto const value = cfg.get_string("test.value");
+			if (expected.has_global) {
+				ASSERT_TRUE(value);
+				ASSERT_EQ(expected.open_global, *value);
+			} else {
+				ASSERT_FALSE(value);
+			}
+		}
 	}
 
 	static constexpr auto XDG_CONFIG_HOME = "XDG_CONFIG_HOME"sv;
 	static constexpr auto HOME = "HOME"sv;
 	static constexpr auto USERPROFILE = "USERPROFILE"sv;
-	static constexpr auto ProgramData = "ProgramData"sv;
 
 	static constexpr auto from_xdg_config = "[test]\nvalue=from xdg config"sv;
 	static constexpr auto from_home_xdg_config =
 	    "[test]\nvalue=from home/.config config"sv;
 	static constexpr auto from_user_profile =
 	    "[test]\nvalue=from user profile"sv;
-	static constexpr auto from_program_data =
-	    "[test]\nvalue=from program data"sv;
+	static constexpr auto from_system_data = "[test]\nvalue=from system data"sv;
 
 	static config_global_test const env[] = {
 	    {
 	        .name = "Windows"sv,
+	        .sysroot = "test-value/data"sv,
 	        .files = {{"test-value/.dotfile"sv, from_user_profile},
-	                  {"test-value/data/.dotfile"sv, from_program_data}},
+	                  {"test-value/data/.dotfile"sv, from_system_data}},
 	        .env = {{XDG_CONFIG_HOME, ""sv},
 	                {HOME, ""sv},
-	                {USERPROFILE, "test-value"sv},
-	                {ProgramData, "test-value/data"sv}},
-	        .expected = "from user profile"sv,
+	                {USERPROFILE, "test-value"sv}},
+	        .expected =
+	            {
+	                .open_default = "from user profile"sv,
+	                .open_global = "from user profile"sv,
+	                .open_system = "from system data"sv,
+	            },
 	    },
 	    {
 	        .name = "XDG over $HOME"sv,
+	        .sysroot = "test-value/non-existent"sv,
 	        .files = {{"test-value/actual/.config/dot/config"sv,
 	                   from_xdg_config},
 	                  {"test-value/home/.config/dot/config"sv,
 	                   from_home_xdg_config}},
 	        .env = {{XDG_CONFIG_HOME, "test-value/actual/.config"sv},
 	                {HOME, "test-value/home"sv},
-	                {USERPROFILE, ""sv},
-	                {ProgramData, ""sv}},
-	        .expected = "from xdg config"sv,
+	                {USERPROFILE, ""sv}},
+	        .expected = {.open_default = "from xdg config"sv,
+	                     .open_global = "from xdg config"sv,
+	                     .has_system = false},
 	    },
 	    {
 	        .name = "$HOME if no XDG"sv,
+	        .sysroot = "test-value/non-existent"sv,
 	        .files = {{"test-value/actual/.config/dot/config"sv,
 	                   from_xdg_config},
 	                  {"test-value/home/.config/dot/config"sv,
 	                   from_home_xdg_config}},
 	        .env = {{XDG_CONFIG_HOME, ""sv},
 	                {HOME, "test-value/home"sv},
-	                {USERPROFILE, ""sv},
-	                {ProgramData, ""sv}},
-	        .expected = "from home/.config config"sv,
+	                {USERPROFILE, ""sv}},
+	        .expected = {.open_default = "from home/.config config"sv,
+	                     .open_global = "from home/.config config"sv,
+	                     .has_system = false},
 	    },
 	    {
-	        .name = "$HOME if no XDG"sv,
-	        .files = {{"test-value/data/.config"sv, from_program_data}},
-	        .env = {{XDG_CONFIG_HOME, ""sv},
-	                {HOME, ""sv},
-	                {USERPROFILE, ""sv},
-	                {ProgramData, "test-value/data"sv}},
-	        .expected = "from program data"sv,
+	        .name = "fall back to system"sv,
+	        .sysroot = "test-value/data"sv,
+	        .files = {{"test-value/data/etc/dotconfig"sv, from_system_data}},
+	        .env = {{XDG_CONFIG_HOME, ""sv}, {HOME, ""sv}, {USERPROFILE, ""sv}},
+	        .expected = {.open_default = "from system data"sv,
+	                     .open_system = "from system data"sv,
+	                     .has_global = false},
 	    },
 #if 0
 	    {
 	        .name = ""sv,
+	        .sysroot = {},
 	        .files = {},
 	        .env = {{XDG_CONFIG_HOME, ""sv},
 	                {HOME, ""sv},
-	                {USERPROFILE, ""sv},
-	                {ProgramData, ""sv}},
-	        .expected = ""sv,
+	                {USERPROFILE, ""sv}},
+	        .expected = { .open_default = ""sv },
 	    },
 #endif
 	};

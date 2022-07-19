@@ -85,7 +85,7 @@ namespace cov::app::testing {
 		    "/lets/just/let/loose/and/create/a/name/long/enough/to/trigger/oom"sv;
 		// it's ought to land somewhere inside discover_repository
 		OOM_LIMIT(5 * 1024)
-		tools::cautiously_open_config(root_dir);
+		tools::cautiously_open_config({}, root_dir);
 		OOM_END
 	}
 

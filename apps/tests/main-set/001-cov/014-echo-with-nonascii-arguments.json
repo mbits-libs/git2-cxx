@@ -1,0 +1,12 @@
+{
+    "args": "-C 'utf8-\u03b1\u03b2\u03b3\u03b4\u03b5' first '--hj\u00e4lp'",
+    "expected": [
+        0,
+        "cov-echo --iroha '\u3044\u308d\u306f\u306b\u307b\u3078\u3068 \u3061\u308a\u306c\u308b\u3092' --pangram 'Pchn\u0105\u0107 w t\u0119 \u0142\u00f3d\u017a je\u017ca lub o\u015bm skrzy\u0144 fig.' --\u03a0\u0391\u039d\u03a4\u038c\u0393\u03a1\u0391\u039c\u039c\u0391 '\u039e\u03b5\u03c3\u03ba\u03b5\u03c0\u03ac\u03b6\u03c9 \u03c4\u03b7\u03bd \u03c8\u03c5\u03c7\u03bf\u03c6\u03b8\u03cc\u03c1\u03b1 \u03c3\u03b1\u03c2 \u03b2\u03b4\u03b5\u03bb\u03c5\u03b3\u03bc\u03af\u03b1' --hj\u00e4lp\n",
+        ""
+    ],
+    "prepare": [
+        "cd '$DATA'",
+        "mkdirs '$DATA/utf8-\u03b1\u03b2\u03b3\u03b4\u03b5/.covdata/objects/coverage'"
+    ]
+}
