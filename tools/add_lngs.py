@@ -35,5 +35,5 @@ touch(os.path.join(app, "data", "strings", f"{name}.lngs"), f'''[
 }}''')
 
 os.makedirs(os.path.join(app, "data", "translations", name), exist_ok=True)
-touch(os.path.join(app, "include", "cov", "app", f"{name}.hh"))
-touch(os.path.join(app, "src", f"{name}.cc"))
+touch(os.path.join(app, "include", "cov", "app", "strings", f"{name}.hh"))
+touch(os.path.join(app, "src", "strings", f"{name}.cc"))

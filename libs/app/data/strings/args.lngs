@@ -14,6 +14,10 @@
 	DIR_META = "<dir>";
 	[help("Name of a file or directory argument"), id(-1)]
 	PATH_META = "<path>";
+	[help("Name of a, well, name argument, e.g. in cov config"), id(-1)]
+	NAME_META = "<name>";
+	[help("Name of a value argument, e.g. in cov config"), id(-1)]
+	VALUE_META = "<value>";
 	[help("Header for list of positional arguments"), id(-1)]
 	POSITIONALS = "positional arguments";
 	[help("Header for list of optional arguments"), id(-1)]
@@ -24,6 +28,8 @@
 	UNRECOGNIZED = "unrecognized argument: {0}";
     [help("Universal error message"), id(-1)]
     ARGUMENT_MSG = "argument {0}: {1}";
+    [help("Error message for conflicting arguments; used with ARGUMENT_MSG"), id(-1)]
+	EXCLUSIVE = "not allowed with argument {0}";
 	[help("Error message for a missing argument"), id(-1)]
 	NEEDS_PARAM = "argument {0}: expected one argument";
 	[help("Error message for unneeded value"), id(-1)]
@@ -42,4 +48,6 @@
 	ERROR_MSG = "{0}: error: {1}";
 	[help("Needed file was not found"), id(-1)]
 	FILE_NOT_FOUND = "cannot open {0}";
+	[help("Error message for tool called outside Cov repository"), id(-1)]
+	CANNOT_FIND_COV = "Cannot find a Cov repository in {0}";
 }

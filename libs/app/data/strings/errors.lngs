@@ -1,0 +1,17 @@
+[
+    project("cov"),
+	namespace("cov::app::str::errors"),
+    version("0.11.0"),
+    serial(1)
+] strings {
+	[help("Error message template; placeholder 0 will get the name of program, placeholder 1 the name of domain (such as \"regex\"), placeholder 2 an actual message"), id(-1)]
+	DOMAIN_ERROR_MSG = "{0}: {1} error: {2}";
+    [help("config_entries.c:186"), id(-1)]
+    CONFIG_NON_UNIQUE_MULTIVAR="entry is not unique due to being a multivar";
+    [help("config_entries.c:191"), id(-1)]
+    CONFIG_NON_UNIQUE_INCLUDED="entry is not unique due to being included";
+    [help("config_file.c:412, 442"), id(-1)]
+    CONFIG_CANNOT_DELETE="could not find key '{}' to delete";
+    [help("config.c:1456"), id(-1)]
+    CONFIG_INVALID_NAME="invalid config item name '{}'";
+}

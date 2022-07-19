@@ -1,0 +1,45 @@
+# Code coverage presented localy.
+# Copyright (C) 2022 midnightBITS
+# This file is distributed under the same license as the cov package.
+# Marcin Zdun <mzdun@midnightbits.com>, 2022.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: cov 0.11.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-07-21 06:33+0200\n"
+"PO-Revision-Date: 2022-07-21 06:36+0200\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: pl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.4.2\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 "
+"|| n%100>14) ? 1 : 2);\n"
+
+#. config_file.c:412, 442
+msgctxt "CONFIG_CANNOT_DELETE"
+msgid "could not find key '{}' to delete"
+msgstr "nie można odnaleźć klucza „{}” do usunięcia"
+
+#. config.c:1456
+msgctxt "CONFIG_INVALID_NAME"
+msgid "invalid config item name '{}'"
+msgstr "nieprawidłowa nazwa elementu konfiguracji „{}”"
+
+#. config_entries.c:191
+msgctxt "CONFIG_NON_UNIQUE_INCLUDED"
+msgid "entry is not unique due to being included"
+msgstr "wpis nie jest unikalny ze względu na to, że został załączony"
+
+#. config_entries.c:186
+msgctxt "CONFIG_NON_UNIQUE_MULTIVAR"
+msgid "entry is not unique due to being a multivar"
+msgstr "wpis nie jest unikalny ze względu na to, że jest zmienną wielokrotną"
+
+#. Error message template; placeholder 0 will get the name of program, placeholder 1 the name of domain (such as "regex"), placeholder 2 an actual message
+msgctxt "DOMAIN_ERROR_MSG"
+msgid "{0}: {1} error: {2}"
+msgstr "{0}: błąd {1}: {2}"
