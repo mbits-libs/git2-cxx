@@ -26,8 +26,8 @@
     - [x] `wmain` and spawn w/UTF8 on Windows
   - [x] `cov init` _(0.10.0-beta)_
     - [x] SetFileAttributes FILE_ATTRIBUTE_HIDDEN
-  - [ ] `cov config` _(each is a M⬆️P)_
-  - [ ] `cov module`
+  - [x] `cov config` _(0.11.0-beta)_
+  - [ ] `cov module` _(each is a M⬆️P)_
     - _[module "libraries"]_\
     _name=..._\
     _dir=..._\
