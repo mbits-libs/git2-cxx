@@ -80,9 +80,7 @@ install(
 )
 
 install(
-  DIRECTORY
-    include/
-    ${CMAKE_CURRENT_BINARY_DIR}/include/
+  DIRECTORY include/
   TYPE INCLUDE
   COMPONENT librt
 )
