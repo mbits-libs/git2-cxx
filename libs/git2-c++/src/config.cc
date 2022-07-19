@@ -11,6 +11,7 @@
 static int _taccess(const char* pathname, int mode) noexcept {
 	return access(pathname, mode);
 }
+static constexpr auto RW_OK = W_OK | R_OK;
 #else
 // source:
 // https://docs.microsoft.com/en-us/cpp/c-runtime-library/reference/access-waccess
@@ -30,8 +31,10 @@ static int _taccess(const wchar_t* pathname, int mode) noexcept {
 
 #ifdef __cpp_lib_char8_t
 #define PATH_C_STR(PATH) reinterpret_cast<char const*>((PATH).c_str())
-#define STR_FROM_GENERIC(PATH) \
-	std::string { PATH_C_STR(PATH), (PATH).size() }
+#define STR_FROM_GENERIC(PATH)          \
+	std::string {                       \
+		PATH_C_STR(PATH), (PATH).size() \
+	}
 #else
 #define PATH_C_STR(PATH) ((PATH).c_str())
 #define STR_FROM_GENERIC(PATH) std::move(PATH)
@@ -43,11 +46,10 @@ namespace git {
 		namespace names {
 			constexpr auto config = "config"sv;
 			constexpr auto dotconfig = ".config"sv;
-			constexpr auto etc = "/etc/"sv;
+			constexpr auto etc = "etc/"sv;
 			constexpr char XDG_CONFIG_HOME[] = "XDG_CONFIG_HOME";
 			constexpr char HOME[] = "HOME";
 			constexpr char USERPROFILE[] = "USERPROFILE";
-			constexpr char ProgramData[] = "ProgramData";
 		}  // namespace names
 
 		char const* get_home() noexcept {
@@ -64,7 +66,9 @@ namespace git {
 
 			return result;
 		}
-		std::filesystem::path calc_system_path(std::string_view app) {
+		std::filesystem::path calc_system_path(
+		    std::filesystem::path const& sysroot,
+		    std::string_view app) {
 			std::string result{};
 			result.reserve(names::etc.length() + app.length() +
 			               names::config.length());
@@ -73,26 +77,14 @@ namespace git {
 			result.append(app);
 			result.append(names::config);
 
-			return std::filesystem::path{std::move(result)};
+			return sysroot / std::move(result);
 		}
 
-		std::filesystem::path get_system_path(std::string_view app) {
-			return get_path_([app] { return calc_system_path(app); });
-		}
-
-		std::filesystem::path calc_program_data_path(
-		    std::string_view dot_name) {
-			auto const* program_data = std::getenv(names::ProgramData);
-
-			if (program_data && *program_data)
-				return std::filesystem::path{program_data} / dot_name;
-
-			return {};
-		}
-
-		std::filesystem::path get_program_data_path(std::string_view dot_name) {
+		std::filesystem::path get_system_path(
+		    std::filesystem::path const& sysroot,
+		    std::string_view app) {
 			return get_path_(
-			    [dot_name] { return calc_program_data_path(dot_name); });
+			    [&, app] { return calc_system_path(sysroot, app); });
 		}
 
 		std::pair<std::filesystem::path, std::filesystem::path>
@@ -130,7 +122,12 @@ namespace git {
 			    get_path_([&] { return std::get<1>(result); });
 			return result;
 		}  // GCOV_EXCL_LINE
-	}      // namespace
+
+		static inline bool accessible(std::filesystem::path const& path,
+		                              int mode) {
+			return !path.empty() && !_taccess(path.c_str(), mode);
+		}
+	}  // namespace
 
 	config config::create(std::error_code& ec) noexcept {
 		git_config* out{};
@@ -142,7 +139,8 @@ namespace git {
 		return ptr;
 	}
 
-	config config::open_default(std::string_view dot_name,
+	config config::open_default(std::filesystem::path const& sysroot,
+	                            std::string_view dot_name,
 	                            std::string_view app,
 	                            std::error_code& ec) {
 		ec.clear();
@@ -151,8 +149,7 @@ namespace git {
 		if (!result) return result;
 
 		auto const [xdg, global] = get_global_path(dot_name, app);
-		auto const system = get_system_path(app);
-		auto const program_data = get_program_data_path(dot_name);
+		auto const system = get_system_path(sysroot, app);
 
 		if (!system.empty())
 			ec = result.add_file_ondisk(  // GCOV_EXCL_LINE
@@ -161,11 +158,41 @@ namespace git {
 			ec = result.add_file_ondisk(xdg, GIT_CONFIG_LEVEL_XDG);
 		if (!ec && !global.empty())
 			ec = result.add_file_ondisk(global, GIT_CONFIG_LEVEL_GLOBAL);
-		if (!ec && !program_data.empty())
-			ec = result.add_file_ondisk(program_data,
-			                            GIT_CONFIG_LEVEL_PROGRAMDATA);
 
 		if (ec) result = nullptr;
+		return result;
+	}
+
+	config config::open_system(std::filesystem::path const& sysroot,
+	                           std::string_view app,
+	                           std::error_code& ec) {
+		ec.clear();
+
+		auto result = create(ec);
+		if (!result) return result;
+
+		auto const system = calc_system_path(sysroot, app);
+		ec = result.add_file_ondisk(system, GIT_CONFIG_LEVEL_SYSTEM);
+		return result;
+	}
+
+	config config::open_global(std::string_view dot_name,
+	                           std::string_view app,
+	                           bool for_writing,
+	                           std::error_code& ec) {
+		ec.clear();
+
+		auto result = create(ec);
+		if (!result) return result;
+
+		auto const [xdg, global] = calc_global_path(dot_name, app);
+
+		auto const mode = for_writing ? RW_OK : R_OK;
+		if (!accessible(xdg, mode) && accessible(global, mode)) {
+			ec = result.add_file_ondisk(global, GIT_CONFIG_LEVEL_GLOBAL);
+		} else {
+			ec = result.add_file_ondisk(xdg, GIT_CONFIG_LEVEL_XDG);
+		}
 		return result;
 	}
 
@@ -213,6 +240,12 @@ namespace git {
 	    std::filesystem::path const& value) const noexcept {
 		auto const generic = value.generic_u8string();
 		return set_string(name, PATH_C_STR(generic));
+	}
+
+	std::error_code config::set_multivar(char const* name,
+	                                     char const* regex,
+	                                     char const* value) const noexcept {
+		return as_error(git_config_set_multivar(get(), name, regex, value));
 	}
 
 	std::optional<unsigned> config::get_unsigned(
@@ -309,5 +342,10 @@ namespace git {
 
 	std::error_code config::delete_entry(const char* name) const noexcept {
 		return as_error(git_config_delete_entry(get(), name));
+	}
+
+	std::error_code config::delete_multivar(const char* name,
+	                                        const char* regex) const noexcept {
+		return as_error(git_config_delete_multivar(get(), name, regex));
 	}
 }  // namespace git

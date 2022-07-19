@@ -1,0 +1,24 @@
+{
+    "env": {
+        "HOME": null,
+        "XDG_CONFIG_HOME": null,
+        "USERPROFILE": null
+    },
+    "args": "-C recurse --list-cmds builtin,other,alias,unknown,builtins,aliases",
+    "expected": [
+        0,
+        [
+            "config",
+            "first",
+            "init",
+            "name",
+            "second",
+            "third\n"
+        ],
+        ""
+    ],
+    "prepare": [
+        "cd '$DATA'",
+        "mkdirs '$DATA/recurse/.covdata/objects/coverage'"
+    ]
+}

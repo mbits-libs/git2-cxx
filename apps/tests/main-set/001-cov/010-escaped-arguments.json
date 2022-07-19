@@ -1,0 +1,9 @@
+{
+    "os": "nt",
+    "args": "echo 'argument with space' 'argument with \\ backslash' 'argument with \"quotes\"' 'argument with '\"'\"'apos'\"'\"'' 'this thing: \\\"' 'that thing: \\\\'",
+    "expected": [
+        0,
+        "cov-echo 'argument with space' 'argument with \\ backslash' 'argument with \"quotes\"' \"argument with 'apos'\" 'this thing: \\\"' 'that thing: \\\\'\n",
+        ""
+    ]
+}

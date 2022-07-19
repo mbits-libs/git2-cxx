@@ -1,0 +1,22 @@
+{
+    "args": "-C recurse first -D",
+    "expected": [
+        0,
+        [
+            "usage: cov init [-h] [--git-dir <dir>] [--force] [directory]",
+            "",
+            "positional arguments:",
+            " directory       sets the directory to put the repository in; defaults to current directory",
+            "",
+            "optional arguments:",
+            " -h, --help      shows this help message and exits",
+            " --git-dir <dir> points to connected Git repository; defaults to current repo",
+            " --force         will re-init the repository with a fresh database\n"
+        ],
+        ""
+    ],
+    "prepare": [
+        "cd '$DATA'",
+        "mkdirs '$DATA/recurse/.covdata/objects/coverage'"
+    ]
+}

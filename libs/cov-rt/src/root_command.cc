@@ -167,7 +167,7 @@ namespace cov::app::root {
 		std::error_code ec{};
 		auto cwd = std::filesystem::current_path(ec);
 		if (ec) cwd.clear();
-		auto cfg = tools::cautiously_open_config(cwd);
+		auto cfg = tools::cautiously_open_config(platform::sys_root(), cwd);
 		return {std::move(cfg), builtins};
 	}
 }  // namespace cov::app::root

@@ -1,0 +1,12 @@
+{
+    "args": "config --file $TMP/config --list",
+    "expected": [
+        0,
+        "group.2.key-2=value for key 2\n",
+        ""
+    ],
+    "prepare": [
+        "touch '$TMP/config' '[group]\nkey = value 1\nkey = value 2\n[group \"2\"]\nkey-2 = value for key 2'",
+        "cov config --file $TMP/config --unset-all group.key"
+    ]
+}

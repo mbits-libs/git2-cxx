@@ -1,10 +1,11 @@
 
 set(BUILTINS
     init
+    config
 )
 
 set(SOURCES
-	cov/cov.cc
+	  cov/cov.cc
 )
 
 foreach(NAME ${BUILTINS})
@@ -60,27 +61,29 @@ if (COV_TESTING)
     target_link_libraries(cov-echo PRIVATE fmt::fmt mbits::args)
     set_target_properties(cov-echo PROPERTIES FOLDER tests/spawn)
 
-	set_target_properties(cov-echo PROPERTIES
-		RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/elsewhere/${CORE_DIR}"
-    )
+    set_target_properties(cov-echo PROPERTIES
+      RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/elsewhere/${CORE_DIR}"
+      )
 
-	foreach(BUILD_TYPE DEBUG RELEASE RELWITHDEBINFO MINSIZEREL)
-		set_target_properties(cov-echo PROPERTIES
-			RUNTIME_OUTPUT_DIRECTORY_${BUILD_TYPE} "${CMAKE_BINARY_DIR}/elsewhere/${CORE_DIR}"
-        )
-	endforeach()
+    foreach(BUILD_TYPE DEBUG RELEASE RELWITHDEBINFO MINSIZEREL)
+      set_target_properties(cov-echo PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY_${BUILD_TYPE} "${CMAKE_BINARY_DIR}/elsewhere/${CORE_DIR}"
+          )
+    endforeach()
 
-    add_test(
-        NAME cov-exec
-        COMMAND "${Python3_EXECUTABLE}"
-            "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_driver.py"
-            --target "$<TARGET_FILE:cov>"
-            --tests "${CMAKE_CURRENT_SOURCE_DIR}/tests/main-set"
-            --data-dir "${CMAKE_CURRENT_SOURCE_DIR}/tests/data"
-            --version "${PROJECT_VERSION}${PROJECT_VERSION_STABILITY}${PROJECT_VERSION_BUILD_META}"
-            --install "${CMAKE_CURRENT_SOURCE_DIR}/tests/copy"
-            --install-with "$<TARGET_FILE:cov-echo>"
-            )
+    foreach(TEST_SET 001-cov 002-init 003-config-A 004-config-B 005-config-C)
+        add_test(
+            NAME cov-exec--${TEST_SET}
+            COMMAND "${Python3_EXECUTABLE}"
+                "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_driver.py"
+                --target "$<TARGET_FILE:cov>"
+                --tests "${CMAKE_CURRENT_SOURCE_DIR}/tests/main-set/${TEST_SET}"
+                --data-dir "${CMAKE_CURRENT_SOURCE_DIR}/tests/data"
+                --version "${PROJECT_VERSION}${PROJECT_VERSION_STABILITY}${PROJECT_VERSION_BUILD_META}"
+                --install "${CMAKE_CURRENT_SOURCE_DIR}/tests/copy"
+                --install-with "$<TARGET_FILE:cov-echo>"
+                )
+    endforeach()
 
     add_test(
         NAME cov-exec-pl
@@ -107,22 +110,22 @@ install(TARGETS cov
 )
 
 install(
-  DIRECTORY ${PROJECT_BINARY_DIR}/share/
-  DESTINATION share/
-  COMPONENT main_exec
+    DIRECTORY ${PROJECT_BINARY_DIR}/share/
+    DESTINATION share/
+    COMPONENT main_exec
 )
 
 cpack_add_component(main_exec
-  DISPLAY_NAME "Main executable"
-  GROUP apps
+    DISPLAY_NAME "Main executable"
+    GROUP apps
 )
 
 cpack_add_component(tools
-  DISPLAY_NAME "Core tools"
-  GROUP apps
+    DISPLAY_NAME "Core tools"
+    GROUP apps
 )
 
 cpack_add_component_group(apps
-  DISPLAY_NAME "Executables"
-  EXPANDED
+    DISPLAY_NAME "Executables"
+    EXPANDED
 )

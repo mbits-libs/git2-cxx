@@ -257,8 +257,9 @@ namespace cov::testing {
 			init_repository(repo_dir, {}, ignore);
 		}
 
-		OOM_LIMIT(400)
-		auto const cfg = cov::repository::open(repo_dir, ignore);
+		OOM_LIMIT(450)
+		auto const cfg = cov::repository::open(setup::test_dir() / "sysroot"sv,
+		                                       repo_dir, ignore);
 		OOM_END
 	}
 }  // namespace cov::testing

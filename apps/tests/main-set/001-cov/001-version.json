@@ -1,0 +1,8 @@
+{
+    "args": "--version",
+    "expected": [
+        0,
+        "cov version $VERSION\n",
+        ""
+    ]
+}

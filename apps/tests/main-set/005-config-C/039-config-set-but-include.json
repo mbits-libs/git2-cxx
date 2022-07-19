@@ -1,0 +1,15 @@
+{
+    "args": "config --file $TMP/config group.key 'value 3'",
+    "expected": [
+        2,
+        "",
+        [
+            "usage: cov config [-h] [<file>] [<name> [<value>] | --unset <name> | -l | --list]",
+            "cov config: error: entry is not unique due to being included\n"
+        ]
+    ],
+    "prepare": [
+        "touch '$TMP/config.inc' '[group]\nkey = value 1'",
+        "touch '$TMP/config' '[include]\npath = config.inc'"
+    ]
+}

@@ -28,9 +28,17 @@ namespace git {
 		}
 		static config create(std::error_code& ec) noexcept;
 
-		static config open_default(std::string_view dot_name,
+		static config open_default(std::filesystem::path const& sysroot,
+		                           std::string_view dot_name,
 		                           std::string_view app,
 		                           std::error_code& ec);
+		static config open_system(std::filesystem::path const& sysroot,
+		                          std::string_view app,
+		                          std::error_code& ec);
+		static config open_global(std::string_view dot_name,
+		                          std::string_view app,
+		                          bool for_writing,
+		                          std::error_code& ec);
 
 		std::error_code add_file_ondisk(
 		    char const* path,
@@ -57,6 +65,9 @@ namespace git {
 		std::error_code set_path(
 		    char const* name,
 		    std::filesystem::path const& value) const noexcept;
+		std::error_code set_multivar(char const* name,
+		                             char const* regex,
+		                             char const* value) const noexcept;
 
 		std::optional<unsigned> get_unsigned(char const* name) const noexcept;
 		std::optional<bool> get_bool(char const* name) const noexcept;
@@ -66,12 +77,23 @@ namespace git {
 		config_entry get_entry(char const* name) const noexcept;
 
 		std::error_code delete_entry(char const* name) const noexcept;
+		std::error_code delete_multivar(const char* name,
+		                                const char* regex) const noexcept;
 
 		template <typename Callback>
-		std::error_code foreach (Callback cb) const {
+		std::error_code foreach_entry(Callback cb) const {
 			auto payload = reinterpret_cast<void*>(&cb);
-			return as_error(git_config_foreach(get(), callback_erased<Callback>,
-			                                   payload));
+			return as_error(
+			    git_config_foreach(get(), callback_erased<Callback>, payload));
+		}
+
+		template <typename Callback>
+		std::error_code get_multivar_foreach(const char* name,
+		                                     const char* regexp,
+		                                     Callback cb) const {
+			auto payload = reinterpret_cast<void*>(&cb);
+			return as_error(git_config_get_multivar_foreach(
+			    get(), name, regexp, callback_erased<Callback>, payload));
 		}
 
 	private:

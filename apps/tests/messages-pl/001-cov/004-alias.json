@@ -1,0 +1,23 @@
+{
+    "lang": "pl",
+    "args": "-C recurse first -D",
+    "expected": [
+        0,
+        [
+            "u\u017cycie: cov init [-h] [--git-dir <katalog>] [--force] [katalog]",
+            "",
+            "argumenty pozycyjne:",
+            " katalog             ustawia katalog, w kt\u00f3rym ma zosta\u0107 umieszczone repozytorium; domy\u015blnie wybiera bie\u017c\u0105cy katalog",
+            "",
+            "argumenty opcjonalne:",
+            " -h, --help          pokazuje ten komunikat pomocy i wychodzi",
+            " --git-dir <katalog> wskazuje na po\u0142\u0105czone repozytorium Git; domy\u015blnie wybiera bie\u017c\u0105ce repozytorium",
+            " --force             ponownie zainicjuje repozytorium ze \u015bwie\u017c\u0105 baz\u0105 danych\n"
+        ],
+        ""
+    ],
+    "prepare": [
+        "cd '$DATA'",
+        "mkdirs '$DATA/recurse/.covdata/objects/coverage'"
+    ]
+}

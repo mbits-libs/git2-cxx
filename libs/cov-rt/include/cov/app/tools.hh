@@ -24,6 +24,7 @@ namespace cov::app {
 		static std::filesystem::path get_sysroot();
 		static std::filesystem::path get_locale_dir();
 		static git::config cautiously_open_config(
+		    std::filesystem::path const& sysroot,
 		    std::filesystem::path const& current_directory);
 
 		int handle(std::string_view tool,
@@ -50,5 +51,6 @@ namespace cov::app {
 		int run_tool(std::filesystem::path const& tooldir,
 		             std::string_view tool,
 		             args::arglist args);
+		std::filesystem::path const& sys_root();
 	}  // namespace platform
 }  // namespace cov::app

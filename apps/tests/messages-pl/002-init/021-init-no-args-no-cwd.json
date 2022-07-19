@@ -1,0 +1,21 @@
+{
+    "lang": "pl",
+    "args": "init",
+    "patches": {
+        "cov init: b\u0142\u0105d: argument -C: .*": "cov init: b\u0142\u0105d: argument -C: ERROR MESSAGE"
+    },
+    "expected": [
+        2,
+        "",
+        [
+            "u\u017cycie: cov init [-h] [--git-dir <katalog>] [--force] [katalog]",
+            "cov init: b\u0142\u0105d: argument -C: ERROR MESSAGE\n"
+        ]
+    ],
+    "prepare": [
+        "safe-rm '$TMP/init-git-dir-no-cwd'",
+        "mkdirs '$TMP/init-git-dir-no-cwd/subdir'",
+        "cd '$TMP/init-git-dir-no-cwd/subdir'",
+        "rm '$TMP/init-git-dir-no-cwd'"
+    ]
+}

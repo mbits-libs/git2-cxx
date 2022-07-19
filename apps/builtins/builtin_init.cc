@@ -4,6 +4,7 @@
 #include <fmt/format.h>
 #include <cov/app/args.hh>
 #include <cov/app/cov_init_tr.hh>
+#include <cov/app/errors_tr.hh>
 #include <cov/app/tools.hh>
 #include <cov/repository.hh>
 #include <git2/repository.hh>
@@ -63,7 +64,7 @@ namespace cov::app::builtin::init {
 		}
 	}  // namespace
 
-	struct parser : base_parser<str::cov_init::lng> {
+	struct parser : base_parser<errlng, initlng> {
 		struct arguments {
 			path git_dir{};
 			path directory{};
@@ -83,7 +84,7 @@ namespace cov::app::builtin::init {
 
 	parser::parser(::args::args_view const& arguments,
 	               str::translator_open_info const& langs)
-	    : base_parser<str::cov_init::lng>{langs, arguments} {
+	    : base_parser<errlng, initlng>{langs, arguments} {
 		using namespace str;
 
 		parser_.arg(git_dir_, "git-dir")
@@ -167,8 +168,8 @@ namespace cov::app::builtin::init {
 		auto const [git_dir, directory, flags] = p.parse();
 
 		std::error_code ec{};
-		auto const repo =
-		    cov::repository::init(directory, git_dir, ec, {.flags = flags});
+		auto const repo = cov::repository::init(platform::sys_root(), directory,
+		                                        git_dir, ec, {.flags = flags});
 		if (!ec) {
 			p.tr().print(flags & cov::init_options::reinit
 			                 ? cov_init::lng::REINITIALIZED
@@ -192,7 +193,7 @@ namespace cov::app::builtin::init {
 		[[unlikely]];
 		p.tr().print(cov_init::lng::CANNOT_INITIALIZE, get_path(directory));
 		std::fputc('\n', stdout);
-		p.error(ec);
+		p.error(ec, p.tr());
 		// GCOV_EXCL_STOP
 	}  // GCOV_EXCL_LINE[WIN32]
 }  // namespace cov::app::builtin::init

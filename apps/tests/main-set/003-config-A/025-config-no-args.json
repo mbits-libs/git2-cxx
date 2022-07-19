@@ -1,0 +1,44 @@
+{
+    "args": "config",
+    "expected": [
+        0,
+        [
+            "usage: ",
+            " cov config [-h] [<file-options>] <name> [<value>]",
+            " cov config [-h] [<file-options>] --add <name> <value>",
+            " cov config [-h] [<file-options>] --get <name>",
+            " cov config [-h] [<file-options>] --get-all <name>",
+            " cov config [-h] [<file-options>] --unset <name>",
+            " cov config [-h] [<file-options>] --unset-all <name>",
+            " cov config [-h] [<file-options>] -l | --list",
+            "",
+            "file options:",
+            " <no option>          reads from all visible scopes at once, writes to .covdata/config",
+            " --local              chooses .covdata/config",
+            " --global             chooses ~/.config/cov/config",
+            " --system             chooses $(prefix)/etc/covconfig",
+            " -f, --file <file>    chooses given file",
+            "",
+            "positional arguments:",
+            " <name> [<value>]     when only name is given, reads its value; otherwise sets the new value",
+            "",
+            "optional arguments:",
+            " -h, --help           shows this help message and exits",
+            " --add <name> <value> adds a new line to the option without altering any existing values",
+            " --get <name>         prints the value matching the key name",
+            " --get-all <name>     prints all values matching the key name",
+            " --unset <name>       removes the value matching the key name if there is exactly one",
+            " --unset-all <name>   removes all values matching the key name",
+            " -l, --list           lists all variables in a config files\n"
+        ],
+        ""
+    ],
+    "prepare": [
+        "safe-rm $TMP/config-no-args",
+        "mkdirs $TMP/config-no-args/repo.git",
+        "mkdirs $TMP/config-no-args/repo.covdata",
+        "cd $TMP/config-no-args/repo.covdata",
+        "git init --bare $TMP/config-no-args/repo.git",
+        "cov init --git-dir $TMP/init-independent/repo.git ."
+    ]
+}

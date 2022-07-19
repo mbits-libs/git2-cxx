@@ -5,8 +5,10 @@
 
 #include <git2/errors.h>
 #include <args/parser.hpp>
+#include <concepts>
 #include <cov/app/dirs.hh>
 #include <cov/app/strings/args.hh>
+#include <cov/app/strings/errors.hh>
 #include <cov/app/tr.hh>
 #include <git2/error.hh>
 
@@ -24,10 +26,34 @@ namespace cov::app {
 			parser_.error(msg);
 		}  // GCOV_EXCL_LINE[WIN32]
 
-		[[noreturn]] void error(std::error_code const& ec);
+		template <typename Strings>
+		requires std::derived_from<Strings, str::errors::Strings> &&
+		    std::derived_from<Strings, str::args::Strings>
+		[[noreturn]] void error(std::error_code const& ec,
+		                        Strings const& str) const {
+			error(ec, str, str);
+		}  // GCOV_EXCL_LINE[WIN32]
+
+		template <typename Strings>
+		requires std::derived_from<Strings, str::errors::Strings> &&
+		    std::derived_from<Strings, str::args::Strings>
+		        std::string message(std::error_code const& ec,
+		                            Strings const& str)
+		const { return message(ec, str, str); }
+
+		static std::pair<char const*, std::string> message_from_libgit(
+		    str::errors::Strings const&);
 
 	protected:
 		::args::parser parser_;
+
+	private:
+		[[noreturn]] void error(std::error_code const& ec,
+		                        str::errors::Strings const&,
+		                        str::args::Strings const&) const;
+		std::string message(std::error_code const& ec,
+		                    str::errors::Strings const&,
+		                    str::args::Strings const&) const;
 	};
 
 	template <typename... Enum>

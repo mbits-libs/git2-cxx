@@ -1,0 +1,13 @@
+{
+    "args": "config -f '$TMP/config-list-file/some.file' --list",
+    "expected": [
+        0,
+        "group.key=from file\n",
+        ""
+    ],
+    "prepare": [
+        "safe-rm $TMP/config-list-file",
+        "touch '$TMP/config-list-file/some.file' '[group]\nkey = from file\n'",
+        "cd $TMP/config-list-file"
+    ]
+}

@@ -1,0 +1,18 @@
+{
+    "args": "config --local --list",
+    "expected": [
+        2,
+        "",
+        [
+            "usage: cov config [-h] [<file>] [<name> [<value>] | --unset <name> | -l | --list]",
+            "cov config: error: Cannot find a Cov repository in $TMP/config-list-local/repo.covdata\n"
+        ]
+    ],
+    "prepare": [
+        "safe-rm $TMP/config-list-local",
+        "mkdirs $TMP/config-list-local/repo.git",
+        "mkdirs $TMP/config-list-local/repo.covdata",
+        "cd $TMP/config-list-local/repo.covdata",
+        "git init --bare $TMP/config-list-local/repo.git"
+    ]
+}
