@@ -5,6 +5,8 @@
 #include <zlib.h>
 #include <cov/io/file.hh>
 #include <git2/bytes.hh>
+#include <string>
+#include <utility>
 #include <vector>
 
 namespace cov {
@@ -73,6 +75,6 @@ namespace cov {
 		void close() {
 			finish();
 			f_.close();
-		};
+		}
 	};
 }  // namespace cov

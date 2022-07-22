@@ -32,12 +32,12 @@ namespace lighter::testing {
 		ASSERT_GT(nl10_100, nl100);
 		ASSERT_LT(nl100, nl10_100);
 
-		ASSERT_TRUE(nl100.cmp(comment100) < 0);
-		ASSERT_TRUE(comment100.cmp(nl100) > 0);
-		ASSERT_TRUE(nl100.cmp(nl90) < 0);
-		ASSERT_TRUE(nl90.cmp(nl100) > 0);
-		ASSERT_TRUE(nl100.cmp(nl10_100) < 0);
-		ASSERT_TRUE(nl10_100.cmp(nl100) > 0);
+		ASSERT_TRUE(nl100.cmp(comment100) < 0);  // NOLINT
+		ASSERT_TRUE(comment100.cmp(nl100) > 0);  // NOLINT
+		ASSERT_TRUE(nl100.cmp(nl90) < 0);        // NOLINT
+		ASSERT_TRUE(nl90.cmp(nl100) > 0);        // NOLINT
+		ASSERT_TRUE(nl100.cmp(nl10_100) < 0);    // NOLINT
+		ASSERT_TRUE(nl10_100.cmp(nl100) > 0);    // NOLINT
 	}
 
 	TEST(additional, action_state) {

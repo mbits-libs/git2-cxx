@@ -5,6 +5,7 @@
 
 #include <filesystem>
 #include <git2/repository.hh>
+#include <string>
 
 namespace git::testing::setup {
 	using std::filesystem::path;

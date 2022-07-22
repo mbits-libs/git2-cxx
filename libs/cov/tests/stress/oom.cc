@@ -239,7 +239,6 @@ namespace cov::testing {
 		auto const repo_dir = setup::test_dir() / "repo"sv;
 
 		unsetenv("USERPROFILE");
-		unsetenv("ProgramData");
 		unsetenv("XDG_CONFIG_HOME");
 		setpath("HOME", home.c_str());
 

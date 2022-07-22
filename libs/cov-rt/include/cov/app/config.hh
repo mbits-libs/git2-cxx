@@ -8,7 +8,9 @@
 #include <cov/app/errors_tr.hh>
 #include <filesystem>
 #include <git2/config.hh>
+#include <string>
 #include <type_traits>
+#include <vector>
 
 namespace cov::app::config {
 	enum class scope { unspecified, local, global, system, file };

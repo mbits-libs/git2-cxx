@@ -42,8 +42,7 @@ namespace cov {
 				z_.avail_out = output_size;
 				z_.next_out = output;
 				ret = process(Z_NO_FLUSH);
-				if (ret != Z_OK) 
-					size += z_.avail_in;
+				if (ret != Z_OK) size += z_.avail_in;
 			}
 		}
 

@@ -8,6 +8,9 @@
 #include <cov/report.hh>
 #include <filesystem>
 #include <map>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace cov::testing {
 	using line_cvg = std::map<unsigned, unsigned>;

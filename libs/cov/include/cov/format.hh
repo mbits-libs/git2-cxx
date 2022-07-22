@@ -6,6 +6,7 @@
 #include <cov/report.hh>
 #include <map>
 #include <string>
+#include <utility>
 #include <variant>
 #include <vector>
 
@@ -24,7 +25,7 @@ namespace cov {
 		mark_incomplete,
 		mark_passing,
 	};
-}
+}  // namespace cov
 
 namespace cov::placeholder {
 	enum class color {
@@ -160,7 +161,7 @@ namespace cov::placeholder {
 				    report.committer_email(),
 				    report.commit_time_utc(),
 				};
-			};
+			}
 		}
 	};
 

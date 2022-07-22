@@ -8,6 +8,7 @@
 #include <cov/streams.hh>
 #include <memory>
 #include <unordered_map>
+#include <utility>
 
 namespace cov::io {
 	enum class errc : int {

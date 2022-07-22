@@ -37,10 +37,11 @@ namespace git::testing {
 					default:
 						if (c < 32) {
 							char buffer[10];
-							sprintf(buffer, "%03o", c);
+							snprintf(buffer, sizeof(buffer), "%03o", c);
 							out << buffer;
-						} else
+						} else {
 							out << c;
+						}
 						break;
 				}
 			}

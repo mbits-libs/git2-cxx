@@ -1120,7 +1120,7 @@ namespace hl::cxx::parser {
 						on_newline(ctx);
 					}
 					return true;
-				};
+				}
 			}
 			return false;
 		}

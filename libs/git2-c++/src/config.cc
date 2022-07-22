@@ -53,9 +53,12 @@ namespace git {
 		}  // namespace names
 
 		char const* get_home() noexcept {
-			if (auto var = std::getenv(names::HOME); var && *var) return var;
-			if (auto var = std::getenv(names::USERPROFILE); var && *var)
+			if (auto var = std::getenv(names::HOME); var && *var) {
 				return var;
+			}
+			if (auto var = std::getenv(names::USERPROFILE); var && *var) {
+				return var;
+			}
 			return nullptr;
 		}
 

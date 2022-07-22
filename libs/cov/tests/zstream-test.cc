@@ -37,7 +37,7 @@ namespace cov::testing {
 			else
 				out << ',';
 			char buffer[10];
-			sprintf(buffer, " 0x%02x", c);
+			snprintf(buffer, sizeof(buffer), " 0x%02x", c);
 			out << buffer;
 		}
 		out << " }";

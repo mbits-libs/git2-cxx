@@ -2,7 +2,8 @@
 // This code is licensed under MIT license (see LICENSE for details)
 
 #pragma once
-#include "cov/hash/hash.hh"
+#include <algorithm>
+#include <cov/hash/hash.hh>
 
 namespace hash {
 	struct md5 : basic_hash<md5, 64, 16, endian::little> {

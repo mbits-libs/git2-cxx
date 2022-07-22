@@ -1,0 +1,1 @@
+cpplint --exclude ./build --exclude ./external --exclude ./tools --exclude ./libs/app/include/cov/app/strings --exclude ./libs/app/src/strings --exclude ./libs/hilite/hilite-cxx/src/cxx.cc --recursive ./

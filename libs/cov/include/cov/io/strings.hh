@@ -3,9 +3,11 @@
 
 #pragma once
 
+#include <functional>
 #include <set>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 namespace cov::io {

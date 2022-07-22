@@ -1,8 +1,12 @@
 // Copyright (c) 2022 Marcin Zdun
 // This code is licensed under MIT license (see LICENSE for details)
 
+#pragma once
+
 #include <cov/reference.hh>
+#include <string>
 #include <string_view>
+#include <utility>
 
 namespace cov {
 	namespace detail {

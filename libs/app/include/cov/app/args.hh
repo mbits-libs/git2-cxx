@@ -11,6 +11,8 @@
 #include <cov/app/strings/errors.hh>
 #include <cov/app/tr.hh>
 #include <git2/error.hh>
+#include <string>
+#include <utility>
 
 namespace cov::app {
 	class parser_holder {

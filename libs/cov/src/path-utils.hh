@@ -8,6 +8,7 @@
 #include <git2/error.hh>
 #include <git2/repository.hh>
 #include <optional>
+#include <string>
 
 #ifdef WIN32
 #include <Windows.h>
@@ -62,7 +63,9 @@ namespace cov {
 		inline std::string get_path(path const& p) {
 			return p.generic_u8string();
 		}
-		inline path make_path(std::string_view utf8) { return u8path(utf8); }
+		inline path make_path(std::string_view utf8) {
+			return u8path(utf8);
+		}
 #endif
 
 		inline bool is_valid_path(path const& base_dir) {
@@ -102,7 +105,7 @@ namespace cov {
 
 		inline auto isspace(char c) {
 			return std::isspace(static_cast<unsigned char>(c));
-		};
+		}
 
 		inline std::string_view lstrip(std::string_view view) {
 			while (!view.empty() && isspace(view.front()))

@@ -118,8 +118,9 @@ namespace cov::placeholder {
 					if (space == 1) *out++ = '-';
 					space = 0;
 					*out++ = c;
-				} else
+				} else {
 					space |= 1;
+				}
 				seen_dot = c == '.';
 			}
 			return out;
@@ -157,7 +158,7 @@ namespace cov::placeholder {
 			if ((cov * passing.den) < (passing.num * rel))
 				return translatable::mark_incomplete;
 			return translatable::mark_passing;
-		};
+		}
 
 		iterator format_rating(iterator out,
 		                       io::v1::coverage_stats const& stats,
@@ -408,8 +409,9 @@ namespace cov::placeholder {
 			if (first) {
 				first = false;
 				if (wrapped) out = format_str(out, " (");
-			} else
+			} else {
 				out = format_str(out, ", "sv);
+			}
 			out = format_str(out, "tag: "sv);
 			out = format_str(out, key);
 		}
@@ -419,8 +421,9 @@ namespace cov::placeholder {
 			if (first) {
 				first = false;
 				if (wrapped) out = format_str(out, " (");
-			} else
+			} else {
 				out = format_str(out, ", "sv);
+			}
 			out = format_str(out, key);
 		}
 
@@ -563,7 +566,9 @@ namespace cov {
 #define SIMPLE_FORMAT(CHAR, RESULT) \
 	case CHAR:                      \
 		++cur;                      \
-		return format { RESULT }
+		return format {             \
+			RESULT                  \
+		}
 #define DEEPER_FORMAT(CHAR, CB) \
 	case CHAR:                  \
 		++cur;                  \

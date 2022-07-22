@@ -1,8 +1,12 @@
 // Copyright (c) 2022 Marcin Zdun
 // This code is licensed under MIT license (see LICENSE for details)
 
+#pragma once
+
 #include <cov/io/file.hh>
 #include <cov/streams.hh>
+#include <functional>
+#include <utility>
 
 namespace cov::io {
 	class direct_read_stream : public read_stream {
