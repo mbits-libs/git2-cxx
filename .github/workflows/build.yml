@@ -1,4 +1,4 @@
-name: CovTool
+name: Build
 
 on:
   push:
