@@ -1,15 +1,4 @@
----
-#################################
-#################################
-## Super Linter GitHub Actions ##
-#################################
-#################################
-name: Lint Code Base
-
-#
-# Documentation:
-# https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions
-#
+name: Super-linter
 
 on:
   push:
@@ -18,8 +7,8 @@ on:
     branches: [main]
 
 jobs:
-  line:
-    name: Lint Code Base
+  lint:
+    name: Super-linter
     runs-on: ubuntu-latest
 
     steps:
@@ -48,7 +37,10 @@ jobs:
           VALIDATE_TSX: true
           VALIDATE_TYPESCRIPT_ES: true
           VALIDATE_TYPESCRIPT_STANDARD: true
-          FILTER_REGEX_INCLUDE: "libs/.*|apps/.*"
-          FILTER_REGEX_EXCLUDE: "libs/app/include/cov/app/strings/.*|\
-                                 libs/app/src/strings/.*|\
-                                 libs/hilite/hilite-cxx/src/cxx\\.cc"
+          FILTER_REGEX_INCLUDE: ".*/libs/.*|.*/apps/.*"
+          FILTER_REGEX_EXCLUDE: ".*/build/.*|\
+                                 .*/external/.*|\
+                                 .*/tools/.*|\
+                                 .*/libs/app/include/cov/app/strings/.*|\
+                                 .*/libs/app/src/strings/.*|\
+                                 .*/libs/hilite/hilite-cxx/src/cxx\\.cc"
