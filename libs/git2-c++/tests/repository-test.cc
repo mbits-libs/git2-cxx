@@ -54,9 +54,9 @@ namespace git::testing {
 		bool seen_something_else = false;
 		std::string something_else;
 		repo.submodule_foreach([&](auto const&, auto name) {
-			if (name == "bare"sv)
+			if (name == "bare"sv) {
 				seen_bare = true;
-			else {
+			} else {
 				if (!seen_something_else) something_else.assign(name);
 				seen_something_else = true;
 			}

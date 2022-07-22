@@ -10,6 +10,7 @@
 #include <git2/odb.hh>
 #include <git2/repository.hh>
 #include <map>
+#include <string>
 #include <vector>
 
 namespace git {

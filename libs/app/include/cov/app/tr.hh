@@ -7,6 +7,7 @@
 #include <args/translator.hpp>
 #include <cov/app/strings/args.hh>
 #include <span>
+#include <string>
 #include <string_view>
 
 namespace cov::app::str {

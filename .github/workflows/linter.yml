@@ -1,0 +1,44 @@
+name: Super-linter
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    name: Super-linter
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Lint Code Base
+        uses: github/super-linter/slim@v4
+        env:
+          VALIDATE_ALL_CODEBASE: false
+          DEFAULT_BRANCH: main
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LOG_LEVEL: ERROR
+          SUPPRESS_POSSUM: true
+          VALIDATE_CPP: true
+          VALIDATE_CSS: true
+          VALIDATE_GITHUB_ACTIONS: true
+          VALIDATE_HTML: true
+          VALIDATE_JAVASCRIPT_ES: true
+          VALIDATE_JAVASCRIPT_STANDARD: true
+          VALIDATE_JSON: true
+          VALIDATE_JSX: true
+          VALIDATE_MARKDOWN: true
+          VALIDATE_TSX: true
+          VALIDATE_TYPESCRIPT_ES: true
+          VALIDATE_TYPESCRIPT_STANDARD: true
+          FILTER_REGEX_INCLUDE: ".*/libs/.*|.*/apps/.*"
+          FILTER_REGEX_EXCLUDE: ".*/build/.*|\
+                                 .*/external/.*|\
+                                 .*/tools/.*|\
+                                 .*/libs/app/include/cov/app/strings/.*|\
+                                 .*/libs/app/src/strings/.*|\
+                                 .*/libs/hilite/hilite-cxx/src/cxx\\.cc"

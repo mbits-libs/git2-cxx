@@ -4,6 +4,7 @@
 #pragma once
 #include <atomic>
 #include <concepts>
+#include <utility>
 
 namespace cov {
 	struct counted {
@@ -32,7 +33,7 @@ namespace cov {
 	concept Counted = requires(T& ref) {
 		ref.acquire();
 		ref.release();
-	};
+	};  // NOLINT
 
 	template <typename Object>
 	class ref_ptr {
@@ -147,7 +148,7 @@ namespace cov {
 	template <Counted Object, typename... Args>
 	inline ref_ptr<Object> make_ref(Args&&... args) {
 		return ref_ptr<Object>{new Object(std::forward<Args>(args)...)};
-	};
+	}
 
 	template <class Counted, class Intermediate>
 	struct enable_ref_from_this {

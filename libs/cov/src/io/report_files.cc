@@ -122,7 +122,7 @@ namespace cov::io::handlers {
 			for (auto const& entry_ptr : entries) {
 				auto& entry = *entry_ptr;
 				strings.insert(entry.path());
-			};
+			}
 
 			return strings.build();
 		}();

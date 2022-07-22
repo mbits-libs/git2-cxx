@@ -36,8 +36,10 @@ namespace cov {
 		// virtual std::error_code read() = 0;
 		template <typename Derived>
 		inline bool is_a() const noexcept;
-#define IS_A(NAME) \
-	virtual bool is_##NAME() const noexcept { return false; }
+#define IS_A(NAME)                            \
+	virtual bool is_##NAME() const noexcept { \
+		return false;                         \
+	}
 		KNOWN_OBJECTS(IS_A)
 #undef IS_A
 	};
@@ -72,12 +74,12 @@ namespace cov {
 
 	template <typename derived, typename base>
 	inline derived const* as_a(base const& var) {
-		return is_a<derived>(var) ? &static_cast<derived const&>(var) : nullptr;
+		return is_a<derived>(var) ? static_cast<derived const*>(&var) : nullptr;
 	}
 
 	template <typename derived, typename base>
 	inline derived* as_a(base& var) {
-		return is_a<derived>(var) ? &static_cast<derived&>(var) : nullptr;
+		return is_a<derived>(var) ? static_cast<derived*>(&var) : nullptr;
 	}
 
 	template <typename derived, typename base>

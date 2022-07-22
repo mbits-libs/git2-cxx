@@ -5,6 +5,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <string>
 #include <string_view>
 #include <vector>
 
@@ -46,8 +47,12 @@ namespace hl {
 		size_t stop;
 		hl::token kind;
 		auto cmp(const token_t& rhs) const {
-			if (auto const cmp = start <=> rhs.start; cmp != 0) return cmp;
-			if (auto const cmp = rhs.stop <=> stop; cmp != 0) return cmp;
+			if (auto const cmp = start <=> rhs.start; cmp != 0) {
+				return cmp;
+			}
+			if (auto const cmp = rhs.stop <=> stop; cmp != 0) {
+				return cmp;
+			}
 			return kind <=> rhs.kind;
 		}
 

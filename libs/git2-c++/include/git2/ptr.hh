@@ -5,6 +5,7 @@
 #include <git2/types.h>
 #include <git2/error.hh>
 #include <memory>
+#include <utility>
 
 namespace git {
 	template <typename Object>

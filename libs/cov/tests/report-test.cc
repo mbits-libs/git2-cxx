@@ -54,7 +54,8 @@ namespace cov::testing {
 		    "develop\x00"               // 32,  8 :: 0x20
 		    "johnny@appleseed.com\x00"  // 40,  - :: 0x28
 		    "\x00\x00\x00"sv;
-	}
+	}  // namespace
+
 	class test_stream final : public write_stream {
 	public:
 		static constexpr size_t infinite = std::numeric_limits<size_t>::max();

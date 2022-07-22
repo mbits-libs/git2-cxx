@@ -5,6 +5,7 @@
 
 #include <git2/oid.h>
 #include <filesystem>
+#include <string>
 
 namespace cov::testing::setup {
 	using std::filesystem::path;

@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <vector>
 #include "cell/context.hh"
 #include "cell/parser.hh"
 #include "cell/special.hh"
@@ -19,7 +20,9 @@
 	    const
 
 #define RULE_EMIT(name, tok) \
-	RULE_MAP(name) { _emit(context, tok); }
+	RULE_MAP(name) {         \
+		_emit(context, tok); \
+	}
 
 namespace hl {
 	struct endline_t {
@@ -50,7 +53,7 @@ namespace hl {
 				default:
 					tokens_.push_back({start, end, kind});
 					break;
-			};
+			}
 		}
 
 		void produce_lines(callback& cb, size_t contents_length);

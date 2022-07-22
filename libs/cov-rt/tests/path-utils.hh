@@ -6,6 +6,8 @@
 #include <cov/init.hh>
 #include <cov/io/file.hh>
 #include <git2/repository.hh>
+#include <string>
+#include <vector>
 #include "setup.hh"
 
 namespace cov::testing {

@@ -38,7 +38,6 @@ static inline void print_one(std::string_view arg) {
 }
 
 int tool(args::args_view const& arguments) {
-
 	print_one(arguments.progname);
 
 	for (unsigned index = 0; index < arguments.args.size(); ++index) {

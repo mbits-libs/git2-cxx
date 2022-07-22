@@ -1,6 +1,6 @@
-# The placeholders are:
+# The placeholders are
 
-## Placeholders that expand to a single literal character:
+## Placeholders that expand to a single literal character
 
 |Placeholder|Meaning|
 |-|-|
@@ -8,7 +8,7 @@
 |`%%`| a raw % |
 |`%x00`| print a byte from a hex code |
 
-## Placeholders that affect formatting of later placeholders:
+## Placeholders that affect formatting of later placeholders
 
 |Placeholder|Meaning|
 |-|-|
@@ -19,7 +19,7 @@
 |`%C(…​)`|color specification|
 |`%w([<w>[,<i1>[,<i2>]]])`|switch line wrapping, like the -w option of git-shortlog[1].|
 
-## Placeholders that expand to information extracted from the report:
+## Placeholders that expand to information extracted from the report
 
 |Placeholder|Meaning|
 |-|-|
@@ -41,7 +41,7 @@
 |`%d`|ref names, like the --decorate option of git-log[1]|
 |`%D`|ref names without the " (", ")" wrapping.|
 
-## Placeholders that expand to information extracted from the commit:
+## Placeholders that expand to information extracted from the commit
 
 Below, "person" is either author or committer.
 

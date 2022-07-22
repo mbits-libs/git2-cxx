@@ -6,6 +6,7 @@
 #include <cstdio>
 #include <filesystem>
 #include <git2/global.hh>
+#include <string>
 
 namespace cov::testing::setup {
 	using namespace ::std::literals;
@@ -48,8 +49,12 @@ namespace cov::testing::setup {
 		}
 	};  // namespace
 
-	test_initializer::test_initializer() { test_globals::get().enter(); }
-	test_initializer::~test_initializer() { test_globals::get().leave(); }
+	test_initializer::test_initializer() {
+		test_globals::get().enter();
+	}
+	test_initializer::~test_initializer() {
+		test_globals::get().leave();
+	}
 
 	std::filesystem::path test_dir() {
 		static std::filesystem::path dirname = get_test_dir();
@@ -68,10 +73,14 @@ namespace cov::testing::setup {
 		return {view.data(), view.length()};
 	}
 
-	path make_path(std::string_view utf8) { return conv<char8_t>(utf8); }
+	path make_path(std::string_view utf8) {
+		return conv<char8_t>(utf8);
+	}
 
 #else
-	std::string get_path(path const& p) { return p.generic_u8string(); }
+	std::string get_path(path const& p) {
+		return p.generic_u8string();
+	}
 
 	path make_path(std::string_view utf8) {
 		return std::filesystem::u8path(utf8);

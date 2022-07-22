@@ -9,6 +9,8 @@
 #include <git2/config.hh>
 #include <set>
 #include <span>
+#include <string>
+#include <utility>
 
 namespace cov::app {
 	struct builtin_tool {

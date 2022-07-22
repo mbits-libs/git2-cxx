@@ -30,7 +30,9 @@ namespace cov::io {
 		return *this;
 	}
 
-	void strings_view::resync() noexcept { update(data.data(), data.size()); }
+	void strings_view::resync() noexcept {
+		update(data.data(), data.size());
+	}
 
 	void strings_block::update_() noexcept {
 		update(data_.data(), data_.size());
@@ -41,7 +43,7 @@ namespace cov::io {
 			offsets_.reserve(length);
 		} catch (std::bad_alloc&) {
 			return false;
-		} // GCOV_EXCL_LINE[WIN32]
+		}  // GCOV_EXCL_LINE[WIN32]
 
 		return offsets_.capacity() >= length;
 	}

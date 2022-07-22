@@ -1,10 +1,13 @@
 // Copyright (c) 2022 Marcin Zdun
 // This code is licensed under MIT license (see LICENSE for details)
 
+#pragma once
+
 #include <cov/hash/sha1.hh>
 #include <cov/io/file.hh>
 #include <cov/streams.hh>
 #include <cov/zstream.hh>
+#include <utility>
 
 namespace cov::io {
 	class safe_base {

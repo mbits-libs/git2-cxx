@@ -5,7 +5,9 @@
 #include <cov/io/types.hh>
 #include <cov/object.hh>
 #include <memory>
+#include <string>
 #include <string_view>
+#include <vector>
 
 namespace cov {
 	struct object_with_id : object {

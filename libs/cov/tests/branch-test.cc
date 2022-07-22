@@ -61,14 +61,15 @@ namespace cov::testing {
 			    make_setup(
 			        remove_all("branch-lookup-dangling"sv),
 			        create_directories("branch-lookup-dangling"sv),
-			        touch("branch-lookup-dangling/refs/heads/feat/task-1"sv, "ref: refs/not-a-commitish\n"sv)),
+			        touch("branch-lookup-dangling/refs/heads/feat/task-1"sv,
+			              "ref: refs/not-a-commitish\n"sv)),
 			    ec);
 			ASSERT_FALSE(ec) << "   Error: " << ec.message() << " ("
 			                 << ec.category().name() << ')';
 		}
 
-		auto refs =
-		    cov::references::make_refs(setup::test_dir() / "branch-lookup-dangling"sv);
+		auto refs = cov::references::make_refs(setup::test_dir() /
+		                                       "branch-lookup-dangling"sv);
 		ASSERT_TRUE(refs);
 
 		auto branch = cov::branch::lookup("feat/task-1"sv, *refs);
