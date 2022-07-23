@@ -27,7 +27,7 @@ namespace cov::app {
 		    {errlng::CONFIG_NON_UNIQUE_MULTIVAR,
 		     "entry is not unique due to being a multivar"sv},
 		    {errlng::CONFIG_NON_UNIQUE_INCLUDED,
-		     "entry is not unique due to being a multivar"sv},
+		     "entry is not unique due to being included"sv},
 		};
 
 		static constexpr error_lookup config_regex[] = {
