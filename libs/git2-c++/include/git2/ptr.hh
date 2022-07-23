@@ -19,6 +19,8 @@ namespace git {
 		    typename std::unique_ptr<Object, ptr_closer<Object>>::pointer;
 		using element_type =
 		    typename std::unique_ptr<Object, ptr_closer<Object>>::element_type;
+
+		pointer raw() const noexcept { return this->get(); }
 	};
 
 	template <typename Object>
@@ -35,6 +37,8 @@ namespace git {
 		handle& operator=(handle&&) = default;
 
 		explicit operator bool() const noexcept { return !!ptr_; }
+
+		pointer raw() const noexcept { return ptr_; }
 
 	protected:
 		pointer get() const noexcept { return ptr_; }

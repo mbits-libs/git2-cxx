@@ -9,6 +9,7 @@ set(SOURCES
   src/ptr.cc
   src/repository.cc
   src/submodule.cc
+  src/transaction.cc
   src/tree.cc
   include/git2/bytes.hh
   include/git2/blob.hh
@@ -22,6 +23,7 @@ set(SOURCES
   include/git2/ptr.hh
   include/git2/repository.hh
   include/git2/submodule.hh
+  include/git2/transaction.hh
   include/git2/tree.hh
 )
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})

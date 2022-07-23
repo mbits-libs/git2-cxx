@@ -12,6 +12,7 @@
 namespace git {
 	GIT_PTR_FREE(git_tree);
 	GIT_PTR_FREE(git_tree_entry);
+	GIT_PTR_FREE(git_treebuilder);
 
 	struct tree;
 	struct commit;
@@ -92,6 +93,8 @@ namespace git {
 		             repository_handle repo,
 		             git_diff_options const* opts,
 		             std::error_code& ec) const noexcept;
+
+		friend struct treebuilder;
 	};
 
 	template <class GitObject, git_object_t ObjectType>
@@ -100,4 +103,26 @@ namespace git {
 	    std::error_code& ec) const noexcept {
 		return this->bypath<tree>(path, ec);
 	}
+
+	struct treebuilder : ptr<git_treebuilder> {
+		using ptr<git_treebuilder>::ptr;
+
+		static treebuilder create(std::error_code& ec,
+		                          repository_handle repo,
+		                          tree const& tree = {}) {
+			return create_handle<treebuilder>(ec, git_treebuilder_new,
+			                                  repo.get(), tree.get());
+		}
+
+		std::error_code insert(char const* filename,
+		                       git_oid const& id,
+		                       git_filemode_t filemode) {
+			return as_error(git_treebuilder_insert(nullptr, get(), filename,
+			                                       &id, filemode));
+		}
+
+		std::error_code write(git_oid& id) {
+			return as_error(git_treebuilder_write(&id, get()));
+		}
+	};
 }  // namespace git

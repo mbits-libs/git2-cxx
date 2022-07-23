@@ -258,6 +258,10 @@ namespace git {
 		                       GIT_CONFIG_LEVEL_LOCAL, repo, force);
 	}
 
+	transaction config::lock(std::error_code& ec) const noexcept {
+		return create_handle<transaction>(ec, git_config_lock, get());
+	}
+
 	std::error_code config::set_unsigned(const char* name,
 	                                     unsigned value) const noexcept {
 		return as_error(git_config_set_int64(get(), name, value));
