@@ -21,7 +21,8 @@ namespace cov::testing {
 			default:
 				if (!std::isprint(static_cast<unsigned char>(c))) {
 					char buffer[10];
-					snprintf(buffer, sizeof(buffer), "\\x%02x", c);
+					snprintf(buffer, sizeof(buffer), "\\x%02x",
+					         static_cast<unsigned char>(c));
 					return out << buffer;
 				} else {
 					return out << c;

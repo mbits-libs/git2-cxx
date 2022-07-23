@@ -3,6 +3,7 @@
 
 #pragma once
 #include <git2/config.h>
+#include <git2/transaction.hh>
 #include <git2/ptr.hh>
 
 #include <filesystem>
@@ -58,6 +59,9 @@ namespace git {
 		std::error_code add_local_config(std::filesystem::path const& directory,
 		                                 const git_repository* repo = nullptr,
 		                                 int force = 1) const;
+
+		transaction lock(std::error_code& ec) const noexcept;
+
 		std::error_code set_unsigned(char const* name,
 		                             unsigned value) const noexcept;
 		std::error_code set_bool(char const* name, bool value) const noexcept;

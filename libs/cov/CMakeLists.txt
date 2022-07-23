@@ -23,6 +23,8 @@ set(SOURCES
   src/discover.cc
   src/format.cc
   src/init.cc
+  src/module_config.cc
+  src/module.cc
   src/path-utils.hh
   src/repository.cc
   src/streams.cc
@@ -46,6 +48,7 @@ set(SOURCES
   include/cov/discover.hh
   include/cov/format.hh
   include/cov/init.hh
+  include/cov/module.hh
   include/cov/object.hh
   include/cov/reference.hh
   include/cov/report.hh
@@ -62,7 +65,7 @@ target_link_options(cov-api PRIVATE ${ADDITIONAL_LINK_FLAGS})
 target_include_directories(cov-api PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}/include
   ${CMAKE_CURRENT_BINARY_DIR}/include)
-target_link_libraries(cov-api PUBLIC git2-c++ fmt::fmt date::date PRIVATE OpenSSL::OpenSSL)
+target_link_libraries(cov-api PUBLIC git2-c++ fmt::fmt date::date PRIVATE hilite OpenSSL::OpenSSL)
 
 set_target_properties(cov-api PROPERTIES FOLDER libs)
 
