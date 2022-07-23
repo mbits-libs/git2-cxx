@@ -3,6 +3,7 @@
     "files.trimFinalNewlines": true,
     "cSpell.words": [
         "covdata",
-        "hilite"
+        "hilite",
+        "workdir"
     ]
 }

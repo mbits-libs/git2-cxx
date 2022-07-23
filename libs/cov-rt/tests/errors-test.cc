@@ -19,11 +19,14 @@ namespace cov::app::testing {
 			int git_error{GIT_ERROR};
 		} git{};
 		std::error_code ec{};
-		std::string_view excpected{};
+		struct {
+			std::string_view en{};
+			std::string_view pl{};
+		} expected{};
 	};
 
 	class error : public ::testing::TestWithParam<error_test> {};
-	TEST_P(error, with_domain) {
+	TEST_P(error, message_en) {
 		auto const& [git, ec, expected] = GetParam();
 		git::init globals{};
 
@@ -44,28 +47,58 @@ namespace cov::app::testing {
 
 		parser_holder holder{{"cov config"sv, {}}, {}, tr.args()};
 		auto const actual = holder.message(copy, tr);
-		ASSERT_EQ(expected, actual);
+		ASSERT_EQ(expected.en, actual);
+	}
+
+	TEST_P(error, message_pl) {
+		auto const& [git, ec, expected] = GetParam();
+		git::init globals{};
+
+		auto copy = ec;
+
+		if (!ec) {
+			if (git.message) {
+				git_error_set_str(git.type, git.message);
+			} else {
+				git_error_clear();
+			}
+			copy = git::as_error(git.git_error);
+		}
+
+		std::vector<std::string> pl{"pl"};
+		str::args_translator<errlng> tr{
+		    {platform::sys_root() / directory_info::share / "locale"sv, pl}};
+
+		parser_holder holder{{"cov config"sv, {}}, {}, tr.args()};
+		auto const actual = holder.message(copy, tr);
+		ASSERT_EQ(expected.pl, actual);
 	}
 
 	static error_test const tests[] = {
 	    {
 	        .git = {GIT_ERROR_REGEX, "error message goes here"},
-	        .excpected = "cov config: regex error: error message goes here"sv,
+	        .expected =
+	            {.en = "cov config: regex error: error message goes here"sv,
+	             .pl = "cov config: b\xC5\x82\xC4\x85" "d regex: error message goes here"sv},
 	    },
 	    {
 	        .git = {GIT_ERROR_CONFIG, "error message goes here"},
-	        .excpected = "cov config: error: error message goes here"sv,
+	        .expected = {.en = "cov config: error: error message goes here"sv,
+	                     .pl = "cov config: b\xC5\x82\xC4\x85" "d: error message goes here"sv},
 	    },
 	    {
 	        .git = {GIT_ERROR_INDEX, "neither regex nor config"},
-	        .excpected = "cov config: error: neither regex nor config"sv,
+	        .expected = {.en = "cov config: error: neither regex nor config"sv,
+	                     .pl = "cov config: b\xC5\x82\xC4\x85" "d: neither regex nor config"sv},
 	    },
 	    {
 	        .ec = std::make_error_code(std::errc::not_a_directory),
 #ifdef _MSC_VER
-	        .excpected = "cov config: generic error: not a directory"sv,
+	        .expected = {.en = "cov config: generic error: not a directory"sv,
+	                     .pl = "cov config: b\xC5\x82\xC4\x85" "d generic: not a directory"sv},
 #else
-	        .excpected = "cov config: generic error: Not a directory"sv,
+	        .expected = {.en = "cov config: generic error: Not a directory"sv,
+	                     .pl = "cov config: b\xC5\x82\xC4\x85" "d generic: Not a directory"sv},
 #endif
 	    },
 	};
