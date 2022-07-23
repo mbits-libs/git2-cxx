@@ -28,7 +28,7 @@
     - [x] SetFileAttributes FILE_ATTRIBUTE_HIDDEN
   - [x] `cov config` _(0.11.0-beta)_
   - [x] flatten strings files structure _(0.11.1-beta)_
-  - [ ] `cov module` _(each is a M⬆️P)_
+  - [x] `cov module` _(0.12.0-beta)_
     - _[module "libraries"]_\
     _name=..._\
     _dir=..._\
@@ -36,7 +36,7 @@
   - [ ] `cov report`
     - [ ] coveralls _(separate M⬆️P)_
     - [ ] cobertura _(separate M⬆️P)_
-  - [ ] `cov log`
+  - [ ] `cov log` _(each is a M⬆️P)_
   - [ ] `cov show` _(only one M⬆️P)_
     - [ ] Report / component / directory view
     - [ ] File view
