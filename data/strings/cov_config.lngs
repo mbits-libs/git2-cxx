@@ -1,7 +1,7 @@
 [
     project("cov"),
 	namespace("cov::app::str::cov_config"),
-    version("0.11.0"),
+    version("0.11.1"),
     serial(1)
 ] strings {
     [help("Name of a file options argument(s)"), id(-1)]
