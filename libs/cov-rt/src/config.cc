@@ -210,7 +210,7 @@ namespace cov::app::config {
 
 		parser_.usage(
 		    fmt::format("[-h] [{0}] [{1} [{2}] | --unset {1} | -l | --list]"sv,
-		                tr_(args::lng::FILE_META), tr_(args::lng::NAME_META),
+		                tr_(cfglng::SCOPE_META), tr_(args::lng::NAME_META),
 		                tr_(args::lng::VALUE_META)));
 		parser_.provide_help(false);
 		parser_.custom(show_help, "h", "help").opt();
@@ -302,7 +302,7 @@ namespace cov::app::config {
 
 		if (cmd == add && args.size() < 2) {
 			error(tr_.format(args::lng::ARGUMENT_MSG, "--add"sv,
-			                 "needs both <name> and <value>"));
+			                 tr_(cfglng::ADD_VALUE_MISSING)));
 		}
 
 		path current_directory;

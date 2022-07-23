@@ -1,16 +1,17 @@
 {
+    "lang": "pl",
     "env": {
         "HOME": "$TMP/config-explicit/home",
         "XDG_CONFIG_HOME": null,
         "USERPROFILE": null
     },
-    "args": "config --get key.name --get-all unimportant.item",
+    "args": "config --unset-all key.name --add unimportant.item 'next value'",
     "expected": [
         2,
         "",
         [
-            "usage: cov config [-h] [<file-options>] [<name> [<value>] | --unset <name> | -l | --list]",
-            "cov config: error: argument --get: not allowed with argument --get-all\n"
+            "u\u017cycie: cov config [-h] [<opcje-pliku>] [<nazwa> [<warto\u015b\u0107>] | --unset <nazwa> | -l | --list]",
+            "cov config: b\u0142\u0105d: argument --unset-all: nie mo\u017cna u\u017cywa\u0107 z --add\n"
         ]
     ],
     "prepare": [
