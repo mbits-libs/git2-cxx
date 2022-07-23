@@ -352,6 +352,25 @@ namespace git::testing {
 		}
 	}
 
+	TEST(config, enum_mem) {
+		auto cfg = git::config::create();
+		auto const ec = cfg.add_memory(R"([group]
+  key = value 1
+  key = value 2
+
+[titled "group"]
+  param = )"sv);
+		ASSERT_FALSE(ec);
+		std::vector<std::string> actual{};
+		cfg.foreach_entry([&](git_config_entry const* entry) {
+			actual.push_back(entry->name + "="s + entry->value);
+			return 0;
+		});
+		std::vector<std::string> expected{
+		    "group.key=value 1", "group.key=value 2", "titled.group.param="};
+		ASSERT_EQ(expected, actual);
+	}
+
 	constexpr config_info repos[] = {
 	    {
 	        "bare.git/"sv,

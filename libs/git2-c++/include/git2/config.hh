@@ -40,6 +40,11 @@ namespace git {
 		                          bool for_writing,
 		                          std::error_code& ec);
 
+		std::error_code add_memory(
+		    std::string_view contents,
+		    git_config_level_t level = GIT_CONFIG_LEVEL_LOCAL,
+		    const git_repository* repo = nullptr,
+		    int force = 1) const noexcept;
 		std::error_code add_file_ondisk(
 		    char const* path,
 		    git_config_level_t level = GIT_CONFIG_LEVEL_LOCAL,
