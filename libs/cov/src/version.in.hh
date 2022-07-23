@@ -18,7 +18,7 @@
 #ifndef RC_INVOKED
 namespace cov {
 	struct version {
-		static constexpr char string[] = "@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@.@PROJECT_VERSION_PATCH@";  // NOLINT
+		static constexpr char string[] = "@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@.@PROJECT_VERSION_PATCH@";  // NOLINT build/include_what_you_use and whitespace/line_length
 		static constexpr char string_short[] = "@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@";
 		static constexpr char stability[] = "@PROJECT_VERSION_STABILITY@";  // or "-alpha.5", "-beta", "-rc.3", "", ...
 		static constexpr char build_meta[] = "@PROJECT_VERSION_BUILD_META@";
