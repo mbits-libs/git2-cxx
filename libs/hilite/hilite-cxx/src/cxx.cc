@@ -1,5 +1,6 @@
 // Copyright (c) 2022 Marcin Zdun
 // This code is licensed under MIT license (see LICENSE for details)
+// for the purpose of cpplint: @generated
 
 #include "hilite/syntax/cxx.hh"
 #include "hilite/hilite_impl.hh"

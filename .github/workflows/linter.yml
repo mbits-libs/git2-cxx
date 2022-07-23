@@ -35,10 +35,8 @@ jobs:
           VALIDATE_TSX: true
           VALIDATE_TYPESCRIPT_ES: true
           VALIDATE_TYPESCRIPT_STANDARD: true
+          IGNORE_GENERATED_FILES: true
           FILTER_REGEX_INCLUDE: ".*/libs/.*|.*/apps/.*"
           FILTER_REGEX_EXCLUDE: ".*/build/.*|\
                                  .*/external/.*|\
-                                 .*/tools/.*|\
-                                 .*/libs/app/include/cov/app/strings/.*|\
-                                 .*/libs/app/src/strings/.*|\
-                                 .*/libs/hilite/hilite-cxx/src/cxx\\.cc"
+                                 .*/tools/.*"

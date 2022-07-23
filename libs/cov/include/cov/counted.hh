@@ -33,7 +33,7 @@ namespace cov {
 	concept Counted = requires(T& ref) {
 		ref.acquire();
 		ref.release();
-	};  // NOLINT
+	};  // NOLINT(readability/braces)
 
 	template <typename Object>
 	class ref_ptr {
