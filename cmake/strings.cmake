@@ -6,10 +6,10 @@ string(APPEND PO_HINTS_CONTENT "@echo off
 ")
 endif()
 
-string(APPEND POT_HINTS_CONTENT "cd ${CMAKE_CURRENT_SOURCE_DIR}/data
+string(APPEND POT_HINTS_CONTENT "cd ${PROJECT_SOURCE_DIR}/data
 
 ")
-string(APPEND PO_HINTS_CONTENT "cd ${CMAKE_CURRENT_SOURCE_DIR}/data
+string(APPEND PO_HINTS_CONTENT "cd ${PROJECT_SOURCE_DIR}/data
 
 ")
 
@@ -19,22 +19,24 @@ foreach(STRING_FILE ${STRINGS})
   list(APPEND SOURCES src/strings/${STRING_FILE}.cc include/${__lngs_inc})
 
   string(APPEND POT_HINTS_CONTENT "
-echo [POT] data/translations/${STRING_FILE}/${STRING_FILE}.pot
-lngs pot strings/${STRING_FILE}.lngs -o translations/${STRING_FILE}/${STRING_FILE}.pot -a \"Marcin Zdun <mzdun@midnightbits.com>\" -c midnightBITS -t \"${PROJECT_DESCRIPTION}\"
+echo [POT] data/translations/${STRING_FILE}.pot
+lngs pot strings/${STRING_FILE}.lngs -o translations/${STRING_FILE}.pot -a \"Marcin Zdun <mzdun@midnightbits.com>\" -c midnightBITS -t \"${PROJECT_DESCRIPTION}\"
 ")
 
   string(APPEND PO_HINTS_CONTENT "
 echo [CC] src/strings/${STRING_FILE}.cc
-lngs res strings/${STRING_FILE}.lngs -o ../src/strings/${STRING_FILE}.cc --include \"${__lngs_inc}\" --warp
+lngs res strings/${STRING_FILE}.lngs -o \"${CMAKE_CURRENT_SOURCE_DIR}/src/strings/${STRING_FILE}.cc\" --include \"${__lngs_inc}\" --warp
+python ../tools/mark_generated.py \"${CMAKE_CURRENT_SOURCE_DIR}/src/strings/${STRING_FILE}.cc\"
 echo [HH] include/${__lngs_inc}
-lngs enums strings/${STRING_FILE}.lngs -o ../include/${__lngs_inc} --resource
+lngs enums strings/${STRING_FILE}.lngs -o \"${CMAKE_CURRENT_SOURCE_DIR}/include/${__lngs_inc}\" --resource
+python ../tools/mark_generated.py \"${CMAKE_CURRENT_SOURCE_DIR}/include/${__lngs_inc}\"
 ")
 
     
   foreach(LANG_ID ${LANGUAGES})
     set(__lang_ID_int "intermediate/${LANG_ID}/${STRING_FILE}")
     set(__lang_ID_bin "${PROJECT_BINARY_DIR}/${SHARE_DIR}/locale/${LANG_ID}/${STRING_FILE}")
-    set(__lang_ID_po "translations/${STRING_FILE}/${LANG_ID}.po")
+    set(__lang_ID_po "translations/${STRING_FILE}-${LANG_ID}.po")
     set(__lang_ID_target "${STRING_FILE}.${LANG_ID}")
 
     string(APPEND PO_HINTS_CONTENT "echo [INT] data/intermediate/${LANG_ID}/${STRING_FILE}
@@ -42,8 +44,8 @@ lngs make strings/${STRING_FILE}.lngs -o ${__lang_ID_int} -m ${__lang_ID_po} -l 
 ")
 
     add_custom_target(${__lang_ID_target}
-      COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/data/${__lang_ID_int}" "${__lang_ID_bin}"
-      DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/data/${__lang_ID_int}"
+      COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_SOURCE_DIR}/data/${__lang_ID_int}" "${__lang_ID_bin}"
+      DEPENDS "${PROJECT_SOURCE_DIR}/data/${__lang_ID_int}"
       COMMENT "[SHARE] ${LANG_ID}/${STRING_FILE}"
     )
     set_target_properties(${__lang_ID_target} PROPERTIES FOLDER apps/strings)
