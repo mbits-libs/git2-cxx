@@ -1,6 +1,8 @@
 // Copyright (c) 2022 Marcin Zdun
 // This code is licensed under MIT license (see LICENSE for details)
 
+#include <git2/buffer.h>
+#include <git2/sys/config.h>
 #include <git2/config.hh>
 #include <git2/error.hh>
 #include <numeric>
@@ -28,6 +30,12 @@ static int _taccess(const wchar_t* pathname, int mode) noexcept {
 	return _waccess(pathname, mode);
 }
 #endif
+
+GIT_BEGIN_DECL
+extern int git_config_backend_from_string(git_config_backend** out,
+                                          const char* cfg,
+                                          size_t len);
+GIT_END_DECL
 
 #ifdef __cpp_lib_char8_t
 #define PATH_C_STR(PATH) reinterpret_cast<char const*>((PATH).c_str())
@@ -199,6 +207,33 @@ namespace git {
 		return result;
 	}
 
+	std::error_code config::add_memory(std::string_view contents,
+	                                   git_config_level_t level,
+	                                   const git_repository* repo,
+	                                   int force) const noexcept {
+		git_config_backend* mem = nullptr;
+
+		if (git_config_backend_from_string(&mem, contents.data(),
+		                                   contents.size()) < 0) {
+			// GCOV_EXCL_START
+			[[unlikely]];
+			return as_error(-1);
+		}  // GCOV_EXCL_STOP
+
+		auto const res = git_config_add_backend(get(), mem, level, repo, force);
+		if (res < 0) {
+			// GCOV_EXCL_START
+			/*
+			 * free manually; the file is not owned by the config
+			 * instance yet and will not be freed on cleanup
+			 */
+			[[unlikely]];
+			mem->free(mem);
+		}  // GCOV_EXCL_STOP
+
+		return as_error(res);
+	}
+
 	std::error_code config::add_file_ondisk(const char* path,
 	                                        git_config_level_t level,
 	                                        const git_repository* repo,
@@ -280,8 +315,7 @@ namespace git {
 
 	std::optional<std::string> config::get_string(
 	    const char* name) const noexcept {
-		char empty[] = "";
-		git_buf result = GIT_BUF_INIT_CONST(empty, 0);
+		git_buf result = GIT_BUF_INIT;
 		auto const ret = git_config_get_string_buf(&result, get(), name);
 
 		std::optional<std::string> out{};
@@ -304,8 +338,7 @@ namespace git {
 	    const char* name) const noexcept {
 		using namespace std::filesystem;
 
-		char empty[] = "";
-		git_buf result = GIT_BUF_INIT_CONST(empty, 0);
+		git_buf result = GIT_BUF_INIT;
 		auto const ret = git_config_get_path(&result, get(), name);
 
 		std::optional<path> out{};
