@@ -33,7 +33,8 @@ namespace cov::testing::setup {
 			int counter{};
 		};
 		std::filesystem::path get_test_dir() {
-			static constexpr auto playground = "libcov-tests"sv;
+			static constexpr auto playground =
+			    "libcov-tests-c1e671e2b66e37396b593fa98488c1656813af29"sv;
 			std::error_code ec{};
 			auto const temp = std::filesystem::temp_directory_path(ec);
 			if (ec) {
