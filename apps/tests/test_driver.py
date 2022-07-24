@@ -42,8 +42,11 @@ target = args.target
 target_name = os.path.basename(target)
 version = args.version
 
-TEMP = os.path.abspath(tempfile.gettempdir().replace('\\', '/'))
+TEMP = os.path.abspath(os.path.join(
+    tempfile.gettempdir(), "test-driver")).replace('\\', '/')
 TEMP_ALT = None
+
+os.makedirs(TEMP, exist_ok=True)
 
 if os.name == 'nt':
     BUFFER_SIZE = 2048
@@ -270,8 +273,9 @@ class Test:
                     return None
                 cb([expand(o) for o in op])
             except Exception as ex:
-                print('Problem while handling', orig)
-                print(ex)
+                if op[0] != 'safe-rm':
+                    print('Problem while handling', orig)
+                    print(ex)
                 if is_safe:
                     continue
                 return None
@@ -425,6 +429,8 @@ class color:
 
 counter = 0
 error_counter = 0
+skip_counter = 0
+save_counter = 0
 run = args.run
 if not len(run):
     run = list(range(1, len(testsuite)+1))
@@ -448,6 +454,7 @@ for filename in sorted(testsuite):
         print(
             f"{color.counter}[{counter:>{digits}}/{len(testsuite)}]{color.reset} {color.name}{test.name}{color.reset} {color.skipped}SKIPPED{color.reset}"
         )
+        skip_counter += 1
         continue
 
     if test.expected is None:
@@ -459,6 +466,8 @@ for filename in sorted(testsuite):
         print(
             f"{color.counter}[{counter:>{digits}}/{len(testsuite)}]{color.reset} {color.name}{test.name}{color.reset} {color.skipped}saved{color.reset}"
         )
+        skip_counter += 1
+        save_counter += 1
         continue
 
     clipped = test.clip(actual)
@@ -485,7 +494,16 @@ for filename in sorted(testsuite):
 
 if args.install is not None:
     shutil.rmtree(args.install)
+shutil.rmtree(TEMP, ignore_errors=True)
 
 print(f"Failed {error_counter}/{counter}")
+if skip_counter > 0:
+    skip_test = "test" if skip_counter == 1 else "tests"
+    if save_counter > 0:
+        print(
+            f"Skipped {skip_counter} {skip_test} (including {save_counter} due to saving)")
+    else:
+        print(f"Skipped {skip_counter} {skip_test}")
+
 if error_counter:
     sys.exit(1)

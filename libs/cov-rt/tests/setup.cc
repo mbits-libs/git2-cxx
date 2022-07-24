@@ -34,7 +34,8 @@ namespace cov::testing::setup {
 			int counter{};
 		};
 		std::filesystem::path get_test_dir() {
-			static constexpr auto playground = "runtime-tests"sv;
+			static constexpr auto playground =
+			    "runtime-tests-9e85987a06593f1112893578b2c8bc701b9d0ad6"sv;
 			std::error_code ec{};
 			auto const temp = std::filesystem::temp_directory_path(ec);
 			if (ec) {
