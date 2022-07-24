@@ -6,11 +6,10 @@ with open(filename) as infile:
     contents = infile.readlines()
 
 for index in range(len(contents)):
-    if contents[index][:3] == '// ':
+    if contents[index][:3] == "// ":
         continue
-    contents.insert(index, '// @generated\n')
+    contents.insert(index, "// @generated\n")
     break
 
-contents = ''.join(contents)
 with open(filename, "w") as outfile:
-    outfile.write(contents)
+    outfile.write("".join(contents))
