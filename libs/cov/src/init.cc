@@ -41,6 +41,7 @@ namespace cov {
 				// error, if the stat failed, not due to ENOENT/ENOTDIR;
 				// however, this would require messing with covdata directory,
 				// which would be detected by create_directories below
+				// And put something here as well...
 				return ec;
 				// GCOV_EXCL_STOP
 			}
