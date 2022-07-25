@@ -24,6 +24,13 @@ WORKFLOWS = os.path.join(__dir__, ".github", "workflows")
 ACTION = "github/super-linter"
 PREFIX = f"{ACTION}/"
 
+UNWANTED = [
+    "VALIDATE_ALL_CODEBASE",  # local runs are always "true"
+]
+
+if "--verbose" in sys.argv[1:]:
+    UNWANTED.append("LOG_LEVEL")
+
 
 def get_linter_action(step):
     try:
@@ -91,7 +98,7 @@ def get_linter_actions(data, yml_name):
 
 
 def docker_args(version, env):
-    _env = {key: env[key] for key in env}
+    _env = {key: env[key] for key in env if key not in UNWANTED}
     _env["RUN_LOCAL"] = "true"
     _env["USE_FIND_ALGORITHM"] = "true"
 
