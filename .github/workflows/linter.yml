@@ -21,7 +21,7 @@ jobs:
           VALIDATE_ALL_CODEBASE: false
           DEFAULT_BRANCH: main
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          LOG_LEVEL: ERROR
+          LOG_LEVEL: VERBOSE
           SUPPRESS_POSSUM: true
           VALIDATE_CPP: true
           VALIDATE_CSS: true
