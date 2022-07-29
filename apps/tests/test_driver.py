@@ -187,7 +187,7 @@ def unpack(args):
     reminder, ext = os.path.splitext(archive)
     _, mid = os.path.splitext(reminder)
     if mid == ".tar":
-        ext = f".tar"
+        ext = ".tar"
     ARCHIVES[ext](archive, dst)
 
 

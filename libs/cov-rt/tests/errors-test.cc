@@ -74,7 +74,7 @@ namespace cov::app::testing {
 		             "shows this help message and exits"sv, descr_0);
 		ASSERT_EQUAL("-a, --arg [<file>]"sv,
 		             "shows this help message and exits"sv, descr_1);
-	};
+	}
 
 	TEST_P(error, message_en) {
 		auto const& [git, ec, expected] = GetParam();
