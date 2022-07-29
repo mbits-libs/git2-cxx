@@ -14,7 +14,6 @@
 #include <string_view>
 
 namespace git {
-	GIT_PTR_FREE(git_object);
 	GIT_PTR_FREE(git_repository);
 
 	template <class Holder>

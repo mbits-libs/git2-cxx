@@ -1,6 +1,7 @@
 // Copyright (c) 2022 Marcin Zdun
 // This code is licensed under MIT license (see LICENSE for details)
 
+#include <git2/revparse.h>
 #include <gtest/gtest.h>
 #include <git2/blob.hh>
 #include <git2/commit.hh>
@@ -33,6 +34,23 @@ namespace git::testing {
 		ASSERT_EQ(hash, obj.strid());
 
 		{ ASSERT_EQ(0, git_oid_cmp(&oid, &obj.oid())); }
+	}
+
+	TEST(lookup, HEAD_by_string) {
+		std::error_code ec{};
+		auto const repo = setup::open_repo(ec);
+		ASSERT_FALSE(ec);
+		ASSERT_TRUE(repo);
+
+		git_revspec rs{};
+		ec = git::as_error(git_revparse(&rs, repo.get(), "HEAD"));
+		git::ptr<git_object> from{rs.from};
+		git::ptr<git_object> to{rs.to};
+
+		ASSERT_FALSE(ec);
+		ASSERT_NE(nullptr, rs.from);
+		ASSERT_EQ(nullptr, rs.to);
+		ASSERT_EQ(GIT_REVSPEC_SINGLE, static_cast<int>(rs.flags));
 	}
 
 	TEST(lookup, nothing) {
@@ -73,7 +91,13 @@ namespace git::testing {
 		          std::string_view{obj.message_raw()});
 	}
 
-	TEST(lookup, commit) { do_lookup<git::commit>(setup::hash::commit); }
-	TEST(lookup, tree) { do_lookup<git::tree>(setup::hash::tree); }
-	TEST(lookup, blob) { do_lookup<git::blob>(setup::hash::README); }
+	TEST(lookup, commit) {
+		do_lookup<git::commit>(setup::hash::commit);
+	}
+	TEST(lookup, tree) {
+		do_lookup<git::tree>(setup::hash::tree);
+	}
+	TEST(lookup, blob) {
+		do_lookup<git::blob>(setup::hash::README);
+	}
 }  // namespace git::testing

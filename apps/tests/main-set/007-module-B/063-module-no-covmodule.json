@@ -1,0 +1,13 @@
+{
+    "args": "module",
+    "expected": [
+        0,
+        "",
+        ""
+    ],
+    "prepare": [
+        "git init $TMP/repo",
+        "mkdirs $TMP/repo/.covmodule/nope",
+        "cd $TMP/repo/"
+    ]
+}

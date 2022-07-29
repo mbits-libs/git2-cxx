@@ -12,7 +12,9 @@ import stat
 import string
 import subprocess
 import sys
+import tarfile
 import tempfile
+import zipfile
 from difflib import unified_diff
 
 if os.name == "nt":
@@ -166,6 +168,29 @@ def make_RW(args):
     os.chmod(args[0], mode)
 
 
+def untar(src, dst):
+    with tarfile.open(src) as TAR:
+        TAR.extractall(dst)
+
+
+def unzip(src, dst):
+    with zipfile.ZipFile(src) as ZIP:
+        ZIP.extractall(dst)
+
+
+ARCHIVES = {".tar": untar, ".zip": unzip}
+
+
+def unpack(args):
+    archive = args[0]
+    dst = args[1]
+    reminder, ext = os.path.splitext(archive)
+    _, mid = os.path.splitext(reminder)
+    if mid == ".tar":
+        ext = f".tar"
+    ARCHIVES[ext](archive, dst)
+
+
 op_types = {
     "mkdirs": (1, lambda args: os.makedirs(args[0], exist_ok=True)),
     "rm": (1, lambda args: shutil.rmtree(args[0])),
@@ -173,6 +198,7 @@ op_types = {
     "rw": (1, make_RW),
     "touch": (1, touch),
     "cd": (1, lambda args: os.chdir(args[0])),
+    "unpack": (2, unpack),
     "git": (0, git),
     "cov": (0, cov),
 }

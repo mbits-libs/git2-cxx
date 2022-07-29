@@ -1,10 +1,12 @@
 set(SOURCES
   src/config.cc
+  src/module.cc
   src/root_command.cc
   src/split_command.cc
   src/tools.cc
 
   include/cov/app/config.hh
+  include/cov/app/module.hh
   include/cov/app/cov_config_tr.hh
   include/cov/app/cov_init_tr.hh
   include/cov/app/cov_module_tr.hh

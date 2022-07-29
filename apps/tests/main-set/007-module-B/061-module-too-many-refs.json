@@ -1,0 +1,15 @@
+{
+    "args": "module HEAD ANOTHER_HEAD main v1.0.0",
+    "expected": [
+        2,
+        "",
+        [
+            "usage: cov module [-h] [--show-sep [<git-commit>]] | [--set-sep <value> | --add <name> <dir> | --remove <name> <dir> | --remove-all <name>] | [<git-commit>]",
+            "cov module: error: <git-commit> argument needs at most one argument\n"
+        ]
+    ],
+    "prepare": [
+        "mkdirs $TMP/repo.git",
+        "cd $TMP/repo.git"
+    ]
+}

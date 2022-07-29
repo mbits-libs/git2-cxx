@@ -2,6 +2,7 @@
 set(BUILTINS
     init
     config
+    module
 )
 
 set(SOURCES
@@ -71,7 +72,7 @@ if (COV_TESTING)
           )
     endforeach()
 
-    foreach(TEST_SET 001-cov 002-init 003-config-A 004-config-B 005-config-C)
+    foreach(TEST_SET 001-cov 002-init 003-config-A 004-config-B 005-config-C 006-module-A 007-module-B)
         add_test(
             NAME cov-exec--${TEST_SET}
             COMMAND "${Python3_EXECUTABLE}"

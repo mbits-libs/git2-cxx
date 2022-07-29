@@ -1,0 +1,18 @@
+{
+    "args": "module --remove-all \"doesn't matter\"",
+    "expected": [
+        2,
+        "",
+        [
+            "usage: cov module [-h] [--show-sep [<git-commit>]] | [--set-sep <value> | --add <name> <dir> | --remove <name> <dir> | --remove-all <name>] | [<git-commit>]",
+            "cov module: error: this operation must be run in a work tree\n"
+        ]
+    ],
+    "prepare": [
+        "mkdirs $TMP/repo.git",
+        "mkdirs $TMP/repo.covdata",
+        "cd $TMP/repo.covdata",
+        "git init --bare $TMP/repo",
+        "cov init --git-dir $TMP/repo ."
+    ]
+}
