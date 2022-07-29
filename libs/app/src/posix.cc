@@ -31,7 +31,5 @@ namespace cov::app::platform {
 		return {};     // GCOV_EXCL_LINE[POSIX]
 	}
 
-	std::string con_to_u8(std::error_code const& ec) {
-		return ec.message();
-	}
+	std::string con_to_u8(std::error_code const& ec) { return ec.message(); }
 }  // namespace cov::app::platform

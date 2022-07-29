@@ -4,9 +4,9 @@
 #pragma once
 
 #include <args/parser.hpp>
+#include <cov/app/args.hh>
 #include <cov/app/cov_tr.hh>
 #include <cov/app/tools.hh>
-#include <cov/app/args.hh>
 
 using namespace std::literals;
 

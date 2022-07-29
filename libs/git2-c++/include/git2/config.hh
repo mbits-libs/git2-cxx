@@ -3,8 +3,8 @@
 
 #pragma once
 #include <git2/config.h>
-#include <git2/transaction.hh>
 #include <git2/ptr.hh>
+#include <git2/transaction.hh>
 
 #include <filesystem>
 #include <optional>

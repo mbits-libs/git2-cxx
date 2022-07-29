@@ -27,8 +27,8 @@ namespace cov {
 	};
 
 	enum class [[nodiscard("Propagate towards UI")]] mod_errc{
-		unmodified,
-		needs_update,
+	    unmodified,
+	    needs_update,
 	    duplicate,
 	    no_module,
 	};

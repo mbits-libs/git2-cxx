@@ -23,10 +23,8 @@ using namespace std::literals;
 	void on_##name##_handler::operator()([[maybe_unused]] Context& context) \
 	    const
 
-#define RULE_APPEND(name)              \
-	RULE_MAP(name) {                   \
-		_append(context, token::name); \
-	}
+#define RULE_APPEND(name) \
+	RULE_MAP(name) { _append(context, token::name); }
 
 namespace cov::parser {
 	using namespace cell;
@@ -46,13 +44,9 @@ namespace cov::parser {
 	RULE_APPEND(header);
 	RULE_APPEND(value);
 	RULE_APPEND(other);
-	RULE_MAP(eol) {
-		_val(context).eol(context);
-	}
+	RULE_MAP(eol) { _val(context).eol(context); }
 
-	RULE_MAP(comment) {
-		_val(context).comment(context);
-	}
+	RULE_MAP(comment) { _val(context).comment(context); }
 
 	struct dbg {
 		std::string_view tag;

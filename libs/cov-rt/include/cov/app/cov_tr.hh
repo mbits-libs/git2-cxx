@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include <cov/app/tr.hh>
 #include <cov/app/strings/cov.hh>
+#include <cov/app/tr.hh>
 
 namespace cov::app {
 	using covlng = str::root::lng;

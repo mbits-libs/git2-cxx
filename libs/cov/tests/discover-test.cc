@@ -38,8 +38,8 @@ namespace cov::testing {
 		}
 
 		std::error_code ec{};
-		auto const repo =
-		    setup::get_path(discover_repository(setup::test_dir() / location, ec));
+		auto const repo = setup::get_path(
+		    discover_repository(setup::test_dir() / location, ec));
 		if (expected.empty()) {
 			ASSERT_TRUE(ec);
 			ASSERT_TRUE(repo.empty());

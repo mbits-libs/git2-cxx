@@ -63,9 +63,7 @@ namespace cov {
 		inline std::string get_path(path const& p) {
 			return p.generic_u8string();
 		}
-		inline path make_path(std::string_view utf8) {
-			return u8path(utf8);
-		}
+		inline path make_path(std::string_view utf8) { return u8path(utf8); }
 #endif
 
 		inline bool is_valid_path(path const& base_dir) {

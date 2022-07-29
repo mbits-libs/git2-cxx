@@ -566,9 +566,7 @@ namespace cov {
 #define SIMPLE_FORMAT(CHAR, RESULT) \
 	case CHAR:                      \
 		++cur;                      \
-		return format {             \
-			RESULT                  \
-		}
+		return format { RESULT }
 #define DEEPER_FORMAT(CHAR, CB) \
 	case CHAR:                  \
 		++cur;                  \
