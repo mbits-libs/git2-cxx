@@ -5,14 +5,13 @@
         "",
         [
             "usage: cov config [-h] [<file-options>] [<name> [<value>] | --unset <name> | -l | --list]",
-            "cov config: error: Cannot find a Cov repository in $TMP/config-list-local/repo.covdata\n"
+            "cov config: error: Cannot find a Cov repository in $TMP/repo.covdata\n"
         ]
     ],
     "prepare": [
-        "safe-rm $TMP/config-list-local",
-        "mkdirs $TMP/config-list-local/repo.git",
-        "mkdirs $TMP/config-list-local/repo.covdata",
-        "cd $TMP/config-list-local/repo.covdata",
-        "git init --bare $TMP/config-list-local/repo.git"
+        "mkdirs $TMP/repo.git",
+        "mkdirs $TMP/repo.covdata",
+        "cd $TMP/repo.covdata",
+        "git init --bare $TMP/repo.git"
     ]
 }

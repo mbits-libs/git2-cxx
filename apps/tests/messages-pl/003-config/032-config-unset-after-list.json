@@ -1,7 +1,7 @@
 {
     "lang": "pl",
     "env": {
-        "HOME": "$TMP/config-explicit/home",
+        "HOME": "$TMP/home",
         "XDG_CONFIG_HOME": null,
         "USERPROFILE": null
     },
@@ -15,12 +15,11 @@
         ]
     ],
     "prepare": [
-        "safe-rm $TMP/config-explicit",
-        "mkdirs $TMP/config-explicit/repo.git",
-        "mkdirs $TMP/config-explicit/repo.covdata",
-        "cd $TMP/config-explicit/repo.covdata",
-        "git init --bare $TMP/config-explicit/repo.git",
-        "cov init --git-dir $TMP/config-explicit/repo.git .",
-        "cd $TMP/config-explicit/repo.covdata"
+        "mkdirs $TMP/repo.git",
+        "mkdirs $TMP/repo.covdata",
+        "cd $TMP/repo.covdata",
+        "git init --bare $TMP/repo.git",
+        "cov init --git-dir $TMP/repo.git .",
+        "cd $TMP/repo.covdata"
     ]
 }

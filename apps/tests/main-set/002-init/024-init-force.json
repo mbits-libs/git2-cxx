@@ -3,17 +3,17 @@
     "expected": [
         0,
         [
-            "Reinitialized empty Cov repository in $TMP/init-force/.git/.covdata",
-            " Using Git repository in $TMP/init-force/.git\n"
+            "Reinitialized empty Cov repository in $TMP/.git/.covdata",
+            " Using Git repository in $TMP/.git\n"
         ],
         ""
     ],
     "prepare": [
-        "safe-rm '$TMP/init-force'",
-        "mkdirs '$TMP/init-force/subdir'",
-        "cd '$TMP/init-force'",
+        "safe-rm '$TMP'",
+        "mkdirs '$TMP/subdir'",
+        "cd '$TMP'",
         "git init",
         "cov init",
-        "cd '$TMP/init-force/subdir'"
+        "cd '$TMP/subdir'"
     ]
 }
