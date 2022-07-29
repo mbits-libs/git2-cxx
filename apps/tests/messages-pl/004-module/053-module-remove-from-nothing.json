@@ -1,0 +1,20 @@
+{
+    "lang": "pl",
+    "args": "module --remove some-name 'dir 1'",
+    "expected": [
+        2,
+        "",
+        [
+            "u\u017cycie: cov module [-h] [--show-sep [<zapis-gita>]] | [--set-sep <warto\u015b\u0107> | --add <nazwa> <katalog> | --remove <nazwa> <katalog> | --remove-all <nazwa>] | [<zapis-gita>]",
+            "cov module: b\u0142\u0105d: nie ma modu\u0142u some-name\n"
+        ]
+    ],
+    "prepare": [
+        "mkdirs $TMP/repo.git",
+        "mkdirs $TMP/repo.covdata",
+        "cd $TMP/repo.covdata",
+        "git init $TMP/repo",
+        "touch '$TMP/repo/.covmodule' '[module \"A\"]\npath = dir 1\n'",
+        "cov init --git-dir $TMP/repo ."
+    ]
+}

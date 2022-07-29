@@ -1,0 +1,15 @@
+{
+    "args": "module HEAD --add module dir",
+    "expected": [
+        2,
+        "",
+        [
+            "usage: cov module [-h] [--show-sep [<git-commit>]] | [--set-sep <value> | --add <name> <dir> | --remove <name> <dir> | --remove-all <name>] | [<git-commit>]",
+            "cov module: error: HEAD argument cannot be used with other options\n"
+        ]
+    ],
+    "prepare": [
+        "mkdirs $TMP/repo.git",
+        "cd $TMP/repo.git"
+    ]
+}

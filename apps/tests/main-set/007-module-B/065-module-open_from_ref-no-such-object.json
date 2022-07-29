@@ -1,0 +1,12 @@
+{
+    "args": "module nonexistent-ref",
+    "expected": [
+        0,
+        "",
+        ""
+    ],
+    "prepare": [
+        "unpack $DATA/repo.git.tar $TMP",
+        "cd $TMP/repo.git"
+    ]
+}

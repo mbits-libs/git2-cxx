@@ -1,0 +1,22 @@
+{
+    "args": "module",
+    "expected": [
+        0,
+        [
+            "library",
+            "- includes",
+            "- src",
+            "extras",
+            "- extras/\n"
+        ],
+        ""
+    ],
+    "prepare": [
+        "mkdirs $TMP/repo.git",
+        "mkdirs $TMP/repo.covdata",
+        "cd $TMP/repo.covdata",
+        "git init $TMP/repo",
+        "cov init --git-dir $TMP/repo .",
+        "cov module --add library includes --add library src --add extras extras/ --set-sep ' :: '"
+    ]
+}

@@ -1,0 +1,17 @@
+{
+    "lang": "pl",
+    "args": "module --add module dir",
+    "expected": [
+        2,
+        "",
+        [
+            "u\u017cycie: cov module [-h] [--show-sep [<zapis-gita>]] | [--set-sep <warto\u015b\u0107> | --add <nazwa> <katalog> | --remove <nazwa> <katalog> | --remove-all <nazwa>] | [<zapis-gita>]",
+            "cov module: b\u0142\u0105d: requested file is a directory\n"
+        ]
+    ],
+    "prepare": [
+        "git init $TMP/repo",
+        "mkdirs $TMP/repo/.covmodule/nope",
+        "cd $TMP/repo/"
+    ]
+}

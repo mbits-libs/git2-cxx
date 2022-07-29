@@ -1,0 +1,15 @@
+{
+    "args": "module --remove-all module dir",
+    "expected": [
+        2,
+        "",
+        [
+            "usage: cov module [-h] [--show-sep [<git-commit>]] | [--set-sep <value> | --add <name> <dir> | --remove <name> <dir> | --remove-all <name>] | [<git-commit>]",
+            "cov module: error: --remove-all argument needs exactly one argument\n"
+        ]
+    ],
+    "prepare": [
+        "mkdirs $TMP/repo.git",
+        "cd $TMP/repo.git"
+    ]
+}
