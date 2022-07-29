@@ -148,7 +148,8 @@ namespace cov::testing {
 		              canonical(setup::test_dir() / "repository/.covdata"sv)),
 		          setup::get_path(covdir));
 
-		auto const repo = cov::repository::open(setup::test_dir() / "sysroot"sv, covdir, ec);
+		auto const repo =
+		    cov::repository::open(setup::test_dir() / "sysroot"sv, covdir, ec);
 		ASSERT_TRUE(ec);
 	}
 
@@ -167,7 +168,8 @@ namespace cov::testing {
 		              canonical(setup::test_dir() / "repository/.covdata"sv)),
 		          setup::get_path(covdir));
 
-		auto const repo = cov::repository::open(setup::test_dir() / "sysroot"sv, covdir, ec);
+		auto const repo =
+		    cov::repository::open(setup::test_dir() / "sysroot"sv, covdir, ec);
 		ASSERT_FALSE(ec);
 		ASSERT_TRUE(repo.refs());
 
@@ -196,7 +198,8 @@ namespace cov::testing {
 		              canonical(setup::test_dir() / "repository/.covdata"sv)),
 		          setup::get_path(covdir));
 
-		auto const repo = cov::repository::open(setup::test_dir() / "sysroot"sv, covdir, ec);
+		auto const repo =
+		    cov::repository::open(setup::test_dir() / "sysroot"sv, covdir, ec);
 		ASSERT_FALSE(ec);
 		ASSERT_TRUE(repo.refs());
 
@@ -224,7 +227,8 @@ namespace cov::testing {
 		              canonical(setup::test_dir() / "repository/.covdata"sv)),
 		          setup::get_path(covdir));
 
-		auto const repo = cov::repository::open(setup::test_dir() / "sysroot"sv, covdir, ec);
+		auto const repo =
+		    cov::repository::open(setup::test_dir() / "sysroot"sv, covdir, ec);
 		ASSERT_FALSE(ec);
 		ASSERT_TRUE(repo.refs());
 

@@ -13,9 +13,7 @@
 
 namespace cov::app::platform {
 	namespace {
-		void append(std::wstring& ws, wchar_t next) {
-			ws.push_back(next);
-		}
+		void append(std::wstring& ws, wchar_t next) { ws.push_back(next); }
 
 		template <size_t Length>
 		void append(std::wstring& ws, wchar_t const (&next)[Length]) {

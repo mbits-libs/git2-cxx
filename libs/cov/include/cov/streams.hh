@@ -13,7 +13,7 @@
 
 namespace cov {
 	template <typename Type>
-	concept Simple = std::is_standard_layout_v<Type>&& std::is_trivial_v<Type>;
+	concept Simple = std::is_standard_layout_v<Type> && std::is_trivial_v<Type>;
 
 	struct write_stream {
 		virtual ~write_stream();

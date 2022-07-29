@@ -30,8 +30,8 @@ namespace cov {
 		git::config open_config(std::filesystem::path const& sysroot,
 		                        std::filesystem::path const& common,
 		                        std::error_code& ec) {
-			auto result =
-			    git::config::open_default(sysroot, names::dot_config, "cov"sv, ec);
+			auto result = git::config::open_default(sysroot, names::dot_config,
+			                                        "cov"sv, ec);
 			if (!ec) ec = result.add_local_config(common);
 			if (ec) result = nullptr;
 			return result;

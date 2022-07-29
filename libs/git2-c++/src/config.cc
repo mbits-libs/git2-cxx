@@ -39,10 +39,8 @@ GIT_END_DECL
 
 #ifdef __cpp_lib_char8_t
 #define PATH_C_STR(PATH) reinterpret_cast<char const*>((PATH).c_str())
-#define STR_FROM_GENERIC(PATH)          \
-	std::string {                       \
-		PATH_C_STR(PATH), (PATH).size() \
-	}
+#define STR_FROM_GENERIC(PATH) \
+	std::string { PATH_C_STR(PATH), (PATH).size() }
 #else
 #define PATH_C_STR(PATH) ((PATH).c_str())
 #define STR_FROM_GENERIC(PATH) std::move(PATH)

@@ -21,7 +21,8 @@ namespace git {
 
 		template <typename Byte>
 		requires(!std::same_as<std::byte, Byte> && (sizeof(Byte) == 1))
-		    bytes(Byte const* data, size_type length) noexcept
+		    bytes(Byte const* data, size_type length)
+		noexcept
 		    : data_{reinterpret_cast<std::byte const*>(data)}
 		    , length_{length} {}
 

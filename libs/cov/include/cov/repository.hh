@@ -112,9 +112,7 @@ namespace cov {
 			return git_.repo().commondir();
 		}
 
-		git::repository_handle git() const noexcept {
-			return git_.repo();
-		}
+		git::repository_handle git() const noexcept { return git_.repo(); }
 
 		git::config const& config() const noexcept { return cfg_; }
 		ref_ptr<references> const& refs() const noexcept { return refs_; }

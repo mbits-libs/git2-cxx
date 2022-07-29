@@ -47,12 +47,8 @@ namespace {
 		return true;
 	}
 
-	void* throw_bad_alloc() {
-		throw std::bad_alloc();
-	}
-	void* return_nullptr() noexcept {
-		return nullptr;
-	}
+	void* throw_bad_alloc() { throw std::bad_alloc(); }
+	void* return_nullptr() noexcept { return nullptr; }
 	void* alloc(size_t count, auto handler) noexcept(noexcept(handler())) {
 		auto const saved = argument;
 		auto allowed = can_allocate(count);
@@ -92,22 +88,20 @@ namespace {
                                    std::align_val_t,
                                    const std::nothrow_t&) noexcept AS_NOTHROW;
 
-#define FREE            \
-	noexcept {          \
-		std::free(ptr); \
-	}
-void operator delete(void* ptr) FREE;
+#define FREE \
+	noexcept { std::free(ptr); }
+void operator delete(void* ptr)FREE;
 void operator delete[](void* ptr) FREE;
-void operator delete(void* ptr, std::align_val_t) FREE;
+void operator delete(void* ptr, std::align_val_t)FREE;
 void operator delete[](void* ptr, std::align_val_t) FREE;
-void operator delete(void* ptr, std::size_t) FREE;
+void operator delete(void* ptr, std::size_t)FREE;
 void operator delete[](void* ptr, std::size_t) FREE;
-void operator delete(void* ptr, std::size_t, std::align_val_t) FREE;
+void operator delete(void* ptr, std::size_t, std::align_val_t)FREE;
 void operator delete[](void* ptr, std::size_t, std::align_val_t) FREE;
 
-void operator delete(void* ptr, const std::nothrow_t&) FREE;
+void operator delete(void* ptr, const std::nothrow_t&)FREE;
 void operator delete[](void* ptr, const std::nothrow_t&) FREE;
-void operator delete(void* ptr, std::align_val_t, const std::nothrow_t&) FREE;
+void operator delete(void* ptr, std::align_val_t, const std::nothrow_t&)FREE;
 void operator delete[](void* ptr, std::align_val_t, const std::nothrow_t&) FREE;
 
 #include <gtest/gtest.h>

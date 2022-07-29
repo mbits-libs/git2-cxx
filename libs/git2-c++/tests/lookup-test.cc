@@ -91,13 +91,7 @@ namespace git::testing {
 		          std::string_view{obj.message_raw()});
 	}
 
-	TEST(lookup, commit) {
-		do_lookup<git::commit>(setup::hash::commit);
-	}
-	TEST(lookup, tree) {
-		do_lookup<git::tree>(setup::hash::tree);
-	}
-	TEST(lookup, blob) {
-		do_lookup<git::blob>(setup::hash::README);
-	}
+	TEST(lookup, commit) { do_lookup<git::commit>(setup::hash::commit); }
+	TEST(lookup, tree) { do_lookup<git::tree>(setup::hash::tree); }
+	TEST(lookup, blob) { do_lookup<git::blob>(setup::hash::README); }
 }  // namespace git::testing

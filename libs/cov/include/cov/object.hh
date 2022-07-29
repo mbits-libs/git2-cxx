@@ -35,10 +35,8 @@ namespace cov {
 		virtual obj_type type() const noexcept = 0;
 		template <typename Derived>
 		inline bool is_a() const noexcept;
-#define IS_A(NAME)                            \
-	virtual bool is_##NAME() const noexcept { \
-		return false;                         \
-	}
+#define IS_A(NAME) \
+	virtual bool is_##NAME() const noexcept { return false; }
 		KNOWN_OBJECTS(IS_A)
 #undef IS_A
 	};

@@ -47,9 +47,7 @@ namespace cov::app::platform {
 		static pid_t pid = -1;
 
 		// GCOV_EXCL_START[POSIX]
-		void forward_signal(int signo) {
-			kill(pid, signo);
-		}
+		void forward_signal(int signo) { kill(pid, signo); }
 		// GCOV_EXCL_STOP
 	}  // namespace
 
