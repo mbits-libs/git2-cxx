@@ -1,17 +1,16 @@
 {
-    "args": "init '$TMP/init-directory/subdir'",
+    "args": "init '$TMP/subdir'",
     "expected": [
         0,
         [
-            "Initialized empty Cov repository in $TMP/init-directory/.git/.covdata",
-            " Using Git repository in $TMP/init-directory/.git\n"
+            "Initialized empty Cov repository in $TMP/.git/.covdata",
+            " Using Git repository in $TMP/.git\n"
         ],
         ""
     ],
     "prepare": [
-        "safe-rm '$TMP/init-directory'",
-        "mkdirs '$TMP/init-directory/subdir'",
-        "cd '$TMP/init-directory'",
+        "mkdirs '$TMP/subdir'",
+        "cd '$TMP'",
         "git init",
         "cd '$DATA'"
     ]

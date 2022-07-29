@@ -35,11 +35,7 @@
         ""
     ],
     "prepare": [
-        "safe-rm $TMP/config-no-args",
-        "mkdirs $TMP/config-no-args/repo.git",
-        "mkdirs $TMP/config-no-args/repo.covdata",
-        "cd $TMP/config-no-args/repo.covdata",
-        "git init --bare $TMP/config-no-args/repo.git",
-        "cov init --git-dir $TMP/init-independent/repo.git ."
+        "mkdirs $TMP/repo.covdata",
+        "cd $TMP/repo.covdata"
     ]
 }

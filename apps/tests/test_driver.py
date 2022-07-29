@@ -4,10 +4,12 @@
 import argparse
 import json
 import os
+import random
 import re
 import shlex
 import shutil
 import stat
+import string
 import subprocess
 import sys
 import tempfile
@@ -72,9 +74,9 @@ if os.sep != "/":
 print(TEMP_ALT, TEMP)
 
 
-def expand(input):
+def expand(input, tempdir):
     return (
-        input.replace("$TMP", TEMP)
+        input.replace("$TMP", tempdir)
         .replace("$DATA", args.data_dir)
         .replace("$VERSION", args.version)
     )
@@ -93,16 +95,16 @@ def alt_sep(input, value, var):
     return var.join([first, *split])
 
 
-def fix(input, patches):
+def fix(input, patches, tempdir, tempdir_alt):
     if os.name == "nt":
         input = input.replace(b"\r\n", b"\n")
     input = input.decode("UTF-8")
-    input = alt_sep(input, TEMP, "$TMP")
+    input = alt_sep(input, tempdir, "$TMP")
     input = alt_sep(input, args.data_dir, "$DATA")
     input = input.replace(args.version, "$VERSION")
 
-    if TEMP_ALT is not None:
-        input = alt_sep(input, TEMP_ALT, "$TMP")
+    if tempdir_alt is not None:
+        input = alt_sep(input, tempdir_alt, "$TMP")
         input = alt_sep(input, args.data_dir_alt, "$DATA")
 
     if not len(patches):
@@ -165,12 +167,12 @@ def make_RW(args):
 
 
 op_types = {
-    "mkdirs": (1, lambda args: os.makedirs(expand(args[0]), exist_ok=True)),
-    "rm": (1, lambda args: shutil.rmtree(expand(args[0]))),
+    "mkdirs": (1, lambda args: os.makedirs(args[0], exist_ok=True)),
+    "rm": (1, lambda args: shutil.rmtree(args[0])),
     "ro": (1, make_RO),
     "rw": (1, make_RW),
     "touch": (1, touch),
-    "cd": (1, lambda args: os.chdir(expand(args[0]))),
+    "cd": (1, lambda args: os.chdir(args[0])),
     "git": (0, git),
     "cov": (0, cov),
 }
@@ -265,7 +267,7 @@ class Test:
                 print(file=f)
 
     @staticmethod
-    def run_cmds(ops):
+    def run_cmds(ops, tempdir):
         for op in ops:
             orig = op
             if isinstance(op, str):
@@ -280,7 +282,7 @@ class Test:
                 op = op[1:]
                 if len(op) < min_args:
                     return None
-                cb([expand(o) for o in op])
+                cb([expand(o, tempdir) for o in op])
             except Exception as ex:
                 if op[0] != "safe-rm":
                     print("Problem while handling", orig)
@@ -290,27 +292,27 @@ class Test:
                 return None
         return True
 
-    def run(self):
+    def run(self, tempdir, tempdir_alt):
         current_directory = os.getcwd()
 
-        prep = Test.run_cmds(self.prepare)
+        prep = Test.run_cmds(self.prepare, tempdir)
         if prep is None:
             return None
 
-        expanded = [expand(arg) for arg in self.args]
+        expanded = [expand(arg, tempdir) for arg in self.args]
 
         env = {name: os.environ[name] for name in os.environ}
         env["LANGUAGE"] = self.lang
         for key in self.env:
             value = self.env[key]
             if value:
-                env[key] = expand(value)
+                env[key] = expand(value, tempdir)
             elif key in env:
                 del env[key]
 
         proc = subprocess.run([target, *expanded], capture_output=True, env=env)
 
-        clean = Test.run_cmds(self.cleanup)
+        clean = Test.run_cmds(self.cleanup, tempdir)
         if clean is None:
             return None
 
@@ -318,8 +320,8 @@ class Test:
 
         return [
             proc.returncode,
-            fix(proc.stdout, self.patches),
-            fix(proc.stderr, self.patches),
+            fix(proc.stdout, self.patches, tempdir, tempdir_alt),
+            fix(proc.stderr, self.patches, tempdir, tempdir_alt),
         ]
 
     def clip(self, actual):
@@ -335,7 +337,7 @@ class Test:
                     return check
         return clipped
 
-    def report(self, actual):
+    def report(self, actual, tempdir):
         for ndx in range(len(actual)):
             if actual[ndx] == self.expected[ndx]:
                 continue
@@ -371,7 +373,7 @@ Diff:
             elif key in env:
                 del env[key]
 
-        expanded = [expand(arg) for arg in self.args]
+        expanded = [expand(arg, tempdir) for arg in self.args]
         print(
             " ".join(
                 shlex.quote(arg)
@@ -475,7 +477,16 @@ for filename in sorted(testsuite):
 
     print(test_id)
 
-    actual = test.run()
+    temp_instance = "".join(random.choice(string.ascii_letters) for _ in range(16))
+    tempdir = f"{TEMP}/{temp_instance}"
+    tempdir_alt = None
+
+    if TEMP_ALT is not None:
+        tempdir_alt = f"{TEMP_ALT}{os.sep}{temp_instance}"
+
+    os.makedirs(tempdir, exist_ok=True)
+
+    actual = test.run(tempdir, tempdir_alt)
     if actual is None:
         print(f"{test_id} {color.skipped}SKIPPED{color.reset}")
         skip_counter += 1
@@ -507,7 +518,7 @@ for filename in sorted(testsuite):
         print(f"{test_id} {color.passed}PASSED{color.reset}")
         continue
 
-    test.report(clipped)
+    test.report(clipped, tempdir)
     print(f"{test_id} {color.failed}FAILED{color.reset}")
     error_counter += 1
 
