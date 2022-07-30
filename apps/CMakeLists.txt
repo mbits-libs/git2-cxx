@@ -55,7 +55,6 @@ if (WIN32)
 endif()
 
 add_cov_tool(cov ${SOURCES})
-message(STATUS "${SOURCES}")
 target_compile_options(cov PRIVATE ${ADDITIONAL_WALL_FLAGS})
 target_link_options(cov PRIVATE ${ADDITIONAL_LINK_FLAGS})
 target_include_directories(cov PRIVATE
