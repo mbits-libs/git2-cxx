@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cov 0.12.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-16 22:35+0200\n"
+"POT-Creation-Date: 2022-07-29 21:35+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,6 +20,11 @@ msgstr ""
 #. Description for the -C argument
 msgctxt "CWD_DESCRIPTION"
 msgid "runs as if cov was started in <dir> instead of the current working directory"
+msgstr ""
+
+#. Description for windows binaries
+msgctxt "DESCRIPTION"
+msgid "Cov for Windows"
 msgstr ""
 
 #. Error message for alias, which is not properly created

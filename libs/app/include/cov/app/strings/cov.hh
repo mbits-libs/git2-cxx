@@ -9,40 +9,42 @@ namespace cov::app::str::root {
     enum class lng {
         /// [-h] [-C <dir>] <command> [<args>] (Short usage description)
         USAGE = 1001,
+        /// Cov for Windows (Description for windows binaries)
+        DESCRIPTION = 1002,
         /// shows version information and exits (Description for the -v/--version argument)
-        VERSION_DESCRIPTION = 1002,
+        VERSION_DESCRIPTION = 1003,
         /// runs as if cov was started in <dir> instead of the current working directory (Description for the -C argument)
-        CWD_DESCRIPTION = 1003,
+        CWD_DESCRIPTION = 1004,
         /// lists known commands from requested groups (Description for the --list-cmds argument)
-        LIST_CMDS_DESCRIPTION = 1004,
+        LIST_CMDS_DESCRIPTION = 1005,
         /// <spec>[,<spec>,...] (Name of a command group argument)
-        SPECS_MULTI_META = 1005,
+        SPECS_MULTI_META = 1006,
         /// cov version {} (Answer for --version option)
-        VERSION_IS = 1006,
+        VERSION_IS = 1007,
         /// '{}' is aliased to '{}' (Answer for --help option for alias tool)
-        HELP_ALIAS = 1007,
+        HELP_ALIAS = 1008,
         /// "{}" is not a cov command (Error mesage for a tool, which was not recognized)
-        ERROR_TOOL_NOT_RECOGNIZED = 1008,
+        ERROR_TOOL_NOT_RECOGNIZED = 1009,
         /// empty alias for '{}' (Error message for alias, which is not properly created)
-        ERROR_ALIAS = 1009,
+        ERROR_ALIAS = 1010,
         /// common commands (Help group title for common tools)
-        HELP_GROUP_COMMON = 1010,
+        HELP_GROUP_COMMON = 1011,
         /// creates a new cov repo (Description for the init tool)
-        HELP_DESCRIPTION_INIT = 1011,
+        HELP_DESCRIPTION_INIT = 1012,
         /// shows and/or sets various settings (Description for the config tool)
-        HELP_DESCRIPTION_CONFIG = 1012,
+        HELP_DESCRIPTION_CONFIG = 1013,
         /// defines file groups (Description for the module tool)
-        HELP_DESCRIPTION_MODULE = 1013,
+        HELP_DESCRIPTION_MODULE = 1014,
         /// appends a report to repo (Description for the add tool)
-        HELP_DESCRIPTION_ADD = 1014,
+        HELP_DESCRIPTION_ADD = 1015,
         /// removes a particular report from repo (Description for the remove tool)
-        HELP_DESCRIPTION_REMOVE = 1015,
+        HELP_DESCRIPTION_REMOVE = 1016,
         /// prints a list of reports (Description for the log tool)
-        HELP_DESCRIPTION_LOG = 1016,
+        HELP_DESCRIPTION_LOG = 1017,
         /// shows a specific report (Description for the show tool)
-        HELP_DESCRIPTION_SHOW = 1017,
+        HELP_DESCRIPTION_SHOW = 1018,
         /// starts a local webserver with reports (Description for the serve tool)
-        HELP_DESCRIPTION_SERVE = 1018,
+        HELP_DESCRIPTION_SERVE = 1019,
     }; // enum class lng
 
     struct Resource {
