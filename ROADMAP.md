@@ -33,27 +33,31 @@
     _name=..._\
     _dir=..._\
     _dir=..._
+  - [x] Patch-worth:
+    - [ ] add win32 RC file
+    - [ ] merge/split .po files
   - [ ] `cov report`
-    - [ ] coveralls _(separate M⬆️P)_
-    - [ ] cobertura _(separate M⬆️P)_
-  - [ ] `cov log` _(each is a M⬆️P)_
-  - [ ] `cov show` _(only one M⬆️P)_
+    - [ ] update report-creation API (remove file builder, introduce report builder, see tree builder in `libgit2`?)
+    - [ ] own format (either MD5 or SHA over the content, only commit and branch)
+    - [ ] coveralls
+    - [ ] cobertura
+  - [ ] `cov log`
+  - [ ] `cov show`
     - [ ] Report / component / directory view
     - [ ] File view
   - [ ] `cov report --amend`
-  - [ ] `cov tag` / `branch` / `checkout` _(only one M⬆️P)_
+  - [ ] `cov tag` / `branch` / `checkout`
   - [ ] `cov remove`
-  - [ ] Support for `less` _(optional, M⬆️P)_
-  - _(⬆️FP)_
+  - [ ] Support for `less`
 - [ ] `cov serve`
   - [ ] Boost.Beast WS
   - [ ] React frontend
-  - [ ] Project list _(M⬆️P)_
-  - [ ] Project view _(M⬆️P)_
+  - [ ] Project list
+  - [ ] Project view
     - [ ] Coverage graph
     - [ ] Latest report / report list
   - [ ] Report / component / directory view
-  - [ ] File view _(M⬆️P)_
+  - [ ] File view
 ---
 - [ ] Add report object cache
 - [ ] Highlight partial C++ strings
