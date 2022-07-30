@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cov 0.12.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-16 22:35+0200\n"
-"PO-Revision-Date: 2022-07-16 22:41+0200\n"
+"POT-Creation-Date: 2022-07-29 21:35+0200\n"
+"PO-Revision-Date: 2022-07-29 21:36+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: pl\n"
@@ -26,6 +26,11 @@ msgid ""
 msgstr ""
 "działa tak, jakby cov został uruchomiony w <katalogu> zamiast bieżącym "
 "katalogu roboczym"
+
+#. Description for windows binaries
+msgctxt "DESCRIPTION"
+msgid "Cov for Windows"
+msgstr "Cov dla Windows"
 
 #. Error message for alias, which is not properly created
 msgctxt "ERROR_ALIAS"

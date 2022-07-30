@@ -6,6 +6,8 @@
 ] strings {
 	[help("Short usage description"), id(-1)]
 	USAGE = "[-h] [-C <dir>] <command> [<args>]";
+	[help("Description for windows binaries"), id(-1)]
+	DESCRIPTION = "Cov for Windows";
 	[help("Description for the -v/--version argument"), id(-1)]
 	VERSION_DESCRIPTION = "shows version information and exits";
 	[help("Description for the -C argument"), id(-1)]
