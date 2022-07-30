@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) and [COMMITS.md](COMMITS.md) for commit guidelines.
 
+## [0.12.1-beta](https://github.com/mzdun/cov/compare/v0.12.0-beta..v0.12.1-beta) (2022-07-30)
+
+### Bug Fixes
+
+#### Language Strings
+
+- add win32 RC description string ([85f938a](https://github.com/mzdun/cov/commit/85f938ac03064d04cef7cbcb54599a1f54894843))
+
+### Other Changes
+
+- install polib ([c8e40ea](https://github.com/mzdun/cov/commit/c8e40eabdb537d3396cb922ca8a882adfc394c00))
+- prepare for releases ([e594c57](https://github.com/mzdun/cov/commit/e594c570e45b0a4325d34c9ab8311d0fe8ca5665))
+- update roadmap, add conventional commits ([dbfe43b](https://github.com/mzdun/cov/commit/dbfe43b528069d7059d5173e17d8da73f1c89bb2))
+
+#### Application
+
+- add shield icons ([cbb8334](https://github.com/mzdun/cov/commit/cbb833490991e4a748fa8492810eca0c4ba474f7))
+
+#### Language Strings
+
+- no more version updates in .PO[T] files ([5f9e77e](https://github.com/mzdun/cov/commit/5f9e77e5bff2362df68bb399c5ae9be0d215a198))
+
+#### CMake
+
+- add win32 resources to binary ([da0db4a](https://github.com/mzdun/cov/commit/da0db4a214b830ecf2b3290cd2712a60a663ac3b))
+
 ## [0.12.0-beta](https://github.com/mzdun/cov/compare/v0.11.1-beta..v0.12.0-beta) (2022-07-29)
 
 ### New Features

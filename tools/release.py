@@ -4,7 +4,6 @@ import os
 import subprocess
 import sys
 import time
-from pprint import pprint
 from typing import Dict, List, NamedTuple, Tuple
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -306,20 +305,21 @@ def read_tag_date(tag: str):
     return proc.stdout.decode("UTF-8").split("T", 1)[0]
 
 
-def update_changelog(cur_tag: str, prev_tag: str) -> str:
+def update_changelog(cur_tag: str, prev_tag: str):
     today = read_tag_date(cur_tag)
     changelog = show_changelog(cur_tag, prev_tag, today, False)
     github = show_changelog(cur_tag, prev_tag, today, True)
 
-    with open("CHANGELOG.md") as f:
+    print("\n".join(github))
+    print("--------------------------------")
+
+    with open(os.path.join(ROOT, "CHANGELOG.md")) as f:
         current = f.read().split("\n## ", 1)
     new_text = current[0] + "\n" + "\n".join(changelog)
     if len(current) > 1:
         new_text += "\n## " + current[1]
-    with open("CHANGELOG.md", "wb") as f:
+    with open(os.path.join(ROOT, "CHANGELOG.md"), "wb") as f:
         f.write(new_text.encode("UTF-8"))
-
-    return "\n".join(github)
 
 
 def update_cmake(cur_tag: str):
@@ -354,13 +354,19 @@ NEW_TAG = "v{VERSION}{STABILITY}".format(
     VERSION=".".join(str(v) for v in SEMVER[:-1]), STABILITY=STABILITY
 )
 
-GITHUB = update_changelog(NEW_TAG, PREV_TAGS[0])
+update_changelog(NEW_TAG, PREV_TAGS[0])
 update_cmake(NEW_TAG)
-subprocess.check_call(["git", "add", "CMakeLists.txt", "CHANGELOG.md"], shell=False)
-subprocess.check_call(
-    ["git", "commit", "-m", f"chore: release {NEW_TAG[1:]}"], shell=False
-)
-subprocess.check_call(["git", "tag", NEW_TAG], shell=False)
 
-print("--------------------------------")
-print(GITHUB)
+MESSAGE = f"release {NEW_TAG[1:]}"
+
+subprocess.check_call(
+    [
+        "git",
+        "add",
+        os.path.join(ROOT, "CMakeLists.txt"),
+        os.path.join(ROOT, "CHANGELOG.md"),
+    ],
+    shell=False,
+)
+subprocess.check_call(["git", "commit", "-m", f"chore: {MESSAGE}"], shell=False)
+subprocess.check_call(["git", "tag", "-am", MESSAGE, NEW_TAG], shell=False)

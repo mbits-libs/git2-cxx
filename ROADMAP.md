@@ -34,7 +34,7 @@
     _dir=..._\
     _dir=..._
   - [x] Patch-worth:
-    - [ ] add win32 RC file
+    - [x] add win32 RC file
     - [ ] merge/split .po files
   - [ ] `cov report`
     - [ ] update report-creation API (remove file builder, introduce report builder, see tree builder in `libgit2`?)
