@@ -1,7 +1,7 @@
 [
     project("cov"),
 	namespace("cov::app::str::args"),
-    version("0.12.0"),
+    version("latest"),
     serial(1)
 ] strings {
 	[help("Synopsis header; please note there is one space at the end of this entry"), id(-1)]
