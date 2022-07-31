@@ -153,7 +153,11 @@ def level_from_commit(commit: Commit) -> int:
     if commit.is_breaking:
         return LEVEL_BREAKING
     try:
-        return {"feat": LEVEL_FEATURE, "fix": LEVEL_PATCH}[commit.type]
+        current_type = TYPE_FIX[commit.type]
+    except KeyError:
+        current_type = commit.type
+    try:
+        return {"feat": LEVEL_FEATURE, "fix": LEVEL_PATCH}[current_type]
     except KeyError:
         return LEVEL_BENIGN
 
