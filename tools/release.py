@@ -69,28 +69,26 @@ class Section(NamedTuple):
     header: str
 
 
-BREAKING_CHANGE = "BREAKING_CHANGES"
+BREAKING_CHANGE = "BREAKING_CHANGE"
 TYPES = [
-    Section(BREAKING_CHANGE, "Breaking Changes"),
+    Section(BREAKING_CHANGE, "Breaking"),
     Section("feat", "New Features"),
     Section("fix", "Bug Fixes"),
 ]
 KNOWN_TYPES = [section.key for section in TYPES]
+TYPE_FIX = {"docs": "fix"}
 
-SCOPES = [
-    Section("core", "Application"),
-    Section("rt", "App Runtime"),
-    Section("app", "Application Library"),
-    Section("api", "API"),
-    Section("lighter", "Lighter"),
-    Section("webapi", "Web API"),
-    Section("webapp", "Node Application"),
-    Section("server", "HTTP Server"),
-    Section("lang", "Language Strings"),
-    Section("cmake", "CMake"),
-    Section("conan", "Conan"),
-    Section("yarn", "yarn"),
-]
+ALL_TYPES = {
+    "assets": "Assets",
+    "build": "Build System",
+    "chore": "Chores",
+    "ci": "Continuos Integration",
+    "perf": "Performance Improvements",
+    "refactor": "Code Refactoring",
+    "revert": "Reverts",
+    "style": "Code Style",
+    "test": "Tests",
+}
 
 
 SCOPE_FIX = {"ws": "webapi", "rest": "webapi", "lngs": "lang"}
@@ -137,6 +135,7 @@ class Commit(NamedTuple):
 
 
 class CommitLink(NamedTuple):
+    scope: str
     summary: str
     hash: str
     short_hash: str
@@ -145,7 +144,7 @@ class CommitLink(NamedTuple):
     references: Dict[str, List[str]]
 
 
-ChangeLog = Dict[str, Dict[str, List[CommitLink]]]
+ChangeLog = Dict[str, List[CommitLink]]
 
 
 def level_from_commit(commit: Commit) -> int:
@@ -320,11 +319,10 @@ def get_log(commit_range: List[str]) -> Tuple[ChangeLog, int]:
         except KeyError:
             current_scope = commit.scope
         if current_type not in changes:
-            changes[current_type] = {}
-        if current_scope not in changes[current_type]:
-            changes[current_type][current_scope] = []
-        changes[current_type][current_scope].append(
+            changes[current_type] = []
+        changes[current_type].append(
             CommitLink(
+                current_scope,
                 commit.summary,
                 commit.hash,
                 commit.short_hash,
@@ -338,12 +336,22 @@ def get_log(commit_range: List[str]) -> Tuple[ChangeLog, int]:
 
 
 def link_str(link: CommitLink, show_breaking: bool) -> str:
-    breaking = ""
+    scope = ""
+    if len(link.scope):
+        scope = link.scope
+
     if show_breaking:
         if link.is_breaking:
-            breaking = "💥 "
+            if len(scope):
+                scope = f"breaking, {scope}"
+            else:
+                scope = f"breaking"
+
+    if len(scope):
+        scope = f"**{scope}**: "
+
     hash_link = f"{GITHUB_LINK}/commit/{link.hash}"
-    return f"- {breaking}{link.summary} ([{link.short_hash}]({hash_link}))"
+    return f"- {scope}{link.summary} ([{link.short_hash}]({hash_link}))"
 
 
 def show_links(links: List[CommitLink], show_breaking: bool) -> List[str]:
@@ -351,34 +359,6 @@ def show_links(links: List[CommitLink], show_breaking: bool) -> List[str]:
     if len(result):
         result.append("")
     return result
-
-
-def show_section(input: Dict[str, List[CommitLink]], show_breaking: bool):
-    section = {key: input[key] for key in input}
-    try:
-        items = section[""]
-        del section[""]
-    except KeyError:
-        items = []
-
-    lines = show_links(items, show_breaking)
-
-    for scope in SCOPES:
-        try:
-            items = section[scope.key]
-        except KeyError:
-            continue
-
-        del section[scope.key]
-
-        lines.extend([f"#### {scope.header}", ""])
-        lines.extend(show_links(items, show_breaking))
-
-    for scope in sorted(section.keys()):
-        lines.extend([f"#### {scope}", ""])
-        lines.extend(show_links(section[scope], show_breaking))
-
-    return lines
 
 
 def show_changelog(
@@ -401,15 +381,19 @@ def show_changelog(
         show_breaking = section.key != BREAKING_CHANGE
 
         lines.extend([f"### {section.header}", ""])
-        lines.extend(show_section(type_section, show_breaking))
+        lines.extend(show_links(type_section, show_breaking))
 
     for section in sorted(LOG.keys()):
         if section in KNOWN_TYPES:
             continue
         type_section = LOG[section]
+        try:
+            section_header = ALL_TYPES[section]
+        except KeyError:
+            section_header = section
 
-        lines.extend([f"### {section}", ""])
-        lines.extend(show_section(type_section, True))
+        lines.extend([f"### {section_header}", ""])
+        lines.extend(show_links(type_section, True))
 
     if for_github:
         lines.append(f"**Full Changelog**: {compare}")
