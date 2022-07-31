@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os
+import re
 import secrets
 import string
 import subprocess
@@ -361,6 +362,20 @@ def show_links(links: List[CommitLink], show_breaking: bool) -> List[str]:
     return result
 
 
+def find_breaking_notes(links: List[CommitLink]) -> List[str]:
+    breaking: List[str] = []
+    for link in links:
+        if link.breaking_message is not None:
+            paras = []
+            for para in link.breaking_message:
+                text = re.sub(r"\s+", " ", para.strip())
+                if text != "":
+                    paras.append(text + "\n")
+            if len(paras):
+                breaking.extend(paras)
+    return breaking
+
+
 def show_changelog(
     cur_tag: str, prev_tag: str, today: str, for_github: bool
 ) -> List[str]:
@@ -372,6 +387,8 @@ def show_changelog(
             "",
         ]
 
+    breaking: List[str] = []
+
     for section in TYPES:
         try:
             type_section = LOG[section.key]
@@ -382,6 +399,7 @@ def show_changelog(
 
         lines.extend([f"### {section.header}", ""])
         lines.extend(show_links(type_section, show_breaking))
+        breaking.extend(find_breaking_notes(type_section))
 
     for section in sorted(LOG.keys()):
         if section in KNOWN_TYPES:
@@ -394,6 +412,11 @@ def show_changelog(
 
         lines.extend([f"### {section_header}", ""])
         lines.extend(show_links(type_section, True))
+        breaking.extend(find_breaking_notes(type_section))
+
+    if len(breaking):
+        lines.extend([f"### BREAKING CHANGES", ""])
+        lines.extend(breaking)
 
     if for_github:
         lines.append(f"**Full Changelog**: {compare}")
