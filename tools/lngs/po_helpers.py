@@ -113,6 +113,14 @@ class MakeRule(ABC):
         with open(filename, "wb") as outfile:
             outfile.write(("".join(contents)).encode("UTF-8"))
 
+    @staticmethod
+    def normalize_line_endings(filename):
+        with open(filename, encoding="UTF-8") as infile:
+            contents = infile.readlines()
+
+        with open(filename, "wb") as outfile:
+            outfile.write(("".join(contents)).encode("UTF-8"))
+
     @abstractmethod
     def run(self):
         pass
