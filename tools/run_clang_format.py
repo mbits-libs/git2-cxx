@@ -16,6 +16,7 @@ subprocess.run(
         "docker",
         "run",
         "-it",
+        "--rm",
         "--workdir",
         "/src",
         "-v",

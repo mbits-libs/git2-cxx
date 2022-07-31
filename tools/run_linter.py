@@ -108,6 +108,7 @@ def docker_args(version, env):
     return [
         "docker",
         "run",
+        "--rm",
         *args,
         "-v" f"{__dir__}:/tmp/lint",
         f"github/super-linter:{version}",
