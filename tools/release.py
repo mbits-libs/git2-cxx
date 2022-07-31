@@ -473,7 +473,7 @@ def update_changelog(cur_tag: str, prev_tag: str) -> dict:
         "tag_name": cur_tag,
         "name": cur_tag,
         "body": "\n".join(github),
-        "draft": True,
+        "draft": False,
         "prerelease": False,  # updated by the caller
     }
 

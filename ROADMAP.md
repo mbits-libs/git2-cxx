@@ -35,7 +35,7 @@
     _dir=..._
   - [x] Patch-worth:
     - [x] add win32 RC file
-    - [ ] merge/split .po files
+    - [x] merge/split .po files
   - [ ] `cov report`
     - [ ] update report-creation API (remove file builder, introduce report builder, see tree builder in `libgit2`?)
     - [ ] own format (either MD5 or SHA over the content, only commit and branch)

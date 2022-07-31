@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) and [COMMITS.md](COMMITS.md) for commit guidelines.
 
+## [0.12.3-beta](https://github.com/mzdun/cov/compare/v0.12.2-beta...v0.12.3-beta) (2022-07-31)
+
+### Build System
+
+- automatically remove docker containers ([47bdd3a](https://github.com/mzdun/cov/commit/47bdd3af3c796a7a1698e091656207dd95e32e8a))
+- force unix line endings in split files ([72fe514](https://github.com/mzdun/cov/commit/72fe5143a52c7694d869e89cfb118e9ca2e32210))
+- remove first version of helpers ([595de5c](https://github.com/mzdun/cov/commit/595de5ca6474d569fc88dde7ee62a3b2611514e3))
+- home-brewed make scripts for new language structure ([b75104b](https://github.com/mzdun/cov/commit/b75104bc662a110a8ad6639a75ea7f53e4bc1a6f))
+- **lang**: switch to combined POT/PO files ([7ae0d19](https://github.com/mzdun/cov/commit/7ae0d1987f60eb85c455a44edcad7a38ae7e537a))
+- **lang**: remove per-lngs gettext files ([4f9be6e](https://github.com/mzdun/cov/commit/4f9be6e1486768d113af826b54156a0799dd6a18))
+
+### Code Style
+
+- **spell-check**: add polib names to dictionary ([603555b](https://github.com/mzdun/cov/commit/603555bf5c06919a95e47345bea4c2dd861f2b10))
+
 ## [0.12.2-beta](https://github.com/mzdun/cov/compare/v0.12.1-beta...v0.12.2-beta) (2022-07-31)
 
 ### Bug Fixes
