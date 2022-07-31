@@ -14,8 +14,9 @@ class Section(NamedTuple):
     header: str
 
 
+BREAKING_CHANGE = "BREAKING_CHANGES"
 TYPES = [
-    Section("BREAKING_CHANGES", "Breaking Changes"),
+    Section(BREAKING_CHANGE, "Breaking Changes"),
     Section("feat", "New Features"),
     Section("fix", "Bug Fixes"),
 ]
@@ -191,13 +192,9 @@ def get_log(range: List[str]) -> Tuple[ChangeLog, int]:
         if current_level > level:
             level = current_level
         hidden = commit.type not in KNOWN_TYPES
-        current_type = (
-            "BREAKING_CHANGE"
-            if hidden and commit.breaking
-            else commit.type
-            if not hidden
-            else "other"
-        )
+        if hidden and not commit.breaking:
+            continue
+        current_type = BREAKING_CHANGE if commit.breaking else commit.type
         try:
             current_scope = SCOPE_FIX[commit.scope]
         except KeyError:
@@ -274,15 +271,10 @@ def show_changelog(
         except KeyError:
             continue
 
-        show_breaking = section.key != "BREAKING_CHANGES"
+        show_breaking = section.key != BREAKING_CHANGE
 
         lines.extend([f"### {section.header}", ""])
         lines.extend(show_section(type_section, show_breaking))
-
-    if "other" in LOG:
-        type_section = LOG["other"]
-        lines.extend([f"### Other Changes", ""])
-        lines.extend(show_section(type_section, True))
 
     if for_github:
         lines.append(f"**Full Changelog**: {compare}")
