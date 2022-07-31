@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 import os
+import secrets
+import string
 import subprocess
 import sys
 import time
@@ -12,6 +14,10 @@ GITHUB_ORG = "mzdun"
 GITHUB_PROJ = "cov"
 GITHUB_LINK = f"https://github.com/{GITHUB_ORG}/{GITHUB_PROJ}"
 SEPARATOR = "--------------------------------"
+
+COMMIT_SEP = "--{}".format(
+    "".join(secrets.choice(string.ascii_letters + string.digits) for i in range(20))
+)
 
 LEVEL_BENIGN = 0
 LEVEL_PATCH = 1
@@ -125,21 +131,25 @@ class Commit(NamedTuple):
     summary: str
     hash: str
     short_hash: str
-    breaking: bool
+    is_breaking: bool
+    breaking_message: List[str] = []
+    references: Dict[str, List[str]] = {}
 
 
 class CommitLink(NamedTuple):
     summary: str
     hash: str
     short_hash: str
-    breaking: bool
+    is_breaking: bool
+    breaking_message: List[str]
+    references: Dict[str, List[str]]
 
 
 ChangeLog = Dict[str, Dict[str, List[CommitLink]]]
 
 
 def level_from_commit(commit: Commit) -> int:
-    if commit.breaking:
+    if commit.is_breaking:
         return LEVEL_BREAKING
     try:
         return {"feat": LEVEL_FEATURE, "fix": LEVEL_PATCH}[commit.type]
@@ -147,14 +157,16 @@ def level_from_commit(commit: Commit) -> int:
         return LEVEL_BENIGN
 
 
-def get_commit(message: str, hash: str, short_hash: str) -> Commit:
-    split = message.split(": ", 1)
+def get_commit(hash: str, short_hash: str, message: str) -> Commit:
+    subject, body = (message + "\n\n").split("\n\n", 1)
+    split = subject.split(": ", 1)
     if len(split) != 2:
         return None
+
     encoded, summary = split
     encoded = encoded.strip()
-    breaking = len(encoded) and encoded[-1] == "!"
-    if breaking:
+    is_breaking = len(encoded) and encoded[-1] == "!"
+    if is_breaking:
         encoded = encoded[:-1].rstrip()
     type_scope = encoded.split("(", 1)
     if not len(type_scope[0]):
@@ -162,7 +174,49 @@ def get_commit(message: str, hash: str, short_hash: str) -> Commit:
     scope = ""
     if len(type_scope) == 2:
         scope = ")".join(type_scope[1].split(")")[:-1]).strip()
-    return Commit(type_scope[0].strip(), scope, summary, hash, short_hash, breaking)
+
+    breaking_change = None
+    refs = []
+    closes = []
+    body = body.strip().split("BREAKING CHANGE:", 1)
+    if len(body) > 1:
+        breaking_change = [para.strip() for para in body[1].strip().split("\n\n")]
+
+    lines = body[0].strip().split("\n")
+    for index_plus_1 in range(len(lines), 0, -1):
+        index = index_plus_1 - 1
+        footer_line = lines[index].strip()
+        if footer_line == "":
+            continue
+        footer = footer_line.split(": ", 1)
+        if len(footer) == 1:
+            break
+        name = footer[0].strip().lower()
+        if name in ["refs", "closes"]:
+            items = [v.strip() for v in footer[1].split(",")]
+            if name == "refs":
+                refs = items + refs
+            else:
+                closes = items + closes
+            continue
+
+    references = {}
+
+    if len(refs):
+        references["references"] = refs
+    if len(closes):
+        references["closes"] = closes
+
+    return Commit(
+        type_scope[0].strip(),
+        scope,
+        summary,
+        hash,
+        short_hash,
+        is_breaking,
+        breaking_change,
+        references,
+    )
 
 
 def sem_ver(tag):
@@ -210,13 +264,13 @@ def get_tags(version: str, stability: str) -> str:
     return []
 
 
-def get_log(range: List[str]) -> Tuple[ChangeLog, int]:
-    args = ["git", "log", "--format=%s%n%H%n%h"]
-    if len(range):
-        if len(range) == 1:
-            args.append(f"{range[0]}..HEAD")
+def get_log(commit_range: List[str]) -> Tuple[ChangeLog, int]:
+    args = ["git", "log", f"--format=%h %H%n%B%n{COMMIT_SEP}"]
+    if len(commit_range):
+        if len(commit_range) == 1:
+            args.append(f"{commit_range[0]}..HEAD")
         else:
-            args.append("..".join(range[:2]))
+            args.append("..".join(commit_range[:2]))
     print(" ".join(args))
     print(SEPARATOR)
     proc = subprocess.run(
@@ -224,22 +278,43 @@ def get_log(range: List[str]) -> Tuple[ChangeLog, int]:
         shell=False,
         capture_output=True,
     )
-    log = proc.stdout.decode("UTF-8").split("\n")
+    commit_log = []
+    amassed = []
+    for line in proc.stdout.decode("UTF-8").split("\n"):
+        if line == COMMIT_SEP:
+            if len(amassed):
+                short_hash, hash = amassed[0].split(" ")
+                commit = get_commit(hash, short_hash, "\n".join(amassed[1:]).strip())
+                amassed = []
+
+                if commit is None:
+                    continue
+
+                commit_log.append(commit)
+            continue
+        amassed.append(line)
+
     changes: ChangeLog = {}
     level = LEVEL_BENIGN
-    for triple in zip(log[::3], log[1::3], log[2::3]):
-        commit = get_commit(*triple)
-        if commit is None:
-            continue
+
+    for commit in commit_log:
+        # Hide even from --all
         if commit.type == "chore" and commit.summary[:8] == "release ":
             continue
         current_level = level_from_commit(commit)
         if current_level > level:
             level = current_level
-        hidden = commit.type not in KNOWN_TYPES
-        if hidden and not commit.breaking and not all:
+        try:
+            current_type = TYPE_FIX[commit.type]
+        except KeyError:
+            current_type = commit.type
+        hidden = current_type not in KNOWN_TYPES
+
+        if hidden and not commit.is_breaking and not all:
             continue
-        current_type = BREAKING_CHANGE if commit.breaking else commit.type
+        if hidden and commit.is_breaking:
+            current_type = BREAKING_CHANGE
+
         try:
             current_scope = SCOPE_FIX[commit.scope]
         except KeyError:
@@ -249,7 +324,14 @@ def get_log(range: List[str]) -> Tuple[ChangeLog, int]:
         if current_scope not in changes[current_type]:
             changes[current_type][current_scope] = []
         changes[current_type][current_scope].append(
-            CommitLink(commit.summary, commit.hash, commit.short_hash, commit.breaking)
+            CommitLink(
+                commit.summary,
+                commit.hash,
+                commit.short_hash,
+                commit.is_breaking,
+                commit.breaking_message,
+                commit.references,
+            )
         )
 
     return changes, level
@@ -258,7 +340,7 @@ def get_log(range: List[str]) -> Tuple[ChangeLog, int]:
 def link_str(link: CommitLink, show_breaking: bool) -> str:
     breaking = ""
     if show_breaking:
-        if link.breaking:
+        if link.is_breaking:
             breaking = "💥 "
     hash_link = f"{GITHUB_LINK}/commit/{link.hash}"
     return f"- {breaking}{link.summary} ([{link.short_hash}]({hash_link}))"
