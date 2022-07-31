@@ -8,6 +8,11 @@ from typing import Dict, List, NamedTuple, Tuple
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+GITHUB_ORG = "mzdun"
+GITHUB_PROJ = "cov"
+GITHUB_LINK = f"https://github.com/{GITHUB_ORG}/{GITHUB_PROJ}"
+SEPARATOR = "--------------------------------"
+
 
 class Section(NamedTuple):
     key: str
@@ -174,6 +179,7 @@ def get_log(range: List[str]) -> Tuple[ChangeLog, int]:
         else:
             args.append("..".join(range[:2]))
     print(" ".join(args))
+    print(SEPARATOR)
     proc = subprocess.run(
         args,
         shell=False,
@@ -192,7 +198,7 @@ def get_log(range: List[str]) -> Tuple[ChangeLog, int]:
         if current_level > level:
             level = current_level
         hidden = commit.type not in KNOWN_TYPES
-        if hidden and not commit.breaking:
+        if hidden and not commit.breaking and not all:
             continue
         current_type = BREAKING_CHANGE if commit.breaking else commit.type
         try:
@@ -215,7 +221,7 @@ def link_str(link: CommitLink, show_breaking: bool) -> str:
     if show_breaking:
         if link.breaking:
             breaking = "💥 "
-    hash_link = f"https://github.com/mzdun/cov/commit/{link.hash}"
+    hash_link = f"{GITHUB_LINK}/commit/{link.hash}"
     return f"- {breaking}{link.summary} ([{link.short_hash}]({hash_link}))"
 
 
@@ -257,7 +263,7 @@ def show_section(input: Dict[str, List[CommitLink]], show_breaking: bool):
 def show_changelog(
     cur_tag: str, prev_tag: str, today: str, for_github: bool
 ) -> List[str]:
-    compare = f"https://github.com/mzdun/cov/compare/{prev_tag}...{cur_tag}"
+    compare = f"{GITHUB_LINK}/compare/{prev_tag}...{cur_tag}"
     lines = []
     if not for_github:
         lines = [
@@ -275,6 +281,14 @@ def show_changelog(
 
         lines.extend([f"### {section.header}", ""])
         lines.extend(show_section(type_section, show_breaking))
+
+    for section in sorted(LOG.keys()):
+        if section in KNOWN_TYPES:
+            continue
+        type_section = LOG[section]
+
+        lines.extend([f"### {section}", ""])
+        lines.extend(show_section(type_section, True))
 
     if for_github:
         lines.append(f"**Full Changelog**: {compare}")
@@ -297,7 +311,7 @@ def update_changelog(cur_tag: str, prev_tag: str):
     github = show_changelog(cur_tag, prev_tag, today, True)
 
     print("\n".join(github))
-    print("--------------------------------")
+    print(SEPARATOR)
 
     with open(os.path.join(ROOT, "CHANGELOG.md")) as f:
         current = f.read().split("\n## ", 1)
@@ -309,12 +323,30 @@ def update_changelog(cur_tag: str, prev_tag: str):
 
 
 def update_cmake(cur_tag: str):
+    if dry_run:
+        return
     version = cur_tag[1:].split("-")[0]
     set_version(version)
 
 
-if len(sys.argv) > 1:
-    arg = sys.argv[1]
+ARGS = sys.argv[1:]
+
+flags = ["all", "dry-run"]
+
+all = False
+dry_run = False
+
+for flag in flags:
+    value = False
+    for index in range(len(ARGS)):
+        if ARGS[index] == f"--{flag}":
+            value = True
+            del ARGS[index]
+            break
+    globals()[flag.replace("-", "_")] = value
+
+if len(ARGS) > 0:
+    arg = ARGS[0]
     if arg[:1] == "v":
         arg = arg[1:]
     if "-" not in arg:
@@ -329,6 +361,13 @@ else:
 PREV_TAGS = get_tags(VERSION, STABILITY)
 LOG, LEVEL = get_log(PREV_TAGS)
 SEMVER = [*sem_ver(VERSION)]
+
+if LEVEL == LEVEL_BENIGN:
+    print("Cowardly refusing to make an empty release")
+    if dry_run:
+        print(SEPARATOR)
+    else:
+        sys.exit(0)
 
 if LEVEL > LEVEL_BENIGN:
     lvl = LEVEL_BREAKING - LEVEL
@@ -345,6 +384,11 @@ update_cmake(NEW_TAG)
 
 MESSAGE = f"release {NEW_TAG[1:]}"
 
+if dry_run:
+    print(f'Would commit "chore: {MESSAGE}"')
+    sys.exit(0)
+
+print(f'Committing "chore: {MESSAGE}"')
 subprocess.check_call(
     [
         "git",
