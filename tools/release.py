@@ -13,6 +13,50 @@ GITHUB_PROJ = "cov"
 GITHUB_LINK = f"https://github.com/{GITHUB_ORG}/{GITHUB_PROJ}"
 SEPARATOR = "--------------------------------"
 
+LEVEL_BENIGN = 0
+LEVEL_PATCH = 1
+LEVEL_FEATURE = 2
+LEVEL_BREAKING = 3
+
+ARGS = sys.argv[1:]
+
+flags = ["all", "dry-run"]
+
+all = False
+dry_run = False
+forced_level = None
+
+for flag in flags:
+    value = False
+    for index in range(len(ARGS)):
+        if ARGS[index] == f"--{flag}":
+            value = True
+            del ARGS[index]
+            break
+    globals()[flag.replace("-", "_")] = value
+
+for index in range(len(ARGS)):
+    arg = ARGS[index]
+    force = "--force="
+    if arg[: len(force)] == force:
+        lvl = arg[8:].lower()
+        try:
+            forced_level = {
+                "patch": LEVEL_PATCH,
+                "fix": LEVEL_PATCH,
+                "minor": LEVEL_FEATURE,
+                "feat": LEVEL_FEATURE,
+                "feature": LEVEL_FEATURE,
+                "major": LEVEL_BREAKING,
+                "breaking": LEVEL_BREAKING,
+                "release": LEVEL_BREAKING,
+            }[lvl]
+        except KeyError:
+            print(f"Unknown level {ARGS[index][8:]}")
+            sys.exit(1)
+        del ARGS[index]
+        break
+
 
 class Section(NamedTuple):
     key: str
@@ -92,11 +136,6 @@ class CommitLink(NamedTuple):
 
 
 ChangeLog = Dict[str, Dict[str, List[CommitLink]]]
-
-LEVEL_BENIGN = 0
-LEVEL_PATCH = 1
-LEVEL_FEATURE = 2
-LEVEL_BREAKING = 3
 
 
 def level_from_commit(commit: Commit) -> int:
@@ -329,22 +368,6 @@ def update_cmake(cur_tag: str):
     set_version(version)
 
 
-ARGS = sys.argv[1:]
-
-flags = ["all", "dry-run"]
-
-all = False
-dry_run = False
-
-for flag in flags:
-    value = False
-    for index in range(len(ARGS)):
-        if ARGS[index] == f"--{flag}":
-            value = True
-            del ARGS[index]
-            break
-    globals()[flag.replace("-", "_")] = value
-
 if len(ARGS) > 0:
     arg = ARGS[0]
     if arg[:1] == "v":
@@ -361,6 +384,9 @@ else:
 PREV_TAGS = get_tags(VERSION, STABILITY)
 LOG, LEVEL = get_log(PREV_TAGS)
 SEMVER = [*sem_ver(VERSION)]
+
+if forced_level is not None:
+    LEVEL = forced_level
 
 if LEVEL == LEVEL_BENIGN:
     print("Cowardly refusing to make an empty release")
