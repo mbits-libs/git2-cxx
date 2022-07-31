@@ -91,8 +91,9 @@ ALL_TYPES = {
     "test": "Tests",
 }
 
-
 SCOPE_FIX = {"ws": "webapi", "rest": "webapi", "lngs": "lang"}
+
+ISSUE_LINKS = {"refs": "references", "closes": "closes", "fixes": "fixes"}
 
 
 def get_version():
@@ -176,8 +177,7 @@ def get_commit(hash: str, short_hash: str, message: str) -> Commit:
         scope = ")".join(type_scope[1].split(")")[:-1]).strip()
 
     breaking_change = None
-    refs = []
-    closes = []
+    references = {}
     body = body.strip().split("BREAKING CHANGE:", 1)
     if len(body) > 1:
         breaking_change = [para.strip() for para in body[1].strip().split("\n\n")]
@@ -192,20 +192,13 @@ def get_commit(hash: str, short_hash: str, message: str) -> Commit:
         if len(footer) == 1:
             break
         name = footer[0].strip().lower()
-        if name in ["refs", "closes"]:
+        if name in ISSUE_LINKS:
             items = [v.strip() for v in footer[1].split(",")]
-            if name == "refs":
-                refs = items + refs
-            else:
-                closes = items + closes
+            key = ISSUE_LINKS[name]
+            if key not in references:
+                references[key] = []
+            references[key] = items + references[key]
             continue
-
-    references = {}
-
-    if len(refs):
-        references["references"] = refs
-    if len(closes):
-        references["closes"] = closes
 
     return Commit(
         type_scope[0].strip(),
@@ -336,7 +329,13 @@ def get_log(commit_range: List[str]) -> Tuple[ChangeLog, int]:
     return changes, level
 
 
-def link_str(link: CommitLink, show_breaking: bool) -> str:
+def issue_link(ref: str) -> str:
+    if ref[:1] == "#" and ref != "#" and ref[1:].isdigit():
+        return f"[{ref}]({GITHUB_LINK}/issues/{ref[1:]})"
+    return ref
+
+
+def link_str(link: CommitLink, show_breaking: bool, for_github: bool) -> str:
     scope = ""
     if len(link.scope):
         scope = link.scope
@@ -352,11 +351,29 @@ def link_str(link: CommitLink, show_breaking: bool) -> str:
         scope = f"**{scope}**: "
 
     hash_link = f"{GITHUB_LINK}/commit/{link.hash}"
-    return f"- {scope}{link.summary} ([{link.short_hash}]({hash_link}))"
+
+    refs = ""
+    conv = str if for_github else issue_link
+    for refs_name in link.references:
+        refs_links = [
+            conv(issue) for issue in link.references[refs_name] if issue != ""
+        ]
+        if len(refs_links) > 0:
+            refs += f", {refs_name} "
+            if len(refs_links) == 1:
+                refs += refs_links[0]
+            else:
+                last = refs_links[-1]
+                listed = ", ".join(refs_links[:-1])
+                refs += f"{listed} and {last}"
+
+    return f"- {scope}{link.summary} ([{link.short_hash}]({hash_link})){refs}"
 
 
-def show_links(links: List[CommitLink], show_breaking: bool) -> List[str]:
-    result = [link_str(link, show_breaking) for link in links]
+def show_links(
+    links: List[CommitLink], show_breaking: bool, for_github: bool
+) -> List[str]:
+    result = [link_str(link, show_breaking, for_github) for link in links]
     if len(result):
         result.append("")
     return result
@@ -398,7 +415,7 @@ def show_changelog(
         show_breaking = section.key != BREAKING_CHANGE
 
         lines.extend([f"### {section.header}", ""])
-        lines.extend(show_links(type_section, show_breaking))
+        lines.extend(show_links(type_section, show_breaking, for_github))
         breaking.extend(find_breaking_notes(type_section))
 
     for section in sorted(LOG.keys()):
@@ -411,7 +428,7 @@ def show_changelog(
             section_header = section
 
         lines.extend([f"### {section_header}", ""])
-        lines.extend(show_links(type_section, True))
+        lines.extend(show_links(type_section, True, for_github))
         breaking.extend(find_breaking_notes(type_section))
 
     if len(breaking):
