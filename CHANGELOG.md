@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) and [COMMITS.md](COMMITS.md) for commit guidelines.
 
+## [0.12.2-beta](https://github.com/mzdun/cov/compare/v0.12.1-beta...v0.12.2-beta) (2022-07-31)
+
+### Bug Fixes
+
+- update the 0.12.1 to flat layout ([79883ac](https://github.com/mzdun/cov/commit/79883aceb4e86905b66a832d7e457df2c2727d1b))
+- `docs` should be fully treated as a `fix` ([14ace6a](https://github.com/mzdun/cov/commit/14ace6ac439ce90c60a516198fa60eb804902ec2))
+- update commit footer description ([803400d](https://github.com/mzdun/cov/commit/803400d4a15b6dd9a4f3ca0e847ac7dfb82069d2))
+- hide non-fix/non-feat from changelog ([4134039](https://github.com/mzdun/cov/commit/413403906c1e1118c8f1be5c960f43b10ea8baac))
+
 ## [0.12.1-beta](https://github.com/mzdun/cov/compare/v0.12.0-beta...v0.12.1-beta) (2022-07-30)
 
 ### Bug Fixes
