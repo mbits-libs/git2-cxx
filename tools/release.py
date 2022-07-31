@@ -213,29 +213,23 @@ def get_log(range: List[str]) -> Tuple[ChangeLog, int]:
     return changes, level
 
 
-def link_str(link: CommitLink, show_breaking: bool, for_github: bool) -> str:
+def link_str(link: CommitLink, show_breaking: bool) -> str:
     breaking = ""
     if show_breaking:
         if link.breaking:
             breaking = "💥 "
     hash_link = f"https://github.com/mzdun/cov/commit/{link.hash}"
-    if for_github:
-        hash_link = link.short_hash
     return f"- {breaking}{link.summary} ([{link.short_hash}]({hash_link}))"
 
 
-def show_links(
-    links: List[CommitLink], show_breaking: bool, for_github: bool
-) -> List[str]:
-    result = [link_str(link, show_breaking, for_github) for link in links]
+def show_links(links: List[CommitLink], show_breaking: bool) -> List[str]:
+    result = [link_str(link, show_breaking) for link in links]
     if len(result):
         result.append("")
     return result
 
 
-def show_section(
-    input: Dict[str, List[CommitLink]], show_breaking: bool, for_github: bool
-):
+def show_section(input: Dict[str, List[CommitLink]], show_breaking: bool):
     section = {key: input[key] for key in input}
     try:
         items = section[""]
@@ -243,7 +237,7 @@ def show_section(
     except KeyError:
         items = []
 
-    lines = show_links(items, show_breaking, for_github)
+    lines = show_links(items, show_breaking)
 
     for scope in SCOPES:
         try:
@@ -254,11 +248,11 @@ def show_section(
         del section[scope.key]
 
         lines.extend([f"#### {scope.header}", ""])
-        lines.extend(show_links(items, show_breaking, for_github))
+        lines.extend(show_links(items, show_breaking))
 
     for scope in sorted(section.keys()):
         lines.extend([f"#### {scope}", ""])
-        lines.extend(show_links(section[scope], show_breaking, for_github))
+        lines.extend(show_links(section[scope], show_breaking))
 
     return lines
 
@@ -266,7 +260,7 @@ def show_section(
 def show_changelog(
     cur_tag: str, prev_tag: str, today: str, for_github: bool
 ) -> List[str]:
-    compare = f"https://github.com/mzdun/cov/compare/{prev_tag}..{cur_tag}"
+    compare = f"https://github.com/mzdun/cov/compare/{prev_tag}...{cur_tag}"
     lines = []
     if not for_github:
         lines = [
@@ -283,12 +277,12 @@ def show_changelog(
         show_breaking = section.key != "BREAKING_CHANGES"
 
         lines.extend([f"### {section.header}", ""])
-        lines.extend(show_section(type_section, show_breaking, for_github))
+        lines.extend(show_section(type_section, show_breaking))
 
     if "other" in LOG:
         type_section = LOG["other"]
         lines.extend([f"### Other Changes", ""])
-        lines.extend(show_section(type_section, True, for_github))
+        lines.extend(show_section(type_section, True))
 
     if for_github:
         lines.append(f"**Full Changelog**: {compare}")

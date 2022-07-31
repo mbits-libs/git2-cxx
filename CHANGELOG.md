@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) and [COMMITS.md](COMMITS.md) for commit guidelines.
 
-## [0.12.1-beta](https://github.com/mzdun/cov/compare/v0.12.0-beta..v0.12.1-beta) (2022-07-30)
+## [0.12.1-beta](https://github.com/mzdun/cov/compare/v0.12.0-beta...v0.12.1-beta) (2022-07-30)
 
 ### Bug Fixes
 
@@ -28,7 +28,7 @@ All notable changes to this project will be documented in this file. See [Conven
 
 - add win32 resources to binary ([da0db4a](https://github.com/mzdun/cov/commit/da0db4a214b830ecf2b3290cd2712a60a663ac3b))
 
-## [0.12.0-beta](https://github.com/mzdun/cov/compare/v0.11.1-beta..v0.12.0-beta) (2022-07-29)
+## [0.12.0-beta](https://github.com/mzdun/cov/compare/v0.11.1-beta...v0.12.0-beta) (2022-07-29)
 
 ### New Features
 
@@ -64,7 +64,7 @@ All notable changes to this project will be documented in this file. See [Conven
 - allow local runs with LOG_LEVEL=VERBOSE ([8f7de37](https://github.com/mzdun/cov/commit/8f7de37e57d1c159e45f3cb3dcafceefb2f096e8))
 - add python linting ([89e0620](https://github.com/mzdun/cov/commit/89e06205f1a26df04f0a9120ea3205b7ce07ad43))
 
-## [0.11.1-beta](https://github.com/mzdun/cov/compare/v0.11.0-beta..v0.11.1-beta) (2022-07-23)
+## [0.11.1-beta](https://github.com/mzdun/cov/compare/v0.11.0-beta...v0.11.1-beta) (2022-07-23)
 
 ### Bug Fixes
 
@@ -84,7 +84,7 @@ All notable changes to this project will be documented in this file. See [Conven
 - move run_linter to tools ([83ea900](https://github.com/mzdun/cov/commit/83ea900c6cef5f0533efcad8abc8e714af3dc8df))
 - add Super Linter (slim) (#15) ([7903516](https://github.com/mzdun/cov/commit/79035166211b1dd9b1321cbb3d1e47b04372d7c9))
 
-## [0.11.0-beta](https://github.com/mzdun/cov/compare/v0.10.0-beta..v0.11.0-beta) (2022-07-19)
+## [0.11.0-beta](https://github.com/mzdun/cov/compare/v0.10.0-beta...v0.11.0-beta) (2022-07-19)
 
 ### New Features
 
@@ -96,7 +96,7 @@ All notable changes to this project will be documented in this file. See [Conven
 
 - add strings for cov config ([bce1915](https://github.com/mzdun/cov/commit/bce1915d163b05f9120bf9e59e337eae2bcf214f))
 
-## [0.10.0-beta](https://github.com/mzdun/cov/compare/v0.9.0-beta..v0.10.0-beta) (2022-07-19)
+## [0.10.0-beta](https://github.com/mzdun/cov/compare/v0.9.0-beta...v0.10.0-beta) (2022-07-19)
 
 ### New Features
 
@@ -125,7 +125,7 @@ All notable changes to this project will be documented in this file. See [Conven
 
 - update test driver for cov init tests ([4d73c4d](https://github.com/mzdun/cov/commit/4d73c4d72a975bfb921d6ab1cf80271f670ba67e))
 
-## [0.9.0-beta](https://github.com/mzdun/cov/compare/v0.8.0-beta..v0.9.0-beta) (2022-07-17)
+## [0.9.0-beta](https://github.com/mzdun/cov/compare/v0.8.0-beta...v0.9.0-beta) (2022-07-17)
 
 ### New Features
 
@@ -150,13 +150,13 @@ All notable changes to this project will be documented in this file. See [Conven
 
 - add library-only lngs dependency ([b4a053b](https://github.com/mzdun/cov/commit/b4a053b9300ae921a955890606c03b8d2efbe126))
 
-## [0.8.0-beta](https://github.com/mzdun/cov/compare/v0.7.2-alpha..v0.8.0-beta) (2022-07-30)
+## [0.8.0-beta](https://github.com/mzdun/cov/compare/v0.7.2-alpha...v0.8.0-beta) (2022-07-30)
 
 ### New Features
 
 - add tool runner (alias, builtin, external) ([b87984f](https://github.com/mzdun/cov/commit/b87984faa4a7fd15bcc57e167091f6180b6515d8))
 
-## [0.7.2-alpha](https://github.com/mzdun/cov/compare/v0.6.0-alpha..v0.7.2-alpha) (2022-07-30)
+## [0.7.2-alpha](https://github.com/mzdun/cov/compare/v0.6.0-alpha...v0.7.2-alpha) (2022-07-30)
 
 ### New Features
 
@@ -184,7 +184,7 @@ All notable changes to this project will be documented in this file. See [Conven
 
 - reorganize to grant `libcov` access to `lighter` ([c557fdd](https://github.com/mzdun/cov/commit/c557fdd6d3ce5b84468bd22d239d007a8bd6d9c9))
 
-## [0.6.0-alpha](https://github.com/mzdun/cov/compare/v0.5.0-alpha..v0.6.0-alpha) (2022-07-08)
+## [0.6.0-alpha](https://github.com/mzdun/cov/compare/v0.5.0-alpha...v0.6.0-alpha) (2022-07-08)
 
 ### New Features
 
@@ -200,7 +200,7 @@ All notable changes to this project will be documented in this file. See [Conven
 - trying to get pack to hilite-cxx ([2f8a010](https://github.com/mzdun/cov/commit/2f8a01093adafabb089089a39bc7fe7c5f61c37a))
 - making hilites' target name more CPack-friendly ([d55efbe](https://github.com/mzdun/cov/commit/d55efbe8fd1bdfd01224b678dcd1f3b24b70958b))
 
-## [0.5.0-alpha](https://github.com/mzdun/cov/compare/v0.4.1-alpha..v0.5.0-alpha) (2022-07-05)
+## [0.5.0-alpha](https://github.com/mzdun/cov/compare/v0.4.1-alpha...v0.5.0-alpha) (2022-07-05)
 
 ### New Features
 
@@ -217,14 +217,14 @@ All notable changes to this project will be documented in this file. See [Conven
 - stress-testing allocator uses ([58937b8](https://github.com/mzdun/cov/commit/58937b8700db95b0f358e4db2179f1e2f23ee2b7))
 - stress-testing allocator uses ([e790323](https://github.com/mzdun/cov/commit/e790323a82cbe1c3b285a6ec38c3c1f5e3fe0cf2))
 
-## [0.4.1-alpha](https://github.com/mzdun/cov/compare/v0.4.0-alpha..v0.4.1-alpha) (2022-07-04)
+## [0.4.1-alpha](https://github.com/mzdun/cov/compare/v0.4.0-alpha...v0.4.1-alpha) (2022-07-04)
 
 ### Other Changes
 
 - adjust conan cache recovery ([0b267d2](https://github.com/mzdun/cov/commit/0b267d20bc4895d1edcd477f00cb2ef1f5f46259))
 - print current conanfile hash ([4720c8f](https://github.com/mzdun/cov/commit/4720c8f85abe899590148a365ba4ea704c870076))
 
-## [0.4.0-alpha](https://github.com/mzdun/cov/compare/v0.3.0-alpha..v0.4.0-alpha) (2022-07-04)
+## [0.4.0-alpha](https://github.com/mzdun/cov/compare/v0.3.0-alpha...v0.4.0-alpha) (2022-07-04)
 
 ### New Features
 
