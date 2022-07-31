@@ -42,21 +42,27 @@ Additionally, after v1.0.0 release, any breaking change will have a `!` appended
 
 ### Referencing issues
 
-Closed issues should be listed on a separate line in the footer prefixed with "Closes" keyword like this:
+Closed issues should be listed on a separate line in the footer prefixed with "Closes" header like this:
 
 ```
-Closes #234
+Closes: #234
 ```
 
 or in the case of multiple issues:
 
 ```
-Closes #123, #245, #992
+Closes: #123, #245, #992
+```
+
+Referenced, but not closed issues should use "Refs" footer header:
+
+```
+Refs: #123, #245, #992
 ```
 
 ### Breaking changes
 
-All breaking changes have to be mentioned in footer with the description of the change, justification and migration notes.
+All breaking changes have to be mentioned in footer with the description of the change, justification and migration notes. This should be the last part of a commit message.
 
 ```
 BREAKING CHANGE:
