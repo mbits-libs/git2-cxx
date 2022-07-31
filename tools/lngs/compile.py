@@ -59,6 +59,7 @@ for lang_code in split:
         if existing is None or not same_content(output, existing):
             print(f"[PO] {lang_code}/{name}.po")
             output.save(out_name)
+            MakeBin.normalize_line_endings(out_name)
 
 
 srcs = sorted(srcs)
