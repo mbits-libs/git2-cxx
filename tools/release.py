@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import json
 import os
 import re
 import secrets
@@ -7,6 +8,7 @@ import string
 import subprocess
 import sys
 import time
+from pathlib import Path
 from typing import Dict, List, NamedTuple, Tuple
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -454,13 +456,10 @@ def read_tag_date(tag: str):
     return proc.stdout.decode("UTF-8").split("T", 1)[0]
 
 
-def update_changelog(cur_tag: str, prev_tag: str):
+def update_changelog(cur_tag: str, prev_tag: str) -> dict:
     today = read_tag_date(cur_tag)
     changelog = show_changelog(cur_tag, prev_tag, today, False)
     github = show_changelog(cur_tag, prev_tag, today, True)
-
-    print("\n".join(github))
-    print(SEPARATOR)
 
     with open(os.path.join(ROOT, "CHANGELOG.md")) as f:
         current = f.read().split("\n## ", 1)
@@ -469,6 +468,61 @@ def update_changelog(cur_tag: str, prev_tag: str):
         new_text += "\n## " + current[1]
     with open(os.path.join(ROOT, "CHANGELOG.md"), "wb") as f:
         f.write(new_text.encode("UTF-8"))
+
+    return {
+        "tag_name": cur_tag,
+        "name": cur_tag,
+        "body": "\n".join(github),
+        "draft": True,
+        "prerelease": False,  # updated by the caller
+    }
+
+
+def load_secret() -> str:
+    try:
+        with open(str(Path("~/.github_secrets").expanduser())) as f:
+            github_secrets = json.load(f)
+        token = None
+        for key in [
+            f"{GITHUB_ORG}/{GITHUB_PROJ}:releases",
+            f"{GITHUB_ORG}:releases",
+            f"{GITHUB_ORG}/{GITHUB_PROJ}",
+            f"{GITHUB_ORG}",
+        ]:
+            try:
+                return github_secrets[key]
+            except KeyError:
+                continue
+    except FileNotFoundError:
+        pass
+    return None
+
+
+def locate_remote() -> str:
+    proc = subprocess.run(
+        ["git", "remote", "-v"],
+        shell=False,
+        capture_output=True,
+    )
+
+    expected = [
+        f"https://github.com/{GITHUB_ORG}/{GITHUB_PROJ}.git",
+        f"git@github.com:{GITHUB_ORG}/{GITHUB_PROJ}.git",
+    ]
+    for remote_name, url in [
+        line[:-7].split("\t")
+        for line in proc.stdout.decode("UTF-8").split("\n")
+        if line[-7:] == " (push)"
+    ]:
+        if url in expected:
+            return remote_name
+
+    return None
+
+
+def prepare_release(github_json: dict, stability: str):
+    github_json["prerelease"] = stability != ""
+    return json.dumps(github_json)
 
 
 def update_cmake(cur_tag: str):
@@ -515,13 +569,20 @@ NEW_TAG = "v{VERSION}{STABILITY}".format(
     VERSION=".".join(str(v) for v in SEMVER[:-1]), STABILITY=STABILITY
 )
 
-update_changelog(NEW_TAG, PREV_TAGS[0])
+RELEASE = update_changelog(NEW_TAG, PREV_TAGS[0])
 update_cmake(NEW_TAG)
 
 MESSAGE = f"release {NEW_TAG[1:]}"
 
+GITHUB_TOKEN = load_secret()
+GITHUB_REMOTE = None if GITHUB_TOKEN is None else locate_remote()
+
 if dry_run:
     print(f'Would commit "chore: {MESSAGE}"')
+    if GITHUB_REMOTE is not None:
+        print(
+            f"Would create release in GitHub under {GITHUB_LINK}/releases/tag/{NEW_TAG}"
+        )
     sys.exit(0)
 
 print(f'Committing "chore: {MESSAGE}"')
@@ -536,3 +597,23 @@ subprocess.check_call(
 )
 subprocess.check_call(["git", "commit", "-m", f"chore: {MESSAGE}"], shell=False)
 subprocess.check_call(["git", "tag", "-am", MESSAGE, NEW_TAG], shell=False)
+if GITHUB_REMOTE is not None:
+    print(f"Creating release in GitHub under {GITHUB_LINK}/releases/tag/{NEW_TAG}")
+    subprocess.check_call(
+        ["git", "push", GITHUB_REMOTE, "main", "--follow-tags"], shell=False
+    )
+    subprocess.check_call(
+        [
+            "curl",
+            "-X",
+            "POST",
+            "-H",
+            "Accept: application/vnd.github+json",
+            "-H",
+            f"Authorization: token {GITHUB_TOKEN}",
+            f"https://api.github.com/repos/{GITHUB_ORG}/{GITHUB_PROJ}/releases",
+            "-d",
+            prepare_release(RELEASE, STABILITY),
+        ],
+        shell=False,
+    )
