@@ -1,4 +1,4 @@
-$Icons = "$PSScriptRoot\..\data\icons"
+$Icons = "$PSScriptRoot\..\..\data\icons"
 $sizes = @("16", "24", "32", "48", "256")
 $paths = @()
 
