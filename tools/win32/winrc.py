@@ -43,7 +43,7 @@ class Translation(NamedTuple):
 
 
 APP = {
-    "fileName": Translation("DESCRIPTION", "Cov for Windows"),
+    "fileName": Translation("cov.DESCRIPTION", "Cov for Windows"),
 }
 
 
@@ -57,7 +57,7 @@ class Language(NamedTuple):
     res_sublang: str
 
 
-root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 translations_dir = os.path.join(root, "data", "translations")
 dest = os.path.join(sys.argv[1] if len(sys.argv) > 1 else ".", "versioninfo.rc")
 
@@ -115,10 +115,7 @@ def create_translations() -> Dict[str, LocalInfo]:
     for here, dirs, files in os.walk(translations_dir):
         dirs[:] = []
         for filename in files:
-            name, ext = os.path.splitext(filename)
-            if ext != ".po":
-                continue
-            if "-".join(name.split("-")[:-1]) != "cov":
+            if os.path.splitext(filename)[1] != ".po":
                 continue
 
             lang, nfo = info_from_file(os.path.join(here, filename))
