@@ -300,4 +300,21 @@ namespace cov::testing {
 		ASSERT_TRUE(result);
 		ASSERT_EQ(expected, stream.view());
 	}
+
+	TEST(report_files, remove) {
+		report_files_builder builder{};
+		builder.add_nfo({.path = "Alpha"})
+		    .add_nfo({.path = "Beta"})
+		    .add_nfo({.path = "Gamma"})
+		    .add_nfo({.path = "Delta"});
+		ASSERT_TRUE(builder.remove("Beta"));
+		ASSERT_FALSE(builder.remove("Epsilon"));
+		std::vector<std::string_view> expected = {"Alpha", "Delta", "Gamma"};
+		auto result = builder.release();
+		std::vector<std::string_view> actual{};
+		actual.reserve(result.size());
+		for (auto const& ptr : result)
+			actual.push_back(ptr->path());
+		ASSERT_EQ(expected, actual);
+	}
 }  // namespace cov::testing
