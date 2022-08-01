@@ -72,13 +72,13 @@ namespace cov {
 			git_oid contents{};
 			git_oid line_coverage{};
 		};
-		void add(std::unique_ptr<report_entry>&&);
-		void add(std::string_view path,
-		         io::v1::coverage_stats const& stats,
-		         git_oid const& contents,
-		         git_oid const& line_coverage);
-		void add_nfo(info const& nfo) {
-			add(nfo.path, nfo.stats, nfo.contents, nfo.line_coverage);
+		report_files_builder& add(std::unique_ptr<report_entry>&&);
+		report_files_builder& add(std::string_view path,
+		                          io::v1::coverage_stats const& stats,
+		                          git_oid const& contents,
+		                          git_oid const& line_coverage);
+		report_files_builder& add_nfo(info const& nfo) {
+			return add(nfo.path, nfo.stats, nfo.contents, nfo.line_coverage);
 		}
 		bool remove(std::string_view path);
 		ref_ptr<report_files> extract();

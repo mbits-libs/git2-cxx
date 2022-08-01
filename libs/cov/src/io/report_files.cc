@@ -168,16 +168,19 @@ namespace cov {
 		return make_ref<io::handlers::impl>(std::move(entries));
 	}
 
-	void report_files_builder::add(std::unique_ptr<report_entry>&& entry) {
+	report_files_builder& report_files_builder::add(
+	    std::unique_ptr<report_entry>&& entry) {
 		auto const filename = entry->path();
 		entries_[filename] = std::move(entry);
+		return *this;
 	}
 
-	void report_files_builder::add(std::string_view path,
-	                               io::v1::coverage_stats const& stats,
-	                               git_oid const& contents,
-	                               git_oid const& line_coverage) {
-		add(std::make_unique<io::handlers::report_entry_impl>(
+	report_files_builder& report_files_builder::add(
+	    std::string_view path,
+	    io::v1::coverage_stats const& stats,
+	    git_oid const& contents,
+	    git_oid const& line_coverage) {
+		return add(std::make_unique<io::handlers::report_entry_impl>(
 		    path, stats, contents, line_coverage));
 	}
 
@@ -201,5 +204,6 @@ namespace cov {
 		               [](auto&& pair) { return std::move(pair.second); });
 		entries_.clear();
 		return entries;
-	}
+	}  // GCOV_EXCL_LINE[GCC]
+
 }  // namespace cov
