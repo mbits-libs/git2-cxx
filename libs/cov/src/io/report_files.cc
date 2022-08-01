@@ -8,28 +8,40 @@
 namespace cov::io::handlers {
 	namespace {
 		struct report_entry_impl : report_entry {
-			report_entry_impl(report_entry_builder&& data)
-			    : data_{std::move(data)} {}
+			report_entry_impl(bool const& is_dirty,
+			                  bool const& is_modified,
+			                  std::string_view path,
+			                  io::v1::coverage_stats const& stats,
+			                  git_oid const& contents,
+			                  git_oid const& line_coverage)
+			    : is_dirty_{is_dirty}
+			    , is_modified_{is_modified}
+			    , path_{path.data(), path.size()}
+			    , stats_{stats}
+			    , contents_{contents}
+			    , line_coverage_{line_coverage} {}
+
 			~report_entry_impl() = default;
-			bool is_dirty() const noexcept override { return data_.is_dirty; }
-			bool is_modified() const noexcept override {
-				return data_.is_modified;
-			}
-			std::string_view path() const noexcept override {
-				return data_.path;
-			}
+			bool is_dirty() const noexcept override { return is_dirty_; }
+			bool is_modified() const noexcept override { return is_modified_; }
+			std::string_view path() const noexcept override { return path_; }
 			io::v1::coverage_stats const& stats() const noexcept override {
-				return data_.stats;
+				return stats_;
 			}
 			git_oid const& contents() const noexcept override {
-				return data_.contents;
+				return contents_;
 			}
 			git_oid const& line_coverage() const noexcept override {
-				return data_.line_coverage;
+				return line_coverage_;
 			}
 
 		private:
-			report_entry_builder data_;
+			bool is_dirty_{};
+			bool is_modified_{};
+			std::string path_{};
+			io::v1::coverage_stats stats_{};
+			git_oid contents_{};
+			git_oid line_coverage_{};
 		};
 
 		struct impl : counted_impl<cov::report_files> {
@@ -76,28 +88,23 @@ namespace cov::io::handlers {
 		             sizeof(uint32_t)))
 			return {};
 
-		std::vector<std::unique_ptr<report_entry>> result(header.entries_count);
+		report_files_builder builder{};
 		std::vector<std::byte> buffer{};
 
-		for (auto& file : result) {
+		for (uint32_t index = 0; index < header.entries_count; ++index) {
 			if (!in.load(buffer, entry_size)) return {};
 			auto const& entry =
 			    *reinterpret_cast<v1::report_entry const*>(buffer.data());
 
 			if (!strings.is_valid(entry.path)) return {};
 
-			report_entry_builder builder{};
-			builder.set_dirty(entry.is_dirty)
-			    .set_modifed(entry.is_modified)
-			    .set_path(strings.at(entry.path))
-			    .set_stats(entry.stats)
-			    .set_contents(entry.contents)
-			    .set_line_coverage(entry.line_coverage);
-			file = std::move(builder).create();
+			builder.add(entry.is_dirty, entry.is_modified,
+			            strings.at(entry.path), entry.stats, entry.contents,
+			            entry.line_coverage);
 		}
 
 		ec.clear();
-		return report_files_create(std::move(result));
+		return builder.extract();
 	}
 
 #if defined(__GNUC__)
@@ -169,13 +176,45 @@ namespace cov::io::handlers {
 namespace cov {
 	report_entry::~report_entry() {}
 
-	std::unique_ptr<report_entry> report_entry_builder::create() && {
-		return std::make_unique<io::handlers::report_entry_impl>(
-		    std::move(*this));
-	}
-
-	ref_ptr<report_files> report_files_create(
+	ref_ptr<report_files> report_files::create(
 	    std::vector<std::unique_ptr<report_entry>>&& entries) {
 		return make_ref<io::handlers::impl>(std::move(entries));
+	}
+
+	void report_files_builder::add(std::unique_ptr<report_entry>&& entry) {
+		auto const filename = entry->path();
+		entries_[filename] = std::move(entry);
+	}
+
+	void report_files_builder::add(bool const& is_dirty,
+	                               bool const& is_modified,
+	                               std::string_view path,
+	                               io::v1::coverage_stats const& stats,
+	                               git_oid const& contents,
+	                               git_oid const& line_coverage) {
+		add(std::make_unique<io::handlers::report_entry_impl>(
+		    is_dirty, is_modified, path, stats, contents, line_coverage));
+	}
+
+	bool report_files_builder::remove(std::string_view path) {
+		auto it = entries_.find(path);
+		if (it == entries_.end()) return false;
+		entries_.erase(it);
+		return true;
+	}
+
+	ref_ptr<report_files> report_files_builder::extract() {
+		return report_files::create(release());
+	}
+
+	std::vector<std::unique_ptr<report_entry>> report_files_builder::release() {
+		std::vector<std::unique_ptr<report_entry>> entries{};
+		entries.reserve(entries_.size());
+		std::transform(std::move_iterator(entries_.begin()),
+		               std::move_iterator(entries_.end()),
+		               std::back_inserter(entries),
+		               [](auto&& pair) { return std::move(pair.second); });
+		entries_.clear();
+		return entries;
 	}
 }  // namespace cov

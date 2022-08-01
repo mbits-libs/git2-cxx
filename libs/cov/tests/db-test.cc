@@ -67,8 +67,7 @@ namespace cov::testing {
 		// write
 		{
 			auto total = io::v1::coverage_stats::init();
-			std::vector<std::unique_ptr<report_entry>> entries{};
-			entries.reserve(rprt.files.size());
+			report_files_builder builder{};
 			for (auto const& file : rprt.files) {
 				auto cvg_object = from_lines(file.lines, file.finish);
 				ASSERT_TRUE(cvg_object);
@@ -78,10 +77,10 @@ namespace cov::testing {
 				auto file_stats = stats(cvg_object->coverage());
 				total += file_stats;
 
-				entries.push_back(file.build(file_stats, line_cvg_id).create());
+				file.add_to(builder, file_stats, line_cvg_id);
 			}
 
-			auto cvg_files = report_files_create(std::move(entries));
+			auto cvg_files = builder.extract();
 			ASSERT_TRUE(cvg_files);
 			git_oid files_id{};
 			ASSERT_TRUE(backend->write(files_id, cvg_files));
