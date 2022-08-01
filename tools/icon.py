@@ -125,15 +125,18 @@ class svg_mask:
 
 
 class svg_root:
-    def __init__(self, size, *args: Union[svg_path, svg_group, svg_mask, str]):
+    def __init__(
+        self, size, *args: Union[svg_path, svg_group, svg_mask, str], **kwargs
+    ):
         self.children = args
         self.size = size
+        self.px_size = kwargs.get("px_size", 256)
 
     def __str__(self):
         # <rect width="{self.size}" height="{self.size}" stroke="blue" />
         children = "".join(f"{node}\n" for node in self.children)
         return f"""<svg xmlns='http://www.w3.org/2000/svg'
-    width='256px' height='256px' viewBox='0 0 {self.size} {self.size}' version='1.1'
+    width='{self.px_size}px' height='{self.px_size}px' viewBox='0 0 {self.size} {self.size}' version='1.1'
     fill="none">
 {children}</svg>"""
 
@@ -245,6 +248,9 @@ class Shield:
     ):
         height = shield_calc()[1]
         result = svg_group(pt(ICON_HEIGHT / 2, ICON_HEIGHT - height))
+        mask_style = []
+        if add_mask:
+            mask_style = [style("mask", "url(#mask)")]
         result.paths = [
             svg_path(self.shield_glyph, style("fill", shield_color)),
             svg_path(symbol, glyph_stroke(symbol_color)),
@@ -254,9 +260,7 @@ class Shield:
                 style("opacity", ".2"),
             ),
             svg_path(
-                self.shield_glyph,
-                style("stroke", symbol_color, width="2"),
-                style("mask", "url(#mask)"),
+                self.shield_glyph, style("stroke", symbol_color, width="2"), *mask_style
             ),
         ]
         if add_mask:
@@ -266,7 +270,7 @@ class Shield:
                 svg_path(self.shield_glyph, style("fill", "#fff")),
             )
             result.paths.insert(0, mask)
-        return svg_root(ICON_HEIGHT, result)
+        return svg_root(ICON_HEIGHT, result, px_size=256 if add_mask else 1024)
 
     def appicon_cov(self):
         return self._appicon(self.mark_glyph, "#b9e7fc", "#1f88e5", True)
@@ -281,7 +285,7 @@ class Shield:
             f'<rect width="{ICON_HEIGHT}" height="{ICON_HEIGHT}" fill="#000"/>',
             svg_path(self.shield_glyph, style("fill", "#fff")),
         ]
-        return svg_root(ICON_HEIGHT, result)
+        return svg_root(ICON_HEIGHT, result, px_size=1024)
 
     def favicon_bad(self):
         return self._favicon(self.fail_glyph, "#cf222e", "#fff")
@@ -312,10 +316,17 @@ __dir__ = os.path.join(
 )
 for icon in ["good", "bad", "passing", "outline"]:
     pathname = f"favicon-{icon}.svg"
-    with open(os.path.join(__dir__, pathname), "w") as f:
-        print(getattr(shield, f"favicon_{icon}")(), file=f)
+    with open(os.path.join(__dir__, pathname), "wb") as f:
+        svg = str(getattr(shield, f"favicon_{icon}")())
+        f.write(svg.encode("UTF-8"))
+        f.write(b"\n")
 
 for icon in ["cov", "win32", "win32_mask"]:
-    pathname = f"appicon-{icon.replace('_', '-')}.svg"
-    with open(os.path.join(__dir__, pathname), "w") as f:
-        print(getattr(shield, f"appicon_{icon}")(), file=f)
+    try:
+        pathname = {"cov": "appicon.svg"}[icon]
+    except KeyError:
+        pathname = f"appicon-{icon.replace('_', '-')}.svg"
+    with open(os.path.join(__dir__, pathname), "wb") as f:
+        svg = str(getattr(shield, f"appicon_{icon}")())
+        f.write(svg.encode("UTF-8"))
+        f.write(b"\n")
