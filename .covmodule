@@ -1,0 +1,20 @@
+[module "git2 (c++)"]
+    path = libs/git2-c++
+[module "cov/API"]
+    path = libs/cov
+[module "cov/runtime"]
+    path = libs/cov-rt
+[module "app/library"]
+    path = libs/app
+[module "app/main"]
+    path = apps/cov/
+    path = apps/builtins/
+[module "hilite/lighter"]
+    path = libs/hilite/hilite
+    path = libs/hilite/lighter
+[module "hilite/c++"]
+    path = libs/hilite/hilite-cxx
+[module "hilite/python"]
+    path = libs/hilite/hilite-py3
+[module "hilite/type script"]
+    path = libs/hilite/hilite-ts

@@ -37,7 +37,7 @@
     - [x] add win32 RC file _(0.12.1-beta)_
     - [x] merge/split .po files _(0.12.2-beta)_
   - [ ] `cov report`
-    - [ ] update report-creation API
+    - [x] update report-creation API
       - remove file builder
       - introduce report builder
       - get rid of is_dirty/is_modified
