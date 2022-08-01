@@ -138,10 +138,8 @@ msgstr "<value>"
 
 #. Description for the -C argument
 msgctxt "cov.CWD_DESCRIPTION"
-msgid ""
-"runs as if cov was started in <dir> instead of the current working directory"
-msgstr ""
-"runs as if cov was started in <dir> instead of the current working directory"
+msgid "runs as if cov was started in <dir> instead of the current working directory"
+msgstr "runs as if cov was started in <dir> instead of the current working directory"
 
 #. Description for windows binaries
 msgctxt "cov.DESCRIPTION"
@@ -261,8 +259,7 @@ msgstr "lists all variables in a config files"
 #. Description for the positional arguments (name and optional value)
 msgctxt "cov_config.NAME_VALUE"
 msgid "when only name is given, reads its value; otherwise sets the new value"
-msgstr ""
-"when only name is given, reads its value; otherwise sets the new value"
+msgstr "when only name is given, reads its value; otherwise sets the new value"
 
 #. Description for missing scope
 msgctxt "cov_config.NO_SCOPE_DESCRIPTION"
@@ -322,10 +319,8 @@ msgstr "removes all values matching the key name"
 
 #. Description for the init's last argument
 msgctxt "cov_init.ARG_DIRECTORY"
-msgid ""
-"sets the directory to put the repository in; defaults to current directory"
-msgstr ""
-"sets the directory to put the repository in; defaults to current directory"
+msgid "sets the directory to put the repository in; defaults to current directory"
+msgstr "sets the directory to put the repository in; defaults to current directory"
 
 #. Description for the --force argument
 msgctxt "cov_init.ARG_FORCE"
@@ -486,6 +481,10 @@ msgstr "prints module name separator from either workdir or commit"
 msgctxt "cov_module.SHOW_WORKDIR_DESCRIPTION"
 msgid "prints module list from git work directory and exits"
 msgstr "prints module list from git work directory and exits"
+
+msgctxt "cov_report.STR"
+msgid "dummy"
+msgstr "dummy"
 
 #. config_file.c:412, 442
 msgctxt "errors.CONFIG_CANNOT_DELETE"

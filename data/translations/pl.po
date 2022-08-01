@@ -15,7 +15,8 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 "
+"|| n%100>14) ? 1 : 2);\n"
 "X-Generator: Poedit 2.4.2\n"
 
 #. Universal error message
@@ -270,8 +271,8 @@ msgstr ""
 msgctxt "cov_config.NO_SCOPE_DESCRIPTION"
 msgid "reads from all visible scopes at once, writes to .covdata/config"
 msgstr ""
-"odczytuje ze wszystkich dostępnych plików jednocześnie, zapisuje do "
-".covdata/config"
+"odczytuje ze wszystkich dostępnych plików jednocześnie, zapisuje do .covdata/"
+"config"
 
 #. Name for the situation, when neither local, global, nor system scopes were
 #. chosen.
@@ -317,8 +318,7 @@ msgstr "zbyt wiele argumentów"
 #. Description for the --unset scope
 msgctxt "cov_config.UNSET"
 msgid "removes the value matching the key name if there is exactly one"
-msgstr ""
-"usuwa wartość pasującą do nazwy klucza, jeśli istnieje dokładnie jedna"
+msgstr "usuwa wartość pasującą do nazwy klucza, jeśli istnieje dokładnie jedna"
 
 #. Description for the --unset-all scope
 msgctxt "cov_config.UNSET_ALL"
@@ -498,6 +498,10 @@ msgstr ""
 msgctxt "cov_module.SHOW_WORKDIR_DESCRIPTION"
 msgid "prints module list from git work directory and exits"
 msgstr "drukuje listę modułów z katalogu roboczego git i wychodzi"
+
+msgctxt "cov_report.STR"
+msgid "dummy"
+msgstr "dummy"
 
 #. config_file.c:412, 442
 msgctxt "errors.CONFIG_CANNOT_DELETE"
