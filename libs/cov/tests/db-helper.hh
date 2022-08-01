@@ -21,15 +21,10 @@ namespace cov::testing {
 		line_cvg lines{};
 		unsigned finish{};
 
-		report_entry_builder build(io::v1::coverage_stats const& stats,
-		                           git_oid const& lines_id) const {
-			report_entry_builder bldr{};
-			bldr.set_path(name)
-			    .set_dirty(dirty)
-			    .set_modifed(modified)
-			    .set_stats(stats)
-			    .set_line_coverage(lines_id);
-			return bldr;
+		void add_to(report_files_builder& builder,
+		            io::v1::coverage_stats const& stats,
+		            git_oid const& lines_id) const {
+			builder.add(dirty, modified, name, stats, {}, lines_id);
 		}
 	};
 

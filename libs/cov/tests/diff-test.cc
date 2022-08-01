@@ -89,7 +89,7 @@ namespace cov::testing {
 		}
 
 		git_oid peeled_id{};
-		auto peeled = report_files_create(std::move(entries));
+		auto peeled = report_files::create(std::move(entries));
 		if (!repo.write(peeled_id, peeled)) {
 			return git::make_error_code(git::errc::error);
 		}

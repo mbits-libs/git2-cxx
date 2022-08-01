@@ -296,9 +296,9 @@ namespace cov::testing {
 		dbo.add_handler<io::OBJECT::FILES, io::handlers::report_files>();
 
 		auto const obj = make_ref<report_files_impl>();
-		report_entry_builder builder{};
-		builder.set_path("file path"s).set_stats(1250, 300, 299);
-		obj->files.push_back(std::move(builder).create());
+		report_files_builder builder{};
+		builder.add_nfo({.path = "file path"sv, .stats = {1250, 300, 299}});
+		obj->files = builder.release();
 		auto const result = dbo.store(obj, stream);
 		ASSERT_TRUE(result);
 		ASSERT_EQ(expected, stream.view());

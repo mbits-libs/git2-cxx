@@ -37,7 +37,10 @@
     - [x] add win32 RC file _(0.12.1-beta)_
     - [x] merge/split .po files _(0.12.2-beta)_
   - [ ] `cov report`
-    - [ ] update report-creation API (remove file builder, introduce report builder, see tree builder in `libgit2`?)
+    - [ ] update report-creation API
+      - remove file builder
+      - introduce report builder
+      - get rid of is_dirty/is_modified
     - [ ] own format (either MD5 or SHA over the content, only commit and branch)
     - [ ] coveralls
     - [ ] cobertura
