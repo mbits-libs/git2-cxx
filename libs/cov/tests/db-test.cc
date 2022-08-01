@@ -40,8 +40,6 @@ namespace cov::testing {
 		             .message = "Initial commit"s,
 		             .commit_time_utc = sys_seconds{0x11223344556677s}},
 		    .files = {{.name = "main.cpp"sv,
-		               .dirty = false,
-		               .modified = false,
 		               .lines = {{10, 1},
 		                         {11, 1},
 		                         {12, 1},
@@ -50,8 +48,6 @@ namespace cov::testing {
 		                         {18, 0},
 		                         {19, 0}}},
 		              {.name = "module.cpp"sv,
-		               .dirty = false,
-		               .modified = false,
 		               .lines = {{10, 15},
 		                         {11, 15},
 		                         {12, 10},
@@ -120,8 +116,6 @@ namespace cov::testing {
 				auto& entry = entries[index];
 				auto& file = rprt.files[index];
 				ASSERT_EQ(file.name, entry->path());
-				ASSERT_EQ(file.dirty, entry->is_dirty());
-				ASSERT_EQ(file.modified, entry->is_modified());
 
 				auto cvg_lines =
 				    backend->lookup<cov::line_coverage>(entry->line_coverage());

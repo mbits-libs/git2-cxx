@@ -8,22 +8,16 @@
 namespace cov::io::handlers {
 	namespace {
 		struct report_entry_impl : report_entry {
-			report_entry_impl(bool const& is_dirty,
-			                  bool const& is_modified,
-			                  std::string_view path,
+			report_entry_impl(std::string_view path,
 			                  io::v1::coverage_stats const& stats,
 			                  git_oid const& contents,
 			                  git_oid const& line_coverage)
-			    : is_dirty_{is_dirty}
-			    , is_modified_{is_modified}
-			    , path_{path.data(), path.size()}
+			    : path_{path.data(), path.size()}
 			    , stats_{stats}
 			    , contents_{contents}
 			    , line_coverage_{line_coverage} {}
 
 			~report_entry_impl() = default;
-			bool is_dirty() const noexcept override { return is_dirty_; }
-			bool is_modified() const noexcept override { return is_modified_; }
 			std::string_view path() const noexcept override { return path_; }
 			io::v1::coverage_stats const& stats() const noexcept override {
 				return stats_;
@@ -36,8 +30,6 @@ namespace cov::io::handlers {
 			}
 
 		private:
-			bool is_dirty_{};
-			bool is_modified_{};
 			std::string path_{};
 			io::v1::coverage_stats stats_{};
 			git_oid contents_{};
@@ -57,11 +49,13 @@ namespace cov::io::handlers {
 			std::vector<std::unique_ptr<report_entry>> files_{};
 		};
 
-		constexpr uint32_t uint_30(size_t value) {
-			return static_cast<uint32_t>(value & ((1u << 30) - 1u));
+		constexpr uint32_t uint_32(size_t value) {
+			return static_cast<uint32_t>(value &
+			                             std::numeric_limits<uint32_t>::max());
 		}
-		static_assert(uint_30(std::numeric_limits<size_t>::max()) ==
-		              0x3FFF'FFFF);
+		static_assert(sizeof(1ull) > 4);
+		static_assert(uint_32(std::numeric_limits<size_t>::max()) ==
+		              0xFFFF'FFFF);
 	}  // namespace
 
 	ref_ptr<counted> report_files::load(uint32_t,
@@ -98,8 +92,7 @@ namespace cov::io::handlers {
 
 			if (!strings.is_valid(entry.path)) return {};
 
-			builder.add(entry.is_dirty, entry.is_modified,
-			            strings.at(entry.path), entry.stats, entry.contents,
+			builder.add(strings.at(entry.path), entry.stats, entry.contents,
 			            entry.line_coverage);
 		}
 
@@ -111,12 +104,8 @@ namespace cov::io::handlers {
 // The warning is legit, since as_a<> can return nullptr, if there is no
 // cov::report_files in type tree branch, but this should be called from within
 // db_object::store, which is guarded by report_files::recognized
-//
-// Conversion is turned off due to "out_entry.path = path30", which is mitigated
-// through uint_30()
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wnull-dereference"
-#pragma GCC diagnostic ignored "-Wconversion"
 #endif
 	bool report_files::store(ref_ptr<counted> const& value,
 	                         write_stream& out) const {
@@ -151,13 +140,11 @@ namespace cov::io::handlers {
 			auto& in = *entry_ptr;
 
 			auto const path = stg.locate_or(in.path(), stg.size() + 1);
-			auto const path30 = uint_30(path);
-			if (path != path30 || path30 > stg.size()) return false;
+			auto const path32 = uint_32(path);
+			if (path != path32 || path32 > stg.size()) return false;
 
 			v1::report_entry entry = {
-			    .path = path30,
-			    .is_dirty = in.is_dirty() ? 1u : 0u,
-			    .is_modified = in.is_modified() ? 1u : 0u,
+			    .path = path32,
 			    .stats = in.stats(),
 			    .contents = in.contents(),
 			    .line_coverage = in.line_coverage(),
@@ -186,14 +173,12 @@ namespace cov {
 		entries_[filename] = std::move(entry);
 	}
 
-	void report_files_builder::add(bool const& is_dirty,
-	                               bool const& is_modified,
-	                               std::string_view path,
+	void report_files_builder::add(std::string_view path,
 	                               io::v1::coverage_stats const& stats,
 	                               git_oid const& contents,
 	                               git_oid const& line_coverage) {
 		add(std::make_unique<io::handlers::report_entry_impl>(
-		    is_dirty, is_modified, path, stats, contents, line_coverage));
+		    path, stats, contents, line_coverage));
 	}
 
 	bool report_files_builder::remove(std::string_view path) {
