@@ -1,0 +1,7 @@
+[
+    project("cov"),
+    namespace("cov::app::str::cov_report"),
+    version("latest"),
+    serial(1)
+] strings {
+}

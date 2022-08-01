@@ -19,7 +19,9 @@ set(STRINGS
   errors
   cov_init
   cov_config
-  cov_module)
+  cov_module
+  cov_report
+)
 set(LANGUAGES pl en)
 
 set(COV_TESTING ON CACHE BOOL "Compile and/or run self-tests")

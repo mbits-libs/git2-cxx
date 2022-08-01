@@ -1,6 +1,7 @@
 set(SOURCES
   src/config.cc
   src/module.cc
+  src/report.cc
   src/root_command.cc
   src/split_command.cc
   src/tools.cc
@@ -10,8 +11,10 @@ set(SOURCES
   include/cov/app/cov_config_tr.hh
   include/cov/app/cov_init_tr.hh
   include/cov/app/cov_module_tr.hh
+  include/cov/app/cov_report_tr.hh
   include/cov/app/cov_tr.hh
   include/cov/app/errors_tr.hh
+  include/cov/app/report.hh
   include/cov/app/root_command.hh
   include/cov/app/split_command.hh
   include/cov/app/tools.hh
@@ -30,7 +33,7 @@ target_link_options(cov-rt PRIVATE ${ADDITIONAL_LINK_FLAGS})
 target_include_directories(cov-rt PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}/include
   ${CMAKE_CURRENT_BINARY_DIR}/include)
-target_link_libraries(cov-rt PUBLIC app)
+target_link_libraries(cov-rt PUBLIC app json)
 
 set_target_properties(cov-rt PROPERTIES FOLDER libs)
 

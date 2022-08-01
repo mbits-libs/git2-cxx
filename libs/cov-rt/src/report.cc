@@ -1,0 +1,5 @@
+// Copyright (c) 2022 Marcin Zdun
+// This code is licensed under MIT license (see LICENSE for details)
+
+namespace cov::app::report {
+}  // namespace cov::app::report
