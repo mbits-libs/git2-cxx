@@ -117,9 +117,6 @@ namespace cov::testing {
 		auto const& front = lines->entries().front();
 		ASSERT_TRUE(front);
 		auto const& entry = *front;
-		ASSERT_FALSE(entry.in_workdir());
-		ASSERT_TRUE(entry.in_index());
-		ASSERT_FALSE(entry.is_modified());
 		ASSERT_EQ("file path"sv, entry.path());
 		ASSERT_EQ(1250u, entry.stats().total);
 		ASSERT_EQ(300u, entry.stats().relevant);

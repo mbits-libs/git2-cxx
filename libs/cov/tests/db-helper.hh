@@ -17,14 +17,13 @@ namespace cov::testing {
 
 	struct file {
 		std::string_view name;
-		bool dirty{}, modified{};
 		line_cvg lines{};
 		unsigned finish{};
 
 		void add_to(report_files_builder& builder,
 		            io::v1::coverage_stats const& stats,
 		            git_oid const& lines_id) const {
-			builder.add(dirty, modified, name, stats, {}, lines_id);
+			builder.add(name, stats, {}, lines_id);
 		}
 	};
 
