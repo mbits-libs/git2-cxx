@@ -31,17 +31,17 @@ list(APPEND SOURCES ${CMAKE_CURRENT_BINARY_DIR}/cov/builtins.hh)
 
 if (WIN32)
     foreach(LANG ${LANGUAGES})
-        list(APPEND PO_FILES "${CMAKE_SOURCE_DIR}/data/translations/cov-${LANG}.po")
+        list(APPEND PO_FILES "${CMAKE_SOURCE_DIR}/data/translations/${LANG}.po")
     endforeach()
 
     add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/cov/versioninfo.rc"
         COMMAND ${Python3_EXECUTABLE}
         ARGS
-            "${CMAKE_SOURCE_DIR}/tools/winrc.py"
+            "${CMAKE_SOURCE_DIR}/tools/win32/winrc.py"
             "${CMAKE_CURRENT_BINARY_DIR}/cov"
             "${CMAKE_CURRENT_SOURCE_DIR}/win32/versioninfo.h"
         DEPENDS
-            "${CMAKE_SOURCE_DIR}/tools/winrc.py"
+            "${CMAKE_SOURCE_DIR}/tools/win32/winrc.py"
             "${CMAKE_CURRENT_SOURCE_DIR}/win32/versioninfo.h"
             ${PO_FILES}
         VERBATIM
