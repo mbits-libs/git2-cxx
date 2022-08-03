@@ -1,6 +1,8 @@
 if (COV_TESTING)
     set(SOURCES
+        src/path.cc
         src/tar.cc
+        include/path.hh
         include/tar.hh
     )
     source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})

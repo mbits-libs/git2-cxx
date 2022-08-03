@@ -72,7 +72,7 @@ namespace git::testing {
 	}  // namespace
 
 	std::string get_repo_config(std::string_view path) {
-		return setup::get_path(setup::test_dir() / setup::make_path(path) /
+		return setup::get_path(setup::test_dir() / setup::make_u8path(path) /
 		                       "config"sv);
 	}
 

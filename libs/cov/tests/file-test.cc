@@ -24,8 +24,7 @@ namespace cov::testing {
 
 	TEST(file, ctors) {
 		io::file one{};
-		io::file two =
-		    io::fopen(setup::test_dir() / setup::make_path("file"sv), "w");
+		io::file two = io::fopen(setup::test_dir() / "file"sv, "w");
 		ASSERT_FALSE(one);
 		ASSERT_TRUE(two);
 		std::swap(one, two);
@@ -34,7 +33,7 @@ namespace cov::testing {
 	}
 
 	TEST(file, io) {
-		auto const filename = setup::test_dir() / setup::make_path("file"sv);
+		auto const filename = setup::test_dir() / "file"sv;
 		std::error_code ec{};
 		std::filesystem::remove(filename, ec);
 		ASSERT_FALSE(ec) << "What: " << ec.message();
@@ -61,7 +60,7 @@ namespace cov::testing {
 	}
 
 	TEST(file, skip) {
-		auto const filename = setup::test_dir() / setup::make_path("file"sv);
+		auto const filename = setup::test_dir() / "file"sv;
 		std::error_code ec{};
 		std::filesystem::remove(filename, ec);
 		ASSERT_FALSE(ec) << "What: " << ec.message();

@@ -6,9 +6,11 @@
 #include <git2/oid.h>
 #include <filesystem>
 #include <string>
+#include "path.hh"
 
 namespace cov::testing::setup {
-	using std::filesystem::path;
+	using ::testing::path::get_path;
+	using ::testing::path::make_u8path;
 	using namespace ::std::literals;
 
 	struct test_initializer {
@@ -18,9 +20,5 @@ namespace cov::testing::setup {
 	static test_initializer initializer{};
 
 	std::filesystem::path test_dir();
-	std::string get_path(path const& p);
-	path make_path(std::string_view utf8);
 	std::string get_oid(git_oid const& id);
 }  // namespace cov::testing::setup
-
-void PrintTo(std::filesystem::path const& path, ::std::ostream* os);
