@@ -10,8 +10,6 @@
 #include "new.hh"
 
 namespace cov::app::testing {
-	using namespace cov::testing;
-
 	class oom : public ::testing::Test {
 		git::init globals{};
 

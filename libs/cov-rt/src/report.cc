@@ -285,7 +285,7 @@ namespace cov::app::report {
 		    .message = stored(rstrip(commit.message_raw())),
 		    .tree = std::move(tree),
 		};
-	}
+	}  // GCOV_EXCL_LINE[WIN32]
 
 	blob_info git_commit::verify(std::filesystem::path const& current_directory,
 	                             file_info const& file) const {

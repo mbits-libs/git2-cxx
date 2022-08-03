@@ -7,8 +7,9 @@
 #include <filesystem>
 #include <git2/global.hh>
 #include <string>
+#include <tar.hh>
 
-namespace cov::testing::setup {
+namespace cov::app::testing::setup {
 	using namespace ::std::literals;
 
 	namespace {
@@ -68,12 +69,23 @@ namespace cov::testing::setup {
 		return buffer;
 	}
 
+	git::repository open_verify_repo() {
+		std::error_code ec{};
+		return git::repository::open(test_dir() / "verify"sv, ec);
+	}
+
+	USE_TAR
+
+	namespace {
+#include "verify-tar.inc"
+	}  // namespace
+
 	void test_globals::setup_test_env() {
 		printf("Setting up test environment\n");
-		using namespace std::filesystem;
 
 		std::error_code ignore{};
 		remove_all(test_dir(), ignore);
+		unpack_files(test_dir(), subdirs, text, binary);
 	}
 
 	void test_globals::teardown_test_env() {
@@ -82,4 +94,4 @@ namespace cov::testing::setup {
 		std::error_code ignore{};
 		remove_all(test_dir(), ignore);
 	}
-}  // namespace cov::testing::setup
+}  // namespace cov::app::testing::setup
