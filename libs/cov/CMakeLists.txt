@@ -88,14 +88,14 @@ if (COV_TESTING)
   set_target_properties(cov-test cov-stress-test PROPERTIES FOLDER tests)
 
   target_compile_options(cov-test PRIVATE ${ADDITIONAL_WALL_FLAGS})
-  target_link_libraries(cov-test cov-api GTest::gmock_main)
+  target_link_libraries(cov-test PRIVATE cov-api testing-lib)
   target_include_directories(cov-test
     PRIVATE
       ${CMAKE_CURRENT_SOURCE_DIR}/tests
       ${CMAKE_CURRENT_BINARY_DIR})
 
   target_compile_options(cov-stress-test PRIVATE ${ADDITIONAL_WALL_FLAGS})
-  target_link_libraries(cov-stress-test PRIVATE cov-api GTest::gmock_main)
+  target_link_libraries(cov-stress-test PRIVATE cov-api testing-lib)
   target_include_directories(cov-stress-test
     PRIVATE
       ${CMAKE_CURRENT_SOURCE_DIR}/tests

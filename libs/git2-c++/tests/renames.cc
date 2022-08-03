@@ -5,30 +5,15 @@
 #include <cstdio>
 #include <filesystem>
 #include <fstream>
+#include <tar.hh>
 #include "setup.hh"
 
 namespace git::testing::renames {
 	using namespace ::std::literals;
 
+	USE_TAR
+
 	namespace {
-		namespace file {
-			struct text {
-				std::string_view path{};
-				std::string_view content{};
-			};
-
-			struct binary {
-				std::string_view path{};
-				std::basic_string_view<unsigned char> content{};
-			};
-		}  // namespace file
-
-		template <size_t Length>
-		constexpr std::basic_string_view<unsigned char> span(
-		    unsigned char const (&v)[Length]) noexcept {
-			return {v, Length};
-		}
-
 		namespace file {
 			static constexpr auto text_1 =
 			    "A file content.\n"
@@ -284,31 +269,9 @@ namespace git::testing::renames {
 	}  // namespace
 
 	repository open_repo(std::error_code& ec) {
-		using namespace std::filesystem;
-
 		std::error_code ignore{};
 		remove_all(setup::test_dir() / "renames"sv, ignore);
-
-		for (auto const subdir : subdirs) {
-			create_directories(setup::test_dir() / setup::make_path(subdir),
-			                   ignore);
-		}
-
-		for (auto const [filename, contents] : text) {
-			auto const p = setup::test_dir() / setup::make_path(filename);
-			create_directories(p.parent_path(), ignore);
-			std::ofstream out{p};
-			out.write(contents.data(),
-			          static_cast<std::streamsize>(contents.size()));
-		}
-
-		for (auto const nfo : binary) {
-			auto const p = setup::test_dir() / setup::make_path(nfo.path);
-			create_directories(p.parent_path(), ignore);
-			std::ofstream out{p, std::ios::binary};
-			out.write(reinterpret_cast<char const*>(nfo.content.data()),
-			          static_cast<std::streamsize>(nfo.content.size()));
-		}
+		unpack_files(setup::test_dir(), subdirs, text, binary);
 
 		return git::repository::open(setup::test_dir() / "renames/.git"sv, ec);
 	}
