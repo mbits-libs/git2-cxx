@@ -108,21 +108,21 @@ namespace cov::app::report {
 				case '7':
 				case '8':
 				case '9':
-					return c - '0';
+					return static_cast<unsigned>(c - '0');
 				case 'a':
 				case 'b':
 				case 'c':
 				case 'd':
 				case 'e':
 				case 'f':
-					return c - 'a' + 10;
+					return static_cast<unsigned>(c - 'a' + 10);
 				case 'A':
 				case 'B':
 				case 'C':
 				case 'D':
 				case 'E':
 				case 'F':
-					return c - 'A' + 10;
+					return static_cast<unsigned>(c - 'A' + 10);
 				default:
 					return 16;
 			}
@@ -198,6 +198,8 @@ namespace cov::app::report {
 					return match_<hash::md5>(hash, data);
 				case digest::sha1:
 					return match_<hash::sha1>(hash, data);
+				default:
+					break;
 			}
 			return matching::none;
 		}
