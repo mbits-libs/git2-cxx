@@ -3,7 +3,9 @@
 
 #include <gtest/gtest.h>
 #include <cov/app/report.hh>
+#include <git2/global.hh>
 #include <json/json.hpp>
+#include "setup.hh"
 
 namespace cov::testing {
 	std::ostream& single_char(std::ostream& out, char c) {
@@ -45,6 +47,22 @@ namespace cov::testing {
 }  // namespace cov::testing
 
 namespace cov::app::report {
+	struct print_digest {
+		digest type;
+		friend std::ostream& operator<<(std::ostream& out, print_digest value) {
+			switch (value.type) {
+				case digest::unknown:
+					return out << "app::report::digest::unknown"sv;
+				case digest::md5:
+					return out << "app::report::digest::md5"sv;
+				case digest::sha1:
+					return out << "app::report::digest::sha1"sv;
+			}
+			return out << "app::report::digest{"sv
+			           << static_cast<int>(value.type) << '}';
+		}
+	};
+
 	void PrintTo(app::report::report_info const& report, std::ostream* out) {
 		using namespace ::std::literals;
 		if (report.files.empty() && report.git.head.empty() &&
@@ -67,7 +85,7 @@ namespace cov::app::report {
 			*out << ", .files = {"sv;
 			for (auto const& file : report.files) {
 				cov::testing::print_view(*out << "{.name = ", file.name);
-				cov::testing::print_view(*out << ", .algorithm = "sv, file.algorithm);
+				*out << ", .algorithm = "sv << print_digest{file.algorithm};
 				cov::testing::print_view(*out << ", .digest = "sv, file.digest)
 				    << ", .line_coverage = {"sv;
 				for (auto const [line, hits] : file.line_coverage)
@@ -78,6 +96,39 @@ namespace cov::app::report {
 		}
 
 		*out << '}';
+	}
+
+	inline text operator~(text op) {
+		using underlying = std::underlying_type_t<text>;
+		return static_cast<text>(~static_cast<underlying>(op));
+	}
+
+	void PrintTo(text flags, std::ostream* out) {
+		using underlying = std::underlying_type_t<text>;
+		if (flags == text::missing) {
+			*out << "text::missing"sv;
+		}
+		bool first = true;
+#define TEST_FLAG(FLAG)           \
+	if ((flags & FLAG) == FLAG) { \
+		flags = flags & ~FLAG;    \
+		if (first)                \
+			first = false;        \
+		else                      \
+			*out << " | "sv;      \
+		*out << #FLAG;            \
+	}
+		TEST_FLAG(text::in_repo);
+		TEST_FLAG(text::in_fs);
+		TEST_FLAG(text::different_newline);
+		TEST_FLAG(text::mismatched);
+		if (flags != text{}) {
+			if (first)
+				first = false;
+			else
+				*out << " | "sv;
+			*out << "0x"sv << std::hex << static_cast<underlying>(flags);
+		}
 	}
 }  // namespace cov::app::report
 
@@ -107,6 +158,101 @@ namespace cov::app::testing {
 		ASSERT_EQ(expected, actual);
 	}
 
+	using app::report::text;
+	struct verify_test {
+		std::string_view title;
+		std::string_view filename;
+		std::string_view commit;
+		std::string_view md5{};
+		std::string_view sha1{};
+		struct {
+			text result{text::missing};
+			std::chrono::seconds committed;
+			std::string_view message{};
+			std::string_view oid{};
+		} expected;
+
+		friend std::ostream& operator<<(std::ostream& out,
+		                                verify_test const& test) {
+			return out << test.filename << "; "sv << test.title;
+		}
+	};
+
+	class report_verify : public ::testing::TestWithParam<verify_test> {
+	protected:
+		void verify(std::string_view digest,
+		            app::report::digest algorithm,
+		            verify_test const& test) {
+			git::init globals{};
+
+			auto const& [title, filename, commit_id, _1, _2, expected] = test;
+			auto repo = setup::open_verify_repo();
+			std::error_code ec{};
+
+			auto const commit =
+			    app::report::git_commit::load(repo, commit_id, ec);
+			ASSERT_FALSE(ec);
+
+			ASSERT_EQ("Johnny Appleseed"sv, commit.author.name);
+			ASSERT_EQ("johnny@appleseed.com"sv, commit.author.mail);
+			ASSERT_EQ("Johnny Appleseed"sv, commit.committer.name);
+			ASSERT_EQ("johnny@appleseed.com"sv, commit.committer.mail);
+			ASSERT_EQ(expected.committed, commit.committed.time_since_epoch());
+			ASSERT_EQ(expected.message, commit.message);
+			ASSERT_TRUE(commit.tree);
+
+			app::report::file_info file{.algorithm = algorithm};
+			file.name.assign(filename);
+			file.digest.assign(digest);
+
+			auto const blob =
+			    commit.verify(setup::test_dir() / "verify"sv, file);
+
+			ASSERT_EQ(expected.result, blob.flags)
+			    << "Message: "sv << commit.message;
+			if ((expected.result & text::in_repo) == text::in_repo) {
+				git_oid id{};
+				git_oid_fromstrn(&id, expected.oid.data(), expected.oid.size());
+				ASSERT_EQ(0, git_oid_cmp(&id, &blob.existing));
+			} else {
+				ASSERT_TRUE(git_oid_is_zero(&blob.existing));
+			}
+		}
+	};
+
+	TEST_P(report_verify, md5_upper) {
+		std::string digest{};
+		digest.assign(GetParam().md5);
+		for (auto& c : digest)
+			c = static_cast<char>(std::toupper(static_cast<unsigned char>(c)));
+		verify(digest, app::report::digest::md5, GetParam());
+	}
+
+	TEST_P(report_verify, md5) {
+		verify(GetParam().md5, app::report::digest::md5, GetParam());
+	}
+
+	TEST_P(report_verify, sha1) {
+		verify(GetParam().sha1, app::report::digest::sha1, GetParam());
+	}
+
+	TEST_F(report_verify, unknown) {
+		static constexpr verify_test const test = {
+			.title{},
+		    .filename = "is/unix"sv,
+		    .commit = "34c845392a2c508e1a6d7755740485f24f4e19c9"sv,
+		    .expected =
+		        {
+		            // because is/unix is in commit and fs, but unknow digest
+		            // algorithm matches nothing
+		            .result = text::in_repo | text::in_fs | text::mismatched,
+		            .committed = 1659528019s,
+		            .message = "commit #1"sv,
+		        },
+		};
+		verify({}, app::report::digest::unknown, test);
+	}
+
 	namespace {
 		consteval unsigned just_right() {
 			return std::numeric_limits<unsigned>::max();
@@ -126,7 +272,7 @@ namespace cov::app::testing {
 	"files": [
 		{
 			"name": "A",
-			"digest": "alg:value",
+			"digest": "sha:value",
 			"line_coverage": {
 				"15": 156,
 				"16": -5,
@@ -173,18 +319,31 @@ namespace cov::app::testing {
 	    {
 	        .text =
 	            R"({"git": {"branch": "main", "head": "hash"}, "files": [
-	{"name": "A", "digest": "alg:value", "line_coverage": {}}
+	{"name": "A", "digest": "md5:value", "line_coverage": {}}
 ]})"sv,
 	        .expected = {.git = {.branch = "main", .head = "hash"},
 	                     .files = {{.name = "A",
-	                                .algorithm = "alg", .digest = "value",
+	                                .algorithm = app::report::digest::md5,
+	                                .digest = "value",
+	                                .line_coverage = {}}}},
+	    },
+	    {
+	        .text =
+	            R"({"git": {"branch": "main", "head": "hash"}, "files": [
+	{"name": "A", "digest": "sha1:value", "line_coverage": {}}
+]})"sv,
+	        .expected = {.git = {.branch = "main", .head = "hash"},
+	                     .files = {{.name = "A",
+	                                .algorithm = app::report::digest::sha1,
+	                                .digest = "value",
 	                                .line_coverage = {}}}},
 	    },
 	    {
 	        .text = json_text(),
 	        .expected = {.git = {.branch = "main", .head = "hash"},
 	                     .files = {{.name = "A",
-	                                .algorithm = "alg", .digest = "value",
+	                                .algorithm = app::report::digest::sha1,
+	                                .digest = "value",
 	                                .line_coverage =
 	                                    {
 	                                        {15, 156},
@@ -213,19 +372,19 @@ namespace cov::app::testing {
 	    {.text = R"({
 "git": {"branch": "main", "head": "hash"},
 "files": [
-	{"name": "A", "digest": "alg:value", "line_coverage": []}
+	{"name": "A", "digest": "md5:value", "line_coverage": []}
 ]})"sv,
 	     .succeeds = false},
 	    {.text = R"({
 "git": {"branch": "main", "head": "hash"},
 "files": [
-	{"name": "A", "digest": "alg:value"}
+	{"name": "A", "digest": "md5:value"}
 ]})"sv,
 	     .succeeds = false},
 	    {.text = R"({
 "git": {"branch": "main", "head": "hash"},
 "files": [
-	{"digest": "alg:value", "line_coverage": {}}
+	{"digest": "md5:value", "line_coverage": {}}
 ]})"sv,
 	     .succeeds = false},
 	    {.text = R"({
@@ -239,7 +398,7 @@ namespace cov::app::testing {
 "files": [
 	{
 		"name": "A",
-		"digest": "alg:value",
+		"digest": "md5:value",
 		"line_coverage": {
 			"not-a-number": 0
 		}
@@ -251,7 +410,7 @@ namespace cov::app::testing {
 "files": [
 	{
 		"name": "A",
-		"digest": "alg:value",
+		"digest": "md5:value",
 		"line_coverage": {
 			"15": 1.0
 		}
@@ -263,7 +422,7 @@ namespace cov::app::testing {
 "files": [
 	{
 		"name": "A",
-		"digest": "alg:value",
+		"digest": "md5:value",
 		"line_coverage": {
 			"15": "a string"
 		}
@@ -275,7 +434,19 @@ namespace cov::app::testing {
 "files": [
 	{
 		"name": "A",
-		"digest": "alg, value",
+		"digest": "md5, value",
+		"line_coverage": {
+			"15": "a string"
+		}
+	}
+]})"sv,
+	     .succeeds = false},
+	    {.text = R"({
+"git": {"branch": "main", "head": "hash"},
+"files": [
+	{
+		"name": "A",
+		"digest": "md0:value",
 		"line_coverage": {
 			"15": "a string"
 		}
@@ -285,4 +456,41 @@ namespace cov::app::testing {
 	};
 
 	INSTANTIATE_TEST_SUITE_P(bad, report, ::testing::ValuesIn(bad));
+
+	static verify_test const files[] = {
+#include "verify-test.inc"
+	};
+
+	INSTANTIATE_TEST_SUITE_P(files, report_verify, ::testing::ValuesIn(files));
+
+	static verify_test const not_hex[] = {
+	    {
+	        .title = "broken hex, upper nybble"sv,
+	        .filename = "is/unix"sv,
+	        .commit = "34c845392a2c508e1a6d7755740485f24f4e19c9"sv,
+	        .md5 = "f8g44c1e3dbcfd520f09642e0c37d580"sv,
+	        .expected =
+	            {
+	                .result = text::in_repo | text::in_fs | text::mismatched,
+	                .committed = 1659528019s,
+	                .message = "commit #1"sv,
+	            },
+	    },
+	    {
+	        .title = "broken hex, lower nybble"sv,
+	        .filename = "is/unix"sv,
+	        .commit = "34c845392a2c508e1a6d7755740485f24f4e19c9"sv,
+	        .md5 = "f89h4c1e3dbcfd520f09642e0c37d580"sv,
+	        .expected =
+	            {
+	                .result = text::in_repo | text::in_fs | text::mismatched,
+	                .committed = 1659528019s,
+	                .message = "commit #1"sv,
+	            },
+	    },
+	};
+
+	INSTANTIATE_TEST_SUITE_P(not_hex,
+	                         report_verify,
+	                         ::testing::ValuesIn(not_hex));
 }  // namespace cov::app::testing

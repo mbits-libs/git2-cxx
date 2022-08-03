@@ -10,7 +10,7 @@
 #include <vector>
 #include "setup.hh"
 
-namespace cov::testing {
+namespace cov::app::testing {
 	using namespace ::std::literals;
 	using namespace ::std::filesystem;
 
@@ -119,4 +119,4 @@ namespace cov::testing {
 			           << static_cast<int>(entry.type) << '}';
 		}
 	};
-}  // namespace cov::testing
+}  // namespace cov::app::testing
