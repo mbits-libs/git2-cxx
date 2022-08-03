@@ -3,6 +3,7 @@ cpack_add_component_group(devel
   EXPANDED
 )
 
+add_subdirectory(helpers)
 add_subdirectory(git2-c++)
 add_subdirectory(hilite)
 add_subdirectory(cov)
