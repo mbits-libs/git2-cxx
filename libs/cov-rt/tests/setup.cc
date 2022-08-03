@@ -51,12 +51,8 @@ namespace cov::app::testing::setup {
 		}
 	};  // namespace
 
-	test_initializer::test_initializer() {
-		test_globals::get().enter();
-	}
-	test_initializer::~test_initializer() {
-		test_globals::get().leave();
-	}
+	test_initializer::test_initializer() { test_globals::get().enter(); }
+	test_initializer::~test_initializer() { test_globals::get().leave(); }
 
 	std::filesystem::path test_dir() {
 		static std::filesystem::path dirname = get_test_dir();

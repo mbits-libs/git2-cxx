@@ -4,8 +4,8 @@
 #pragma once
 
 #include <git2/oid.h>
-#include <git2/repository.hh>
 #include <filesystem>
+#include <git2/repository.hh>
 #include <string>
 #include "path.hh"
 
@@ -23,4 +23,4 @@ namespace cov::app::testing::setup {
 	std::filesystem::path test_dir();
 	std::string get_oid(git_oid const& id);
 	git::repository open_verify_repo();
-}  // namespace cov::testing::setup
+}  // namespace cov::app::testing::setup

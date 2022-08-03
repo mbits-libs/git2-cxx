@@ -1,8 +1,6 @@
 // Copyright (c) 2022 Marcin Zdun
 // This code is licensed under MIT license (see LICENSE for details)
 
-#pragma once
-
 #include <filesystem>
 #include <string_view>
 
@@ -20,14 +18,10 @@ namespace testing::path {
 		return {view.data(), view.length()};
 	}
 
-	path make_u8path(std::string_view utf8) {
-		return conv<char8_t>(utf8);
-	}
+	path make_u8path(std::string_view utf8) { return conv<char8_t>(utf8); }
 
 #else
-	std::string get_path(path const& p) {
-		return p.generic_u8string();
-	}
+	std::string get_path(path const& p) { return p.generic_u8string(); }
 
 	path make_u8path(std::string_view utf8) {
 		return std::filesystem::u8path(utf8);
