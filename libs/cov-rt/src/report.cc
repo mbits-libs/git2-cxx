@@ -4,15 +4,47 @@
 #include <charconv>
 #include <chrono>
 #include <cov/app/report.hh>
+#include <cov/hash/md5.hh>
+#include <cov/hash/sha1.hh>
+#include <cov/io/file.hh>
+#include <git2/commit.hh>
 #include <json/json.hpp>
 
 namespace cov::app::report {
 	namespace {
+		std::filesystem::path make_path(std::string_view u8) {
+#ifdef __cpp_lib_char8_t
+			return std::u8string_view{
+			    reinterpret_cast<char8_t const*>(u8.data()), u8.size()};
+#else
+			return std::filesystem::u8path(utf8);
+#endif
+		}
+
 		std::u8string_view to_json(std::string_view str) {
 			return {reinterpret_cast<char8_t const*>(str.data()), str.size()};
 		}
+
 		std::string_view from_json(std::u8string_view str) {
 			return {reinterpret_cast<char const*>(str.data()), str.size()};
+		}
+
+		struct digest_info {
+			std::string_view id;
+			digest result;
+		};
+
+		digest lookup_digest(std::string_view algorithm) {
+			static constexpr digest_info algorithms[] = {
+			    {"md5"sv, digest::md5},
+			    {"sha"sv, digest::sha1},
+			    {"sha1"sv, digest::sha1},
+			};
+			// too short for binary search
+			for (auto const& [id, result] : algorithms) {
+				if (id == algorithm) return result;
+			}
+			return digest::unknown;
 		}
 
 		bool conv(std::u8string_view key, unsigned& out) {
@@ -41,6 +73,133 @@ namespace cov::app::report {
 			    std::min(unsigned_cast<unsigned long long>(hits),
 			             unsigned_cast<unsigned long long>(max_hits));
 			return unsigned_cast<unsigned>(u_hits);
+		}
+
+		inline std::string stored(std::string_view view) {
+			return {view.data(), view.size()};
+		}
+
+		inline std::string_view rstrip(std::string_view view) {
+			while (!view.empty() &&
+			       std::isspace(static_cast<unsigned char>(view.back())))
+				view = view.substr(0, view.size() - 1);
+			return view;
+		}
+
+		git_signature signature(git::commit::signature const& sign) {
+			return {.name = stored(sign.name), .mail = stored(sign.email)};
+		}
+
+		enum class matching {
+			none,
+			exactly,
+			with_different_newlines,
+		};
+
+		unsigned nybble(char c) {
+			switch (c) {
+				case '0':
+				case '1':
+				case '2':
+				case '3':
+				case '4':
+				case '5':
+				case '6':
+				case '7':
+				case '8':
+				case '9':
+					return c - '0';
+				case 'a':
+				case 'b':
+				case 'c':
+				case 'd':
+				case 'e':
+				case 'f':
+					return c - 'a' + 10;
+				case 'A':
+				case 'B':
+				case 'C':
+				case 'D':
+				case 'E':
+				case 'F':
+					return c - 'A' + 10;
+				default:
+					return 16;
+			}
+		}
+
+		template <typename Digest>
+		matching match_(std::string_view hash, git::bytes data) {
+			using digest_type = typename Digest::digest_type;
+			static constexpr auto digest_byte_size = Digest::digest_byte_size;
+
+			if (hash.size() != digest_byte_size * 2) return matching::none;
+			digest_type expected{};
+			for (size_t index = 0; index < digest_byte_size; ++index) {
+				auto const upper = nybble(hash[index * 2]);
+				auto const lower = nybble(hash[index * 2 + 1]);
+				if (upper > 15 || lower > 15) return matching::none;
+				expected.data[index] =
+				    static_cast<std::byte>((upper << 4) | lower);
+			}
+
+			if (Digest::once(data) == expected) return matching::exactly;
+
+			{
+				// 2. replace \n with \r\n
+				Digest calc{};
+				auto chars = std::string_view{
+				    reinterpret_cast<char const*>(data.data()), data.size()};
+				auto pos = chars.find('\n');
+				while (pos != std::string_view::npos) {
+					if (!pos || chars[pos - 1] != '\r') {
+						auto const chunk = chars.substr(0, pos);
+
+						if (chunk.size()) calc.update(git::bytes{chunk});
+						calc.update(git::bytes{"\r\n"sv});
+
+						chars = chars.substr(pos + 1);
+						pos = chars.find('\n');
+						continue;
+					}
+					pos = chars.find('\n', pos + 1);
+				}
+				if (chars.size()) calc.update(git::bytes{chars});
+				if (calc.finalize() == expected)
+					return matching::with_different_newlines;
+			}
+
+			{
+				// 3. replace \r\n with \n
+				Digest calc{};
+				auto chars = std::string_view{
+				    reinterpret_cast<char const*>(data.data()), data.size()};
+				auto pos = chars.find("\r\n"sv);
+				while (pos != std::string_view::npos) {
+					auto const chunk = chars.substr(0, pos);
+
+					if (chunk.size()) calc.update(git::bytes{chunk});
+					calc.update(git::bytes{"\n"sv});
+
+					chars = chars.substr(pos + 2);
+					pos = chars.find("\r\n"sv);
+				}
+				if (chars.size()) calc.update(git::bytes{chars});
+				if (calc.finalize() == expected)
+					return matching::with_different_newlines;
+			}
+
+			return matching::none;
+		}
+
+		matching match(digest type, std::string_view hash, git::bytes data) {
+			switch (type) {
+				case digest::md5:
+					return match_<hash::md5>(hash, data);
+				case digest::sha1:
+					return match_<hash::sha1>(hash, data);
+			}
+			return matching::none;
 		}
 	}  // namespace
 
@@ -77,9 +236,10 @@ namespace cov::app::report {
 				return false;
 			}
 
-			auto digest = from_json(*json_file_digest);
-			auto const pos = digest.find(':');
-			if (pos == std::string_view::npos) {
+			auto digest_view = from_json(*json_file_digest);
+			auto const pos = digest_view.find(':');
+			auto const algorithm = lookup_digest(digest_view.substr(0, pos));
+			if (pos == std::string_view::npos || algorithm == digest::unknown) {
 				[[unlikely]];
 				files.clear();
 				return false;
@@ -89,8 +249,8 @@ namespace cov::app::report {
 			auto& dst = files.back();
 
 			dst.name.assign(from_json(*json_file_name));
-			dst.algorithm.assign(digest.substr(0, pos));
-			dst.digest.assign(digest.substr(pos + 1));
+			dst.algorithm = algorithm;
+			dst.digest.assign(digest_view.substr(pos + 1));
 
 			for (auto const& [node_key, node_value] :
 			     *json_file_line_coverage) {
@@ -110,4 +270,55 @@ namespace cov::app::report {
 		git.head.assign(from_json(*json_git_head));
 		return true;
 	}
+
+	git_commit git_commit::load(git::repository_handle repo,
+	                            std::string_view commit_id,
+	                            std::error_code& ec) {
+		auto const commit = repo.lookup<git::commit>(commit_id, ec);
+		if (ec) return {};
+		auto tree = commit.tree(ec);
+		if (ec) return {};
+		return {
+		    .author = signature(commit.author()),
+		    .committer = signature(commit.committer()),
+		    .committed = commit.committer().when,
+		    .message = stored(rstrip(commit.message_raw())),
+		    .tree = std::move(tree),
+		};
+	}
+
+	blob_info git_commit::verify(std::filesystem::path const& current_directory,
+	                             file_info const& file) const {
+		std::error_code ec{};
+		auto const entry = tree.blob_bypath(file.name.c_str(), ec);
+		auto flags = text::missing;
+
+		if (entry && !ec) {
+			auto const bytes = entry.raw();
+			auto const result = match(file.algorithm, file.digest, bytes);
+			if (result != matching::none) {
+				return {.flags = result == matching::exactly
+				                     ? text::in_repo
+				                     : text::in_repo | text::different_newline,
+				        .existing = entry.oid()};
+			}
+			flags = text::in_repo;
+		}
+
+		auto const opened =
+		    io::fopen(make_path(*workdir) / make_path(file.name), "rb");
+		if (!opened) return {};
+
+		auto stg = opened.read();
+		auto const result =
+		    match(file.algorithm, file.digest, {stg.data(), stg.size()});
+
+		flags = result == matching::none
+		            ? flags | text::in_fs | text::mismatched
+		        : result == matching::exactly
+		            ? text::in_fs
+		            : text::in_fs | text::different_newline;
+		return {.flags = flags};
+	}  // GCOV_EXCL_LINE[WIN32]
+
 }  // namespace cov::app::report
