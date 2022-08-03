@@ -61,34 +61,8 @@ namespace git::testing::setup {
 		return dirname;
 	}
 
-#ifdef __cpp_lib_char8_t
-	template <typename CharTo, typename Source>
-	std::basic_string_view<CharTo> conv(Source const& view) {
-		return {reinterpret_cast<CharTo const*>(view.data()), view.length()};
-	}
-
-	std::string get_path(path const& p) {
-		auto const s8 = p.generic_u8string();
-		auto const view = conv<char>(s8);
-		return {view.data(), view.length()};
-	}
-
-	path make_path(std::string_view utf8) {
-		return conv<char8_t>(utf8);
-	}
-
-#else
-	std::string get_path(path const& p) {
-		return p.generic_u8string();
-	}
-
-	path make_path(std::string_view utf8) {
-		return std::filesystem::u8path(utf8);
-	}
-#endif
-
 	git::repository open_repo(std::error_code& ec) {
-		return git::repository::open(test_dir() / make_path("bare.git/"sv), ec);
+		return git::repository::open(test_dir() / "bare.git/"sv, ec);
 	}
 
 	USE_TAR
@@ -560,7 +534,3 @@ namespace git::testing::setup {
 		remove_all(test_dir(), ignore);
 	}
 }  // namespace git::testing::setup
-
-void PrintTo(std::filesystem::path const& path, ::std::ostream* os) {
-	*os << git::testing::setup::get_path(path);
-}

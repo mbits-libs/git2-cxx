@@ -62,7 +62,7 @@ namespace cov::testing {
 		ASSERT_TRUE(result);
 
 		auto in =
-		    io::fopen(setup::test_dir() / name / setup::make_path(ref_name));
+		    io::fopen(setup::test_dir() / name / setup::make_u8path(ref_name));
 		auto actual = in.read_line();
 
 		ASSERT_EQ(expected, actual);
@@ -80,7 +80,7 @@ namespace cov::testing {
 			    ec);
 			ASSERT_FALSE(ec) << "   Error: " << ec.message() << " ("
 			                 << ec.category().name() << ')';
-			auto path = setup::test_dir() / name / setup::make_path(ref_name);
+			auto path = setup::test_dir() / name / setup::make_u8path(ref_name);
 			std::filesystem::create_directories(path.parent_path());
 			auto out = io::fopen(path, "wb");
 			out.store(prev_content.data(), prev_content.size());
@@ -109,7 +109,7 @@ namespace cov::testing {
 		ASSERT_TRUE(result);
 
 		auto in =
-		    io::fopen(setup::test_dir() / name / setup::make_path(ref_name));
+		    io::fopen(setup::test_dir() / name / setup::make_u8path(ref_name));
 		auto actual = in.read_line();
 
 		ASSERT_EQ(expected, actual);

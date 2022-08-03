@@ -66,8 +66,8 @@ namespace cov::testing {
 
 			auto dir = core_gitdir(result);
 			ASSERT_TRUE(dir);
-			auto const git = setup::make_path(gitdir);
-			auto const actual = setup::make_path(*dir);
+			auto const git = setup::make_u8path(gitdir);
+			auto const actual = setup::make_u8path(*dir);
 			if (git != actual && may_have_root_name) {
 				if (actual.has_root_name())
 					*dir = setup::get_path("/" / actual.relative_path());

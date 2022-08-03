@@ -28,7 +28,7 @@ namespace cov::testing {
 
 		auto prep_file(std::string_view name) {
 			static constexpr auto content = "first line\nsecond line\n"sv;
-			auto outname = setup::test_dir() / setup::make_path(name);
+			auto outname = setup::test_dir() / setup::make_u8path(name);
 			auto const out = io::fopen(outname, "wb");
 			out.store(content.data(), content.size());
 			return outname;
@@ -118,7 +118,7 @@ namespace cov::testing {
 	TEST(stream, z_fail) {
 		std::error_code ec{};
 		std::filesystem::remove_all(
-		    setup::test_dir() / setup::make_path(readme_dir), ec);
+		    setup::test_dir() / setup::make_u8path(readme_dir), ec);
 		ASSERT_FALSE(ec) << "What: " << ec.message();
 
 		{
@@ -130,13 +130,13 @@ namespace cov::testing {
 		}
 
 		ASSERT_FALSE(std::filesystem::exists(setup::test_dir() /
-		                                     setup::make_path(readme_path)));
+		                                     setup::make_u8path(readme_path)));
 	}
 
 	TEST(stream, z_success) {
 		std::error_code ec{};
 		std::filesystem::remove_all(
-		    setup::test_dir() / setup::make_path(readme_dir), ec);
+		    setup::test_dir() / setup::make_u8path(readme_dir), ec);
 		ASSERT_FALSE(ec) << "What: " << ec.message();
 
 		{
@@ -152,7 +152,7 @@ namespace cov::testing {
 			ASSERT_EQ(readme_sha, actual);
 		}
 
-		auto const path = setup::test_dir() / setup::make_path(readme_path);
+		auto const path = setup::test_dir() / setup::make_u8path(readme_path);
 		ASSERT_TRUE(std::filesystem::exists(path));
 
 		auto in = io::fopen(path, "rb");
