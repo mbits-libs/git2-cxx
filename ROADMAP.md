@@ -41,9 +41,11 @@
       - remove file builder
       - introduce report builder
       - get rid of is_dirty/is_modified
-    - [ ] own format (either MD5 or SHA over the content, only commit and branch)
-    - [ ] coveralls
-    - [ ] cobertura
+    - [x] own format (either MD5 or SHA over the content, only commit and branch)
+    - [x] coveralls
+    - [x] cobertura
+    - [x] extract `make_u8path`/`get_u8path` to cov-rt
+    - [ ] `cov::sth_create` -> `cov::sth::create`
   - [ ] `cov log`
   - [ ] `cov show`
     - [ ] Report / component / directory view

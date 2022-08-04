@@ -1,6 +1,7 @@
 set(SOURCES
   src/config.cc
   src/module.cc
+  src/report_command.cc
   src/report.cc
   src/root_command.cc
   src/split_command.cc
@@ -14,6 +15,7 @@ set(SOURCES
   include/cov/app/cov_report_tr.hh
   include/cov/app/cov_tr.hh
   include/cov/app/errors_tr.hh
+  include/cov/app/report_command.hh
   include/cov/app/report.hh
   include/cov/app/root_command.hh
   include/cov/app/split_command.hh
