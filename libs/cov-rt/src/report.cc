@@ -203,6 +203,16 @@ namespace cov::app::report {
 			}
 			return matching::none;
 		}
+
+		size_t lines_in(git::bytes data) {
+			static constexpr auto LN = std::byte{'\n'};
+			size_t lines{};
+			for (auto b : data) {
+				if (b == LN) ++lines;
+			}
+			if (data.size() == 0 || data.data()[data.size() - 1] != LN) ++lines;
+			return lines;
+		}
 	}  // namespace
 
 	bool report_info::load_from_text(std::string_view u8_encoded) {
@@ -289,8 +299,7 @@ namespace cov::app::report {
 		};
 	}  // GCOV_EXCL_LINE[WIN32]
 
-	blob_info git_commit::verify(std::filesystem::path const& current_directory,
-	                             file_info const& file) const {
+	blob_info git_commit::verify(file_info const& file) const {
 		std::error_code ec{};
 		auto const entry = tree.blob_bypath(file.name.c_str(), ec);
 		auto flags = text::missing;
@@ -302,9 +311,17 @@ namespace cov::app::report {
 				return {.flags = result == matching::exactly
 				                     ? text::in_repo
 				                     : text::in_repo | text::different_newline,
-				        .existing = entry.oid()};
+				        .existing = entry.oid(),
+				        .lines = lines_in(bytes)};
 			}
 			flags = text::in_repo;
+		}
+
+		auto raw = git_object_owner(reinterpret_cast<git_object*>(tree.raw()));
+		auto workdir = git::repository_handle{raw}.workdir();
+		if (!workdir) {
+			// there is no source to compare against...
+			return {};
 		}
 
 		auto const opened =
@@ -320,7 +337,10 @@ namespace cov::app::report {
 		        : result == matching::exactly
 		            ? text::in_fs
 		            : text::in_fs | text::different_newline;
-		return {.flags = flags};
+		auto const lines = result == matching::none
+		                       ? size_t{}
+		                       : lines_in({stg.data(), stg.size()});
+		return {.flags = flags, .lines = lines};
 	}  // GCOV_EXCL_LINE[WIN32]
 
 }  // namespace cov::app::report

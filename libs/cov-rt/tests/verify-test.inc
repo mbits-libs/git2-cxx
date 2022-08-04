@@ -20,6 +20,7 @@
         .result = text::in_fs,
         .committed = 1659528019s,
         .message = "commit #1"sv,
+        .lines = 7,
     },
 },
 {
@@ -32,6 +33,7 @@
         .result = text::in_fs,
         .committed = 1659528019s,
         .message = "commit #1"sv,
+        .lines = 7,
     },
 },
 {
@@ -56,6 +58,7 @@
         .result = text::in_fs | text::different_newline,
         .committed = 1659528019s,
         .message = "commit #1"sv,
+        .lines = 7,
     },
 },
 {
@@ -68,7 +71,8 @@
         .result = text::in_fs | text::different_newline,
         .committed = 1659528019s,
         .message = "commit #1"sv,
-    },
+         .lines = 7,
+   },
 },
 {
     .title = "tree exact match"sv,
@@ -81,7 +85,8 @@
         .committed = 1659528019s,
         .message = "commit #1"sv,
         .oid="71bbaa701d69ea7d9ec8f2f12aad9f287a9bc9cf"sv,
-    },
+         .lines = 7,
+   },
 },
 {
     .title = "tree exact match"sv,
@@ -94,6 +99,7 @@
         .committed = 1659528019s,
         .message = "commit #1"sv,
         .oid="2f5d67ac22c3c29dfc00eb52103e42f3dbff82c4"sv,
+        .lines = 7,
     },
 },
 {
@@ -118,7 +124,8 @@
         .result = text::in_fs,
         .committed = 1659528019s,
         .message = "commit #1"sv,
-    },
+         .lines = 4,
+   },
 },
 {
     .title = "tree mismatch, file exact match"sv,
@@ -130,6 +137,7 @@
         .result = text::in_fs,
         .committed = 1659528019s,
         .message = "commit #1"sv,
+        .lines = 4,
     },
 },
 {
@@ -154,6 +162,7 @@
         .result = text::in_fs | text::different_newline,
         .committed = 1659528019s,
         .message = "commit #1"sv,
+        .lines = 4,
     },
 },
 {
@@ -166,6 +175,7 @@
         .result = text::in_fs | text::different_newline,
         .committed = 1659528019s,
         .message = "commit #1"sv,
+        .lines = 4,
     },
 },
 {
@@ -179,6 +189,7 @@
         .committed = 1659528019s,
         .message = "commit #1"sv,
         .oid="7cc167da4bde93cc6833574e4dd19ab26bbdf6e6"sv,
+        .lines = 7,
     },
 },
 {
@@ -192,5 +203,6 @@
         .committed = 1659528019s,
         .message = "commit #1"sv,
         .oid="d0127abdaa8e249417ef3c0098659bc266455508"sv,
+        .lines = 7,
     },
 },

@@ -44,6 +44,7 @@ class file_history:
     tested: int = INITIAL
     tested_oid: str = None
     hashes: Dict[str, str] = field(default_factory=lambda: {})
+    lines: int = 0
 
 
 @dataclass
@@ -328,6 +329,10 @@ for ops, hashed_files, _ in commits:
     for filename in hashed_files:
         with open(os.path.join(root, filename), "rb") as f:
             content = f.read()
+            lines = content.split(b"\n")
+            if len(lines) and lines[-1] == b"":
+                lines = lines[:-1]
+            all_files[filename].lines = len(lines)
         for hash in hashes:
             all_files[filename].hashes[hash] = hashes[hash](content).hexdigest()
 
@@ -360,19 +365,24 @@ for _, _, tested_files in commits:
 
 
 results = {
-    mk_name(EXACT): ("text::in_repo", False),
-    mk_name(EOL_CHANGE): ("text::in_repo | text::different_newline", False),
-    mk_name(MISMATCH, EXACT): ("text::in_fs", True),
-    mk_name(MISMATCH, EOL_CHANGE): ("text::in_fs | text::different_newline", True),
+    mk_name(EXACT): ("text::in_repo", False, False),
+    mk_name(EOL_CHANGE): ("text::in_repo | text::different_newline", False, False),
+    mk_name(MISMATCH, EXACT): ("text::in_fs", True, False),
+    mk_name(MISMATCH, EOL_CHANGE): (
+        "text::in_fs | text::different_newline",
+        True,
+        False,
+    ),
     mk_name(MISMATCH, MISMATCH): (
         "text::in_repo | text::in_fs | text::mismatched",
         True,
+        True,
     ),
-    mk_name(MISMATCH, ABSENT): ("text::missing", True),
-    mk_name(ABSENT, EXACT): ("text::in_fs", True),
-    mk_name(ABSENT, EOL_CHANGE): ("text::in_fs | text::different_newline", True),
-    mk_name(ABSENT, MISMATCH): ("text::in_fs | text::mismatched", True),
-    mk_name(ABSENT, ABSENT): ("text::missing", True),
+    mk_name(MISMATCH, ABSENT): ("text::missing", True, True),
+    mk_name(ABSENT, EXACT): ("text::in_fs", True, False),
+    mk_name(ABSENT, EOL_CHANGE): ("text::in_fs | text::different_newline", True, False),
+    mk_name(ABSENT, MISMATCH): ("text::in_fs | text::mismatched", True, True),
+    mk_name(ABSENT, ABSENT): ("text::missing", True, True),
 }
 
 
@@ -382,11 +392,15 @@ def make_test(
     commit_id: List[str],
     hashes: Dict[str, str],
     oid: Union[str, None],
+    lines: int,
 ):
-    test_result, remove_oid = results[title]
+    test_result, remove_oid, remove_lines = results[title]
     if remove_oid:
         oid = None
+    if remove_lines:
+        lines = 0
     oid_list = [f'    .oid="{oid}"sv,'] if oid is not None else []
+    lines_list = [f"    .lines = {lines},"] if lines != 0 else []
     return [
         f'.title = "{title}"sv,',
         f'.filename = "{filename}"sv,',
@@ -397,6 +411,7 @@ def make_test(
         f"    .committed = {commit_info[commit_id][1]}s,",
         f'    .message = "commit #{commit_id}"sv,',
         *oid_list,
+        *lines_list,
         "},",
     ]
 
@@ -406,7 +421,14 @@ for file in history:
     if file.test not in reorg:
         reorg[file.test] = []
     reorg[file.test].append(
-        make_test(file.test, file.filename, file.tested, file.hashes, file.tested_oid)
+        make_test(
+            file.test,
+            file.filename,
+            file.tested,
+            file.hashes,
+            file.tested_oid,
+            file.lines,
+        )
     )
 
 no_such = b"This file was never in the repo\n"
@@ -415,7 +437,7 @@ for hash in hashes:
     no_such_hashes[hash] = hashes[hash](no_such).hexdigest()
 
 reorg[mk_name(ABSENT, ABSENT)] = [
-    make_test(mk_name(ABSENT, ABSENT), "no_such", 1, no_such_hashes, None)
+    make_test(mk_name(ABSENT, ABSENT), "no_such", 1, no_such_hashes, None, 0)
 ]
 
 with open("verify-test.inc", "wb") as output:
