@@ -11,6 +11,7 @@
 #include <span>
 #include <string>
 #include <utility>
+#include <vector>
 
 namespace cov::app {
 	struct builtin_tool {
@@ -53,6 +54,18 @@ namespace cov::app {
 		int run_tool(std::filesystem::path const& tooldir,
 		             std::string_view tool,
 		             args::arglist args);
+
+		struct captured_output {
+			std::vector<std::byte> output{};
+			std::vector<std::byte> error{};
+			int return_code{};
+		};
+
+		captured_output run_filter(std::filesystem::path const& filter_dir,
+		                           std::filesystem::path const& cwd,
+		                           std::string_view filter,
+		                           std::vector<std::byte> const& input);
+
 		std::filesystem::path const& sys_root();
 	}  // namespace platform
 }  // namespace cov::app
