@@ -5,6 +5,11 @@ set(BUILTINS
     module
 )
 
+set(REPORT_FILTERS
+    cobertura
+    coveralls
+)
+
 set(SOURCES
 	  cov/cov.cc
 )
@@ -14,9 +19,16 @@ foreach(NAME ${BUILTINS})
     list(APPEND SOURCES builtins/builtin_${SAFE_NAME}.cc)
 endforeach()
 
+foreach(NAME ${REPORT_FILTERS})
+    list(APPEND SOURCES filters/${NAME}.py)
+endforeach()
+
 string(REPLACE ";" ", " BUILTIN_LIST "${BUILTINS}")
 message(STATUS "Builtins: ${BUILTIN_LIST}")
 include(builtins)
+
+string(REPLACE ";" ", " REPORT_FILTER_LIST "${REPORT_FILTERS}")
+message(STATUS "Filters: ${REPORT_FILTER_LIST}")
 
 if (WIN32)
     list(APPEND SOURCES
@@ -66,21 +78,23 @@ set_target_properties(cov PROPERTIES FOLDER apps)
 
 ########################################################
 
-# add_cov_ext(serve)
+foreach(NAME ${REPORT_FILTERS})
+    set(__input ${CMAKE_CURRENT_SOURCE_DIR}/filters/${NAME}.py)
+    set(__output ${CMAKE_BINARY_DIR}/${SHARE_DIR}/filters/${NAME})
 
-print_cov_ext()
+    add_custom_command(TARGET cov
+        POST_BUILD
+        COMMAND "${CMAKE_COMMAND}" -E make_directory "${CMAKE_BINARY_DIR}/${SHARE_DIR}/filters"
+        COMMAND "${CMAKE_COMMAND}" -E copy "${__input}" "${__output}"
+        COMMENT "[FILTER] ${NAME}"
+    )
+endforeach()
 
 ########################################################
 
-add_custom_target(copy-langs ALL)
-add_dependencies(cov copy-langs)
-set_target_properties(copy-langs PROPERTIES FOLDER apps/strings)
+# add_cov_ext(serve)
 
-foreach(STRING_FILE ${STRINGS})
-    foreach(LANG_ID ${LANGUAGES})
-        add_dependencies(copy-langs "${STRING_FILE}.${LANG_ID}")
-    endforeach()
-endforeach()
+print_cov_ext()
 
 ########################################################
 
