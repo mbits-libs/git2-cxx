@@ -66,6 +66,7 @@ namespace cov::app::report {
 	struct blob_info {
 		text flags{text::missing};
 		git_oid existing{};
+		size_t lines{};
 	};
 
 	struct git_commit {
@@ -79,7 +80,6 @@ namespace cov::app::report {
 		                       std::string_view commit_id,
 		                       std::error_code& ec);
 
-		blob_info verify(std::filesystem::path const& current_directory,
-		                 file_info const& file) const;
+		blob_info verify(file_info const& file) const;
 	};
 }  // namespace cov::app::report

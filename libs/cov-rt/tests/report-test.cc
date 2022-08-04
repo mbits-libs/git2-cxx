@@ -170,6 +170,7 @@ namespace cov::app::testing {
 			std::chrono::seconds committed;
 			std::string_view message{};
 			std::string_view oid{};
+			size_t lines{};
 		} expected;
 
 		friend std::ostream& operator<<(std::ostream& out,
@@ -205,8 +206,7 @@ namespace cov::app::testing {
 			file.name.assign(filename);
 			file.digest.assign(digest);
 
-			auto const blob =
-			    commit.verify(setup::test_dir() / "verify"sv, file);
+			auto const blob = commit.verify(file);
 
 			ASSERT_EQ(expected.result, blob.flags)
 			    << "Message: "sv << commit.message;
@@ -217,6 +217,7 @@ namespace cov::app::testing {
 			} else {
 				ASSERT_TRUE(git_oid_is_zero(&blob.existing));
 			}
+			ASSERT_EQ(expected.lines, blob.lines);
 		}
 	};
 
@@ -238,7 +239,7 @@ namespace cov::app::testing {
 
 	TEST_F(report_verify, unknown) {
 		static constexpr verify_test const test = {
-			.title{},
+		    .title{},
 		    .filename = "is/unix"sv,
 		    .commit = "34c845392a2c508e1a6d7755740485f24f4e19c9"sv,
 		    .expected =
