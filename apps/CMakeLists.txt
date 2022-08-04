@@ -3,6 +3,7 @@ set(BUILTINS
     init
     config
     module
+    report
 )
 
 set(REPORT_FILTERS
