@@ -1,0 +1,173 @@
+{
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "$id": "http://midnightbits.com/schemas/report-schema.json",
+    "type": "object",
+    "default": {},
+    "title": "Root Schema",
+    "required": [
+        "git",
+        "files"
+    ],
+    "properties": {
+        "git": {
+            "type": "object",
+            "default": {},
+            "title": "git info",
+            "required": [
+                "branch",
+                "head"
+            ],
+            "properties": {
+                "branch": {
+                    "type": "string",
+                    "default": "",
+                    "title": "git branch associated with this report",
+                    "examples": [
+                        "main"
+                    ]
+                },
+                "head": {
+                    "type": "string",
+                    "default": "",
+                    "title": "git commit associated with this report",
+                    "examples": [
+                        "f8632047e4ea88f5e30bf57570694e5b145c5c0d"
+                    ]
+                }
+            },
+            "examples": [
+                {
+                    "branch": "main",
+                    "head": "f8632047e4ea88f5e30bf57570694e5b145c5c0d"
+                }
+            ]
+        },
+        "files": {
+            "type": "array",
+            "default": [],
+            "title": "file list",
+            "items": {
+                "type": "object",
+                "title": "single file coverage info",
+                "required": [
+                    "name",
+                    "line_coverage",
+                    "digest"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "title": "path of the file, relative to git repo work directory (findable in commit tree)",
+                        "examples": [
+                            "apps/builtins/builtin_config.cc",
+                            "apps/builtins/builtin_init.cc",
+                            "apps/builtins/builtin_module.cc",
+                            "apps/cov/cov.cc",
+                            "libs/cov/include/cov/branch.hh",
+                            "libs/cov/src/branch.cc",
+                            "src/main/java/package/Application.kt",
+                            "src/components/App/index.tsx"
+                        ]
+                    },
+                    "digest": {
+                        "oneOf": [
+                            {
+                                "type": "string",
+                                "pattern": "md5:[0-9a-fA-F]{32}"
+                            },
+                            {
+                                "type": "string",
+                                "pattern": "sha1:[0-9a-fA-F]{40}"
+                            }
+                        ],
+                        "title": "the content digest at the time of taking the report; contains a digest algorithm and hash, joined by a colon; known algorithms are: md5 and sha1",
+                        "examples": [
+                            "md5:192cc23d05c33a7b423da3e3e4653eff",
+                            "sha1:d76762b8592ac4958463b65506cdef0779a2c8ef"
+                        ]
+                    },
+                    "line_coverage": {
+                        "type": "object",
+                        "title": "line coverage of the file",
+                        "required": [],
+                        "properties": {},
+                        "patternProperties": {
+                            "^[1-9][0-9]*$": {
+                                "type": "integer",
+                                "minimum": 0
+                            },
+                            "^0[0-9]+$": {
+                                "type": "integer",
+                                "minimum": 0
+                            },
+                            "^0$": {
+                                "title": "line numbers should start from 1",
+                                "not": {}
+                            },
+                            "^$": {
+                                "title": "line numbers should not be empty",
+                                "not": {}
+                            },
+                            "^\\d*[^0-9]+.*$": {
+                                "title": "line numbers should be integers",
+                                "not": {}
+                            }
+                        },
+                        "examples": [
+                            {
+                                "5": 0,
+                                "6": 15,
+                                "23": 1
+                            }
+                        ]
+                    }
+                },
+                "examples": [
+                    {
+                        "name": "src/main.cc",
+                        "digest": "md5:192cc23d05c33a7b423da3e3e4653eff",
+                        "line_coverage": {
+                            "5": 0,
+                            "6": 15,
+                            "23": 1
+                        }
+                    }
+                ]
+            },
+            "examples": [
+                [
+                    {
+                        "name": "src/main.cc",
+                        "digest": "md5:192cc23d05c33a7b423da3e3e4653eff",
+                        "line_coverage": {
+                            "5": 0,
+                            "6": 15,
+                            "23": 1
+                        }
+                    }
+                ]
+            ]
+        }
+    },
+    "examples": [
+        {
+            "git": {
+                "branch": "report-api",
+                "head": "f8632047e4ea88f5e30bf57570694e5b145c5c0d"
+            },
+            "files": [
+                [
+                    {
+                        "name": "src/main.cc",
+                        "digest": "md5:192cc23d05c33a7b423da3e3e4653eff",
+                        "line_coverage": {
+                            "5": 0,
+                            "6": 15,
+                            "23": 1
+                        }
+                    }
+                ]
+            ]
+        }
+    ]
+}
