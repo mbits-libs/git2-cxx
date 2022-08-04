@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) and [COMMITS.md](COMMITS.md) for commit guidelines.
 
+## [0.12.4-beta](https://github.com/mzdun/cov/compare/v0.12.3-beta...v0.12.4-beta) (2022-08-04)
+
+### Bug Fixes
+
+- change schema id to expected tag name ([57a6069](https://github.com/mzdun/cov/commit/57a6069a9a1252beb76d9f9c2dd82c576d3fd630))
+- create JSON schema for a report ([a145021](https://github.com/mzdun/cov/commit/a1450216ed5fbd69b8a1c3ba70bbcae98d68d835))
+
 ## [0.12.3-beta](https://github.com/mzdun/cov/compare/v0.12.2-beta...v0.12.3-beta) (2022-07-31)
 
 ### Build System
