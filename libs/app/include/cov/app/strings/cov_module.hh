@@ -27,18 +27,16 @@ namespace cov::app::str::cov_module {
         REMOVA_ALL_DESCRIPTION = 1009,
         /// {} argument cannot be used with other options (Error message for conflicting arguments; used by arguments which cannot be part of series of options)
         ERROR_EXCLUSIVE = 1010,
-        /// cannot find Git repository in {} (Error message for failing to locate Git repository in place of call)
-        ERROR_NO_GIT_REPO = 1014,
         /// this operation must be run in a work tree (Error message for calling inside a bare Git repository)
-        ERROR_NO_GIT_WORKDIR = 1015,
+        ERROR_NO_GIT_WORKDIR = 1014,
         /// <git-commit> argument should describe a single object (Error message for calling with a commit range (first..last))
-        ERROR_REVPARSE_NEEDS_SINGLE = 1016,
+        ERROR_REVPARSE_NEEDS_SINGLE = 1015,
         /// <git-commit> argument should describe a commit (Error message for calling with reference to some other type of Git object,than commit (e.g. commited file or directory))
-        ERROR_REVPARSE_NEEDS_COMMIT = 1017,
+        ERROR_REVPARSE_NEEDS_COMMIT = 1016,
         /// module {} already contains directory {} (Error message for trying to add a duplicate directory)
-        ERROR_ADD_DUPLICATE = 1018,
+        ERROR_ADD_DUPLICATE = 1017,
         /// there is no {} module (Error message for trying to remove a directory from non-existent module)
-        ERROR_REMOVE_NO_MODULE = 1019,
+        ERROR_REMOVE_NO_MODULE = 1018,
     }; // enum class lng
 
     enum class counted {
