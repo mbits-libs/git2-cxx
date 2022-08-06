@@ -213,7 +213,62 @@ namespace cov::app::report {
 			if (data.size() == 0 || data.data()[data.size() - 1] != LN) ++lines;
 			return lines;
 		}
+
+		unsigned visit_lines(std::map<unsigned, unsigned> const& line_coverage,
+		                     size_t line_count,
+		                     auto visitor) {
+			static constexpr auto max_u31 = (1u << 31) - 1;
+
+			unsigned prev_line = 0;
+			for (auto [line, hits] : line_coverage) {
+				auto null_lines = line - prev_line - 1;
+				while (null_lines) {
+					auto const chunk = std::min(max_u31, null_lines);
+					null_lines -= chunk;
+					visitor(chunk, true);
+				}
+
+				visitor(std::min(max_u31, hits), false);
+				prev_line = line;
+			}
+
+			auto const result =
+			    std::max(prev_line, static_cast<unsigned>(line_count));
+			if (prev_line < result) {
+				auto null_lines = result - prev_line - 1;
+				while (null_lines) {
+					auto const chunk = std::min(max_u31, null_lines);
+					null_lines -= chunk;
+					visitor(chunk, true);
+				}
+			}
+
+			return result;
+		}
 	}  // namespace
+
+	file_info::coverage_info file_info::expand_coverage(
+	    size_t line_count) const {
+		coverage_info result{std::vector<io::v1::coverage>{},
+		                     io::v1::coverage_stats::init()};
+		auto& [coverage, stats] = result;
+
+		size_t size{};
+		stats.total = visit_lines(line_coverage, line_count,
+		                          [&](unsigned, bool) { ++size; });
+		coverage.reserve(size);
+		visit_lines(line_coverage, line_count,
+		            [&](unsigned count, bool is_null) {
+			            coverage.push_back(
+			                io::v1::coverage{.value = count & ((1u << 31) - 1),
+			                                 .is_null = is_null ? 1u : 0u});
+			            if (!is_null) {
+				            ++stats.relevant;
+				            if (count) ++stats.covered;
+			            }
+		            });
+		return result;
+	}
 
 	bool report_info::load_from_text(std::string_view u8_encoded) {
 		git = {};
