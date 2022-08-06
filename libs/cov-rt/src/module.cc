@@ -3,6 +3,7 @@
 
 #include <git2/revparse.h>
 #include <cov/app/module.hh>
+#include <cov/app/path.hh>
 #include <cov/app/tools.hh>
 #include <cov/repository.hh>
 
@@ -56,25 +57,6 @@ namespace cov::app::module {
 			auto const index =
 			    static_cast<std::underlying_type_t<command>>(cmd);
 			return items[index].minmax;
-		}
-
-		std::filesystem::path make_path(std::string_view u8) {
-#ifdef __cpp_lib_char8_t
-			return std::u8string_view{
-			    reinterpret_cast<char8_t const*>(u8.data()), u8.size()};
-#else
-			return std::filesystem::u8path(utf8);
-#endif
-		}
-
-		std::string get_path(std::filesystem::path copy) {
-			copy.make_preferred();
-#ifdef __cpp_lib_char8_t
-			auto u8 = copy.u8string();
-			return {reinterpret_cast<char const*>(u8.data()), u8.size()};
-#else
-			return copy.u8string();
-#endif
 		}
 
 		[[noreturn]] void show_help(::args::parser& p) {
@@ -248,7 +230,7 @@ namespace cov::app::module {
 		auto git_repo = git::repository::open(cwd, ec);
 		if (git_repo && !ec) return git_repo;
 
-		error(tr_.format(modlng::ERROR_NO_GIT_REPO, get_path(cwd)));
+		error(tr_.format(modlng::ERROR_NO_GIT_REPO, get_u8path(cwd)));
 	}  // GCOV_EXCL_LINE[WIN32]
 
 	ref_ptr<modules> parser::open_modules(
@@ -303,6 +285,6 @@ namespace cov::app::module {
 	    git::repository_handle repo) const {
 		auto const workdir = repo.workdir();
 		if (!workdir) error(to_string(tr_(modlng::ERROR_NO_GIT_WORKDIR)));
-		return make_path(*workdir) / ".covmodule"sv;
+		return make_u8path(*workdir) / ".covmodule"sv;
 	}
 }  // namespace cov::app::module

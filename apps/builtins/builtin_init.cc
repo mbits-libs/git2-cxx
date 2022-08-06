@@ -5,6 +5,7 @@
 #include <cov/app/args.hh>
 #include <cov/app/cov_init_tr.hh>
 #include <cov/app/errors_tr.hh>
+#include <cov/app/path.hh>
 #include <cov/app/tools.hh>
 #include <cov/repository.hh>
 #include <git2/repository.hh>
@@ -13,25 +14,6 @@ namespace cov::app::builtin::init {
 	namespace {
 		using namespace std::filesystem;
 		using namespace std::literals;
-
-		path make_path(std::string_view u8) {
-#ifdef __cpp_lib_char8_t
-			return std::u8string_view{
-			    reinterpret_cast<char8_t const*>(u8.data()), u8.size()};
-#else
-			return std::filesystem::u8path(utf8);
-#endif
-		}
-
-		std::string get_path(path copy) {
-			copy.make_preferred();
-#ifdef __cpp_lib_char8_t
-			auto u8 = copy.u8string();
-			return {reinterpret_cast<char const*>(u8.data()), u8.size()};
-#else
-			return copy.u8string();
-#endif
-		}
 
 		bool starts_with(path const& canonical_inner,
 		                 path const& canonical_outer) {
@@ -52,7 +34,7 @@ namespace cov::app::builtin::init {
 			auto const workdir = repo.workdir();
 			if (workdir) {
 				ec.clear();
-				auto result = weakly_canonical(make_path(*workdir), ec);
+				auto result = weakly_canonical(make_u8path(*workdir), ec);
 				if (ec) {
 					[[unlikely]];   // GCOV_EXCL_LINE
 					return common;  // GCOV_EXCL_LINE
@@ -119,15 +101,15 @@ namespace cov::app::builtin::init {
 					                 platform::con_to_u8(ec)));
 				}
 				// GCOV_EXCL_STOP
-				git_dir_ = get_path(cwd);
+				git_dir_ = get_u8path(cwd);
 			}
 		}
 
-		result.git_dir = git::repository::discover(make_path(*git_dir_), ec);
+		result.git_dir = git::repository::discover(make_u8path(*git_dir_), ec);
 		if (ec) {
 			std::error_code ec2;
 			auto const arg_git_dir =
-			    get_path(weakly_canonical(make_path(*git_dir_), ec2));
+			    get_u8path(weakly_canonical(make_u8path(*git_dir_), ec2));
 			// GCOV_EXCL_START
 			if (ec2) {
 				[[unlikely]];
@@ -142,7 +124,7 @@ namespace cov::app::builtin::init {
 		result.directory = result.git_dir / ".covdata"sv;
 
 		if (had_both) {
-			auto canonical = weakly_canonical(make_path(*directory_), ec);
+			auto canonical = weakly_canonical(make_u8path(*directory_), ec);
 			// GCOV_EXCL_START
 			if (ec) {
 				[[unlikely]];
@@ -174,24 +156,24 @@ namespace cov::app::builtin::init {
 			p.tr().print(flags & cov::init_options::reinit
 			                 ? cov_init::lng::REINITIALIZED
 			                 : cov_init::lng::INITIALIZED,
-			             get_path(repo.commondir()));
+			             get_u8path(repo.commondir()));
 			fputs("\n ", stdout);
-			p.tr().print(
-			    cov_init::lng::USING_GIT,
-			    get_path(weakly_canonical(make_path(repo.git_commondir()))));
+			p.tr().print(cov_init::lng::USING_GIT,
+			             get_u8path(weakly_canonical(
+			                 make_u8path(repo.git_commondir()))));
 			fputc('\n', stdout);
 			return 0;
 		}
 
 		if (ec == std::errc::file_exists) {
-			p.tr().print(cov_init::lng::EXISTS, get_path(directory));
+			p.tr().print(cov_init::lng::EXISTS, get_u8path(directory));
 			std::fputc('\n', stdout);
 			return 1;
 		}
 
 		// GCOV_EXCL_START
 		[[unlikely]];
-		p.tr().print(cov_init::lng::CANNOT_INITIALIZE, get_path(directory));
+		p.tr().print(cov_init::lng::CANNOT_INITIALIZE, get_u8path(directory));
 		std::fputc('\n', stdout);
 		p.error(ec, p.tr());
 		// GCOV_EXCL_STOP

@@ -2,9 +2,11 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/dirs.hh.in ${CMAKE_CURRENT_BINARY
 
 set(SOURCES
   src/args.cc
+  src/path.cc
   src/tr.cc
 
   include/cov/app/args.hh
+  include/cov/app/path.hh
   include/cov/app/tr.hh
 )
 

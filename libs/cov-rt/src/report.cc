@@ -3,6 +3,7 @@
 
 #include <charconv>
 #include <chrono>
+#include <cov/app/path.hh>
 #include <cov/app/report.hh>
 #include <cov/hash/md5.hh>
 #include <cov/hash/sha1.hh>
@@ -12,15 +13,6 @@
 
 namespace cov::app::report {
 	namespace {
-		std::filesystem::path make_path(std::string_view u8) {
-#ifdef __cpp_lib_char8_t
-			return std::u8string_view{
-			    reinterpret_cast<char8_t const*>(u8.data()), u8.size()};
-#else
-			return std::filesystem::u8path(utf8);
-#endif
-		}
-
 		std::u8string_view to_json(std::string_view str) {
 			return {reinterpret_cast<char8_t const*>(str.data()), str.size()};
 		}
@@ -380,7 +372,7 @@ namespace cov::app::report {
 		}
 
 		auto const opened =
-		    io::fopen(make_path(*workdir) / make_path(file.name), "rb");
+		    io::fopen(make_u8path(*workdir) / make_u8path(file.name), "rb");
 		if (!opened) return {};
 
 		auto stg = opened.read();
