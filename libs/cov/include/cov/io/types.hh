@@ -341,6 +341,7 @@ namespace cov::io {
 		struct coverage {
 			uint32_t value : 31;
 			uint32_t is_null : 1;
+			bool operator==(coverage const&) const noexcept = default;
 		};
 
 		inline coverage_stats& coverage_stats::operator+=(

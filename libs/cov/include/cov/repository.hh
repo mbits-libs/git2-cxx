@@ -117,6 +117,8 @@ namespace cov {
 		git::config const& config() const noexcept { return cfg_; }
 		ref_ptr<references> const& refs() const noexcept { return refs_; }
 		ref_ptr<object> dwim(std::string_view) const;
+		ref_ptr<reference> create_reference(std::string_view name,
+		                                    git_oid const& target) const;
 		template <typename Object>
 		ref_ptr<Object> lookup(git_oid const& id, std::error_code& ec) const {
 			return as_a<Object>(lookup_object(id, ec));

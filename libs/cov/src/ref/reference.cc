@@ -153,8 +153,17 @@ namespace cov {
 		ref_ptr<reference> peel_target() noexcept override {
 			auto bead = ref_from_this();
 			while (bead &&
-			       bead->reference_type() != cov::reference_type::direct) {
-				bead = peel_source_->lookup(bead->symbolic_target());
+			       bead->reference_type() == cov::reference_type::symbolic) {
+				auto name = bead->symbolic_target();
+				auto next = peel_source_->lookup(name);
+				if (!next) {
+					auto const [kind, prefix_length] =
+					    references::prefix_info(name);
+					next = null_reference_create(
+					    kind, {name.data(), name.size()}, prefix_length);
+				}
+
+				bead = std::move(next);
 			}
 			return bead;
 		}
@@ -173,4 +182,27 @@ namespace cov {
 		return make_ref<symbolic_reference>(tgt_kind, name, shorthand_prefix,
 		                                    target, peel_source);
 	}
+
+	class null_reference
+	    : public reference_base,
+	      public enable_ref_from_this<reference, null_reference> {
+	public:
+		null_reference(ref_tgt tgt_kind,
+		               std::string const& name,
+		               size_t shorthand_prefix)
+		    : reference_base{tgt_kind, name, shorthand_prefix} {}
+		cov::reference_type reference_type() const noexcept override {
+			return cov::reference_type::undetermined;
+		}
+		ref_ptr<reference> peel_target() noexcept override {
+			return ref_from_this();
+		}
+	};
+
+	ref_ptr<reference> null_reference_create(ref_tgt tgt_kind,
+	                                         std::string const& name,
+	                                         size_t shorthand_prefix) {
+		return make_ref<null_reference>(tgt_kind, name, shorthand_prefix);
+	}
+
 }  // namespace cov

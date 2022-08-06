@@ -149,16 +149,6 @@ namespace cov {
 		}
 
 	private:
-		static std::pair<ref_tgt, size_t> prefix_info(std::string_view name) {
-			if (name.starts_with(names::heads_dir_prefix))
-				return {ref_tgt::branch, names::heads_dir_prefix.size()};
-			if (name.starts_with(names::tags_dir_prefix))
-				return {ref_tgt::tag, names::tags_dir_prefix.size()};
-			if (name.starts_with(names::refs_dir_prefix))
-				return {ref_tgt::other, names::refs_dir_prefix.size()};
-			return {ref_tgt::other, 0u};
-		}
-
 		bool print(std::string_view name, std::string const& line) {
 			auto filename = root_ / make_path(name);
 
@@ -182,5 +172,16 @@ namespace cov {
 	ref_ptr<references> references::make_refs(
 	    std::filesystem::path const& root) {
 		return make_ref<references_impl>(root);
+	}
+
+	std::pair<ref_tgt, size_t> references::prefix_info(
+	    std::string_view name) noexcept {
+		if (name.starts_with(names::heads_dir_prefix))
+			return {ref_tgt::branch, names::heads_dir_prefix.size()};
+		if (name.starts_with(names::tags_dir_prefix))
+			return {ref_tgt::tag, names::tags_dir_prefix.size()};
+		if (name.starts_with(names::refs_dir_prefix))
+			return {ref_tgt::other, names::refs_dir_prefix.size()};
+		return {ref_tgt::other, 0u};
 	}
 }  // namespace cov

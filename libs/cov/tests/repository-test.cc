@@ -177,8 +177,10 @@ namespace cov::testing {
 		ASSERT_TRUE(HEAD);
 		ASSERT_EQ(reference_type::symbolic, HEAD->reference_type());
 
-		auto const empty_repo = !HEAD->peel_target();
-		ASSERT_TRUE(empty_repo);
+		auto const branch = HEAD->peel_target();
+		ASSERT_TRUE(branch);
+		ASSERT_EQ(reference_type::undetermined, branch->reference_type());
+		ASSERT_EQ("main"sv, branch->shorthand());
 	}
 
 	TEST_F(repository, detached) {
