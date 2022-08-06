@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cov latest\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-19 17:34+0200\n"
-"PO-Revision-Date: 2022-07-19 17:36+0200\n"
+"POT-Creation-Date: 2022-08-07 21:21+0200\n"
+"PO-Revision-Date: 2022-08-07 21:22+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: pl\n"
@@ -28,6 +28,11 @@ msgstr "argument {0}: {1}"
 msgctxt "args.CANNOT_FIND_COV"
 msgid "Cannot find a Cov repository in {0}"
 msgstr "Nie można znaleźć repozytorium Cov w {0}"
+
+#. Error message for tool called outside Git repository
+msgctxt "args.CANNOT_FIND_GIT"
+msgid "cannot find Git repository in {}"
+msgstr "nie można znaleźć repozytorium Git w {}"
 
 #. Default name of an argument
 msgctxt "args.DEF_META"
@@ -136,6 +141,12 @@ msgstr "użycie: "
 msgctxt "args.VALUE_META"
 msgid "<value>"
 msgstr "<wartość>"
+
+#. Warning message template; placeholder 0 will get the name of program,
+#. placeholder 1 an actual message
+msgctxt "args.WARNING_MSG"
+msgid "{0}: warning: {1}"
+msgstr "{0}: ostrzeżenie: {1}"
 
 #. Description for the -C argument
 msgctxt "cov.CWD_DESCRIPTION"
@@ -407,11 +418,6 @@ msgctxt "cov_module.ERROR_EXCLUSIVE"
 msgid "{} argument cannot be used with other options"
 msgstr "argument {} nie może być używany z innymi opcjami"
 
-#. Error message for failing to locate Git repository in place of call
-msgctxt "cov_module.ERROR_NO_GIT_REPO"
-msgid "cannot find Git repository in {}"
-msgstr "nie można znaleźć repozytorium Git w {}"
-
 #. Error message for calling inside a bare Git repository
 msgctxt "cov_module.ERROR_NO_GIT_WORKDIR"
 msgid "this operation must be run in a work tree"
@@ -499,9 +505,129 @@ msgctxt "cov_module.SHOW_WORKDIR_DESCRIPTION"
 msgid "prints module list from git work directory and exits"
 msgstr "drukuje listę modułów z katalogu roboczego git i wychodzi"
 
-msgctxt "cov_report.STR"
-msgid "dummy"
-msgstr "dummy"
+#. Description for the --amend argument
+msgctxt "cov_report.AMEND_DESCRIPTION"
+msgid "replaces the tip of the current branch by creating a new commit"
+msgstr "zastępuje końcówkę bieżącej gałęzi, tworząc nowy zapis"
+
+#. Error message for calling --amend before any reports
+msgctxt "cov_report.ERROR_AMEND_IN_FRESH_REPO"
+msgid "you have nothing to amend"
+msgstr "nie masz nic do poprawienia"
+
+#. Error message for calling the app in bare repository
+msgctxt "cov_report.ERROR_BARE_GIT"
+msgid "this operation must be run in a work tree"
+msgstr "ta operacja musi być wykonana w drzewie roboczym"
+
+#. Error message for failing to open a file
+msgctxt "cov_report.ERROR_CANNOT_FIND_FILE"
+msgid "cannot find {}"
+msgstr "nie można znaleźć {}"
+
+#. Error message for failing to find the reported commit in the git repository
+msgctxt "cov_report.ERROR_CANNOT_LOAD_COMMIT"
+msgid "cannot find the Git commit from report"
+msgstr "nie można znaleźć zapisu Git z raportu"
+
+#. Error message for trying to read from a missing file
+msgctxt "cov_report.ERROR_CANNOT_OPEN_FILE"
+msgid "could not read {}"
+msgstr "nie można odczytać {}"
+
+#. Error message for failing to read repository objects
+msgctxt "cov_report.ERROR_CANNOT_READ_FROM_DB"
+msgid "cannot read current report back"
+msgstr "nie można odczytać raportu bieżącego"
+
+#. Error message for failing to write repository objects
+msgctxt "cov_report.ERROR_CANNOT_WRITE_TO_DB"
+msgid "cannot write to repository database"
+msgstr "nie można pisać do bazy danych repozytorium"
+
+#. Error message for issues with cov JSON, which was produced by a filter
+msgctxt "cov_report.ERROR_FILTERED_REPORT_ISSUES"
+msgid "there were issues with {} processed by {} filter"
+msgstr "wystąpiły problemy z {} przetworzonym przez filtr {}"
+
+#. Error message for unusable filter file
+msgctxt "cov_report.ERROR_FILTER_ACCESS"
+msgid "filter {} could not be used"
+msgstr "nie można użyć filtra {}"
+
+#. Error message for non-0 result code from a filter
+msgctxt "cov_report.ERROR_FILTER_FAILED"
+msgid "filter {} exited with return code {}"
+msgstr "filtr {} zakończył się kodem {}"
+
+#. Error message for a missing filter file
+msgctxt "cov_report.ERROR_FILTER_NOENT"
+msgid "filter {} could not be found"
+msgstr "nie można znaleźć filtra {}"
+
+#. Error message for issues with cov JSON
+msgctxt "cov_report.ERROR_REPORT_ISSUES"
+msgid "there were issues with {}"
+msgstr "wystąpiły problemy z {}"
+
+#. Description for the report file argument; the list at the end uses
+#. REPORT_FILE_DESCRIPTION_LIST_END
+msgctxt "cov_report.FILTER_DESCRIPTION"
+msgid ""
+"filters other report formats to internal cov format; known filters are: {}"
+msgstr ""
+"filtruje inne formaty raportów do wewnętrznego formatu cov; znane filtry to: "
+"{}"
+
+#. Final part of the report file argument description; together the list will
+#. be "known filters are: 'first', 'second', 'third' and 'fourth'"
+msgctxt "cov_report.FILTER_DESCRIPTION_LIST_END"
+msgid "{} and {}"
+msgstr "{} i {}"
+
+#. Name of filter argument
+msgctxt "cov_report.FILTER_META"
+msgid "<filter>"
+msgstr "<filtr>"
+
+#. Name of a branch, when there is no branch
+msgctxt "cov_report.MESSAGE_DETACHED_HEAD"
+msgid "detached HEAD"
+msgstr "odłączone HEAD"
+
+#. Description for commit in current report; will become "based on
+#. 13a39fbf9@main"
+msgctxt "cov_report.MESSAGE_FIELD_GIT_COMMIT"
+msgid "based on"
+msgstr "w oparciu o"
+
+#. Description for parent of current report; will become "parent d4965abfb"
+msgctxt "cov_report.MESSAGE_FIELD_PARENT_REPORT"
+msgid "parent"
+msgstr "rodzic"
+
+#. Number of files in current report
+msgctxt "cov_report.MESSAGE_FILE_COUNT"
+msgid "{} file"
+msgid_plural "{} files"
+msgstr[0] "jeden plik"
+msgstr[1] "{} pliki"
+msgstr[2] "{} plików"
+
+#. Description for the report file argument
+msgctxt "cov_report.REPORT_FILE_DESCRIPTION"
+msgid "selects report to import"
+msgstr "wybiera raport do zaimportowania"
+
+#. Name of report file argument (be it Cobertura XML or Coveralls JSON)
+msgctxt "cov_report.REPORT_FILE_META"
+msgid "<report-file>"
+msgstr "<plik-raportu>"
+
+#. Warning message for adding a modified file
+msgctxt "cov_report.WARNING_FILE_MODIFIED"
+msgid "{} was modified after the report"
+msgstr "{} został zmodyfikowany po raporcie"
 
 #. config_file.c:412, 442
 msgctxt "errors.CONFIG_CANNOT_DELETE"

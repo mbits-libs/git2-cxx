@@ -5,7 +5,7 @@
         "",
         [
             "usage: cov module [-h] [--show-sep [<git-commit>]] | [--set-sep <value> | --add <name> <dir> | --remove <name> <dir> | --remove-all <name>] | [<git-commit>]",
-            "cov module: error: cannot find Git repository in $TMP/repo.git\n"
+            "cov module: error: cannot find a Git repository in $TMP/repo.git\n"
         ]
     ],
     "prepare": [

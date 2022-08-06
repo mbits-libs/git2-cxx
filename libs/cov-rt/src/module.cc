@@ -230,7 +230,7 @@ namespace cov::app::module {
 		auto git_repo = git::repository::open(cwd, ec);
 		if (git_repo && !ec) return git_repo;
 
-		error(tr_.format(modlng::ERROR_NO_GIT_REPO, get_u8path(cwd)));
+		error(tr_.format(str::args::lng::CANNOT_FIND_GIT, get_u8path(cwd)));
 	}  // GCOV_EXCL_LINE[WIN32]
 
 	ref_ptr<modules> parser::open_modules(

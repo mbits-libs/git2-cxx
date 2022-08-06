@@ -42,8 +42,6 @@
         id(-1)
     ]
     ERROR_OPTS_NEEDS_AT_MOST = "{} argument needs at most {} argument";
-    [help("Error message for failing to locate Git repository in place of call"), id(-1)]
-    ERROR_NO_GIT_REPO = "cannot find Git repository in {}";
     [help("Error message for calling inside a bare Git repository"), id(-1)]
     ERROR_NO_GIT_WORKDIR = "this operation must be run in a work tree";
     [help("Error message for calling with a commit range (first..last)"), id(-1)]

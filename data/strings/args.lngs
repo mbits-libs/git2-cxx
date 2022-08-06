@@ -46,8 +46,12 @@
 	REQUIRED = "argument {0} is required";
 	[help("Error message template; placeholder 0 will get the name of program, placeholder 1 an actual message"), id(-1)]
 	ERROR_MSG = "{0}: error: {1}";
+	[help("Warning message template; placeholder 0 will get the name of program, placeholder 1 an actual message"), id(-1)]
+	WARNING_MSG = "{0}: warning: {1}";
 	[help("Needed file was not found"), id(-1)]
 	FILE_NOT_FOUND = "cannot open {0}";
 	[help("Error message for tool called outside Cov repository"), id(-1)]
 	CANNOT_FIND_COV = "Cannot find a Cov repository in {0}";
+    [help("Error message for tool called outside Git repository"), id(-1)]
+    CANNOT_FIND_GIT = "cannot find Git repository in {}";
 }

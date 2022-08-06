@@ -7,10 +7,10 @@
 #include <cov/app/tr.hh>
 
 namespace cov::app {
-	using reportlng = str::cov_report::faulty;
+	using replng = str::cov_report::lng;
 	using ReportStrings = str::cov_report::Strings;
 
 	template <>
-	struct lngs_traits<reportlng>
-	    : base_lngs_traits<reportlng, "cov_report", ReportStrings> {};
+	struct lngs_traits<replng>
+	    : base_lngs_traits<replng, "cov_report", ReportStrings> {};
 }  // namespace cov::app
