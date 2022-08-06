@@ -8,7 +8,7 @@
 #include <string>
 
 namespace cov {
-	enum class ref_tgt {
+	enum class ref_tgt : int {
 		other,
 		branch,
 		tag,
@@ -25,6 +25,10 @@ namespace cov {
 	    size_t shorthand_prefix,
 	    std::string const& target,
 	    ref_ptr<references> const& peel_source);
+
+	ref_ptr<reference> null_reference_create(ref_tgt tgt_kind,
+	                                         std::string const& name,
+	                                         size_t shorthand_prefix);
 
 	ref_ptr<reference_list> reference_list_create(
 	    std::filesystem::path const& path,

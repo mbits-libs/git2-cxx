@@ -23,9 +23,12 @@ namespace cov {
 		struct link : counted_impl<typename Policy::type> {
 			using type = typename Policy::type;
 			link(std::string const& name, git_oid const& id)
-			    : name_{name}, id_{id} {}
+			    : name_{name}, id_{id}, null_{!!git_oid_is_zero(&id)} {}
+			link(std::string const& name) : name_{name}, id_{}, null_{true} {}
 			std::string_view name() const noexcept override { return name_; }
-			git_oid const* id() const noexcept override { return &id_; }
+			git_oid const* id() const noexcept override {
+				return null_ ? nullptr : &id_;
+			}
 
 			static std::string full_name(std::string_view name) {
 				return detail::full_name(Policy::prefix(), name);
@@ -47,13 +50,16 @@ namespace cov {
 			}
 
 			static ref_ptr<type> from(ref_ptr<reference>&& ref) {
+				if (!ref) return {};
+
 				std::string name{};
-				if (ref) name.assign(ref->shorthand());
-				if (ref) ref = ref->peel_target();
-				if (!ref || ref->reference_type() != reference_type::direct)
-					return {};
-				return make_ref<typename Policy::type_impl>(
-				    name, *ref->direct_target());
+				name.assign(ref->shorthand());
+				ref = ref->peel_target();
+				if (ref->direct_target())
+					return make_ref<typename Policy::type_impl>(
+					    name, *ref->direct_target());
+
+				return make_ref<typename Policy::type_impl>(name);
 			}
 
 			static ref_ptr<typename Policy::list_type> iterator(
@@ -64,6 +70,7 @@ namespace cov {
 		private:
 			std::string name_;
 			git_oid id_;
+			bool null_;
 		};
 
 		template <typename Policy>

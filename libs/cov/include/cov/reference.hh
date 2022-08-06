@@ -6,9 +6,10 @@
 #include <cov/object.hh>
 #include <filesystem>
 #include <string_view>
+#include <utility>
 
 namespace cov {
-	enum class reference_type : bool { direct = true, symbolic = false };
+	enum class reference_type : int { undetermined, direct, symbolic };
 
 	struct reference : object {
 		obj_type type() const noexcept override { return obj_reference; };
@@ -67,8 +68,11 @@ namespace cov {
 		iter_t end() { return {}; }
 	};
 
+	enum class ref_tgt : int;
 	struct references : object {
 		static ref_ptr<references> make_refs(std::filesystem::path const& root);
+		static std::pair<ref_tgt, size_t> prefix_info(
+		    std::string_view name) noexcept;
 		obj_type type() const noexcept override { return obj_references; };
 		bool is_references() const noexcept final { return true; }
 		virtual ref_ptr<reference> create(std::string_view name,

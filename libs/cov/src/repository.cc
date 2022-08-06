@@ -104,6 +104,12 @@ namespace cov {
 		return ref;
 	}
 
+	ref_ptr<reference> repository::create_reference(
+	    std::string_view name,
+	    git_oid const& target) const {
+		return refs_->create(name, target);
+	}
+
 	ref_ptr<object> repository::lookup_object(git_oid const& id,
 	                                          std::error_code& ec) const {
 		if (auto report = db_->lookup_object(id)) return report;
