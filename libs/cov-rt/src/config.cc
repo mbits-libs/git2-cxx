@@ -3,6 +3,7 @@
 
 #include <cov/app/config.hh>
 #include <cov/app/dirs.hh>
+#include <cov/app/path.hh>
 #include <cov/app/tools.hh>
 #include <cov/repository.hh>
 
@@ -43,25 +44,6 @@ namespace cov::app::config {
 			}
 			[[unlikely]];  // GCOV_EXCL_LINE
 			return {};     // GCOV_EXCL_LINE
-		}
-
-		path make_path(std::string_view u8) {
-#ifdef __cpp_lib_char8_t
-			return std::u8string_view{
-			    reinterpret_cast<char8_t const*>(u8.data()), u8.size()};
-#else
-			return std::filesystem::u8path(utf8);
-#endif
-		}
-
-		std::string get_path(path copy) {
-			copy.make_preferred();
-#ifdef __cpp_lib_char8_t
-			auto u8 = copy.u8string();
-			return {reinterpret_cast<char const*>(u8.data()), u8.size()};
-#else
-			return copy.u8string();
-#endif
 		}
 
 		[[noreturn]] void show_help(::args::parser& p) {
@@ -144,7 +126,7 @@ namespace cov::app::config {
 		parser_
 		    .custom(
 		        [&](std::string const& val) {
-			        file = make_path(val);
+			        file = make_u8path(val);
 			        which = scope::file;
 		        },
 		        "f", "file")
@@ -249,7 +231,7 @@ namespace cov::app::config {
 			    cov::repository::discover(current_directory, ec);
 			if (ec)
 				error(tr_.format(args::lng::CANNOT_FIND_COV,
-				                 get_path(current_directory)));
+				                 get_u8path(current_directory)));
 			file = commondir / "config"sv;
 			which = scope::file;
 		} else if (which == scope::unspecified) {
