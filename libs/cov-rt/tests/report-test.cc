@@ -132,6 +132,19 @@ namespace cov::app::report {
 	}
 }  // namespace cov::app::report
 
+namespace cov::io::v1 {
+	void PrintTo(coverage const& line, std::ostream* out) {
+		*out << "{.value=";
+		if (line.value >= 10240) *out << "0x" << std::hex;
+		*out << line.value << std::dec << "u, .is_null=" << line.is_null
+		     << "u}";
+	}
+	void PrintTo(coverage_stats const& stats, std::ostream* out) {
+		*out << "{.total=" << stats.total << "u, .relevant=" << stats.relevant
+		     << "u, .covered=" << stats.covered << "u}";
+	}
+}  // namespace cov::io::v1
+
 namespace cov::app::testing {
 	using namespace ::std::literals;
 
@@ -156,6 +169,30 @@ namespace cov::app::testing {
 		auto const result = actual.load_from_text(text);
 		ASSERT_EQ(succeeds, result);
 		ASSERT_EQ(expected, actual);
+	}
+
+	TEST(report, line_coverage) {
+		app::report::file_info lines{
+		    .line_coverage = {
+		        {1, 0},
+		        {10, std::numeric_limits<unsigned>::max()},
+		        {11, 512},
+		        {12, 100},
+		    }};
+		auto const [actual_coverage, actual_status] =
+		    lines.expand_coverage(std::numeric_limits<uint32_t>::max());
+		std::vector<io::v1::coverage> expected_coverage{
+		    {.value = 0u, .is_null = 0u},
+		    {.value = 8u, .is_null = 1u},
+		    {.value = 0x7fffffffu, .is_null = 0u},
+		    {.value = 512u, .is_null = 0u},
+		    {.value = 100u, .is_null = 0u},
+		    {.value = 0x7fffffffu, .is_null = 1u},
+		    {.value = 0x7ffffff3u, .is_null = 1u}};
+		io::v1::coverage_stats expected_status{
+		    .total = 4294967295u, .relevant = 4u, .covered = 3u};
+		ASSERT_EQ(expected_coverage, actual_coverage);
+		ASSERT_EQ(expected_status, actual_status);
 	}
 
 	using app::report::text;

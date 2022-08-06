@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <cov/io/report.hh>
 #include <cov/io/types.hh>
 #include <filesystem>
 #include <git2/repository.hh>
@@ -10,6 +11,7 @@
 #include <map>
 #include <string>
 #include <string_view>
+#include <tuple>
 #include <type_traits>
 #include <vector>
 
@@ -17,11 +19,14 @@ namespace cov::app::report {
 	enum class digest { unknown, md5, sha1 };
 
 	struct file_info {
+		using coverage_info =
+		    std::tuple<std::vector<io::v1::coverage>, io::v1::coverage_stats>;
 		std::string name{};
 		report::digest algorithm{digest::unknown};
 		std::string digest{};
 		std::map<unsigned, unsigned> line_coverage{};
 		auto operator<=>(file_info const&) const noexcept = default;
+		coverage_info expand_coverage(size_t line_count) const;
 	};
 
 	struct git_info {
