@@ -1,0 +1,13 @@
+{
+    "files": [
+        {
+            "name": "src/main.cc",
+            "digest": "md5:192cc23d05c33a7b423da3e3e4653eff",
+            "line_coverage": {
+                "5": 0,
+                "6": 15,
+                "23": 1
+            }
+        }
+    ]
+}

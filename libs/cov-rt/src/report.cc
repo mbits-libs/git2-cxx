@@ -260,7 +260,7 @@ namespace cov::app::report {
 			            }
 		            });
 		return result;
-	}
+	}  // GCOV_EXCL_LINE[GCC]
 
 	bool report_info::load_from_text(std::string_view u8_encoded) {
 		git = {};

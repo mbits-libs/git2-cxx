@@ -61,7 +61,7 @@ namespace cov::app::builtin::report {
 			if (filter_) {
 				error(tr_.format(replng::ERROR_FILTERED_REPORT_ISSUES, report_,
 				                 *filter_));
-			} else {
+			} else {  // GCOV_EXCL_LINE[WIN32]
 				error(tr_.format(replng::ERROR_REPORT_ISSUES, report_));
 			}
 		}
@@ -158,7 +158,7 @@ namespace cov::app::builtin::report {
 				}
 				break;
 			}
-		}
+		}  // GCOV_EXCL_LINE[WIN32]
 
 		return result;
 	}  // GCOV_EXCL_LINE[GCC]

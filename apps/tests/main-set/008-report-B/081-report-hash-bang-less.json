@@ -1,0 +1,13 @@
+{
+    "args": "report $DATA/build-coverage-2-files.json -f hash-bang-less",
+    "expected": [
+        1,
+        "",
+        "cov report: error: filter hash-bang-less could not be used\n"
+    ],
+    "prepare": [
+        "unpack $DATA/repo.git.tar $TMP",
+        "cd '$TMP/repo.git'",
+        "cov init"
+    ]
+}

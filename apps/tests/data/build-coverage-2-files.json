@@ -1,0 +1,55 @@
+{
+    "files": {
+        "src/main.cc": {
+            "text": [
+                "import sys;",
+                "import greetings;",
+                "",
+                "int main() {",
+                "  std::cout << \"Hello, \" << name() << \"!\";",
+                "}"
+            ],
+            "lines": {
+                "3": 0,
+                "4": 15,
+                "5": 15
+            }
+        },
+        "src/greetings.cc": {
+            "hashed": [
+                "module;",
+                "#include <string>",
+                "export module greetings;",
+                "",
+                "export std::string name() {",
+                "  using namespace std::literals;",
+                "  return \"coverage!\"s;",
+                "}"
+            ],
+            "text": [
+                "export module greetings;",
+                "import std;",
+                "",
+                "export std::string name() {",
+                "  using namespace std::literals;",
+                "  return \"coverage!\"s;",
+                "}"
+            ],
+            "lines": {
+                "4": 15,
+                "5": 15,
+                "6": 15,
+                "7": 15
+            }
+        }
+    },
+    "commits": [
+        {
+            "message": "reported files",
+            "files": [
+                "src/main.cc",
+                "src/greetings.cc"
+            ]
+        }
+    ]
+}

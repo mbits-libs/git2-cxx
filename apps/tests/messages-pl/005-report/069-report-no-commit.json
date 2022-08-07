@@ -1,0 +1,14 @@
+{
+    "lang": "pl",
+    "args": "report $DATA/basic-coverage.json",
+    "expected": [
+        1,
+        "",
+        "cov report: b\u0142\u0105d: nie mo\u017cna znale\u017a\u0107 zapisu Git z raportu\n"
+    ],
+    "prepare": [
+        "cd '$TMP'",
+        "git init",
+        "cov init"
+    ]
+}

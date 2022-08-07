@@ -117,7 +117,7 @@ namespace cov {
 		if (peeled->direct_target()) return {.tip = *peeled->direct_target()};
 
 		return {};
-	}
+	}  // GCOV_EXCL_LINE[WIN32]
 
 	bool repository::update_current_head(git_oid const& ref,
 	                                     current_head_type const& known) const {

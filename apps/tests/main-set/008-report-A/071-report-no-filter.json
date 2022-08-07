@@ -1,0 +1,13 @@
+{
+    "args": "report $DATA/basic-coverage.json -f no-filter",
+    "expected": [
+        1,
+        "",
+        "cov report: error: filter no-filter could not be found\n"
+    ],
+    "prepare": [
+        "cd '$TMP'",
+        "git init",
+        "cov init"
+    ]
+}

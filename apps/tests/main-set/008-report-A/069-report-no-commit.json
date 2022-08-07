@@ -1,0 +1,13 @@
+{
+    "args": "report $DATA/basic-coverage.json",
+    "expected": [
+        1,
+        "",
+        "cov report: error: cannot find the Git commit from report\n"
+    ],
+    "prepare": [
+        "cd '$TMP'",
+        "git init",
+        "cov init"
+    ]
+}

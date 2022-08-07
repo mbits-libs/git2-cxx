@@ -1,0 +1,18 @@
+{
+    "args": "report -h",
+    "expected": [
+        0,
+        [
+            "usage: cov report [-h] <report-file> [-f <filter>] [--amend]",
+            "",
+            "positional arguments:",
+            " <report-file>         selects report to import",
+            "",
+            "optional arguments:",
+            " -h, --help            shows this help message and exits",
+            " -f, --filter <filter> filters other report formats to internal cov format; known filters are: \u2018cobertura\u2019 and \u2018coveralls\u2019",
+            " --amend               replaces the tip of the current branch by creating a new commit\n"
+        ],
+        ""
+    ]
+}

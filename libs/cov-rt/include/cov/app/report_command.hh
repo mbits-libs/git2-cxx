@@ -52,7 +52,7 @@ namespace cov::app::builtin::report {
 			data_msg(str::args::lng::ERROR_MSG, id,
 			         std::forward<Args>(args)...);
 			std::exit(1);
-		}
+		}  // GCOV_EXCL_LINE[WIN32]
 
 		template <typename Enum, typename... Args>
 		void data_warning(Enum id,

@@ -182,15 +182,20 @@ namespace cov::app::platform {
 			captured_output result{};
 			pipes_type pipes{};
 			if (!pipes.open(input != nullptr, capture)) {
+				// GCOV_EXCL_START[POSIX]
 				[[unlikely]];
 				result.return_code = 128;
 				return result;
+				// GCOV_EXCL_STOP
 			}
 
 			pid = fork();
 			if (pid < 0) {
+				// GCOV_EXCL_START[POSIX]
+				[[unlikely]];
 				result.return_code = -errno;
 				return result;
+				// GCOV_EXCL_STOP
 			}
 			if (!pid) {
 				if (cwd) {
