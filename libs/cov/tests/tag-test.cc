@@ -50,6 +50,7 @@ namespace cov::testing {
 		ASSERT_EQ(obj_tag, tag->type());
 		ASSERT_TRUE(is_a<cov::tag>(static_cast<object*>(tag.get())));
 		ASSERT_TRUE(!is_a<cov::branch>(static_cast<object*>(tag.get())));
+		ASSERT_TRUE(tag->id());
 		ASSERT_EQ(0, git_oid_cmp(&id, tag->id()));
 		ASSERT_EQ("moving"sv, tag->name());
 	}
