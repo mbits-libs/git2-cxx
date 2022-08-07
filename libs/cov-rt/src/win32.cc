@@ -196,6 +196,8 @@ namespace cov::app::platform {
 			std::thread async_read(std::vector<std::byte>& dst) {
 				return std::thread(
 				    [](HANDLE handle, std::vector<std::byte>& bytes) {
+					    static constexpr auto CR = std::byte{'\r'};
+
 					    DWORD read;
 					    std::vector<std::byte> buffer(BUFSIZE);
 
@@ -205,8 +207,19 @@ namespace cov::app::platform {
 						        read == 0)
 							    break;
 
-						    bytes.insert(bytes.end(), buffer.data(),
-						                 buffer.data() + read);
+						    auto first = buffer.data();
+						    auto last = first + read;
+						    bytes.reserve(bytes.size() + read);
+
+						    while (first != last) {
+							    auto start = first;
+							    while (first != last && *first != CR)
+								    ++first;
+
+							    bytes.insert(bytes.end(), start, first);
+
+							    if (first != last) ++first;
+						    }
 					    }
 				    },
 				    read, std::ref(dst));
