@@ -1,0 +1,34 @@
+{
+    "args": "report $DATA/basic-coverage.json -f echo-to-stderr",
+    "expected": [
+        1,
+        "",
+        [
+            "{",
+            "    \"$schema\": \"https://raw.githubusercontent.com/mzdun/cov/v$VERSION/apps/report-schema.json\",",
+            "    \"git\": {",
+            "        \"branch\": \"main\",",
+            "        \"head\": \"f8632047e4ea88f5e30bf57570694e5b145c5c0d\"",
+            "    },",
+            "    \"files\": [",
+            "        {",
+            "            \"name\": \"src/main.cc\",",
+            "            \"digest\": \"md5:192cc23d05c33a7b423da3e3e4653eff\",",
+            "            \"line_coverage\": {",
+            "                \"5\": 0,",
+            "                \"6\": 15,",
+            "                \"23\": 1",
+            "            }",
+            "        }",
+            "    ]",
+            "}",
+            "",
+            "cov report: error: filter echo-to-stderr exited with return code 1\n"
+        ]
+    ],
+    "prepare": [
+        "cd '$TMP'",
+        "git init",
+        "cov init"
+    ]
+}

@@ -1,0 +1,18 @@
+{
+    "files": {
+        "src/main.cc": {
+            "text": [
+                "#include <iostream>",
+                "",
+                "int main() {",
+                "  std::cout << \"Hello, coverage!\";",
+                "}"
+            ],
+            "lines": {
+                "3": 0,
+                "4": 15,
+                "5": 15
+            }
+        }
+    }
+}

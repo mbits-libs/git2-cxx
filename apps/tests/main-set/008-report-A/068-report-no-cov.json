@@ -1,0 +1,15 @@
+{
+    "args": "report $DATA/basic-coverage.json",
+    "expected": [
+        2,
+        "",
+        [
+            "usage: cov report [-h] <report-file> [-f <filter>] [--amend]",
+            "cov report: error: Cannot find a Cov repository in $TMP\n"
+        ]
+    ],
+    "prepare": [
+        "cd '$TMP'",
+        "git init"
+    ]
+}

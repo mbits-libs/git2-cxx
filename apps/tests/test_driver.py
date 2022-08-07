@@ -90,6 +90,8 @@ def alt_sep(input, value, var):
     split = split[1:]
     for index in range(len(split)):
         m = re.match(r"(\S+)(\s*.*)", split[index])
+        if m is None:
+            continue
         g2 = m.group(2)
         if g2 is None:
             g2 = ""
@@ -146,7 +148,7 @@ def git(args):
 
 
 def cov(aditional):
-    subprocess.run([args.target, *aditional], shell=False)
+    subprocess.run([target, *aditional], shell=False)
 
 
 file_cache = {}
@@ -191,6 +193,20 @@ def unpack(args):
     ARCHIVES[ext](archive, dst)
 
 
+def detach(args):
+    dirname = args[0]
+    with open(os.path.join(dirname, "HEAD")) as f:
+        link = f.readline().strip()
+    print(link)
+    if link[:5] != "ref: ":
+        return
+    link = link[5:]
+    with open(os.path.join(dirname, link)) as f:
+        link = f.readline().strip()
+    with open(os.path.join(dirname, "HEAD"), "w") as f:
+        print(link, file=f)
+
+
 op_types = {
     "mkdirs": (1, lambda args: os.makedirs(args[0], exist_ok=True)),
     "rm": (1, lambda args: shutil.rmtree(args[0])),
@@ -201,6 +217,7 @@ op_types = {
     "unpack": (2, unpack),
     "git": (0, git),
     "cov": (0, cov),
+    "detach": (1, detach),
 }
 
 
@@ -436,6 +453,21 @@ if args.install is not None:
             os.path.join(args.install, "share"),
             dirs_exist_ok=True,
         )
+
+    filters_target = "share/cov-{}/filters".format(
+        ".".join(args.version.split(".", 2)[:2])
+    )
+    filters_source = os.path.join(os.path.dirname(__file__), "test-filters")
+    for _, dirs, files in os.walk(filters_source):
+        dirs[:] = []
+        for filename in files:
+            name, ext = os.path.splitext(filename)
+            if ext != ".py":
+                continue
+            shutil.copy2(
+                os.path.join(filters_source, filename),
+                os.path.join(args.install, filters_target, name),
+            )
 
     for module in args.install_with:
         shutil.copy2(module, os.path.join(args.install, "libexec", "cov"))

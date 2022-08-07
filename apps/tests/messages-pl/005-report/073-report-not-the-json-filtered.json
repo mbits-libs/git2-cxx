@@ -1,0 +1,17 @@
+{
+    "lang": "pl",
+    "args": "report $DATA/no-git-coverage.json -f echo-to-stdout",
+    "expected": [
+        2,
+        "",
+        [
+            "u\u017cycie: cov report [-h] <plik-raportu> [-f <filtr>] [--amend]",
+            "cov report: b\u0142\u0105d: wyst\u0105pi\u0142y problemy z $DATA/no-git-coverage.json przetworzonym przez filtr echo-to-stdout"
+        ]
+    ],
+    "prepare": [
+        "unpack $DATA/repo.git.tar $TMP",
+        "cd '$TMP/repo.git'",
+        "cov init"
+    ]
+}

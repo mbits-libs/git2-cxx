@@ -1,0 +1,21 @@
+{
+    "lang": "pl",
+    "args": "report $DATA/empty-coverage.json -f replace-head",
+    "patches": {
+        "\u001b\\[31m\\[main [0-9a-fA-F]+\\]\u001b\\[m second": "\u001b[31m[main $REPORT]\u001b[m second"
+    },
+    "expected": [
+        0,
+        [
+            "\u001b[31m[main $REPORT]\u001b[m second",
+            " 0 plik\u00f3w, \u001b[31m 0%\u001b[m (0/0)",
+            " \u001b[2mw oparciu o \u001b[33m384512442@main\u001b[m\n"
+        ],
+        ""
+    ],
+    "prepare": [
+        "unpack $DATA/repo.git.tar $TMP",
+        "cd '$TMP/repo.git'",
+        "cov init"
+    ]
+}

@@ -1,0 +1,23 @@
+{
+    "lang": "pl",
+    "args": "report $DATA/build-coverage.json -f create-report --amend",
+    "patches": {
+        "\u001b\\[31m\\[main [0-9a-fA-F]+\\]\u001b\\[m second": "\u001b[31m[main $REPORT]\u001b[m second"
+    },
+    "expected": [
+        2,
+        "",
+        [
+            "[ADD] src/main.cc",
+            "u\u017cycie: cov report [-h] <plik-raportu> [-f <filtr>] [--amend]",
+            "cov report: b\u0142\u0105d: nie masz nic do poprawienia\n"
+        ]
+    ],
+    "prepare": [
+        "unpack $DATA/repo.git.tar $TMP",
+        "cd '$TMP'",
+        "git clone repo.git",
+        "cd '$TMP/repo'",
+        "cov init"
+    ]
+}

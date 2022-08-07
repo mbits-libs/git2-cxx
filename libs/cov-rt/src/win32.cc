@@ -178,8 +178,12 @@ namespace cov::app::platform {
 						    if (chunk > BUFSIZE) chunk = BUFSIZE;
 						    if (!WriteFile(handle, ptr,
 						                   static_cast<DWORD>(chunk), &written,
-						                   nullptr))
+						                   nullptr)) {
+							    // GCOV_EXCL_START
+							    [[unlikely]];
 							    break;
+							    // GCOV_EXCL_STOP
+						    }  // GCOV_EXCL_LINE
 						    ptr += written;
 						    size -= static_cast<size_t>(written);
 					    }
@@ -227,11 +231,20 @@ namespace cov::app::platform {
 				    .bInheritHandle = TRUE,
 				};
 				if (with_input) {
-					if (!input.open(saAttr, true)) return false;
+					if (!input.open(saAttr, true)) {
+						// GCOV_EXCL_START
+						[[unlikely]];
+						return false;
+						// GCOV_EXCL_STOP
+					}  // GCOV_EXCL_LINE
 				}
 				if (with_output) {
-					if (!output.open(saAttr) || !error.open(saAttr))
+					if (!output.open(saAttr) || !error.open(saAttr)) {
+						// GCOV_EXCL_START
+						[[unlikely]];
 						return false;
+						// GCOV_EXCL_STOP
+					}  // GCOV_EXCL_LINE
 				}
 				return true;
 			}
@@ -346,10 +359,12 @@ namespace cov::app::platform {
 
 			win32_pipes pipes{};
 			if (!pipes.open(input != nullptr, capture)) {
+				// GCOV_EXCL_START
 				[[unlikely]];
 				result.return_code = 128;
 				return result;
-			}
+				// GCOV_EXCL_STOP
+			}  // GCOV_EXCL_LINE
 
 			STARTUPINFOW si;
 			PROCESS_INFORMATION pi;
@@ -369,6 +384,8 @@ namespace cov::app::platform {
 			                    nullptr, nullptr, input != nullptr || capture,
 			                    0, nullptr, cwd ? cwd->c_str() : nullptr, &si,
 			                    &pi)) {
+				// GCOV_EXCL_START[WIN32]
+				[[unlikely]];
 				auto const error = GetLastError();
 				if (error == ERROR_FILE_NOT_FOUND ||
 				    error == ERROR_PATH_NOT_FOUND) {
@@ -376,12 +393,10 @@ namespace cov::app::platform {
 					return result;
 				}
 
-				// GCOV_EXCL_START[WIN32]
-				[[unlikely]];
 				result.return_code = 128;
 				return result;
 				// GCOV_EXCL_STOP[WIN32]
-			}
+			}  // GCOV_EXCL_LINE
 
 			pipes.io(input, &result);
 
@@ -393,7 +408,7 @@ namespace cov::app::platform {
 				result.return_code = 128;
 				return result;
 				// GCOV_EXCL_STOP[WIN32]
-			}
+			}  // GCOV_EXCL_LINE
 
 			CloseHandle(pi.hProcess);
 			CloseHandle(pi.hThread);

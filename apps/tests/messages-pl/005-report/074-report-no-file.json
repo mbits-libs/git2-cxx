@@ -1,0 +1,14 @@
+{
+    "lang": "pl",
+    "args": "report $DATA/basic-coverage.json -f replace-head",
+    "expected": [
+        1,
+        "",
+        "cov report: b\u0142\u0105d: nie mo\u017cna znale\u017a\u0107 src/main.cc\n"
+    ],
+    "prepare": [
+        "unpack $DATA/repo.git.tar $TMP",
+        "cd '$TMP/repo.git'",
+        "cov init"
+    ]
+}
