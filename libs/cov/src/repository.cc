@@ -95,6 +95,45 @@ namespace cov {
 		}
 	}
 
+	current_head_type repository::current_head() const {
+		auto const HEAD = dwim(names::HEAD);
+		auto const head_ref = as_a<cov::reference>(HEAD);
+
+		if (!head_ref) return {};
+
+		if (head_ref->direct_target())
+			return {.tip = *head_ref->direct_target()};
+
+		auto const peeled = head_ref->peel_target();
+		auto const name = peeled->shorthand();
+
+		if (peeled->references_branch() && peeled->direct_target()) {
+			return {.branch = {name.data(), name.size()},
+			        .tip = *peeled->direct_target()};
+		}
+		if (peeled->references_branch())
+			return {.branch = {name.data(), name.size()}};
+
+		if (peeled->direct_target()) return {.tip = *peeled->direct_target()};
+
+		return {};
+	}
+
+	bool repository::update_current_head(git_oid const& ref,
+	                                     current_head_type const& known) const {
+		if (known != current_head()) return false;
+		std::string name{};
+		if (known.branch.empty()) {
+			name.assign(names::HEAD);
+		} else {
+			name.reserve(names::heads_dir_prefix.size() + known.branch.size());
+			name.append(names::heads_dir_prefix);
+			name.append(known.branch);
+		}
+		refs_->create(name, ref);
+		return true;
+	}
+
 	ref_ptr<object> repository::dwim(std::string_view name) const {
 		auto ref = refs_->dwim(name);
 		if (ref) {
@@ -102,12 +141,6 @@ namespace cov {
 			if (ref->references_tag()) return tag::from(std::move(ref));
 		}
 		return ref;
-	}
-
-	ref_ptr<reference> repository::create_reference(
-	    std::string_view name,
-	    git_oid const& target) const {
-		return refs_->create(name, target);
 	}
 
 	ref_ptr<object> repository::lookup_object(git_oid const& id,
