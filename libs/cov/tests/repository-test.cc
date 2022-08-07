@@ -181,6 +181,10 @@ namespace cov::testing {
 		ASSERT_TRUE(branch);
 		ASSERT_EQ(reference_type::undetermined, branch->reference_type());
 		ASSERT_EQ("main"sv, branch->shorthand());
+
+		auto const head = repo.current_head();
+		ASSERT_EQ("main"sv, head.branch);
+		ASSERT_FALSE(head.tip);
 	}
 
 	TEST_F(repository, detached) {
@@ -191,6 +195,10 @@ namespace cov::testing {
 		    init_repo("repository/.covdata"sv, "repository/.git"sv),
 		    touch("repository/.covdata/HEAD"sv,
 		          "f8e21b2735744fa148e8c6e0bb59d7629857d2a7\n"sv)));
+
+		static constexpr git_oid f8e21b273 = {
+		    .id = {0xf8, 0xe2, 0x1b, 0x27, 0x35, 0x74, 0x4f, 0xa1, 0x48, 0xe8,
+		           0xc6, 0xe0, 0xbb, 0x59, 0xd7, 0x62, 0x98, 0x57, 0xd2, 0xa7}};
 
 		std::error_code ec{};
 		auto const covdir =
@@ -208,6 +216,140 @@ namespace cov::testing {
 		auto const HEAD = repo.refs()->lookup("HEAD"sv);
 		ASSERT_TRUE(HEAD);
 		ASSERT_EQ(reference_type::direct, HEAD->reference_type());
+
+		auto const head = repo.current_head();
+		ASSERT_TRUE(head.branch.empty());
+		ASSERT_TRUE(head.tip);
+		ASSERT_EQ(0, git_oid_cmp(&f8e21b273, &*head.tip));
+	}
+
+	TEST_F(repository, empty_HEAD) {
+		git::init init{};
+
+		run_setup(make_setup(
+		    remove_all("repository"sv), init_git_workspace("repository"sv),
+		    init_repo("repository/.covdata"sv, "repository/.git"sv),
+		    touch("repository/.covdata/HEAD"sv, "\n"sv)));
+
+		std::error_code ec{};
+		auto const covdir =
+		    cov::repository::discover(setup::test_dir() / "repository"sv, ec);
+		ASSERT_FALSE(ec);
+		ASSERT_EQ(setup::get_path(
+		              canonical(setup::test_dir() / "repository/.covdata"sv)),
+		          setup::get_path(covdir));
+
+		auto const repo =
+		    cov::repository::open(setup::test_dir() / "sysroot"sv, covdir, ec);
+		ASSERT_FALSE(ec);
+		ASSERT_TRUE(repo.refs());
+
+		auto const HEAD = repo.refs()->lookup("HEAD"sv);
+		ASSERT_FALSE(HEAD);
+
+		auto const head = repo.current_head();
+		ASSERT_TRUE(head.branch.empty());
+		ASSERT_FALSE(head.tip);
+	}
+
+	TEST_F(repository, detached_to_tag) {
+		git::init init{};
+
+		run_setup(make_setup(
+		    remove_all("repository"sv), init_git_workspace("repository"sv),
+		    init_repo("repository/.covdata"sv, "repository/.git"sv),
+		    touch("repository/.covdata/refs/tags/v1.0.0"sv,
+		          "f8e21b2735744fa148e8c6e0bb59d7629857d2a7\n"sv),
+		    touch("repository/.covdata/HEAD"sv, "ref: refs/tags/v1.0.0\n"sv)));
+
+		static constexpr git_oid f8e21b273 = {
+		    .id = {0xf8, 0xe2, 0x1b, 0x27, 0x35, 0x74, 0x4f, 0xa1, 0x48, 0xe8,
+		           0xc6, 0xe0, 0xbb, 0x59, 0xd7, 0x62, 0x98, 0x57, 0xd2, 0xa7}};
+
+		std::error_code ec{};
+		auto const covdir =
+		    cov::repository::discover(setup::test_dir() / "repository"sv, ec);
+		ASSERT_FALSE(ec);
+		ASSERT_EQ(setup::get_path(
+		              canonical(setup::test_dir() / "repository/.covdata"sv)),
+		          setup::get_path(covdir));
+
+		auto const repo =
+		    cov::repository::open(setup::test_dir() / "sysroot"sv, covdir, ec);
+		ASSERT_FALSE(ec);
+		ASSERT_TRUE(repo.refs());
+
+		auto const HEAD = repo.refs()->lookup("HEAD"sv);
+		ASSERT_TRUE(HEAD);
+		ASSERT_EQ(reference_type::symbolic, HEAD->reference_type());
+
+		auto const head = repo.current_head();
+		ASSERT_TRUE(head.branch.empty());
+		ASSERT_TRUE(head.tip);
+		ASSERT_EQ(0, git_oid_cmp(&f8e21b273, &*head.tip));
+	}
+
+	TEST_F(repository, detached_to_dangling_tag) {
+		git::init init{};
+
+		run_setup(make_setup(
+		    remove_all("repository"sv), init_git_workspace("repository"sv),
+		    init_repo("repository/.covdata"sv, "repository/.git"sv),
+		    touch("repository/.covdata/HEAD"sv, "ref: refs/tags/v1.0.0\n"sv)));
+
+		std::error_code ec{};
+		auto const covdir =
+		    cov::repository::discover(setup::test_dir() / "repository"sv, ec);
+		ASSERT_FALSE(ec);
+		ASSERT_EQ(setup::get_path(
+		              canonical(setup::test_dir() / "repository/.covdata"sv)),
+		          setup::get_path(covdir));
+
+		auto const repo =
+		    cov::repository::open(setup::test_dir() / "sysroot"sv, covdir, ec);
+		ASSERT_FALSE(ec);
+		ASSERT_TRUE(repo.refs());
+
+		auto const HEAD = repo.refs()->lookup("HEAD"sv);
+		ASSERT_TRUE(HEAD);
+		ASSERT_EQ(reference_type::symbolic, HEAD->reference_type());
+
+		auto const head = repo.current_head();
+		ASSERT_TRUE(head.branch.empty());
+		ASSERT_FALSE(head.tip);
+	}
+
+	TEST_F(repository, update_head) {
+		git::init init{};
+
+		run_setup(make_setup(
+		    remove_all("repository"sv), init_git_workspace("repository"sv),
+		    init_repo("repository/.covdata"sv, "repository/.git"sv),
+		    touch("repository/.covdata/HEAD"sv, "ref: refs/tags/v1.0.0\n"sv)));
+
+		std::error_code ec{};
+		auto const covdir =
+		    cov::repository::discover(setup::test_dir() / "repository"sv, ec);
+		ASSERT_FALSE(ec);
+		ASSERT_EQ(setup::get_path(
+		              canonical(setup::test_dir() / "repository/.covdata"sv)),
+		          setup::get_path(covdir));
+
+		auto const repo =
+		    cov::repository::open(setup::test_dir() / "sysroot"sv, covdir, ec);
+		ASSERT_FALSE(ec);
+		ASSERT_TRUE(repo.refs());
+
+		static constexpr git_oid f8e21b273 = {
+		    .id = {0xf8, 0xe2, 0x1b, 0x27, 0x35, 0x74, 0x4f, 0xa1, 0x48, 0xe8,
+		           0xc6, 0xe0, 0xbb, 0x59, 0xd7, 0x62, 0x98, 0x57, 0xd2, 0xa7}};
+
+		ASSERT_FALSE(repo.update_current_head(f8e21b273, {"main"s, {}}));
+		ASSERT_TRUE(repo.update_current_head(f8e21b273, {{}, {}}));
+
+		repo.refs()->create("HEAD"sv, "refs/heads/main"sv);
+		ASSERT_FALSE(repo.update_current_head(f8e21b273, {{}, {f8e21b273}}));
+		ASSERT_TRUE(repo.update_current_head(f8e21b273, {"main"s, {}}));
 	}
 
 	TEST_F(repository, dwim) {
@@ -248,6 +390,15 @@ namespace cov::testing {
 		auto const branch = as_a<cov::branch>(repo.dwim("heads/main"sv));
 		ASSERT_TRUE(branch);
 		ASSERT_EQ("main"sv, branch->name());
+
+		static constexpr git_oid f8e21b273 = {
+		    .id = {0xf8, 0xe2, 0x1b, 0x27, 0x35, 0x74, 0x4f, 0xa1, 0x48, 0xe8,
+		           0xc6, 0xe0, 0xbb, 0x59, 0xd7, 0x62, 0x98, 0x57, 0xd2, 0xa7}};
+
+		auto const head = repo.current_head();
+		ASSERT_EQ("main"sv, head.branch);
+		ASSERT_TRUE(head.tip);
+		ASSERT_EQ(0, git_oid_cmp(&f8e21b273, &*head.tip));
 	}
 
 	TEST_F(repository, lookup_report) {
