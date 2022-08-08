@@ -82,11 +82,11 @@ namespace cov::testing {
 			                "36109a1c35e0d5cf3e5e68d896c8b1b4be565525");
 
 			io::v1::coverage_stats const default_stats{1250, 300, 299};
-			return report_create(id, parent_id, zero, commit_id, "develop"s,
-			                     "Johnny Appleseed"s, "johnny@appleseed.com"s,
-			                     "Johnny Committer"s,
-			                     "committer@appleseed.com"s, message, commit,
-			                     add, stats.value_or(default_stats));
+			return report::create(
+			    id, parent_id, zero, commit_id, "develop"sv,
+			    {"Johnny Appleseed"sv, "johnny@appleseed.com"sv},
+			    {"Johnny Committer"sv, "committer@appleseed.com"sv}, message,
+			    commit, add, stats.value_or(default_stats));
 		}
 	};
 

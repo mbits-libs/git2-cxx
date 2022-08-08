@@ -74,7 +74,7 @@ namespace cov::testing {
 #pragma GCC diagnostic pop
 #endif
 
-		return line_coverage_create(std::move(result));
+		return line_coverage::create(std::move(result));
 	}
 
 	inline line_cvg from_coverage(std::vector<io::v1::coverage> const& lines,

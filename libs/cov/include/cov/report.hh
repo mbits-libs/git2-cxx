@@ -30,21 +30,39 @@ namespace cov {
 		virtual sys_seconds commit_time_utc() const noexcept = 0;
 		virtual sys_seconds add_time_utc() const noexcept = 0;
 		virtual io::v1::coverage_stats const& stats() const noexcept = 0;
-	};
 
-	ref_ptr<report> report_create(git_oid const& oid,
-	                              git_oid const& parent_report,
-	                              git_oid const& file_list,
-	                              git_oid const& commit,
-	                              std::string const& branch,
-	                              std::string const& author_name,
-	                              std::string const& author_email,
-	                              std::string const& committer_name,
-	                              std::string const& committer_email,
-	                              std::string const& message,
-	                              sys_seconds commit_time_utc,
-	                              sys_seconds add_time_utc,
-	                              io::v1::coverage_stats const& stats);
+		struct signature_view {
+			std::string_view name;
+			std::string_view email;
+		};
+
+		static ref_ptr<report> create(git_oid const& parent_report,
+		                              git_oid const& file_list,
+		                              git_oid const& commit,
+		                              std::string_view branch,
+		                              signature_view author,
+		                              signature_view committer,
+		                              std::string_view message,
+		                              sys_seconds commit_time_utc,
+		                              sys_seconds add_time_utc,
+		                              io::v1::coverage_stats const& stats) {
+			return create({}, parent_report, file_list, commit, branch, author,
+			              committer, message, commit_time_utc, add_time_utc,
+			              stats);
+		}
+
+		static ref_ptr<report> create(git_oid const& oid,
+		                              git_oid const& parent_report,
+		                              git_oid const& file_list,
+		                              git_oid const& commit,
+		                              std::string_view branch,
+		                              signature_view author,
+		                              signature_view committer,
+		                              std::string_view message,
+		                              sys_seconds commit_time_utc,
+		                              sys_seconds add_time_utc,
+		                              io::v1::coverage_stats const& stats);
+	};
 
 	struct report_entry {
 		virtual ~report_entry();
@@ -93,8 +111,8 @@ namespace cov {
 		bool is_line_coverage() const noexcept final { return true; }
 		virtual std::vector<io::v1::coverage> const& coverage()
 		    const noexcept = 0;
+
+		static ref_ptr<line_coverage> create(std::vector<io::v1::coverage>&&);
 	};
 
-	ref_ptr<line_coverage> line_coverage_create(
-	    std::vector<io::v1::coverage>&&);
 }  // namespace cov

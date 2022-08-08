@@ -76,7 +76,7 @@ namespace cov {
 		return true;
 	}
 
-	ref_ptr<backend> loose_backend_create(std::filesystem::path const& root) {
-		return make_ref<loose_backend>(root);
+	ref_ptr<backend> backend::loose_backend(std::filesystem::path const& root) {
+		return make_ref<cov::loose_backend>(root);
 	}
 }  // namespace cov

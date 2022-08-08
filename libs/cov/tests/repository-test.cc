@@ -441,7 +441,7 @@ namespace cov::testing {
 
 		// write
 		{
-			auto backend = loose_backend_create(
+			auto backend = backend::loose_backend(
 			    setup::test_dir() / "repository/.covdata/objects/coverage"sv);
 			ASSERT_TRUE(backend);
 
@@ -464,10 +464,10 @@ namespace cov::testing {
 			git_oid files_id{};
 			ASSERT_TRUE(backend->write(files_id, cvg_files));
 
-			auto cvg_report = report_create(
-			    {}, rprt.parent, files_id, rprt.head.commit, rprt.head.branch,
-			    rprt.head.author_name, rprt.head.author_email,
-			    rprt.head.committer_name, rprt.head.committer_email,
+			auto cvg_report = cov::report::create(
+			    rprt.parent, files_id, rprt.head.commit, rprt.head.branch,
+			    {rprt.head.author_name, rprt.head.author_email},
+			    {rprt.head.committer_name, rprt.head.committer_email},
 			    rprt.head.message, rprt.head.commit_time_utc, rprt.add_time_utc,
 			    total);
 			ASSERT_TRUE(cvg_report);
@@ -583,10 +583,10 @@ namespace cov::testing {
 			git_oid files_id{};
 			ASSERT_TRUE(repo.write(files_id, cvg_files));
 
-			auto cvg_report = report_create(
-			    {}, rprt.parent, files_id, rprt.head.commit, rprt.head.branch,
-			    rprt.head.author_name, rprt.head.author_email,
-			    rprt.head.committer_name, rprt.head.committer_email,
+			auto cvg_report = cov::report::create(
+			    rprt.parent, files_id, rprt.head.commit, rprt.head.branch,
+			    {rprt.head.author_name, rprt.head.author_email},
+			    {rprt.head.committer_name, rprt.head.committer_email},
 			    rprt.head.message, rprt.head.commit_time_utc, rprt.add_time_utc,
 			    total);
 			ASSERT_TRUE(cvg_report);

@@ -21,9 +21,7 @@ namespace cov {
 			git_oid_fmt(buffer, &target);
 
 			if (!print(name, {buffer, GIT_OID_HEXSZ})) return {};
-			auto const [kind, prefix_length] = prefix_info(name);
-			return direct_reference_create(kind, {name.data(), name.size()},
-			                               prefix_length, target);
+			return reference::direct(prefix_info(name), target);
 		}
 
 		ref_ptr<reference> create(std::string_view name,
@@ -38,11 +36,9 @@ namespace cov {
 			contents.append(target);
 
 			if (!print(name, contents)) return {};
-			auto const [kind, prefix_length] = prefix_info(name);
 			auto self = ref_from_this();
-			return symbolic_reference_create(
-			    kind, {name.data(), name.size()}, prefix_length,
-			    {target.data(), target.size()}, self);
+			return reference::symbolic(prefix_info(name),
+			                           {target.data(), target.size()}, self);
 		}
 
 		ref_ptr<reference> create_matching(std::string_view name,
@@ -109,11 +105,10 @@ namespace cov {
 			std::string_view view{line};
 			auto symlink = prefixed(names::ref_prefix, view);
 			if (symlink) {
-				auto const [kind, prefix_length] = prefix_info(name);
 				auto self = ref_from_this();
-				return symbolic_reference_create(
-				    kind, {name.data(), name.size()}, prefix_length,
-				    {symlink->data(), symlink->size()}, self);
+				return reference::symbolic(prefix_info(name),
+				                           {symlink->data(), symlink->size()},
+				                           self);
 			}
 
 			auto const onlyhex = [](std::string_view oid) {
@@ -126,14 +121,12 @@ namespace cov {
 
 			view = strip(view);
 			if (view.length() == GIT_OID_HEXSZ && onlyhex(view)) {
-				auto const [kind, prefix_length] = prefix_info(name);
 				auto self = ref_from_this();
 
 				git_oid target{};
 				if (git_oid_fromstr(&target, view.data())) return {};
 
-				return direct_reference_create(kind, {name.data(), name.size()},
-				                               prefix_length, target);
+				return reference::direct(prefix_info(name), target);
 			}
 
 			return {};
@@ -144,8 +137,8 @@ namespace cov {
 		}
 
 		ref_ptr<reference_list> iterator(std::string_view prefix) override {
-			return reference_list_create(root_, {prefix.data(), prefix.size()},
-			                             ref_from_this());
+			return reference_list::create(root_, {prefix.data(), prefix.size()},
+			                              ref_from_this());
 		}
 
 	private:
@@ -174,14 +167,17 @@ namespace cov {
 		return make_ref<references_impl>(root);
 	}
 
-	std::pair<ref_tgt, size_t> references::prefix_info(
-	    std::string_view name) noexcept {
+	static std::string S(std::string_view value) {
+		return {value.data(), value.size()};
+	}
+
+	reference_name references::prefix_info(std::string_view name) {
 		if (name.starts_with(names::heads_dir_prefix))
-			return {ref_tgt::branch, names::heads_dir_prefix.size()};
+			return {ref_tgt::branch, S(name), names::heads_dir_prefix.size()};
 		if (name.starts_with(names::tags_dir_prefix))
-			return {ref_tgt::tag, names::tags_dir_prefix.size()};
+			return {ref_tgt::tag, S(name), names::tags_dir_prefix.size()};
 		if (name.starts_with(names::refs_dir_prefix))
-			return {ref_tgt::other, names::refs_dir_prefix.size()};
-		return {ref_tgt::other, 0u};
+			return {ref_tgt::other, S(name), names::refs_dir_prefix.size()};
+		return {ref_tgt::other, S(name), 0u};
 	}
 }  // namespace cov

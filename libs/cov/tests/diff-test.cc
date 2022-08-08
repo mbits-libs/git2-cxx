@@ -95,16 +95,15 @@ namespace cov::testing {
 		}
 		std::cout << "files " << setup::get_oid(peeled_id) << '\n';
 
-		git_oid zero{};
 		auto author = commit.author();
 		auto committer = commit.committer();
 		auto const as_s = [](std::string_view view) -> std::string {
 			return {view.data(), view.size()};
 		};
-		auto result = report_create(
-		    zero, parent ? *parent : zero, peeled_id, commit.oid(), "main"s,
-		    as_s(author.name), as_s(author.email), as_s(committer.name),
-		    as_s(committer.email), commit.message_raw(), committer.when,
+		auto result = report::create(
+		    parent ? *parent : zero, peeled_id, commit.oid(), "main"sv,
+		    {author.name, author.email}, {committer.name,
+		    committer.email}, commit.message_raw(), committer.when,
 		    std::chrono::floor<std::chrono::seconds>(
 		        std::chrono::system_clock::now()),
 		    stats);
