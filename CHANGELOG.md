@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) and [COMMITS.md](COMMITS.md) for commit guidelines.
 
+## [0.13.1](https://github.com/mzdun/cov/compare/v0.13.0-beta...v0.13.1) (2022-08-08)
+
+### Bug Fixes
+
+- describe `module` and `report` ([90e29d8](https://github.com/mzdun/cov/commit/90e29d8ae59692247550cfa35a8eb90016199122))
+- **api**: switch from `sth_create` to `sth::create` ([2900978](https://github.com/mzdun/cov/commit/29009784df44bee982e9dd6020e67be121813d42))
+
 ## [0.13.0-beta](https://github.com/mzdun/cov/compare/v0.12.4-beta...v0.13.0-beta) (2022-08-08)
 
 ### New Features

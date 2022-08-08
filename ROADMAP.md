@@ -46,10 +46,10 @@
     - [x] cobertura
     - [x] `cov report --amend`
     - [x] extract `make_u8path`/`get_u8path` to cov-rt
-  - [ ] code cleanup
-    - [ ] add documentation
-    - [ ] `cov::sth_create` -> `cov::sth::create`
-    - [ ] drop &beta;
+  - [x] code cleanup
+    - [x] add documentation
+    - [x] `cov::sth_create` -> `cov::sth::create`
+    - [x] drop &beta;
   - [ ] `cov log`
   - [ ] `cov show`
     - [ ] Report / component / directory view
