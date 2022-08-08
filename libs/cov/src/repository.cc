@@ -90,7 +90,7 @@ namespace cov {
 	    : commondir_{common}, cfg_{open_config(sysroot, common, ec)} {
 		if (!common.empty()) {
 			if (!ec) refs_ = references::make_refs(common);
-			if (!ec) db_ = loose_backend_create(common / names::coverage_dir);
+			if (!ec) db_ = backend::loose_backend(common / names::coverage_dir);
 			if (!ec) git_.open(common, cfg_, ec);
 		}
 	}

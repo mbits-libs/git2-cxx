@@ -14,10 +14,10 @@ namespace cov {
 		}
 		virtual bool write(git_oid&, ref_ptr<object> const&) = 0;
 
+		static ref_ptr<backend> loose_backend(std::filesystem::path const&);
+
 	private:
 		friend struct repository;
 		virtual ref_ptr<object> lookup_object(git_oid const& id) const = 0;
 	};
-
-	ref_ptr<backend> loose_backend_create(std::filesystem::path const&);
 }  // namespace cov

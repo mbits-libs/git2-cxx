@@ -27,7 +27,7 @@ namespace cov::testing {
 		}
 
 		auto backend =
-		    loose_backend_create(setup::test_dir() / "full_report"sv);
+		    backend::loose_backend(setup::test_dir() / "full_report"sv);
 		ASSERT_TRUE(backend);
 
 		report rprt = {
@@ -81,10 +81,10 @@ namespace cov::testing {
 			git_oid files_id{};
 			ASSERT_TRUE(backend->write(files_id, cvg_files));
 
-			auto cvg_report = report_create(
-			    git_oid{}, rprt.parent, files_id, rprt.head.commit,
-			    rprt.head.branch, rprt.head.author_name, rprt.head.author_email,
-			    rprt.head.committer_name, rprt.head.committer_email,
+			auto cvg_report = cov::report::create(
+			    rprt.parent, files_id, rprt.head.commit, rprt.head.branch,
+			    {rprt.head.author_name, rprt.head.author_email},
+			    {rprt.head.committer_name, rprt.head.committer_email},
 			    rprt.head.message, rprt.head.commit_time_utc, rprt.add_time_utc,
 			    total);
 			ASSERT_TRUE(cvg_report);
@@ -145,7 +145,7 @@ namespace cov::testing {
 		}
 
 		auto backend =
-		    loose_backend_create(setup::test_dir() / "read_nonexisting"sv);
+		    backend::loose_backend(setup::test_dir() / "read_nonexisting"sv);
 		ASSERT_TRUE(backend);
 
 		auto cvg_report = backend->lookup<cov::report>(report_id);
@@ -194,12 +194,12 @@ namespace cov::testing {
 		}
 
 		auto backend =
-		    loose_backend_create(setup::test_dir() / "read_unknown"sv);
+		    backend::loose_backend(setup::test_dir() / "read_unknown"sv);
 		ASSERT_TRUE(backend);
 
 		{
-			auto cvg_report = report_create({}, {}, {}, {}, {}, {}, {}, {}, {},
-			                                {}, {}, {}, {});
+			auto cvg_report =
+			    cov::report::create({}, {}, {}, {}, {}, {}, {}, {}, {}, {});
 			ASSERT_TRUE(cvg_report);
 			ASSERT_TRUE(backend->write(report_id, cvg_report));
 		}
@@ -221,7 +221,7 @@ namespace cov::testing {
 		}
 
 		auto backend =
-		    loose_backend_create(setup::test_dir() / "write_unknown"sv);
+		    backend::loose_backend(setup::test_dir() / "write_unknown"sv);
 		ASSERT_TRUE(backend);
 
 		auto none_ref = make_ref<none>();
@@ -253,7 +253,7 @@ namespace cov::testing {
 		}
 
 		auto backend =
-		    loose_backend_create(setup::test_dir() / "failed_z_stream"sv);
+		    backend::loose_backend(setup::test_dir() / "failed_z_stream"sv);
 		ASSERT_TRUE(backend);
 
 		auto obj = backend->lookup<none>(oid);

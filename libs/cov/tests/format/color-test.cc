@@ -48,11 +48,11 @@ namespace cov::testing {
 			                "36109a1c35e0d5cf3e5e68d896c8b1b4be565525");
 
 			io::v1::coverage_stats const default_stats{1250, 300, 299};
-			return report_create(
-			    id, parent_id, zero, commit_id, "develop"s, "Johnny Appleseed"s,
-			    "johnny@appleseed.com"s, "Johnny Committer"s,
-			    "committer@appleseed.com"s,
-			    "Subject, isn't it?\n\nBody para 1\n\nBody para 2\n"s, feb29,
+			return report::create(
+			    id, parent_id, zero, commit_id, "develop"sv,
+			    {"Johnny Appleseed"sv, "johnny@appleseed.com"sv},
+			    {"Johnny Committer"sv, "committer@appleseed.com"sv},
+			    "Subject, isn't it?\n\nBody para 1\n\nBody para 2\n"sv, feb29,
 			    feb29, stats.value_or(default_stats));
 		}
 	};

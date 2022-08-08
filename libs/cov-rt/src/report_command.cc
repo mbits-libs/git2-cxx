@@ -133,10 +133,10 @@ namespace cov::app::builtin::report {
 				parent_id = current->parent_report();
 			}
 
-			auto const report_obj = cov::report_create(
-			    {}, parent_id, file_list_id, commit_id, git.branch,
-			    commit.author.name, commit.author.mail, commit.committer.name,
-			    commit.committer.mail, commit.message,
+			auto const report_obj = cov::report::create(
+			    parent_id, file_list_id, commit_id, git.branch,
+			    {commit.author.name, commit.author.mail},
+			    {commit.committer.name, commit.committer.mail}, commit.message,
 			    sys_seconds{commit.committed}, now, stats);
 
 			if (!repo.write(result.tip, report_obj)) {
@@ -313,7 +313,7 @@ namespace cov::app::builtin::report {
 	                                 file_info const& info) {
 		std::vector<io::v1::coverage> cvg{};
 		std::tie(cvg, stats) = info.expand_coverage(stg.lines);
-		auto const obj = cov::line_coverage_create(std::move(cvg));
+		auto const obj = cov::line_coverage::create(std::move(cvg));
 		return repo.write(cvg_id, obj);
 	}
 

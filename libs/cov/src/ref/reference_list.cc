@@ -40,7 +40,7 @@ namespace cov {
 		ref_ptr<references> source_;
 	};
 
-	ref_ptr<reference_list> reference_list_create(
+	ref_ptr<reference_list> reference_list::create(
 	    std::filesystem::path const& path,
 	    std::string const& prefix,
 	    ref_ptr<references> const& source) {
