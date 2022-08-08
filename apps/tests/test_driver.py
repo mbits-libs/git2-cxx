@@ -24,6 +24,22 @@ if os.name == "nt":
 
     sys.stdout.reconfigure(encoding="utf-8")  # type: ignore
 
+
+def git_config(name, value):
+    subprocess.run(["git", "config", "--global", name, value], capture_output=True)
+
+
+def ensure_identity_exists():
+    proc = subprocess.run(["git", "config", "user.name"], capture_output=True)
+    if proc.stdout != b"":
+        return
+    git_config("user.email", "test_runner@example.com")
+    git_config("user.name", "Test Runner")
+    git_config("init.defaultBranch", "main")
+
+
+ensure_identity_exists()
+
 flds = ["Return code", "Standard out", "Standard err"]
 streams = ["stdin", "stderr"]
 

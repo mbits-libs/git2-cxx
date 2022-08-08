@@ -3,6 +3,7 @@
 import hashlib
 import json
 import os
+import shlex
 import subprocess
 import sys
 
@@ -11,6 +12,31 @@ def run(*args):
     p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = p.communicate()
     return (out, err, p.returncode)
+
+
+def print_lines(bytes, color):
+    lines = bytes.rstrip().decode("utf-8").split("\n")
+    if len(lines) > 0 and lines[-1] == "":
+        lines = lines[-1]
+    if len(lines):
+        print("\n".join(f"{color}{line}\033[m" for line in lines), file=sys.stderr)
+
+
+def print_run(ran):
+    out, err, returncode = ran
+    if os.name == "nt":
+        out = out.replace(b"\r\n", b"\n")
+        err = err.replace(b"\r\n", b"\n")
+    print_lines(out, "\033[0;49;90m")
+    if returncode:
+        print_lines(err, "\033[0;49;91m")
+        print(f"\033[2;49;91m> program ended with {returncode}\033[m", file=sys.stderr)
+
+
+def printed_run(*args):
+    result = run(*args)
+    print(shlex.join(args), file=sys.stderr)
+    print_run(result)
 
 
 def output(*args):
@@ -58,13 +84,13 @@ except KeyError:
     commit_list = []
 
 if commit_list:
-    run("git", "config", "core.fsmonitor", "false")
+    printed_run("git", "config", "core.fsmonitor", "false")
 
 for commit in commit_list:
     message = commit["message"]
     commit_files = commit["files"]
-    run("git", "add", *commit_files)
-    run("git", "commit", "-m", message)
+    printed_run("git", "add", *commit_files)
+    printed_run("git", "commit", "-m", message)
 
 report = {
     "git": {
