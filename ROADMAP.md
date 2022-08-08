@@ -46,10 +46,10 @@
     - [x] cobertura
     - [x] `cov report --amend`
     - [x] extract `make_u8path`/`get_u8path` to cov-rt
-  - [ ] external build id / tag
   - [ ] code cleanup
     - [ ] add documentation
     - [ ] `cov::sth_create` -> `cov::sth::create`
+    - [ ] drop &beta;
   - [ ] `cov log`
   - [ ] `cov show`
     - [ ] Report / component / directory view
@@ -67,6 +67,7 @@
   - [ ] Report / component / directory view
   - [ ] File view
 ---
+- [ ] External build id / tag?
 - [ ] Add report object cache
 - [ ] Highlight partial C++ strings
 - [ ] Add hilite for Python
