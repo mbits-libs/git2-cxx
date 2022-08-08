@@ -36,7 +36,7 @@
   - [x] Patch-worth:
     - [x] add win32 RC file _(0.12.1-beta)_
     - [x] merge/split .po files _(0.12.2-beta)_
-  - [ ] `cov report`
+  - [x] `cov report` _(0.13.0-beta)_
     - [x] update report-creation API
       - remove file builder
       - introduce report builder
@@ -44,13 +44,16 @@
     - [x] own format (either MD5 or SHA over the content, only commit and branch)
     - [x] coveralls
     - [x] cobertura
+    - [x] `cov report --amend`
     - [x] extract `make_u8path`/`get_u8path` to cov-rt
+  - [ ] external build id / tag
+  - [ ] code cleanup
+    - [ ] add documentation
     - [ ] `cov::sth_create` -> `cov::sth::create`
   - [ ] `cov log`
   - [ ] `cov show`
     - [ ] Report / component / directory view
     - [ ] File view
-  - [ ] `cov report --amend`
   - [ ] `cov tag` / `branch` / `checkout`
   - [ ] `cov remove`
   - [ ] Support for `less`

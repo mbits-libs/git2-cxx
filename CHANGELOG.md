@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) and [COMMITS.md](COMMITS.md) for commit guidelines.
 
+## [0.13.0-beta](https://github.com/mzdun/cov/compare/v0.12.4-beta...v0.13.0-beta) (2022-08-08)
+
+### New Features
+
+- **core**: add `report` to builtin commands ([49d4391](https://github.com/mzdun/cov/commit/49d4391b306bb8ca5959663157bf81c2ee60bfdd))
+- **api**: read and/or update current HEAD ([8e109a3](https://github.com/mzdun/cov/commit/8e109a3bf71fcbc39b53fc377ea3daae572a24f2))
+- **lang**: add strings for cov-report ([f429b99](https://github.com/mzdun/cov/commit/f429b9923cba374067bd9a427e43d5fa52e2b7e9))
+- **app**: remove copies of make_path from apps ([576f4a5](https://github.com/mzdun/cov/commit/576f4a51ec5580578526348a87af0f8dc177634d))
+- **api**: create null ref after dangling one ([1c3faf4](https://github.com/mzdun/cov/commit/1c3faf4ebaa0dcde57e9c988d2ea9aeefc656ac4))
+- **posix**: add filter runner ([482d505](https://github.com/mzdun/cov/commit/482d50595caf2977edfa2a6011a131a019beb006))
+- **win32**: add filter runner ([d924ae0](https://github.com/mzdun/cov/commit/d924ae01c39e431082f2373a093735956c46d694))
+- **rt**: expand line-to-hits map to v1 coverage ([eacf940](https://github.com/mzdun/cov/commit/eacf940495eda2827d24f29cc31a2993b67a0e92))
+- **core**: add filters for cobertura and coveralls ([da12beb](https://github.com/mzdun/cov/commit/da12beb49c5edbbf2b8c05787fc45b972c418041))
+- **rt**: load additional info from Git repo ([f4df01c](https://github.com/mzdun/cov/commit/f4df01cdac97cac9c2fd672d92c58272d79e6baf))
+- **rt**: read reports from JSON ([bfbb92d](https://github.com/mzdun/cov/commit/bfbb92dc5e9d681e6a06584e845cbc8a19cd1d88))
+- **rt**: setup code for reports ([5b8060e](https://github.com/mzdun/cov/commit/5b8060e3b023c431f4d63c6b0866c645e1d06d3d))
+- **api**: switch to `report_files_builder` ([c6f6d3e](https://github.com/mzdun/cov/commit/c6f6d3e9b72f7b04bc3c0beeb486c3c425531cfc))
+
+### Bug Fixes
+
+- **core**: simplify text output from filter ([0ddd14a](https://github.com/mzdun/cov/commit/0ddd14aed7778d12510af32c2d749f007dc1f665))
+- **rt**: report total lines in blobs/files ([5b2d0a1](https://github.com/mzdun/cov/commit/5b2d0a1ea2185273a538d624f1b7e5b3da467435))
+- **api**: simplify report entry ([864c596](https://github.com/mzdun/cov/commit/864c5967c1665c91c9d858fd0b5b17fa16e28c19))
+- **cmake**: switch winrc to new PO layout ([b6f1d01](https://github.com/mzdun/cov/commit/b6f1d01c96b58a94a9dfa8687a45dd5ac24bc56e))
+
 ## [0.12.4-beta](https://github.com/mzdun/cov/compare/v0.12.3-beta...v0.12.4-beta) (2022-08-04)
 
 ### Bug Fixes
