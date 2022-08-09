@@ -384,7 +384,12 @@ namespace cov::placeholder {
 		}
 	}  // namespace
 
-	iterator refs::format(iterator out, git_oid const* id, bool wrapped) const {
+	iterator refs::format(iterator out,
+	                      git_oid const* id,
+	                      bool wrapped,
+	                      bool magic_colors,
+	                      struct report_view const& view,
+	                      internal_context& ctx) const {
 		if (!id) return out;
 
 		char buffer[GIT_OID_HEXSZ + 1];
@@ -392,15 +397,24 @@ namespace cov::placeholder {
 		git_oid_fmt(buffer, id);
 		auto const hash = std::string_view{buffer, GIT_OID_HEXSZ};
 
+		auto const color_str = [&, this](iterator out_iter, color clr,
+		                                 std::string_view str) {
+			if (magic_colors) out_iter = view.format(out_iter, ctx, clr);
+			out_iter = format_str(out_iter, str);
+			if (magic_colors)
+				out_iter = view.format(out_iter, ctx, color::reset);
+			return out_iter;
+		};
+
 		bool first = true;
 		if (HEAD_ref == hash) {
 			first = false;
-			if (wrapped) out = format_str(out, " (");
+			if (wrapped) out = color_str(out, color::yellow, " ("sv);
 			if (HEAD.empty()) {
-				out = format_str(out, "HEAD"sv);
+				out = color_str(out, color::bold_cyan, "HEAD"sv);
 			} else {
-				out = format_str(out, "HEAD -> "sv);
-				out = format_str(out, HEAD);
+				out = color_str(out, color::bold_cyan, "HEAD -> "sv);
+				out = color_str(out, color::bold_green, HEAD);
 			}
 		}
 
@@ -408,26 +422,37 @@ namespace cov::placeholder {
 			if (value != hash) continue;
 			if (first) {
 				first = false;
-				if (wrapped) out = format_str(out, " (");
+				if (wrapped) out = color_str(out, color::yellow, " ("sv);
 			} else {
-				out = format_str(out, ", "sv);
+				out = color_str(out, color::yellow, ", "sv);
 			}
+			if (magic_colors) out = view.format(out, ctx, color::bold_yellow);
 			out = format_str(out, "tag: "sv);
 			out = format_str(out, key);
+			if (magic_colors) out = view.format(out, ctx, color::reset);
 		}
 
 		for (auto const& [key, value] : heads) {
 			if (value != hash) continue;
+			if (key == HEAD) continue;
 			if (first) {
 				first = false;
-				if (wrapped) out = format_str(out, " (");
+				if (wrapped) out = color_str(out, color::yellow, " ("sv);
 			} else {
-				out = format_str(out, ", "sv);
+				out = color_str(out, color::yellow, ", "sv);
 			}
-			out = format_str(out, key);
+			out = color_str(out, color::bold_green, key);
 		}
 
-		if (!first && wrapped) *out++ = ')';
+		if (!first && wrapped) {
+			if (magic_colors) {
+				out = view.format(out, ctx, color::yellow);
+				*out++ = ')';
+				out = view.format(out, ctx, color::reset);
+			} else {
+				*out++ = ')';
+			}
+		}
 
 		return out;
 	}
@@ -496,10 +521,22 @@ namespace cov::placeholder {
 				return format_hash(out, parent);
 			case report::parent_hash_abbr:
 				return format_hash(out, parent, ctx.client->hash_length);
+			case report::file_list_hash:
+				return format_hash(out, file_list);
+			case report::file_list_hash_abbr:
+				return format_hash(out, file_list, ctx.client->hash_length);
 			case report::ref_names:
-				return ctx.client->names.format(out, id, true);
+				return ctx.client->names.format(out, id, true, false, *this,
+				                                ctx);
 			case report::ref_names_unwrapped:
-				return ctx.client->names.format(out, id, false);
+				return ctx.client->names.format(out, id, false, false, *this,
+				                                ctx);
+			case report::magic_ref_names:
+				return ctx.client->names.format(out, id, true, true, *this,
+				                                ctx);
+			case report::magic_ref_names_unwrapped:
+				return ctx.client->names.format(out, id, false, true, *this,
+				                                ctx);
 			case report::branch:
 				return format_str(out, git.branch);
 			case report::lines_percent:
@@ -516,24 +553,33 @@ namespace cov::placeholder {
 		return out;  // GCOV_EXCL_LINE - all enums are handled above
 	}
 
+	static color mark_color(translatable mark,
+	                        color pass,
+	                        color incomplete,
+	                        color fail) {
+		return mark == cov::translatable::mark_failing      ? fail
+		       : mark == cov::translatable::mark_incomplete ? incomplete
+		                                                    : pass;
+	}
+
+#define MARK_COLOR(...)                                                        \
+	if (clr == color::__VA_ARGS__##rating)                                     \
+		clr = mark_color(mark, color::__VA_ARGS__##green,                      \
+		                 color::__VA_ARGS__##yellow, color::__VA_ARGS__##red); \
+	else
+
 	iterator report_view::format(iterator out,
 	                             internal_context& ctx,
 	                             color clr) const {
 		width_cleaner clean{ctx};
 		if (ctx.client->colorize) {
-			if (clr == color::rating || clr == color::bg_rating) {
+			if (clr == color::rating || clr == color::bold_rating ||
+			    clr == color::faint_rating || clr == color::bg_rating) {
 				auto const mark = apply_mark(*stats, ctx.client->marks);
-				if (clr == color::rating)
-					clr = mark == cov::translatable::mark_failing ? color::red
-					      : mark == cov::translatable::mark_incomplete
-					          ? color::yellow
-					          : color::green;
-				else
-					clr = mark == cov::translatable::mark_failing
-					          ? color::bg_red
-					      : mark == cov::translatable::mark_incomplete
-					          ? color::bg_yellow
-					          : color::bg_green;
+				MARK_COLOR()
+				MARK_COLOR(bold_)
+				MARK_COLOR(faint_)
+				MARK_COLOR(bg_) {}
 			}
 			out = format_str(
 			    out,
@@ -566,7 +612,9 @@ namespace cov {
 #define SIMPLE_FORMAT(CHAR, RESULT) \
 	case CHAR:                      \
 		++cur;                      \
-		return format { RESULT }
+		return format {             \
+			RESULT                  \
+		}
 #define DEEPER_FORMAT(CHAR, CB) \
 	case CHAR:                  \
 		++cur;                  \
@@ -653,8 +701,8 @@ namespace cov {
 				constexpr auto operator<=>(color_pair const& other) const =
 				    default;
 			};
-			static_assert(color_pair{"blue"sv, color::blue} < "cyan"sv);
-			static_assert("blue"sv < color_pair{"cyan"sv, color::cyan});
+			static_assert(color_pair{"faint blue"sv, color::blue} < "green"sv);
+			static_assert("cyan"sv < color_pair{"faint blue"sv, color::cyan});
 
 			static constexpr color_pair colors[] = {
 			    {"bg blue"sv, color::bg_blue},
@@ -665,16 +713,23 @@ namespace cov {
 			    {"bg red"sv, color::bg_red},
 			    {"bg yellow"sv, color::bg_yellow},
 			    {"blue"sv, color::blue},
-			    {"bold"sv, color::bold},
 			    {"bold blue"sv, color::bold_blue},
 			    {"bold cyan"sv, color::bold_cyan},
 			    {"bold green"sv, color::bold_green},
 			    {"bold magenta"sv, color::bold_magenta},
+			    {"bold normal"sv, color::bold_normal},
+			    {"bold rating"sv, color::bold_rating},
 			    {"bold red"sv, color::bold_red},
 			    {"bold yellow"sv, color::bold_yellow},
 			    {"cyan"sv, color::cyan},
-			    {"faint"sv, color::faint},
-			    {"faint italic"sv, color::faint_italic},
+			    {"faint blue"sv, color::faint_blue},
+			    {"faint cyan"sv, color::faint_cyan},
+			    {"faint green"sv, color::faint_green},
+			    {"faint magenta"sv, color::faint_magenta},
+			    {"faint normal"sv, color::faint_normal},
+			    {"faint rating"sv, color::faint_rating},
+			    {"faint red"sv, color::faint_red},
+			    {"faint yellow"sv, color::faint_yellow},
 			    {"green"sv, color::green},
 			    {"magenta"sv, color::magenta},
 			    {"normal"sv, color::normal},
@@ -786,6 +841,17 @@ namespace cov {
 			return placeholder::width{*total, *indent1, *indent2};
 		}
 		template <typename It>
+		std::optional<format> parse_magic(It& cur, It end) {
+			if (cur == end) return std::nullopt;
+
+			switch (*cur) {
+				SIMPLE_FORMAT('d', placeholder::report::magic_ref_names);
+				SIMPLE_FORMAT('D',
+				              placeholder::report::magic_ref_names_unwrapped);
+			}
+			return std::nullopt;
+		}
+		template <typename It>
 		std::optional<format> parse_hash(It& cur, It end) {
 			if (cur == end) return std::nullopt;
 
@@ -827,6 +893,8 @@ namespace cov {
 			switch (*cur) {
 				SIMPLE_FORMAT('P', placeholder::report::parent_hash);
 				SIMPLE_FORMAT('p', placeholder::report::parent_hash_abbr);
+				SIMPLE_FORMAT('F', placeholder::report::file_list_hash);
+				SIMPLE_FORMAT('f', placeholder::report::file_list_hash_abbr);
 				SIMPLE_FORMAT('D', placeholder::report::branch);
 				default: {
 					auto const person = parse_date(cur, end);
@@ -882,6 +950,7 @@ namespace cov {
 				DEEPER_FORMAT('x', parse_hex);
 				DEEPER_FORMAT('C', parse_color);
 				DEEPER_FORMAT('w', parse_width);
+				DEEPER_FORMAT('m', parse_magic);
 				SIMPLE_FORMAT('D', placeholder::report::ref_names_unwrapped);
 				SIMPLE_FORMAT('d', placeholder::report::ref_names);
 				SIMPLE_FORMAT('s', placeholder::commit::subject);
@@ -943,27 +1012,32 @@ namespace cov {
 		static constexpr std::string_view colors[] = {
 		    ""sv,            // color::normal
 		    "\033[m"sv,      // color::reset
-		    "\033[1m"sv,     // color::bold
 		    "\033[31m"sv,    // color::red
 		    "\033[32m"sv,    // color::green
 		    "\033[33m"sv,    // color::yellow
 		    "\033[34m"sv,    // color::blue
 		    "\033[35m"sv,    // color::magenta
 		    "\033[36m"sv,    // color::cyan
+		    "\033[1;37m"sv,  // color::bold_normal,
 		    "\033[1;31m"sv,  // color::bold_red
 		    "\033[1;32m"sv,  // color::bold_green
 		    "\033[1;33m"sv,  // color::bold_yellow
 		    "\033[1;34m"sv,  // color::bold_blue
 		    "\033[1;35m"sv,  // color::bold_magenta
 		    "\033[1;36m"sv,  // color::bold_cyan
+		    "\033[2;37m"sv,  // color::faint_normal,
+		    "\033[2;31m"sv,  // color::faint_red
+		    "\033[2;32m"sv,  // color::faint_green
+		    "\033[2;33m"sv,  // color::faint_yellow
+		    "\033[2;34m"sv,  // color::faint_blue
+		    "\033[2;35m"sv,  // color::faint_magenta
+		    "\033[2;36m"sv,  // color::faint_cyan
 		    "\033[41m"sv,    // color::bg_red
 		    "\033[42m"sv,    // color::bg_green
 		    "\033[43m"sv,    // color::bg_yellow
 		    "\033[44m"sv,    // color::bg_blue
 		    "\033[45m"sv,    // color::bg_magenta
 		    "\033[46m"sv,    // color::bg_cyan
-		    "\033[2m"sv,     // color::faint
-		    "\033[2;3m"sv,   // color::faint_italic
 		};
 		auto const index = static_cast<size_t>(clr);
 		auto const color =

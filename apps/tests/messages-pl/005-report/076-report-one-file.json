@@ -9,7 +9,7 @@
         [
             "\u001b[31m[main $REPORT]\u001b[m second",
             " jeden plik, \u001b[31m67%\u001b[m (2/3, -1)",
-            " \u001b[2mw oparciu o \u001b[33m384512442@main\u001b[m\n"
+            " \u001b[2;37mw oparciu o\u001b[m \u001b[2;33m384512442@main\u001b[m\n"
         ],
         "[ADD] src/main.cc\n"
     ],

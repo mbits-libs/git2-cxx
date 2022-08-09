@@ -122,7 +122,7 @@ namespace cov::testing {
 
 	static constexpr auto rating_tmplt =
 	    "%C(red)%hr%Creset%C(yellow)%d%Creset %C(bg rating) %pP %Creset "
-	    "%C(faint)%pC/%pR%Creset %C(rating)(%pr)%Creset - "
+	    "%C(faint normal)%pC/%pR%Creset %C(bold rating)(%pr)%Creset - "
 	    "%Cred[%hc@%rD]%Creset %s %Cblue<%an>%Creset %C(green)(committed %cr, "
 	    "added %rr)%C(reset)"sv;
 
@@ -140,7 +140,7 @@ namespace cov::testing {
 	            "[36109a1c3@develop] Subject, isn't it? <Johnny Appleseed> "
 	            "(committed 4 months ago, added 4 months ago)"sv,
 	            "\x1B[31m112233445\x1B[m\x1B[33m (HEAD, main)\x1B[m \x1B[42m "
-	            "100% \x1B[m \x1B[2m299/300\x1B[m \x1B[32m(pass)\x1B[m - "
+	            "100% \x1B[m \x1B[2;37m299/300\x1B[m \x1B[1;32m(pass)\x1B[m - "
 	            "\x1B[31m[36109a1c3@develop]\x1B[m Subject, isn't it? "
 	            "\x1B[34m<Johnny Appleseed>\x1B[m \x1B[32m(committed 4 months "
 	            "ago, added 4 months ago)\x1B[m"sv,
@@ -154,7 +154,8 @@ namespace cov::testing {
 	            "[36109a1c3@develop] Subject, isn't it? <Johnny Appleseed> "
 	            "(committed 4 months ago, added 4 months ago)"sv,
 	            "\x1B[31m112233445\x1B[m\x1B[33m (HEAD, main)\x1B[m \x1B[43m "
-	            "79% \x1B[m \x1B[2m790/1000\x1B[m \x1B[33m(incomplete)\x1B[m - "
+	            "79% \x1B[m \x1B[2;37m790/1000\x1B[m "
+	            "\x1B[1;33m(incomplete)\x1B[m - "
 	            "\x1B[31m[36109a1c3@develop]\x1B[m Subject, isn't it? "
 	            "\x1B[34m<Johnny Appleseed>\x1B[m \x1B[32m(committed 4 months "
 	            "ago, added 4 months ago)\x1B[m"sv,
@@ -169,7 +170,7 @@ namespace cov::testing {
 	            "[36109a1c3@develop] Subject, isn't it? <Johnny Appleseed> "
 	            "(committed 4 months ago, added 4 months ago)"sv,
 	            "\x1B[31m112233445\x1B[m\x1B[33m (HEAD, main)\x1B[m \x1B[41m "
-	            "50% \x1B[m \x1B[2m300/600\x1B[m \x1B[31m(fail)\x1B[m - "
+	            "50% \x1B[m \x1B[2;37m300/600\x1B[m \x1B[1;31m(fail)\x1B[m - "
 	            "\x1B[31m[36109a1c3@develop]\x1B[m Subject, isn't it? "
 	            "\x1B[34m<Johnny Appleseed>\x1B[m \x1B[32m(committed 4 months "
 	            "ago, added 4 months ago)\x1B[m"sv,

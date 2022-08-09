@@ -8,7 +8,7 @@
         [
             "\u001b[31m[main $REPORT]\u001b[m second",
             " one file, \u001b[31m67%\u001b[m (2/3, -1)",
-            " \u001b[2mbased on \u001b[33m384512442@main\u001b[m\n"
+            " \u001b[2;37mbased on\u001b[m \u001b[2;33m384512442@main\u001b[m\n"
         ],
         "[ADD] src/main.cc\n"
     ],

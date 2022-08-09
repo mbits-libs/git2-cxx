@@ -19,14 +19,33 @@
 |`%C(…​)`|color specification|
 |`%w([<w>[,<i1>[,<i2>]]])`|switch line wrapping, like the -w option of git-shortlog[1].|
 
+### Known colors
+
+If there is an ✔ beside a color, it means this color could be prefixed with either `bold`, `bg`, `faint`, giving for example `%C(red)`, `%C(bold green)`, `%C(bg yellow)` or `%C(faint blue)`. Color named `rating` maps to `green` for passing, `yellow` for incomplete or `red` for failing rating, with prefixes preserved.
+
+|color|allows prefixes|
+|:--:|:--:|
+|reset|✖|
+|normal|✔|
+|red|✔|
+|green|✔|
+|yellow|✔|
+|blue|✔|
+|magenta|✔|
+|cyan|✔|
+|rating|✔|
+
+
 ## Placeholders that expand to information extracted from the report
 
 |Placeholder|Meaning|
 |-|-|
 |`%Hr`|report hash|
 |`%hr`|abbreviated report hash|
-|`%rP`|report parent hashes|
-|`%rp`|abbreviated report parent hashes|
+|`%rP`|report parent hash|
+|`%rp`|abbreviated report parent hash|
+|`%rF`|report file list hash|
+|`%rf`|abbreviated report file list hash|
 |`%rD`|reported branch|
 |`%rd`|report date (format respects --date= option)|
 |`%rr`|report date, relative|
@@ -38,8 +57,11 @@
 |`%pT`|lines total|
 |`%pR`|lines relevant|
 |`%pC`|lines covered|
+|`%pr`|lines rating, either `pass`, `incomplete` or `fail`, depending on how report coverage compares to preset ratings (currently 90% for passing and 75% for incomplete)|
 |`%d`|ref names, like the --decorate option of git-log[1]|
 |`%D`|ref names without the " (", ")" wrapping.|
+|`%md`|ref names, each group colored separately, like the --decorate option of git-log[1]|
+|`%mD`|ref names without the " (", ")" wrapping, each group colored separately.|
 
 ## Placeholders that expand to information extracted from the commit
 

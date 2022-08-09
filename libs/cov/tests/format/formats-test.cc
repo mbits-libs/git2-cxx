@@ -29,6 +29,7 @@ namespace cov::testing {
 			sys_seconds commit{};
 			sys_seconds add{};
 			std::optional<ph::rating> marks{};
+			bool use_color{false};
 		} tweaks{};
 
 		friend std::ostream& operator<<(std::ostream& out,
@@ -39,7 +40,7 @@ namespace cov::testing {
 
 	class format : public TestWithParam<format_test> {
 	protected:
-		ph::context context(std::string const& head) {
+		ph::context context(std::string const& head, bool use_color) {
 			return {
 			    .now = now(),
 			    .hash_length = 9,
@@ -66,6 +67,7 @@ namespace cov::testing {
 			                 }},
 			            .HEAD_ref = "112233445566778899aabbccddeeff0012345678"s,
 			        },
+			    .colorize = use_color ? formatter::shell_colorize : nullptr,
 			};
 		}
 
@@ -75,15 +77,17 @@ namespace cov::testing {
 		    sys_seconds commit,
 		    sys_seconds add,
 		    std::optional<io::v1::coverage_stats> const& stats) const {
-			git_oid parent_id{}, commit_id{}, zero{};
+			git_oid parent_id{}, commit_id{}, files_id{};
 			git_oid_fromstr(&parent_id,
 			                "8765432100ffeeddccbbaa998877665544332211");
 			git_oid_fromstr(&commit_id,
 			                "36109a1c35e0d5cf3e5e68d896c8b1b4be565525");
+			git_oid_fromstr(&files_id,
+			                "7698a173c0f8b9c38bd853ba767c71df40b9f669");
 
 			io::v1::coverage_stats const default_stats{1250, 300, 299};
 			return report::create(
-			    id, parent_id, zero, commit_id, "develop"sv,
+			    id, parent_id, files_id, commit_id, "develop"sv,
 			    {"Johnny Appleseed"sv, "johnny@appleseed.com"sv},
 			    {"Johnny Committer"sv, "committer@appleseed.com"sv}, message,
 			    commit, add, stats.value_or(default_stats));
@@ -92,10 +96,11 @@ namespace cov::testing {
 
 	TEST_P(format, print) {
 		auto const& [_, tmplt, expected, tweaks] = GetParam();
-		auto const& [report_id, stats, head, commit, add, marks] = tweaks;
+		auto const& [report_id, stats, head, commit, add, marks, use_color] =
+		    tweaks;
 		auto fmt = formatter::from(tmplt);
 
-		ph::context ctx = context(head);
+		ph::context ctx = context(head, use_color);
 		if (marks) ctx.marks = *marks;
 		git_oid id{};
 		git_oid_fromstr(&id, report_id.empty()
@@ -137,10 +142,20 @@ namespace cov::testing {
 	    {
 	        "HEAD"sv,
 	        "%hr%d %pC/%pR %pP (%pr) - from [%hc] %s <%an>"sv,
-	        "112233445 (HEAD -> feat/task-1, tag: v1.0.1, feat/task-1) 299/300 "
+	        "112233445 (HEAD -> feat/task-1, tag: v1.0.1) 299/300 "
 	        "100% (pass) - from [36109a1c3] Subject, isn't it? <Johnny "
 	        "Appleseed>"sv,
 	        {.report = "112233445566778899aabbccddeeff0012345678"sv},
+	    },
+	    {
+	        "HEAD (magic colors)"sv,
+	        "%hr%md %pC/%pR %pP (%pr) - from [%hc] %s <%an>"sv,
+	        "112233445\x1B[33m (\x1B[m\x1B[1;36mHEAD -> "
+	        "\x1B[m\x1B[1;32mfeat/task-1\x1B[m\x1B[33m, \x1B[m\x1B[1;33mtag: "
+	        "v1.0.1\x1B[m\x1B[33m)\x1B[m 299/300 100% (pass) - from "
+	        "[36109a1c3] Subject, isn't it? <Johnny Appleseed>"sv,
+	        {.report = "112233445566778899aabbccddeeff0012345678"sv,
+	         .use_color = true},
 	    },
 	    {
 	        "detached HEAD"sv,
@@ -149,6 +164,17 @@ namespace cov::testing {
 	        "from [36109a1c3] Subject, isn't it? <Johnny Appleseed>"sv,
 	        {.report = "112233445566778899aabbccddeeff0012345678"sv,
 	         .head = ""s},
+	    },
+	    {
+	        "detached HEAD (magic colors)"sv,
+	        "%hr%md %pC/%pR %pP (%pr) - from [%hc] %s <%an>"sv,
+	        "112233445\x1B[33m (\x1B[m\x1B[1;36mHEAD\x1B[m\x1B[33m, "
+	        "\x1B[m\x1B[1;33mtag: v1.0.1\x1B[m\x1B[33m, "
+	        "\x1B[m\x1B[1;32mfeat/task-1\x1B[m\x1B[33m)\x1B[m 299/300 100% "
+	        "(pass) - from [36109a1c3] Subject, isn't it? <Johnny Appleseed>"sv,
+	        {.report = "112233445566778899aabbccddeeff0012345678"sv,
+	         .head = ""s,
+	         .use_color = true},
 	    },
 	    {
 	        "main"sv,
@@ -203,9 +229,8 @@ namespace cov::testing {
 	    {
 	        "HEAD (unwrapped)"sv,
 	        "%hr [%D] %pC/%pR %pP (%pr) - from [%hc] %s <%an>"sv,
-	        "112233445 [HEAD -> feat/task-1, tag: v1.0.1, feat/task-1] 299/300 "
-	        "100% (pass) - from [36109a1c3] Subject, isn't it? <Johnny "
-	        "Appleseed>"sv,
+	        "112233445 [HEAD -> feat/task-1, tag: v1.0.1] 299/300 100% (pass) "
+	        "- from [36109a1c3] Subject, isn't it? <Johnny Appleseed>"sv,
 	        {.report = "112233445566778899aabbccddeeff0012345678"sv},
 	    },
 	    {
@@ -233,6 +258,11 @@ namespace cov::testing {
 	         .stats = io::v1::coverage_stats{1250, 300, 100}},
 	    },
 	    {
+	        "file list (long and short)"sv,
+	        "%rF %rf"sv,
+	        "7698a173c0f8b9c38bd853ba767c71df40b9f669 7698a173c"sv,
+	    },
+	    {
 	        "export name"sv,
 	        "0001-%hr-%f.xml"sv,
 	        "0001-112233445-Subject-isn-t-it.xml"sv,
@@ -241,7 +271,7 @@ namespace cov::testing {
 	        "full body"sv,
 	        "%Hr%d %pC/%pR %pP (%pr) - from [%Hc] %s <%an %al %ae>%n%B"sv,
 	        "112233445566778899aabbccddeeff0012345678 (HEAD -> feat/task-1, "
-	        "tag: v1.0.1, feat/task-1) 299/300 100% (pass) - from "
+	        "tag: v1.0.1) 299/300 100% (pass) - from "
 	        "[36109a1c35e0d5cf3e5e68d896c8b1b4be565525] Subject, isn't it? "
 	        "<Johnny Appleseed johnny johnny@appleseed.com>\nSubject, isn't "
 	        "it?\n\nLorem ipsum dolor sit amet, consectetur adipiscing elit. "
@@ -351,7 +381,7 @@ namespace cov::testing {
 	TEST_F(format, long_line) {
 		auto fmt = formatter::from("%w(30)%b"sv);
 
-		ph::context ctx = context({});
+		ph::context ctx = context({}, false);
 		git_oid id{};
 		git_oid_fromstr(&id, "112233445566778899aabbccddeeff0012345678");
 		auto report = make_report(id,
@@ -373,7 +403,7 @@ This-line-is-too-long-to-be-properly-wrapped. However, this line is perfectly wr
 	TEST_F(format, starts_excatly_at_limit) {
 		auto fmt = formatter::from("%w(30, 5)%b"sv);
 
-		ph::context ctx = context({});
+		ph::context ctx = context({}, false);
 		git_oid id{};
 		git_oid_fromstr(&id, "112233445566778899aabbccddeeff0012345678");
 		auto report = make_report(id,
