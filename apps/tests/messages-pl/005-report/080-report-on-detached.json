@@ -4,7 +4,7 @@
     "patches": {
         "\u001b\\[0;49;90m\\[master [0-9a-fA-F]+\\] reported files\u001b\\[m": "\u001b[0;49;90m[master $COMMIT] reported files\u001b[m",
         "\u001b\\[31m\\[od\u0142\u0105czone HEAD [0-9a-fA-F]+\\]\u001b\\[m reported files": "\u001b[31m[od\u0142\u0105czone HEAD $REPORT]\u001b[m reported files",
-        " \u001b\\[2mw oparciu o \u001b\\[33m[0-9a-fA-F]+@main\u001b\\[m": " \u001b[2mw oparciu o \u001b[33m$HEAD@main\u001b[m",
+        " \u001b\\[2;37mw oparciu o\u001b\\[m \u001b\\[2;33m[0-9a-fA-F]+@main\u001b\\[m": " \u001b[2;37mw oparciu o\u001b[m \u001b[2;33m$HEAD@main\u001b[m",
         " rodzic [0-9a-fA-F]+": " rodzic $PARENT"
     },
     "expected": [
@@ -12,7 +12,7 @@
         [
             "\u001b[31m[od\u0142\u0105czone HEAD $REPORT]\u001b[m reported files",
             " 2 pliki, \u001b[33m86%\u001b[m (6/7, -1)",
-            " \u001b[2mw oparciu o \u001b[33m$HEAD@main\u001b[m",
+            " \u001b[2;37mw oparciu o\u001b[m \u001b[2;33m$HEAD@main\u001b[m",
             " rodzic $PARENT\n"
         ],
         [
