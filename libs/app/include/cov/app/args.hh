@@ -36,6 +36,9 @@ namespace cov::app {
 		                        Strings const& str) const {
 			error(ec, str, str);
 		}  // GCOV_EXCL_LINE[WIN32]
+		[[noreturn]] void error(std::error_code const& ec,
+		                        str::errors::Strings const&,
+		                        str::args::Strings const&) const;
 
 		template <typename Strings>
 		requires std::derived_from<Strings, str::errors::Strings> &&
@@ -51,9 +54,6 @@ namespace cov::app {
 		::args::parser parser_;
 
 	private:
-		[[noreturn]] void error(std::error_code const& ec,
-		                        str::errors::Strings const&,
-		                        str::args::Strings const&) const;
 		std::string message(std::error_code const& ec,
 		                    str::errors::Strings const&,
 		                    str::args::Strings const&) const;

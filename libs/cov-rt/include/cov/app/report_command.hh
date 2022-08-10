@@ -24,7 +24,7 @@ namespace cov::app::builtin::report {
 		       str::translator_open_info const& langs);
 
 		struct parse_results {
-			std::filesystem::path repo_path;
+			cov::repository repo{};
 			report_info report{};
 		};
 		parse_results parse();

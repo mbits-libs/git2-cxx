@@ -40,25 +40,9 @@ namespace cov::app::builtin::report {
 
 		parser_.parse();
 
-		std::error_code ec{};
-		auto const current_directory = current_path(ec);
-		// GCOV_EXCL_START
-		if (ec) {
-			[[unlikely]];
-			error(ec, tr_);
-		}
-		// GCOV_EXCL_STOP
+		parse_results result{open_here(*this, tr_)};
 
-		parse_results result{cov::discover_repository(current_directory, ec)};
-		if (ec)
-			error(tr_.format(args::lng::CANNOT_FIND_COV,
-			                 get_u8path(current_directory)));
-
-		auto const repo =
-		    cov::repository::open(platform::sys_root(), result.repo_path, ec);
-		if (ec) error(ec, tr_);
-
-		if (!result.report.load_from_text(report_contents(repo.git()))) {
+		if (!result.report.load_from_text(report_contents(result.repo.git()))) {
 			if (filter_) {
 				error(tr_.format(replng::ERROR_FILTERED_REPORT_ISSUES, report_,
 				                 *filter_));

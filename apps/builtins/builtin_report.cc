@@ -21,10 +21,9 @@ namespace cov::app::builtin::report {
 		using namespace str;
 		parser p{{tool, args},
 		         {platform::locale_dir(), ::lngs::system_locales()}};
-		auto [repo_path, report] = p.parse();
+		auto [repo, report] = p.parse();
 
 		std::error_code ec{};
-		auto repo = cov::repository::open(platform::sys_root(), repo_path, ec);
 		auto const commit = git_commit::load(repo.git(), report.git.head, ec);
 		if (ec) {
 			p.data_error(replng::ERROR_CANNOT_LOAD_COMMIT);
