@@ -2,6 +2,17 @@
 
 Coverage visualization system living in your git repository.
 
+## Revision names
+
+Names in Cov are largely simplified, compared to Git. They can be:
+
+- `<sha1>`, long or short
+- `<refname>`
+- `<rev>^0`, `<rev>^1` or `<rev>^`, meaning either the report itself, or it's parent.
+- `<rev>~[<n>]`, where `<rev>~3` means `<rev>^^^`.
+
+If a command allows a range, either `..<rev>`, `<rev>..` or `<rev>..<rev>` (but not `..`) is allowed. In case of missing edge, `HEAD` is used.
+
 ## Commands
 
 - **Setup and Config**: config, module, ~~help~~ \
@@ -53,4 +64,7 @@ Coverage visualization system living in your git repository.
 
 - **Branches and Tags** _(soon)_: branch, checkout, log, tag
 
-- **Inspection and Comparison** _(soon)_: show, log, serve
+- **Inspection and Comparison**: log, show  _(soon)_, serve  _(soon)_\
+  `cov log [-h] [<options>] [<revision-range>|<revision>]`
+
+  Lists all reports reachable from **\<revision>**. Alternatively, lists all reports reachable from right side to **\<revision-range>**, but not reachable from left side.
