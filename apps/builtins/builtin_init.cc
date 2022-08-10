@@ -6,7 +6,7 @@
 #include <cov/app/cov_init_tr.hh>
 #include <cov/app/errors_tr.hh>
 #include <cov/app/path.hh>
-#include <cov/app/tools.hh>
+#include <cov/app/rt_path.hh>
 #include <cov/repository.hh>
 #include <git2/repository.hh>
 
@@ -146,7 +146,7 @@ namespace cov::app::builtin::init {
 	int handle(std::string_view tool, args::arglist args) {
 		using namespace str;
 		parser p{{tool, args},
-		         {tools::get_locale_dir(), ::lngs::system_locales()}};
+		         {platform::locale_dir(), ::lngs::system_locales()}};
 		auto const [git_dir, directory, flags] = p.parse();
 
 		std::error_code ec{};

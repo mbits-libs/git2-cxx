@@ -5,6 +5,7 @@
 #include <cov/app/dirs.hh>
 #include <cov/app/path.hh>
 #include <cov/app/root_command.hh>
+#include <cov/app/rt_path.hh>
 #include <cov/app/tr.hh>
 #include <cov/version.hh>
 

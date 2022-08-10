@@ -85,35 +85,6 @@ namespace cov::app {
 		return sysroot;
 	}  // GCOV_EXCL_LINE
 
-	std::filesystem::path tools::get_locale_dir() {
-		static constexpr auto locale = "locale"sv;
-
-		std::error_code ec{};
-
-		auto locale_dir = platform::exec_path();
-		if (!locale_dir.empty()) {
-			locale_dir = locale_dir.parent_path().parent_path() /
-			             directory_info::share / locale;
-			ec.clear();
-			if (!is_directory(locale_dir, ec) || ec) {
-				[[unlikely]];        // GCOV_EXCL_LINE
-				locale_dir.clear();  // GCOV_EXCL_LINE
-			}
-		}
-
-		if (locale_dir.empty()) {
-			// GCOV_EXCL_START
-			[[unlikely]];
-			locale_dir =
-			    path{directory_info::prefix} / directory_info::share / locale;
-			ec.clear();
-			if (!is_directory(locale_dir, ec) || ec) locale_dir.clear();
-			// GCOV_EXCL_STOP
-		}
-
-		return locale_dir;
-	}  // GCOV_EXCL_LINE
-
 	git::config tools::cautiously_open_config(
 	    std::filesystem::path const& sysroot,
 	    std::filesystem::path const& current_directory) {
@@ -278,12 +249,4 @@ namespace cov::app {
 		result.merge(app::list_tools(*this, groups, sysroot));
 		return result;
 	}
-
-	namespace platform {
-		std::filesystem::path const& sys_root() {
-			// dirname / ..
-			static auto const root = exec_path().parent_path().parent_path();
-			return root;
-		}
-	}  // namespace platform
 }  // namespace cov::app

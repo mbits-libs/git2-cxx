@@ -3,6 +3,7 @@
 
 #include <cov/app/path.hh>
 #include <cov/app/report_command.hh>
+#include <cov/app/rt_path.hh>
 #include <cov/app/tools.hh>
 #include <cov/format.hh>
 #include <cov/io/file.hh>

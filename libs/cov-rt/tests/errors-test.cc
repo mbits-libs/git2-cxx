@@ -6,6 +6,7 @@
 #include <cov/app/args.hh>
 #include <cov/app/errors_tr.hh>
 #include <cov/app/tools.hh>
+#include <cov/app/rt_path.hh>
 #include <git2/error.hh>
 #include <git2/global.hh>
 
