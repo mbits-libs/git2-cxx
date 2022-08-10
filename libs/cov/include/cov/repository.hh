@@ -84,6 +84,9 @@ namespace cov {
 	};
 
 	struct repository {
+		repository();
+		repository(repository&&);
+		repository& operator=(repository&&);
 		~repository();
 
 		static std::filesystem::path discover(
@@ -160,7 +163,6 @@ namespace cov {
 		        file_diff::initial_with_self) const;
 
 	protected:
-		repository();
 		explicit repository(std::filesystem::path const& sysroot,
 		                    std::filesystem::path const& common,
 		                    std::error_code&);

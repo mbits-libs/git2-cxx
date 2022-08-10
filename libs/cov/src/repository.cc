@@ -82,6 +82,8 @@ namespace cov {
 	}
 
 	repository::repository() = default;
+	repository::repository(repository&&) = default;
+	repository& repository::operator=(repository&&) = default;
 	repository::~repository() = default;
 
 	repository::repository(std::filesystem::path const& sysroot,
