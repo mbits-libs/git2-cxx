@@ -7,7 +7,7 @@
 #include <cov/app/args.hh>
 #include <cov/app/cov_module_tr.hh>
 #include <cov/app/errors_tr.hh>
-#include <cov/app/tools.hh>
+#include <cov/app/rt_path.hh>
 
 namespace cov::app::builtin::module {
 	using namespace app::module;
@@ -34,7 +34,7 @@ namespace cov::app::builtin::module {
 	int handle(std::string_view tool, args::arglist args) {
 		using namespace str;
 		parser p{{tool, args},
-		         {tools::get_locale_dir(), ::lngs::system_locales()}};
+		         {platform::locale_dir(), ::lngs::system_locales()}};
 		p.parse();
 		git::repository git_repo = p.open_repo();
 		ref_ptr<modules> mods;

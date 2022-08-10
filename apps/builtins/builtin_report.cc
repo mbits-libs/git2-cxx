@@ -8,10 +8,9 @@
 #include <cov/app/errors_tr.hh>
 #include <cov/app/path.hh>
 #include <cov/app/report.hh>
-#include <cov/app/tools.hh>
-#include <cov/io/file.hh>
-
 #include <cov/app/report_command.hh>
+#include <cov/app/rt_path.hh>
+#include <cov/io/file.hh>
 
 namespace cov::app::builtin::report {
 	using namespace app::report;
@@ -21,7 +20,7 @@ namespace cov::app::builtin::report {
 	int handle(std::string_view tool, args::arglist args) {
 		using namespace str;
 		parser p{{tool, args},
-		         {tools::get_locale_dir(), ::lngs::system_locales()}};
+		         {platform::locale_dir(), ::lngs::system_locales()}};
 		auto [repo_path, report] = p.parse();
 
 		std::error_code ec{};

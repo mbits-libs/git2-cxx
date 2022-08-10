@@ -3,7 +3,7 @@
 
 #include <args/parser.hpp>
 #include <cov/app/root_command.hh>
-#include <cov/app/tools.hh>
+#include <cov/app/rt_path.hh>
 #include <cov/builtins.hh>
 
 int tool(args::args_view const& arguments) {
@@ -11,7 +11,7 @@ int tool(args::args_view const& arguments) {
 
 	root::parser parser{arguments,
 	                    builtin::tools,
-	                    {tools::get_locale_dir(), ::lngs::system_locales()}};
+	                    {platform::locale_dir(), ::lngs::system_locales()}};
 	auto [tool, args] = parser.parse();
 
 	std::string aliased_tool{};

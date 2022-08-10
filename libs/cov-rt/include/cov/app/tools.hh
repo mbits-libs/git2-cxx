@@ -25,7 +25,6 @@ namespace cov::app {
 		    : cfg_{std::move(cfg)}, builtins_{builtins} {}
 
 		static std::filesystem::path get_sysroot();
-		static std::filesystem::path get_locale_dir();
 		static git::config cautiously_open_config(
 		    std::filesystem::path const& sysroot,
 		    std::filesystem::path const& current_directory);
@@ -65,7 +64,5 @@ namespace cov::app {
 		                           std::filesystem::path const& cwd,
 		                           std::string_view filter,
 		                           std::vector<std::byte> const& input);
-
-		std::filesystem::path const& sys_root();
 	}  // namespace platform
 }  // namespace cov::app

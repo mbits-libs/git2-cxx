@@ -4,6 +4,7 @@ set(SOURCES
   src/report_command.cc
   src/report.cc
   src/root_command.cc
+  src/rt_path.cc
   src/split_command.cc
   src/tools.cc
 
@@ -18,6 +19,7 @@ set(SOURCES
   include/cov/app/report_command.hh
   include/cov/app/report.hh
   include/cov/app/root_command.hh
+  include/cov/app/rt_path.hh
   include/cov/app/split_command.hh
   include/cov/app/tools.hh
 )

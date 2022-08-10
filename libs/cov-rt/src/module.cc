@@ -4,6 +4,7 @@
 #include <git2/revparse.h>
 #include <cov/app/module.hh>
 #include <cov/app/path.hh>
+#include <cov/app/rt_path.hh>
 #include <cov/app/tools.hh>
 #include <cov/repository.hh>
 
