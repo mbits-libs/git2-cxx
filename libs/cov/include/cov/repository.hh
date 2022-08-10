@@ -134,6 +134,9 @@ namespace cov {
 		bool update_current_head(git_oid const& ref,
 		                         current_head_type const& known) const;
 		ref_ptr<object> dwim(std::string_view) const;
+		ref_ptr<object> find_partial(std::string_view partial) const;
+		ref_ptr<object> find_partial(git_oid const& in,
+		                             size_t character_count) const;
 		template <typename Object>
 		ref_ptr<Object> lookup(git_oid const& id, std::error_code& ec) const {
 			return as_a<Object>(lookup_object(id, ec));
