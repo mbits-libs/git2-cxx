@@ -968,6 +968,34 @@ namespace cov {
 		}
 	}  // namespace parser
 
+	struct tz_visitor {
+		bool operator()(char) { return false; }
+
+		bool operator()(std::string const&) { return false; }
+
+		bool operator()(placeholder::person_info const& pair) {
+			using placeholder::person;
+			switch (pair.second) {
+				case person::date:
+				case person::date_iso_like:
+				case person::date_iso_strict:
+				case person::date_short:
+					return true;
+				default:
+					return false;
+			}
+		}
+		bool operator()(auto) { return false; }
+		bool operator()(placeholder::width const&) { return false; }
+	};
+
+	formatter::formatter(std::vector<placeholder::format>&& format)
+	    : format_{std::move(format)} {
+		needs_timezones_ = false;
+		for (auto const& fmt : format_)
+			needs_timezones_ |= std::visit(tz_visitor{}, fmt);
+	}
+
 	formatter formatter::from(std::string_view input) {
 		std::vector<placeholder::format> fmts{};
 		auto cur = input.begin();
@@ -998,8 +1026,10 @@ namespace cov {
 		    .app = ctx.app,
 		    .tr = ctx.translate ? ctx.translate
 		                        : placeholder::default_relative_date,
-		    .tz = ctx.time_zone.empty() ? date::current_zone()
-		                                : date::locate_zone(ctx.time_zone),
+		    .tz = needs_timezones_ ? ctx.time_zone.empty()
+		                               ? date::current_zone()
+		                               : date::locate_zone(ctx.time_zone)
+		                         : nullptr,
 		};
 
 		for (auto const& fmt : format_)
