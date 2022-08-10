@@ -145,6 +145,18 @@ namespace cov {
 		return ref;
 	}
 
+	ref_ptr<object> repository::find_partial(std::string_view partial) const {
+		git_oid oid{};
+		auto const length = (std::min)(partial.size(), size_t{GIT_OID_HEXSZ});
+		if (git_oid_fromstrn(&oid, partial.data(), length)) return {};
+		return find_partial(oid, length);
+	}
+
+	ref_ptr<object> repository::find_partial(git_oid const& in,
+	                                         size_t character_count) const {
+		return db_->lookup<object>(in, character_count);
+	}
+
 	ref_ptr<object> repository::lookup_object(git_oid const& id,
 	                                          std::error_code& ec) const {
 		if (auto report = db_->lookup_object(id)) return report;
