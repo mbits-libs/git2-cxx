@@ -4,6 +4,7 @@ set(BUILTINS
     config
     module
     report
+    log
 )
 
 set(REPORT_FILTERS
