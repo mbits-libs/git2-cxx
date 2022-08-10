@@ -254,8 +254,7 @@ namespace cov::placeholder {
 namespace cov {
 	class formatter {
 	public:
-		explicit formatter(std::vector<placeholder::format>&& format)
-		    : format_{std::move(format)} {}
+		explicit formatter(std::vector<placeholder::format>&& format);
 
 		static formatter from(std::string_view input);
 
@@ -270,5 +269,6 @@ namespace cov {
 
 	private:
 		std::vector<placeholder::format> format_{};
+		bool needs_timezones_{true};
 	};
 }  // namespace cov
