@@ -1,6 +1,9 @@
 configure_file(src/version.in.hh ${CMAKE_CURRENT_BINARY_DIR}/include/cov/version.hh @ONLY)
 
 set(SOURCES
+  src/format/defaults.cc
+  src/format/parser.cc
+  src/format/formatter.cc
   src/hash/md5.cc
   src/hash/sha1.cc
   src/io/db_object-error.cc
@@ -21,7 +24,6 @@ set(SOURCES
   src/counted.cc
   src/db.cc
   src/discover.cc
-  src/format.cc
   src/init.cc
   src/module_config.cc
   src/module.cc

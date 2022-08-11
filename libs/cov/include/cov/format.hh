@@ -11,6 +11,10 @@
 #include <vector>
 
 namespace cov {
+	struct repository;
+
+	enum class use_color { no, yes, automatic };
+
 	enum translatable {
 		in_the_future,
 		seconds_ago,
@@ -156,6 +160,8 @@ namespace cov::placeholder {
 		                         translatable scale,
 		                         void* app) = {};
 		std::string (*colorize)(color, void* app) = {};
+
+		static context from(cov::repository const&, use_color);
 	};
 
 	struct git_person {
@@ -257,7 +263,6 @@ namespace cov {
 		explicit formatter(std::vector<placeholder::format>&& format);
 
 		static formatter from(std::string_view input);
-
 		static std::string shell_colorize(placeholder::color, void*);
 
 		std::string format(placeholder::report_view const&,
@@ -268,6 +273,10 @@ namespace cov {
 		}
 
 	private:
+		static std::string no_translation(long long count,
+		                                  translatable scale,
+		                                  void*);
+
 		std::vector<placeholder::format> format_{};
 		bool needs_timezones_{true};
 	};
