@@ -4,6 +4,7 @@
 #pragma once
 #include <cov/reference.hh>
 #include <cov/report.hh>
+#include <cov/format_args.hh>
 #include <map>
 #include <string>
 #include <utility>
@@ -12,8 +13,6 @@
 
 namespace cov {
 	struct repository;
-
-	enum class use_color { no, yes, automatic };
 
 	enum translatable {
 		in_the_future,
@@ -160,8 +159,11 @@ namespace cov::placeholder {
 		                         translatable scale,
 		                         void* app) = {};
 		std::string (*colorize)(color, void* app) = {};
+		bool decorate{false};
 
-		static context from(cov::repository const&, use_color);
+		static context from(cov::repository const&,
+		                    color_feature clr,
+		                    decorate_feature decorate);
 	};
 
 	struct git_person {
