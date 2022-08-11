@@ -345,7 +345,7 @@ namespace cov::placeholder {
 	                      bool magic_colors,
 	                      struct report_view const& view,
 	                      internal_context& ctx) const {
-		if (!id) return out;
+		if (!id || !ctx.client->decorate) return out;
 
 		char buffer[GIT_OID_HEXSZ + 1];
 		buffer[GIT_OID_HEXSZ] = 0;

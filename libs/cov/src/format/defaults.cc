@@ -163,19 +163,26 @@ namespace cov {
 			};
 		}  // namespace
 
-		context context::from(cov::repository const& repo, use_color clr) {
-			if (clr == use_color::automatic) {
-				clr = is_terminal(stdout) ? use_color::yes : use_color::no;
+		context context::from(cov::repository const& repo,
+		                      color_feature clr,
+		                      decorate_feature decorate) {
+			if (clr == use_feature::automatic) {
+				clr = is_terminal(stdout) ? use_feature::yes : use_feature::no;
+			}
+
+			if (decorate == use_feature::automatic) {
+				decorate = is_terminal(stdout) ? use_feature::yes : use_feature::no;
 			}
 
 			using namespace std::chrono;
 			std::string (*colorize)(color, void* app) =
-			    clr == use_color::yes ? formatter::shell_colorize : nullptr;
+			    clr == use_feature::yes ? formatter::shell_colorize : nullptr;
 			return {.now = floor<seconds>(system_clock::now()),
 			        .hash_length = 9,
 			        .names = names_from(repo),
 			        .marks = rating_from(repo),
-			        .colorize = colorize};
+			        .colorize = colorize,
+			        .decorate = decorate == use_feature::yes};
 		}
 	}  // namespace placeholder
 

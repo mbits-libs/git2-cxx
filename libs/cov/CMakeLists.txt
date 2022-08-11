@@ -49,6 +49,7 @@ set(SOURCES
   include/cov/counted.hh
   include/cov/db.hh
   include/cov/discover.hh
+  include/cov/format_args.hh
   include/cov/format.hh
   include/cov/init.hh
   include/cov/module.hh
@@ -92,7 +93,7 @@ if (COV_TESTING)
   set_target_properties(cov-test cov-stress-test PROPERTIES FOLDER tests)
 
   target_compile_options(cov-test PRIVATE ${ADDITIONAL_WALL_FLAGS})
-  target_link_libraries(cov-test PRIVATE cov-api testing-lib)
+  target_link_libraries(cov-test PRIVATE cov-api testing-lib mbits::args)
   target_include_directories(cov-test
     PRIVATE
       ${CMAKE_CURRENT_SOURCE_DIR}/tests
