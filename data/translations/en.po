@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cov latest\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-07 21:21+0200\n"
-"PO-Revision-Date: 2022-08-07 21:22+0200\n"
+"POT-Creation-Date: 2022-08-11 20:58+0200\n"
+"PO-Revision-Date: 2022-08-11 21:00+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: en\n"
@@ -634,3 +634,82 @@ msgstr "entry is not unique due to being a multivar"
 msgctxt "errors.DOMAIN_ERROR_MSG"
 msgid "{0}: {1} error: {2}"
 msgstr "{0}: {1} error: {2}"
+
+#. Relative time, no more than few days ago
+msgctxt "log_format.DAYS_AGO"
+msgid "one day ago"
+msgid_plural "{} days ago"
+msgstr[0] "one day ago"
+msgstr[1] "{} days ago"
+
+#. Relative time, no more than few hours ago
+msgctxt "log_format.HOURS_AGO"
+msgid "one hour ago"
+msgid_plural "{} hours ago"
+msgstr[0] "one hour ago"
+msgstr[1] "{} hours ago"
+
+#. Relative time, timestamp in future compared with 'now'.
+msgctxt "log_format.IN_THE_FUTURE"
+msgid "in the future"
+msgstr "in the future"
+
+#. Result of location coverage below the "incomplete" mark
+msgctxt "log_format.MARK_FAILING"
+msgid "fail"
+msgstr "fail"
+
+#. Result of location coverage above the "incomplete" and below the "pass"
+#. mark
+msgctxt "log_format.MARK_INCOMPLETE"
+msgid "incomplete"
+msgstr "incomplete"
+
+#. Result of location coverage above the "pass" mark
+msgctxt "log_format.MARK_PASSING"
+msgid "pass"
+msgstr "pass"
+
+#. Relative time, no more than few minutes ago
+msgctxt "log_format.MINUTES_AGO"
+msgid "one minute ago"
+msgid_plural "{} minutes ago"
+msgstr[0] "one minute ago"
+msgstr[1] "{} minutes ago"
+
+#. Relative time, no more than few months ago
+msgctxt "log_format.MONTHS_AGO"
+msgid "one month ago"
+msgid_plural "{} months ago"
+msgstr[0] "one month ago"
+msgstr[1] "{} months ago"
+
+#. Relative time, no more than few seconds ago
+msgctxt "log_format.SECONDS_AGO"
+msgid "one second ago"
+msgid_plural "{} seconds ago"
+msgstr[0] "one second ago"
+msgstr[1] "{} seconds ago"
+
+#. Relative time, no more than few weeks ago
+msgctxt "log_format.WEEKS_AGO"
+msgid "one week ago"
+msgid_plural "{} weeks ago"
+msgstr[0] "one week ago"
+msgstr[1] "{} weeks ago"
+
+#. Relative time, longer than 5 years, or longer than 12 months, by whole
+#. years
+msgctxt "log_format.YEARS_AGO"
+msgid "one year ago"
+msgid_plural "{} years ago"
+msgstr[0] "one year ago"
+msgstr[1] "{} years ago"
+
+#. Relative time, no more than few 5 years, no less than a years ago;
+#. concatented with log_format.MONTHS_AGO to create 'X years, Y months ago'
+msgctxt "log_format.YEARS_MONTHS_AGO"
+msgid "one year,"
+msgid_plural "{} years,"
+msgstr[0] "one year,"
+msgstr[1] "{} years,"

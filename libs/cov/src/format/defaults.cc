@@ -281,7 +281,7 @@ namespace cov {
 			case translatable::months_ago:
 				return default_tr(count, "one month ago"sv, "{} months ago"sv);
 			case translatable::years_months_ago:
-				return default_tr(count, "one years, "sv, "{} years, "sv);
+				return default_tr(count, "one year,"sv, "{} years,"sv);
 			case translatable::years_ago:
 				return default_tr(count, "one year ago"sv, "{} years ago"sv);
 			case translatable::mark_failing:
