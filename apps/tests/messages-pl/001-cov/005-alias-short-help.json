@@ -4,7 +4,7 @@
     "expected": [
         0,
         "",
-        "'second' jest aliasem 'third -B'"
+        "\u201esecond\u201d jest aliasem \u201ethird -B\u201d"
     ],
     "prepare": [
         "cd '$DATA'",
