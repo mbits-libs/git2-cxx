@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: cov latest\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-08-11 20:58+0200\n"
-"PO-Revision-Date: 2022-08-11 21:06+0200\n"
+"PO-Revision-Date: 2022-08-12 20:41+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: pl\n"
@@ -164,17 +164,17 @@ msgstr "Cov dla Windows"
 #. Error message for alias, which is not properly created
 msgctxt "cov.ERROR_ALIAS"
 msgid "empty alias for '{}'"
-msgstr "pusty alias dla '{}'"
+msgstr "pusty alias dla „{}”"
 
 #. Error mesage for a tool, which was not recognized
 msgctxt "cov.ERROR_TOOL_NOT_RECOGNIZED"
 msgid "\"{}\" is not a cov command"
-msgstr "\"{}\" nie jest poleceniem cov"
+msgstr "„{}” nie jest poleceniem cov"
 
 #. Answer for --help option for alias tool
 msgctxt "cov.HELP_ALIAS"
 msgid "'{}' is aliased to '{}'"
-msgstr "'{}' jest aliasem '{}'"
+msgstr "„{}” jest aliasem „{}”"
 
 #. Description for the add tool
 msgctxt "cov.HELP_DESCRIPTION_ADD"
@@ -396,6 +396,90 @@ msgstr "Ponownie zainicjowano puste repozytorium Cov w {0}"
 msgctxt "cov_init.USING_GIT"
 msgid "Using Git repository in {0}"
 msgstr "Używając repozytorium Git w {0}"
+
+#. Description for --abbrev-hash argument
+msgctxt "cov_log.ABBREV_HASH_DESCRIPTION"
+msgid ""
+"instead of showing the full 40-byte hexadecimal report object name, shows a "
+"prefix that names the objects uniquely"
+msgstr ""
+"zamiast wyświetlać pełną 40-bajtową szesnastkową nazwę obiektu raportu, "
+"pokazuje prefiks, który nazywa obiekty jednoznacznie"
+
+#. Description for --format argument
+msgctxt "cov_log.FORMAT_DESCRIPTION"
+msgid ""
+"pretty-prints the contents of the report logs in a given format, where <format> "
+"can be one of 'oneline', 'short', 'medium', 'full', 'fuller', 'reference', 'raw' "
+"and 'pretty:<string>'; when <format> is none of the above, and has %placeholder in "
+"it, it acts as if --format=pretty:<format> were given"
+msgstr ""
+"wyświetla zawartość dzienników raportu w danym formacie, gdzie <format> może "
+"być jednym z „oneline”, „short”, „medium”, „full”, „fuller”, „reference”, "
+"„raw” i „pretty:<string>”; gdy <format> nie jest żadnym z powyższych i "
+"zawiera %symbol zastępczy, działa tak, jakby zostało wywołane --"
+"format=pretty:<format>"
+
+#. Name of --format argument
+msgctxt "cov_log.FORMAT_META"
+msgid "<format>"
+msgstr "<format>"
+
+#. Description for --decorate argument
+msgctxt "cov_log.HOW_DESCRIPTION"
+msgid ""
+"prints out ref names of any reports that are shown; <how> is 'short', "
+"'auto', or 'no'"
+msgstr ""
+"drukuje referencje wyświetlanych raportów; <jak> jest jednym z "
+"„short” (krótkie), „auto” lub „no” (nie)"
+
+#. Name of --decorate argument
+msgctxt "cov_log.HOW_META"
+msgid "<how>"
+msgstr "<jak>"
+
+#. Description for -n/--max-count argument
+msgctxt "cov_log.MAX_COUNT_DESCRIPTION"
+msgid "limits the number of reports to output"
+msgstr "ogranicza liczbę raportów do wydrukowania"
+
+#. Description for --no-abbrev-hash argument
+msgctxt "cov_log.NO_ABBREV_HASH_DESCRIPTION"
+msgid "shows the full 40-byte hexadecimal report object name"
+msgstr "pokazuje pełną 40-bajtową szesnastkową nazwę obiektu raportu"
+
+#. Name of a number argument
+msgctxt "cov_log.NUMBER_META"
+msgid "<number>"
+msgstr "<liczba>"
+
+#. Description for --oneline argument
+msgctxt "cov_log.ONELINE_DESCRIPTION"
+msgid "a shorthand for \"--format=oneline --abbrev-hash\" used together"
+msgstr "skrót  użytych jednocześnie \"--format=oneline --abbrev-hash\""
+
+#. Description for log and show target argument
+msgctxt "cov_log.REV_RANGE_DESCRIPTION"
+msgid "shows only reports in the specified revision range"
+msgstr "pokazuje tylko raporty z określonego zakresu rewizji"
+
+#. Name of positional argument of cov log
+msgctxt "cov_log.REV_RANGE_META"
+msgid "<revision-range>"
+msgstr "<zakres-rewizji>"
+
+#. Description for --color argument
+msgctxt "cov_log.WHEN_DESCRIPTION"
+msgid "uses color in output; <when> is 'never', 'always', or 'auto'"
+msgstr ""
+"używa koloru na wyjściu; <kiedy> jest jednym z „never” (nigdy), "
+"„always” (zawsze) lub „auto”"
+
+#. Name of --color argument
+msgctxt "cov_log.WHEN_META"
+msgid "<when>"
+msgstr "<kiedy>"
 
 #. Description for the --add argument
 msgctxt "cov_module.ADD_DESCRIPTION"
