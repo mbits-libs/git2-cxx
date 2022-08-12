@@ -303,6 +303,7 @@ namespace cov::placeholder {
 				if (months) {
 					auto yrs =
 					    ctx.translate(years, translatable::years_months_ago)
+					        .append(" ")
 					        .append(ctx.translate(months,
 					                              translatable::months_ago));
 					return yrs;

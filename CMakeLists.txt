@@ -17,6 +17,7 @@ set(STRINGS
   args
   cov
   errors
+  log_format
   cov_init
   cov_config
   cov_module
