@@ -22,6 +22,7 @@ set(STRINGS
   cov_config
   cov_module
   cov_report
+  cov_log
 )
 set(LANGUAGES pl en)
 
