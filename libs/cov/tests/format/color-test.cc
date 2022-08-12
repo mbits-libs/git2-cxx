@@ -72,6 +72,7 @@ namespace cov::testing {
 		                       "112233445566778899aabbccddeeff0012345678"s},
 		                  },
 		              .HEAD_ref = "112233445566778899aabbccddeeff0012345678"s},
+		    .decorate = true,
 		};
 
 		git_oid id{};
@@ -139,8 +140,8 @@ namespace cov::testing {
 	            "112233445 (HEAD, main)  100%  299/300 (pass) - "
 	            "[36109a1c3@develop] Subject, isn't it? <Johnny Appleseed> "
 	            "(committed 4 months ago, added 4 months ago)"sv,
-	            "\x1B[31m112233445\x1B[m\x1B[33m (HEAD, main)\x1B[m \x1B[42m "
-	            "100% \x1B[m \x1B[2;37m299/300\x1B[m \x1B[1;32m(pass)\x1B[m - "
+	            "\x1B[31m112233445\x1B[m\x1B[33m\x1B[m \x1B[42m 100% \x1B[m "
+	            "\x1B[2;37m299/300\x1B[m \x1B[1;32m(pass)\x1B[m - "
 	            "\x1B[31m[36109a1c3@develop]\x1B[m Subject, isn't it? "
 	            "\x1B[34m<Johnny Appleseed>\x1B[m \x1B[32m(committed 4 months "
 	            "ago, added 4 months ago)\x1B[m"sv,
@@ -150,12 +151,11 @@ namespace cov::testing {
 	        "Rating: incomplete"sv,
 	        rating_tmplt,
 	        {
-	            "112233445 (HEAD, main)  79%  790/1000 (incomplete) - "
+	            "112233445 (HEAD, main)   79%  790/1000 (incomplete) - "
 	            "[36109a1c3@develop] Subject, isn't it? <Johnny Appleseed> "
 	            "(committed 4 months ago, added 4 months ago)"sv,
-	            "\x1B[31m112233445\x1B[m\x1B[33m (HEAD, main)\x1B[m \x1B[43m "
-	            "79% \x1B[m \x1B[2;37m790/1000\x1B[m "
-	            "\x1B[1;33m(incomplete)\x1B[m - "
+	            "\x1B[31m112233445\x1B[m\x1B[33m\x1B[m \x1B[43m  79% \x1B[m "
+	            "\x1B[2;37m790/1000\x1B[m \x1B[1;33m(incomplete)\x1B[m - "
 	            "\x1B[31m[36109a1c3@develop]\x1B[m Subject, isn't it? "
 	            "\x1B[34m<Johnny Appleseed>\x1B[m \x1B[32m(committed 4 months "
 	            "ago, added 4 months ago)\x1B[m"sv,
@@ -166,11 +166,11 @@ namespace cov::testing {
 	        "Rating: bad"sv,
 	        rating_tmplt,
 	        {
-	            "112233445 (HEAD, main)  50%  300/600 (fail) - "
+	            "112233445 (HEAD, main)   50%  300/600 (fail) - "
 	            "[36109a1c3@develop] Subject, isn't it? <Johnny Appleseed> "
 	            "(committed 4 months ago, added 4 months ago)"sv,
-	            "\x1B[31m112233445\x1B[m\x1B[33m (HEAD, main)\x1B[m \x1B[41m "
-	            "50% \x1B[m \x1B[2;37m300/600\x1B[m \x1B[1;31m(fail)\x1B[m - "
+	            "\x1B[31m112233445\x1B[m\x1B[33m\x1B[m \x1B[41m  50% \x1B[m "
+	            "\x1B[2;37m300/600\x1B[m \x1B[1;31m(fail)\x1B[m - "
 	            "\x1B[31m[36109a1c3@develop]\x1B[m Subject, isn't it? "
 	            "\x1B[34m<Johnny Appleseed>\x1B[m \x1B[32m(committed 4 months "
 	            "ago, added 4 months ago)\x1B[m"sv,

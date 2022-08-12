@@ -68,6 +68,7 @@ namespace cov::testing {
 			            .HEAD_ref = "112233445566778899aabbccddeeff0012345678"s,
 			        },
 			    .colorize = use_color ? formatter::shell_colorize : nullptr,
+			    .decorate = true,
 			};
 		}
 
@@ -179,7 +180,7 @@ namespace cov::testing {
 	    {
 	        "main"sv,
 	        "%hr%d %pC/%pR %pP (%pr) - from [%hc] %s <%an>"sv,
-	        "221144335 (main) 226/300 75% (incomplete) - from [36109a1c3] "
+	        "221144335 (main) 226/300  75% (incomplete) - from [36109a1c3] "
 	        "Subject, isn't it? <Johnny Appleseed>"sv,
 	        {.report = "221144335566778899aabbccddeeff0012345678"sv,
 	         .stats = io::v1::coverage_stats{1250, 300, 226}},
@@ -187,7 +188,7 @@ namespace cov::testing {
 	    {
 	        "v1.0.0"sv,
 	        "%hr%d %pC/%pR %pP (%pr) - from [%hc] %s <%an>"sv,
-	        "221133445 (tag: v1.0.0) 270/300 90% (pass) - from [36109a1c3] "
+	        "221133445 (tag: v1.0.0) 270/300  90% (pass) - from [36109a1c3] "
 	        "Subject, isn't it? <Johnny Appleseed>"sv,
 	        {.report = "221133445566778899aabbccddeeff0012345678"sv,
 	         .stats = io::v1::coverage_stats{1250, 300, 270}},
@@ -195,7 +196,7 @@ namespace cov::testing {
 	    {
 	        "no refs"sv,
 	        "%hr%d %pC/%pR %pP (%pr) - from [%hc] %s <%an>"sv,
-	        "442211335 100/300 33% (fail) - from [36109a1c3] Subject, isn't "
+	        "442211335 100/300  33% (fail) - from [36109a1c3] Subject, isn't "
 	        "it? <Johnny Appleseed>"sv,
 	        {.report = "442211335566778899aabbccddeeff0012345678"sv,
 	         .stats = io::v1::coverage_stats{1250, 300, 100}},
@@ -203,7 +204,7 @@ namespace cov::testing {
 	    {
 	        "nothing to judge"sv,
 	        "%hr%d %pC/%pR %pP (%pr) - from [%hc] %s <%an>"sv,
-	        "442211335 0/0  0% (fail) - from [36109a1c3] Subject, isn't it? "
+	        "442211335 0/0   0% (fail) - from [36109a1c3] Subject, isn't it? "
 	        "<Johnny Appleseed>"sv,
 	        {.report = "442211335566778899aabbccddeeff0012345678"sv,
 	         .stats = io::v1::coverage_stats{1250, 0, 0}},
@@ -244,7 +245,7 @@ namespace cov::testing {
 	    {
 	        "main (unwrapped)"sv,
 	        "%hr [%D] %pC/%pR %pP (%pr) - from [%hc] %s <%an>"sv,
-	        "221144335 [main] 226/300 75% (incomplete) - from [36109a1c3] "
+	        "221144335 [main] 226/300  75% (incomplete) - from [36109a1c3] "
 	        "Subject, isn't it? <Johnny Appleseed>"sv,
 	        {.report = "221144335566778899aabbccddeeff0012345678"sv,
 	         .stats = io::v1::coverage_stats{1250, 300, 226}},
@@ -252,7 +253,8 @@ namespace cov::testing {
 	    {
 	        "no refs (unwrapped)"sv,
 	        "%hr [%D] %pC/%pR %pP (%pr) - from [%hc] %s <%an>"sv,
-	        "442211335 [] 100/300 33% (fail) - from [36109a1c3] Subject, isn't "
+	        "442211335 [] 100/300  33% (fail) - from [36109a1c3] Subject, "
+	        "isn't "
 	        "it? <Johnny Appleseed>"sv,
 	        {.report = "442211335566778899aabbccddeeff0012345678"sv,
 	         .stats = io::v1::coverage_stats{1250, 300, 100}},

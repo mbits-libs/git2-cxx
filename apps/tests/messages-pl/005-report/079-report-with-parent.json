@@ -11,7 +11,7 @@
         0,
         [
             "\u001b[31m[main $REPORT]\u001b[m reported files",
-            " 2 pliki, \u001b[33m86%\u001b[m (6/7, -1)",
+            " 2 pliki, \u001b[33m 86%\u001b[m (6/7, -1)",
             " \u001b[2;37mw oparciu o\u001b[m \u001b[2;33m$HEAD@main\u001b[m",
             " rodzic $PARENT\n"
         ],
