@@ -178,6 +178,17 @@ namespace cov::testing {
 	         .use_color = true},
 	    },
 	    {
+	        "detached HEAD (magic colors unwrapped)"sv,
+	        "%hr [%mD] %pC/%pR %pP (%pr) - from [%hc] %s <%an>"sv,
+	        "112233445 [\x1B[1;36mHEAD\x1B[m\x1B[33m, \x1B[m\x1B[1;33mtag: "
+	        "v1.0.1\x1B[m\x1B[33m, \x1B[m\x1B[1;32mfeat/task-1\x1B[m] 299/300 "
+	        "100% (pass) - from [36109a1c3] Subject, isn't it? <Johnny "
+	        "Appleseed>"sv,
+	        {.report = "112233445566778899aabbccddeeff0012345678"sv,
+	         .head = ""s,
+	         .use_color = true},
+	    },
+	    {
 	        "main"sv,
 	        "%hr%d %pC/%pR %pP (%pr) - from [%hc] %s <%an>"sv,
 	        "221144335 (main) 226/300  75% (incomplete) - from [36109a1c3] "
