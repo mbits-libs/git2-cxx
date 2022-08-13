@@ -355,6 +355,11 @@ namespace cov::testing {
 	        "pre %w(123,10,z) post"sv,
 	        {"pre %w(123,10,z) post"s},
 	    },
+	    {
+	        "not magic"sv,
+	        "pre %mB post"sv,
+	        {"pre %mB post"s},
+	    },
 	};
 
 	INSTANTIATE_TEST_SUITE_P(bad, format_parser, ::testing::ValuesIn(errors));

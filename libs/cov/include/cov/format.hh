@@ -2,9 +2,9 @@
 // This code is licensed under MIT license (see LICENSE for details)
 
 #pragma once
+#include <cov/format_args.hh>
 #include <cov/reference.hh>
 #include <cov/report.hh>
-#include <cov/format_args.hh>
 #include <map>
 #include <string>
 #include <utility>
@@ -122,9 +122,10 @@ namespace cov::placeholder {
 	struct internal_context;
 
 	struct refs {
-		std::string HEAD;
-		std::map<std::string, std::string> tags, heads;
-		std::string HEAD_ref;
+		std::string HEAD{};
+		std::map<std::string, std::string> tags{}, heads{};
+		std::string HEAD_ref{};
+		bool operator==(refs const&) const noexcept = default;
 		iterator format(iterator out,
 		                git_oid const* id,
 		                bool wrapped,
@@ -135,6 +136,8 @@ namespace cov::placeholder {
 
 	struct ratio {
 		unsigned num, den;
+
+		bool operator==(ratio const&) const noexcept = default;
 		constexpr ratio gcd() const noexcept {
 			auto const div = std::gcd(num, den);
 			if (!div) return *this;
@@ -145,12 +148,13 @@ namespace cov::placeholder {
 	struct rating {
 		ratio incomplete;
 		ratio passing;
+		bool operator==(rating const&) const noexcept = default;
 	};
 
 	struct context {
-		sys_seconds now;
-		unsigned hash_length;
-		refs names;
+		sys_seconds now{};
+		unsigned hash_length{};
+		refs names{};
 		rating marks{.incomplete{75, 100}, .passing{9, 10}};
 		std::string_view time_zone{};
 		std::string_view locale{};
@@ -161,6 +165,7 @@ namespace cov::placeholder {
 		std::string (*colorize)(color, void* app) = {};
 		bool decorate{false};
 
+		bool operator==(context const&) const noexcept = default;
 		static context from(cov::repository const&,
 		                    color_feature clr,
 		                    decorate_feature decorate);
