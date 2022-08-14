@@ -51,7 +51,7 @@ namespace cov::app::builtin::report {
 			}
 		}
 		return result;
-	}
+	}  // GCOV_EXCL_LINE[GCC] -- and now it wants th throw something...
 
 	std::string parser::report_contents(git::repository_handle repo) const {
 		auto source = io::fopen(make_u8path(report_));
