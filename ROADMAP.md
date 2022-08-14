@@ -50,7 +50,7 @@
     - [x] add documentation
     - [x] `cov::sth_create` -> `cov::sth::create`
     - [x] drop &beta;
-  - [ ] `cov log`
+  - [x] `cov log` _(0.14.0)_
   - [ ] `cov show`
     - [ ] Report / component / directory view
     - [ ] File view

@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) and [COMMITS.md](COMMITS.md) for commit guidelines.
 
+## [0.14.0](https://github.com/mzdun/cov/compare/v0.13.1...v0.14.0) (2022-08-15)
+
+### New Features
+
+- **core**: add `log` to builtin commands ([cfe1fb1](https://github.com/mzdun/cov/commit/cfe1fb115b8ec950caaf08342fa38332adfe5da4))
+- **rt**: show specified range, predefine formats ([a701db7](https://github.com/mzdun/cov/commit/a701db7f5a9f5973638a777c13144b91f6d67759))
+- **lang**: add strings for cov-log ([6854d39](https://github.com/mzdun/cov/commit/6854d3955ceb412b39866b5434d4e9ede370f05c))
+- **lang**: use lngs strings for formatter ([cf34c58](https://github.com/mzdun/cov/commit/cf34c5835758dfa23c551f692792615f424fc3f7))
+- **api**: support generalized tristate feature ([d77dd1e](https://github.com/mzdun/cov/commit/d77dd1e5a0d0e498e436bf24967a9fe0d824cfac))
+- **api**: parse rev pairs ([87ca7c8](https://github.com/mzdun/cov/commit/87ca7c848dc537a295c67aab6b5764cdb3b15aed))
+- **api**: create format context in unified way ([1706e5a](https://github.com/mzdun/cov/commit/1706e5a21fc2582757610fdd336ef5f66f1f6084))
+- **api**: add partial lookup to loose backend ([362c5e7](https://github.com/mzdun/cov/commit/362c5e739c9b7cfa99bd2e101f12d6c6b9dcf5af))
+- **api**: clean up colors, add file list hashes ([1a6874c](https://github.com/mzdun/cov/commit/1a6874ce8957636c223077bc313c42d813ec6093))
+
+### Bug Fixes
+
+- clean up linter findings ([1191da3](https://github.com/mzdun/cov/commit/1191da384a50cecfffa6a19187d7fe47e57a62a1))
+- enhance error reporting for cov-log and cov-show ([3ca1584](https://github.com/mzdun/cov/commit/3ca1584b46de4b70c9025f11fbfdc6eec3d51356))
+- **api**: don't load tzdb if not needed ([24e5b1e](https://github.com/mzdun/cov/commit/24e5b1eec7290a732c013dcfc199fcc4a87b703b))
+- **rt**: extract opening cov repo to function ([9570b7a](https://github.com/mzdun/cov/commit/9570b7a3d265a88a0fc8066b900b369363779465))
+- **rt, core**: detach rt paths from tools ([7f2eb76](https://github.com/mzdun/cov/commit/7f2eb76c4114b40a4a5ee34cf1b0435e5d1f58ab))
+
 ## [0.13.1](https://github.com/mzdun/cov/compare/v0.13.0-beta...v0.13.1) (2022-08-08)
 
 ### Bug Fixes
