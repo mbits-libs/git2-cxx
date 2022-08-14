@@ -67,7 +67,11 @@
   - [ ] Report / component / directory view
   - [ ] File view
 ---
-- [ ] External build id / tag?
+- [ ] Multi-platform reports
+  - [ ] External build id / tag?
+  - [ ] `cov report` taking more, than one report
+    - with single filter?
+    - with filter per input?
 - [ ] Add report object cache
 - [ ] Highlight partial C++ strings
 - [ ] Add hilite for Python

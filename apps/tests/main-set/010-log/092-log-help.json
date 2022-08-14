@@ -1,0 +1,27 @@
+{
+    "args": "log --help",
+    "expected": [
+        0,
+        [
+            "usage: cov log [-h] [<revision-range>] [-n <number>] [--oneline] [--format <format>] [--abbrev-hash] [--no-abbrev-hash] [--color <when>] [--decorate <how>]",
+            "",
+            "positional arguments:",
+            " <revision-range>         shows only reports in the specified revision range",
+            "",
+            "optional arguments:",
+            " -h, --help               shows this help message and exits",
+            " -n, --max-count <number> limits the number of reports to output",
+            " --oneline                a shorthand for \"--format=oneline --abbrev-hash\" used together",
+            " --format <format>        pretty-prints the contents of the report logs in a given format, where <format> can be one of 'oneline', 'short', 'medium', 'full', 'fuller', 'reference', 'raw' and 'pretty:<string>'; when <format> is none of the above, and has %placeholder in it, it acts as if --format=pretty:<format> were given",
+            " --abbrev-hash            instead of showing the full 40-byte hexadecimal report object name, shows a prefix that names the objects uniquely",
+            " --no-abbrev-hash         shows the full 40-byte hexadecimal report object name",
+            " --color <when>           uses color in output; <when> is 'never', 'always', or 'auto'",
+            " --decorate <how>         prints out ref names of any reports that are shown; <how> is 'short', 'auto', or 'no'\n"
+        ],
+        ""
+    ],
+    "prepare": [
+        "unpack $DATA/revparse.tar $TMP",
+        "cd $TMP/revparse"
+    ]
+}
