@@ -86,7 +86,11 @@ namespace cov::app::builtin::module {
 			auto const cfg_path = p.workdir_path(git_repo);
 			auto cfg = git::config::create();
 			auto ec = cfg.add_file_ondisk(cfg_path);
-			if (ec) p.error(ec, p.tr());
+			if (ec) {
+				if (ec == git::errc::notfound)
+					ec = make_error_code(git::errc::file_not_found);
+				p.error(ec, p.tr());
+			}
 			mods->dump(cfg);
 			modules::cleanup_config(cfg_path);
 		}

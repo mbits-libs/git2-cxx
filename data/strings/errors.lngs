@@ -14,4 +14,10 @@
     CONFIG_CANNOT_DELETE="could not find key '{}' to delete";
     [help("config.c:1456"), id(-1)]
     CONFIG_INVALID_NAME="invalid config item name '{}'";
+    [help("Error message for unborn branch"), id(-1)]
+    SHOW_EMPTY_HEAD="HEAD refers to branch with no reports";
+    [help("Error message for not found"), id(-1)]
+    SHOW_NOT_FOUND="requested object could not be found";
+    [help("Error message for invalid pattern"), id(-1)]
+    SHOW_INVALID_PATTERN="invalid pattern '{}'";
 }

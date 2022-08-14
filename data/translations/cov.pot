@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cov latest\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-11 20:58+0200\n"
+"POT-Creation-Date: 2022-08-14 19:44+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -709,6 +709,21 @@ msgstr ""
 #. message
 msgctxt "errors.DOMAIN_ERROR_MSG"
 msgid "{0}: {1} error: {2}"
+msgstr ""
+
+#. Error message for unborn branch
+msgctxt "errors.SHOW_EMPTY_HEAD"
+msgid "HEAD refers to branch with no reports"
+msgstr ""
+
+#. Error message for invalid pattern
+msgctxt "errors.SHOW_INVALID_PATTERN"
+msgid "invalid pattern '{}'"
+msgstr ""
+
+#. Error message for not found
+msgctxt "errors.SHOW_NOT_FOUND"
+msgid "requested object could not be found"
 msgstr ""
 
 #. Relative time, no more than few days ago
