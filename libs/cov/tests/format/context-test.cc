@@ -96,9 +96,9 @@ namespace cov::testing {
 #endif
 			return (_isatty(_fileno(out)) != 0)
 #ifndef _WIN32
-			       && term && strcmp(term, "dumb") != 0;
+			       && term && strcmp(term, "dumb") != 0
 #endif
-			;
+			    ;  // NOLINT
 		}
 	}  // namespace
 

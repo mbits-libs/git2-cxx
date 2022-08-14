@@ -6,6 +6,7 @@
 #include <cov/app/cov_log_tr.hh>
 #include <cov/format_args.hh>
 #include <cov/revparse.hh>
+#include <string>
 
 namespace cov::app {
 	enum class known_format : unsigned {
@@ -43,6 +44,8 @@ namespace cov::app {
 		std::string_view format_str() const noexcept;
 		decorate_feature selected_decorate() const noexcept;
 
-		void print(cov::repository const& repo, cov::revs const& range, std::optional<unsigned> max_count) const;
+		void print(cov::repository const& repo,
+		           cov::revs const& range,
+		           std::optional<unsigned> max_count) const;
 	};
 }  // namespace cov::app

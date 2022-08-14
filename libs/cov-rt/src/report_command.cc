@@ -156,7 +156,8 @@ namespace cov::app::builtin::report {
 		static constexpr auto message_chunk3 =
 		    ", %C(rating)%pP%Creset (%pC/%pR"sv;
 		static constexpr auto message_chunk4 = ")%n %C(faint normal)"sv;
-		static constexpr auto message_chunk5 = "%Creset %C(faint yellow)%hc@%rD%Creset%n"sv;
+		static constexpr auto message_chunk5 =
+		    "%Creset %C(faint yellow)%hc@%rD%Creset%n"sv;
 
 		using str::cov_report::counted;
 

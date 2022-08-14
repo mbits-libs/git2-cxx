@@ -42,7 +42,7 @@ namespace cov {
 						if (!git_oid_is_zero(&parent)) {
 							return {parent, true};
 						}
-					};
+					}
 				}
 				return {};
 			}
