@@ -6,6 +6,7 @@
 #include <cov/app/strings/log_format.hh>
 #include <cov/app/tr.hh>
 #include <cov/format.hh>
+#include <string>
 
 namespace cov::app {
 	using fmtlng = str::log_format::lng;

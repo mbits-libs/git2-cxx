@@ -38,9 +38,9 @@ namespace cov {
 #endif
 				return (_isatty(_fileno(out)) != 0)
 #ifndef _WIN32
-				       && term && strcmp(term, "dumb") != 0;
+				       && term && strcmp(term, "dumb") != 0
 #endif
-				;
+				    ;  // NOLINT
 			}
 
 			refs names_from(cov::repository const& repo) {
@@ -105,7 +105,7 @@ namespace cov {
 				auto [finish, errc] = std::from_chars(ptr, end, result);
 				if (errc == std::errc{} && finish == end) return result;
 				return std::nullopt;
-			};
+			}
 
 			std::optional<ratio> ratio_from(std::string_view value) {
 				auto const pos = value.find('/');
@@ -127,7 +127,7 @@ namespace cov {
 					return std::nullopt;
 
 				return ratio{*numerator, *denominator}.gcd();
-			};
+			}
 
 			rating rating_from(cov::repository const& repo) {
 				auto const value = repo.config().get_string("core.rating");
@@ -160,7 +160,7 @@ namespace cov {
 
 				// default: 75% and 90%
 				return {.incomplete = {3, 4}, .passing = {9, 10}};
-			};
+			}
 		}  // namespace
 
 		context context::from(cov::repository const& repo,
@@ -171,7 +171,8 @@ namespace cov {
 			}
 
 			if (decorate == use_feature::automatic) {
-				decorate = is_terminal(stdout) ? use_feature::yes : use_feature::no;
+				decorate =
+				    is_terminal(stdout) ? use_feature::yes : use_feature::no;
 			}
 
 			using namespace std::chrono;
