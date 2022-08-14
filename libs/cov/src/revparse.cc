@@ -154,8 +154,7 @@ namespace cov {
 
 		if (!to_rev.empty() && to_rev.front() == '.') {
 			// ".." was part of "..." and we do not support symmetric difference
-			git_error_set(GIT_ERROR_INVALID,
-			              "Invalid pattern, symmetric difference");
+			git_error_set(GIT_ERROR_INVALID, "Invalid pattern '...'");
 			return git::make_error_code(git::errc::invalidspec);
 		}
 
@@ -218,7 +217,7 @@ namespace cov {
 					parent_count += get_number(it, end);
 					break;
 				default: {
-					git_error_set(GIT_ERROR_INVALID, "Invalid pattern, '%c'",
+					git_error_set(GIT_ERROR_INVALID, "Invalid pattern '%c'",
 					              *it);
 					return git::make_error_code(git::errc::invalidspec);
 				}
@@ -234,7 +233,8 @@ namespace cov {
 			if (ref->reference_type() != reference_type::direct) {
 				memset(out.id, 0, sizeof(out.id));
 				auto const HEAD = repo.current_head();
-				if ((base_rev == "HEAD"sv || base_rev == HEAD.branch) && !HEAD.tip)
+				if ((base_rev == "HEAD"sv || base_rev == HEAD.branch) &&
+				    !HEAD.tip)
 					return git::make_error_code(git::errc::unbornbranch);
 				return git::make_error_code(git::errc::notfound);
 			}

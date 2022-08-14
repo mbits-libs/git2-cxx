@@ -48,7 +48,8 @@ namespace cov::app {
 		const { return message(ec, str, str); }
 
 		static std::pair<char const*, std::string> message_from_libgit(
-		    str::errors::Strings const&);
+		    str::errors::Strings const&,
+		    git::errc = git::errc{});
 
 	protected:
 		::args::parser parser_;

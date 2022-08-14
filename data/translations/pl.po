@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cov latest\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-11 20:58+0200\n"
-"PO-Revision-Date: 2022-08-12 20:41+0200\n"
+"POT-Creation-Date: 2022-08-14 19:44+0200\n"
+"PO-Revision-Date: 2022-08-14 19:46+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: pl\n"
@@ -739,6 +739,21 @@ msgstr "wpis nie jest unikalny ze względu na to, że jest zmienną wielokrotną
 msgctxt "errors.DOMAIN_ERROR_MSG"
 msgid "{0}: {1} error: {2}"
 msgstr "{0}: błąd {1}: {2}"
+
+#. Error message for unborn branch
+msgctxt "errors.SHOW_EMPTY_HEAD"
+msgid "HEAD refers to branch with no reports"
+msgstr "HEAD odnosi się do gałęzi bez raportów"
+
+#. Error message for invalid pattern
+msgctxt "errors.SHOW_INVALID_PATTERN"
+msgid "invalid pattern '{}'"
+msgstr "nieprawidłowy wzorzec '{}'"
+
+#. Error message for not found
+msgctxt "errors.SHOW_NOT_FOUND"
+msgid "requested object could not be found"
+msgstr "nie można odnaleźć żądanego obiektu"
 
 #. Relative time, no more than few days ago
 msgctxt "log_format.DAYS_AGO"

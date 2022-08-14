@@ -9,6 +9,7 @@ namespace git {
 	enum class errc : int {
 		error = -1,
 		notfound = -3,
+		file_not_found = 3,
 		exists = -4,
 		ambiguous = -5,
 		bufs = -6,
