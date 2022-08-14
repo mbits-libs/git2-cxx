@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 
 import os
+from pprint import pprint
 import sys
-import polib
-
 from typing import Dict, NamedTuple, Optional, Tuple
+
 from winrc_winnt import *
 
 template = """
@@ -99,14 +99,89 @@ def info(lang: dict = {}) -> Optional[LocalInfo]:
             return LocalInfo(**strings)
 
 
+def decode(value: str):
+    double = value.split("\\\\")
+    for index in range(len(double)):
+        items = double[index].split("\\")
+        output = items[0]
+        items = items[1:]
+        for item in items:
+            letter = item[0]
+            rest = item[1:]
+            if letter == "n":
+                output += "\n"
+            else:
+                output += letter
+            output += rest
+        double[index] = output
+    return "\\".join(double)
+
+
+def get_metadata(value):
+    result = {}
+    for item in value.split("\n"):
+        split = item.split(":", 1)
+        if len(split) != 2:
+            continue
+        name, value = split
+        result[name.strip()] = value.strip()
+    return result
+
+
 def info_from_file(path: str) -> Tuple[str, Optional[LocalInfo]]:
-    global langs
+    curr = None
+    item = None
+    seen_msgstr = False
 
-    po = polib.pofile(path)
-    lang = po.metadata["Language"]
+    metadata = {}
+    items = {}
 
-    ts = {entry.msgctxt: entry.msgstr for entry in po if entry.msgid != ""}
-    return (lang, info(ts))
+    with open(path, encoding="UTF-8") as input:
+        for line in input:
+            line = line.strip()
+            if line == "" or line[0] == "#":
+                continue
+            if line[0] == '"':
+                item[curr] += line[1:-1]
+                continue
+            curr, initial = line.split(" ", 1)
+            if curr in ["msgctxt", "msgid"]:
+                if seen_msgstr:
+                    seen_msgstr = False
+                    for key in item:
+                        item[key] = decode(item[key])
+                    if item["msgid"] == "":
+                        metadata = get_metadata(item["msgstr"])
+                    else:
+                        msgctxt = item["msgctxt"]
+                        try:
+                            msgstr = item["msgstr"]
+                        except KeyError:
+                            msgstr = item["msgstr[0]"]
+                        items[msgctxt] = msgstr
+                    item = {}
+                if item is None:
+                    item = {}
+            if curr == "msgstr" or curr[:7] == "msgstr[":
+                seen_msgstr = True
+            item[curr] = initial[1:-1]
+
+        if seen_msgstr:
+            for key in item:
+                item[key] = decode(item[key])
+            if item["msgid"] == "":
+                metadata = get_metadata(item["msgstr"])
+            else:
+                msgctxt = item["msgctxt"]
+                try:
+                    msgstr = item["msgstr"]
+                except KeyError:
+                    msgstr = item["msgstr[0]"]
+                items[msgctxt] = msgstr
+
+    lang = metadata["Language"]
+
+    return (lang, info(items))
 
 
 def create_translations() -> Dict[str, LocalInfo]:
