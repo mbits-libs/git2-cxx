@@ -1,0 +1,19 @@
+{
+    "args": "log --oneline --color always --decorate short G..K",
+    "expected": [
+        0,
+        [
+            "\u001b[33m0a3ec94f3\u001b[m\u001b[33m (\u001b[m\u001b[1;33mtag: K\u001b[m\u001b[33m, \u001b[m\u001b[1;32mfeat/cov-1\u001b[m\u001b[33m)\u001b[m \u001b[41m   0% \u001b[m Commit K \u001b[31m305ad7d05@feat/git-1\u001b[m",
+            "\u001b[33m8cd0b0755\u001b[m\u001b[33m (\u001b[m\u001b[1;33mtag: L\u001b[m\u001b[33m)\u001b[m \u001b[41m   0% \u001b[m Commit L \u001b[31me54a0bd0e@feat/git-1\u001b[m",
+            "\u001b[33m6ec526731\u001b[m\u001b[33m (\u001b[m\u001b[1;33mtag: M\u001b[m\u001b[33m)\u001b[m \u001b[41m   0% \u001b[m Commit M \u001b[31m58e92c410@feat/git-1\u001b[m",
+            "\u001b[33mc63dcf6ed\u001b[m\u001b[33m (\u001b[m\u001b[1;33mtag: N\u001b[m\u001b[33m)\u001b[m \u001b[41m   0% \u001b[m Commit N \u001b[31m3324aa6f9@feat/git-1\u001b[m",
+            "\u001b[33m2b793aa8b\u001b[m\u001b[33m (\u001b[m\u001b[1;33mtag: O\u001b[m\u001b[33m)\u001b[m \u001b[41m   0% \u001b[m Commit O \u001b[31me9c6e04d6@feat/git-1\u001b[m",
+            "\u001b[33mcb6394c0b\u001b[m\u001b[33m (\u001b[m\u001b[1;33mtag: F\u001b[m\u001b[33m)\u001b[m \u001b[41m   0% \u001b[m Commit F \u001b[31mdbe474382@main\u001b[m\n"
+        ],
+        ""
+    ],
+    "prepare": [
+        "unpack $DATA/revparse.tar $TMP",
+        "cd $TMP/revparse"
+    ]
+}

@@ -1,0 +1,16 @@
+{
+    "args": "log",
+    "expected": [
+        2,
+        "",
+        [
+            "usage: cov log [-h] [<revision-range>] [-n <number>] [--oneline] [--format <format>] [--abbrev-hash] [--no-abbrev-hash] [--color <when>] [--decorate <how>]",
+            "cov log: error: HEAD refers to branch with no reports\n"
+        ]
+    ],
+    "prepare": [
+        "git init '$TMP/repo'",
+        "cov init '$TMP/repo'",
+        "cd '$TMP/repo'"
+    ]
+}

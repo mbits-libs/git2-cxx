@@ -1,0 +1,28 @@
+{
+    "lang": "pl",
+    "args": "log --help",
+    "expected": [
+        0,
+        [
+            "u\u017cycie: cov log [-h] [<zakres-rewizji>] [-n <liczba>] [--oneline] [--format <format>] [--abbrev-hash] [--no-abbrev-hash] [--color <kiedy>] [--decorate <jak>]",
+            "",
+            "argumenty pozycyjne:",
+            " <zakres-rewizji>         pokazuje tylko raporty z okre\u015blonego zakresu rewizji",
+            "",
+            "argumenty opcjonalne:",
+            " -h, --help               pokazuje ten komunikat pomocy i wychodzi",
+            " -n, --max-count <liczba> ogranicza liczb\u0119 raport\u00f3w do wydrukowania",
+            " --oneline                skr\u00f3t  u\u017cytych jednocze\u015bnie \"--format=oneline --abbrev-hash\"",
+            " --format <format>        wy\u015bwietla zawarto\u015b\u0107 dziennik\u00f3w raportu w danym formacie, gdzie <format> mo\u017ce by\u0107 jednym z \u201eoneline\u201d, \u201eshort\u201d, \u201emedium\u201d, \u201efull\u201d, \u201efuller\u201d, \u201ereference\u201d, \u201eraw\u201d i \u201epretty:<string>\u201d; gdy <format> nie jest \u017cadnym z powy\u017cszych i zawiera %symbol zast\u0119pczy, dzia\u0142a tak, jakby zosta\u0142o wywo\u0142ane --format=pretty:<format>",
+            " --abbrev-hash            zamiast wy\u015bwietla\u0107 pe\u0142n\u0105 40-bajtow\u0105 szesnastkow\u0105 nazw\u0119 obiektu raportu, pokazuje prefiks, kt\u00f3ry nazywa obiekty jednoznacznie",
+            " --no-abbrev-hash         pokazuje pe\u0142n\u0105 40-bajtow\u0105 szesnastkow\u0105 nazw\u0119 obiektu raportu",
+            " --color <kiedy>          u\u017cywa koloru na wyj\u015bciu; <kiedy> jest jednym z \u201enever\u201d (nigdy), \u201ealways\u201d (zawsze) lub \u201eauto\u201d",
+            " --decorate <jak>         drukuje referencje wy\u015bwietlanych raport\u00f3w; <jak> jest jednym z \u201eshort\u201d (kr\u00f3tkie), \u201eauto\u201d lub \u201eno\u201d (nie)\n"
+        ],
+        ""
+    ],
+    "prepare": [
+        "unpack $DATA/revparse.tar $TMP",
+        "cd $TMP/revparse"
+    ]
+}

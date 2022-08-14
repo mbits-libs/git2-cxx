@@ -1,0 +1,16 @@
+{
+    "lang": "pl",
+    "args": "log 123456789",
+    "expected": [
+        2,
+        "",
+        [
+            "u\u017cycie: cov log [-h] [<zakres-rewizji>] [-n <liczba>] [--oneline] [--format <format>] [--abbrev-hash] [--no-abbrev-hash] [--color <kiedy>] [--decorate <jak>]",
+            "cov log: b\u0142\u0105d: nie mo\u017cna odnale\u017a\u0107 \u017c\u0105danego obiektu\n"
+        ]
+    ],
+    "prepare": [
+        "unpack $DATA/revparse.tar $TMP",
+        "cd $TMP/revparse"
+    ]
+}

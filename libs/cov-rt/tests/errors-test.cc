@@ -5,8 +5,9 @@
 #include <gtest/gtest.h>
 #include <cov/app/args.hh>
 #include <cov/app/errors_tr.hh>
-#include <cov/app/tools.hh>
+#include <cov/app/log_format_tr.hh>
 #include <cov/app/rt_path.hh>
+#include <cov/app/tools.hh>
 #include <git2/error.hh>
 #include <git2/global.hh>
 
@@ -123,6 +124,23 @@ namespace cov::app::testing {
 		parser_holder holder{{"cov config"sv, {}}, {}, tr.args()};
 		auto const actual = holder.message(copy, tr);
 		ASSERT_EQ(expected.pl, actual);
+	}
+
+	struct LogBuiltin : lngs::storage::Builtin<str::log_format::Resource> {
+		std::string_view operator()(str::log_format::lng id) const noexcept {
+			return get_string(static_cast<identifier>(id));
+		}
+	};
+
+	TEST(error, load_builtin_log_messages) {
+		using namespace str::log_format;
+		LogBuiltin builtin{};
+
+		ASSERT_TRUE(builtin.init_builtin());
+		// "ïñ ŧĥê ƒũŧũȓê"
+		ASSERT_EQ(
+		    "\xC3\xAF\xC3\xB1 \xC5\xA7\xC4\xA5\xC3\xAA \xC6\x92\xC5\xA9\xC5\xA7\xC5\xA9\xC8\x93\xC3\xAA"sv,
+		    builtin(lng::IN_THE_FUTURE));
 	}
 
 	static error_test const tests[] = {

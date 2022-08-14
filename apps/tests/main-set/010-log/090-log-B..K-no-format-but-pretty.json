@@ -1,0 +1,22 @@
+{
+    "args": "log '--format=%C(yellow)%hr%Creset (%s, %rs) %C(red)%hc@%rD%Creset' --color always --decorate short Q..M",
+    "check": {
+        "stderr": "begin"
+    },
+    "expected": [
+        0,
+        [
+            "\u001b[33m6ec526731\u001b[m (Commit M, 2022-08-14) \u001b[31m58e92c410@feat/git-1\u001b[m",
+            "\u001b[33mc63dcf6ed\u001b[m (Commit N, 2022-08-14) \u001b[31m3324aa6f9@feat/git-1\u001b[m",
+            "\u001b[33m2b793aa8b\u001b[m (Commit O, 2022-08-14) \u001b[31me9c6e04d6@feat/git-1\u001b[m",
+            "\u001b[33mcb6394c0b\u001b[m (Commit F, 2022-08-14) \u001b[31mdbe474382@main\u001b[m",
+            "\u001b[33m8b9c7b3b7\u001b[m (Commit G, 2022-08-14) \u001b[31me9ef8f01e@main\u001b[m",
+            "\u001b[33mb61f9823c\u001b[m (Commit H, 2022-08-14) \u001b[31md09e4694e@main\u001b[m\n"
+        ],
+        ""
+    ],
+    "prepare": [
+        "unpack $DATA/revparse.tar $TMP",
+        "cd $TMP/revparse"
+    ]
+}
