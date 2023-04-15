@@ -1,10 +1,8 @@
 name: Build
 
 on:
-  push:
-    branches: [ "main" ]
   pull_request:
-    branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -71,6 +69,8 @@ jobs:
     - name: Install Conan
       id: conan
       uses: turtlebrowser/get-conan@main
+      with:
+        version: 1.57.0
 
     - name: Configure Conan (GCC C++11 library)
       if: ${{ matrix.ubuntu }}
