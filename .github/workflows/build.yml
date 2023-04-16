@@ -16,11 +16,20 @@ jobs:
             ubuntu: true
             home: /home/runner
             latest_conan_hash: 29f24b8b55c4a367e3041c678c26b91149c8ab579a5f9c1dd2324f0f1f15831d
+            conan_profile: settings.compiler.libcxx=libstdc++11
+            build_generator: ninja
             # Windows ANY
           - os: windows-latest
             windows: true
             home: C:/Users/runneradmin
             latest_conan_hash: 8c1370b4796ea7399cc31d9b362e5ec2532c434e75ed721cfbed7e3425f33b60
+            build_generator: msbuild
+            # ANY Release
+          - build_type: Release
+            build_profile: release
+            # ANY Debug
+          - build_type: Debug
+            build_profile: debug
             # Ubuntu Release
           - os: ubuntu-latest
             build_type: Release
@@ -33,6 +42,7 @@ jobs:
           - os: windows-latest
             build_type: Release
             cpack_generator: ZIP
+            conan_profile: settings.compiler.runtime=MD
 
     env:
       BUILD_TYPE: ${{ matrix.build_type }}
@@ -50,10 +60,10 @@ jobs:
         echo ${{ hashFiles('conanfile.txt') }}
         echo ${{ matrix.latest_conan_hash }}
 
-    - name: GCC 11
+    - name: GCC 11 & Ninja
       if: ${{ matrix.ubuntu }}
       run: |
-        sudo apt install g++-11 -y
+        sudo apt install g++-11 ninja-build -y
         sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-11 90
         sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 90
         sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-11 90 
@@ -72,11 +82,11 @@ jobs:
       with:
         version: 1.57.0
 
-    - name: Configure Conan (GCC C++11 library)
-      if: ${{ matrix.ubuntu }}
+    - name: Configure Conan (library and build type)
       run: |
-        conan profile new default --detect
-        conan profile update settings.compiler.libcxx=libstdc++11 default
+        conan profile new ${{ matrix.build_profile }} --detect
+        conan profile update ${{ matrix.conan_profile }} ${{ matrix.build_profile }}
+        conan profile update settings.build_type=${{ matrix.build_type }} ${{ matrix.build_profile }}
 
     - name: Conan cache
       uses: actions/cache@v3
@@ -90,17 +100,17 @@ jobs:
 
     - name: Configure Conan
       working-directory: ${{github.workspace}}/build/conan
-      run: conan install ../.. --build missing -s build_type=${{env.BUILD_TYPE}}
+      run: conan install ../.. --build missing -pr:b ${{ matrix.build_profile }} -pr:h ${{ matrix.build_profile }}
 
     - name: Configure CMake
-      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCOV_CUTDOWN_OS=ON
+      run: cmake --preset ${{ matrix.build_profile }}-${{ matrix.build_generator }} -DCOV_CUTDOWN_OS=ON
 
     - name: Build
-      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+      run: cmake --build --preset ${{ matrix.build_profile }}
 
     - name: Pack
       if: ${{ matrix.cpack_generator != '' }}
-      working-directory: ${{github.workspace}}/build
+      working-directory: ${{github.workspace}}/build/${{ matrix.build_profile }}
       run: cpack -G ${{ matrix.cpack_generator }}
 
     - name: Upload packages
@@ -108,10 +118,10 @@ jobs:
       if: ${{ matrix.cpack_generator != '' }}
       with:
         name: Packages
-        path: ${{github.workspace}}/build/packages/cov-*
+        path: ${{github.workspace}}/build/${{ matrix.build_profile }}/packages/cov-*
 
     - name: Test
-      working-directory: ${{github.workspace}}/build
+      working-directory: ${{github.workspace}}/build/${{ matrix.build_profile }}
       run: |
         ctest -C ${{env.BUILD_TYPE}} --output-on-failure
 

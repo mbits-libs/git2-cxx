@@ -34,7 +34,7 @@ string(APPEND __content "\t}\;
 
 
 file(GENERATE
-    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/cov/builtins.hh
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/gen/cov/builtins.hh
     CONTENT ${__content}
 )
 
