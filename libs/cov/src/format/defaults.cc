@@ -30,19 +30,22 @@
 #endif
 
 namespace cov {
+	namespace platform {
+		bool is_terminal(FILE* out) noexcept {
+#ifndef _WIN32
+			char const* term = getenv("TERM");
+#endif
+			return (_isatty(_fileno(out)) != 0)
+#ifndef _WIN32
+			       && term && strcmp(term, "dumb") != 0
+#endif
+			    ;  // NOLINT
+		}
+
+	}  // namespace platform
+
 	namespace placeholder {
 		namespace {
-			bool is_terminal(FILE* out) noexcept {
-#ifndef _WIN32
-				char const* term = getenv("TERM");
-#endif
-				return (_isatty(_fileno(out)) != 0)
-#ifndef _WIN32
-				       && term && strcmp(term, "dumb") != 0
-#endif
-				    ;  // NOLINT
-			}
-
 			refs names_from(cov::repository const& repo) {
 				refs result{};
 				char buffer[GIT_OID_HEXSZ];
@@ -167,12 +170,13 @@ namespace cov {
 		                      color_feature clr,
 		                      decorate_feature decorate) {
 			if (clr == use_feature::automatic) {
-				clr = is_terminal(stdout) ? use_feature::yes : use_feature::no;
+				clr = platform::is_terminal(stdout) ? use_feature::yes
+				                                    : use_feature::no;
 			}
 
 			if (decorate == use_feature::automatic) {
-				decorate =
-				    is_terminal(stdout) ? use_feature::yes : use_feature::no;
+				decorate = platform::is_terminal(stdout) ? use_feature::yes
+				                                         : use_feature::no;
 			}
 
 			using namespace std::chrono;

@@ -30,6 +30,10 @@ namespace cov {
 	};
 }  // namespace cov
 
+namespace cov::platform {
+	bool is_terminal(FILE* out) noexcept;
+}
+
 namespace cov::placeholder {
 	enum class color {
 		normal,
