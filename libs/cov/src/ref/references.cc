@@ -141,6 +141,48 @@ namespace cov {
 			                              ref_from_this());
 		}
 
+		std::error_code remove_ref(reference const& ref) {
+			if (ref.name() == names::HEAD) {
+				// never HEAD!
+				return git::make_error_code(git::errc::error);
+			}
+
+			if (!reference::is_valid_name(ref.name())) {
+				// clean an invalid name, if it exists...
+				std::error_code ec{};
+				std::filesystem::remove(root_ / make_path(ref.name()), ec);
+				if (ec) return ec;
+				return git::make_error_code(git::errc::invalidspec);
+			}
+
+			auto const curr = lookup(ref.name());
+
+			if (!curr) {
+				return git::make_error_code(git::errc::notfound);
+			}
+
+			if (curr->reference_type() != ref.reference_type()) {
+				return git::make_error_code(git::errc::modified);
+			}
+
+			if (ref.reference_type() == reference_type::direct &&
+			    git_oid_cmp(curr->direct_target(), ref.direct_target())) {
+				return git::make_error_code(git::errc::modified);
+			}
+
+			if (ref.reference_type() == reference_type::symbolic &&
+			    curr->symbolic_target() != ref.symbolic_target()) {
+				return git::make_error_code(git::errc::modified);
+			}
+
+			// no FS behind this one
+			if (ref.reference_type() == reference_type::undetermined) return {};
+
+			std::error_code ec{};
+			std::filesystem::remove(root_ / make_path(ref.name()), ec);
+			return ec;
+		}
+
 	private:
 		bool print(std::string_view name, std::string const& line) {
 			auto filename = root_ / make_path(name);
