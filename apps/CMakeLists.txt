@@ -63,7 +63,7 @@ if (WIN32)
     )
 
     list(APPEND SOURCES
-        "${CMAKE_CURRENT_BINARY_DIR}/cov/versioninfo.rc"
+        "${CMAKE_CURRENT_BINARY_DIR}/gen/cov/versioninfo.rc"
         "${CMAKE_SOURCE_DIR}/data/icons/win32.ico"
     )
 endif()
