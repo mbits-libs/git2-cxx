@@ -12,5 +12,5 @@ zlib/1.2.12
 libgit2:with_libssh2=False
 
 [generators]
-cmake
-cmake_find_package_multi
+CMakeDeps
+CMakeToolchain
