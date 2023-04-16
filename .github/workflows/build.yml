@@ -135,4 +135,4 @@ jobs:
       if: always()
       with:
         name: Test results
-        path: ${{github.workspace}}/build/test-results/
+        path: ${{github.workspace}}/build/${{ matrix.build_profile }}/test-results/
