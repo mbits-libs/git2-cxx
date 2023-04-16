@@ -43,6 +43,10 @@ jobs:
             build_type: Release
             cpack_generator: ZIP
             conan_profile: settings.compiler.runtime=MD
+            # Windows Debug
+          - os: windows-latest
+            build_type: Debug
+            conan_profile: settings.compiler.runtime=MDd
 
     env:
       BUILD_TYPE: ${{ matrix.build_type }}
