@@ -51,10 +51,10 @@
     - [x] `cov::sth_create` -> `cov::sth::create`
     - [x] drop &beta;
   - [x] `cov log` _(0.14.0)_
+  - [ ] `cov tag` / `branch` / `checkout`
   - [ ] `cov show`
     - [ ] Report / component / directory view
     - [ ] File view
-  - [ ] `cov tag` / `branch` / `checkout`
   - [ ] `cov remove`
   - [ ] Support for `less`
 - [ ] `cov serve`
@@ -66,6 +66,10 @@
     - [ ] Latest report / report list
   - [ ] Report / component / directory view
   - [ ] File view
+---
+**Potential bugs:**
+- refs: employ tortoise and hare in peel_target
+- refs: windows fs string equivalence (possibly through canonicity when reading from FS)
 ---
 - [ ] Multi-platform reports
   - [ ] External build id / tag?

@@ -112,5 +112,6 @@ namespace cov {
 		virtual ref_ptr<reference> lookup(std::string_view) = 0;
 		virtual ref_ptr<reference_list> iterator() = 0;
 		virtual ref_ptr<reference_list> iterator(std::string_view prefix) = 0;
+		virtual std::error_code remove_ref(reference const& ref) = 0;
 	};
 }  // namespace cov
