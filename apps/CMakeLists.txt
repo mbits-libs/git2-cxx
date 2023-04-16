@@ -39,20 +39,20 @@ if (WIN32)
 endif()
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})
-source_group(TREE ${CMAKE_CURRENT_BINARY_DIR} FILES ${CMAKE_CURRENT_BINARY_DIR}/cov/builtins.hh ${CMAKE_CURRENT_BINARY_DIR}/cov/versioninfo.rc)
+source_group(TREE ${CMAKE_CURRENT_BINARY_DIR} FILES ${CMAKE_CURRENT_BINARY_DIR}/gen/cov/builtins.hh ${CMAKE_CURRENT_BINARY_DIR}/gen/cov/versioninfo.rc)
 
-list(APPEND SOURCES ${CMAKE_CURRENT_BINARY_DIR}/cov/builtins.hh)
+list(APPEND SOURCES ${CMAKE_CURRENT_BINARY_DIR}/gen/cov/builtins.hh)
 
 if (WIN32)
     foreach(LANG ${LANGUAGES})
         list(APPEND PO_FILES "${CMAKE_SOURCE_DIR}/data/translations/${LANG}.po")
     endforeach()
 
-    add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/cov/versioninfo.rc"
+    add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/gen/cov/versioninfo.rc"
         COMMAND ${Python3_EXECUTABLE}
         ARGS
             "${CMAKE_SOURCE_DIR}/tools/win32/winrc.py"
-            "${CMAKE_CURRENT_BINARY_DIR}/cov"
+            "${CMAKE_CURRENT_BINARY_DIR}/gen/cov"
             "${CMAKE_CURRENT_SOURCE_DIR}/win32/versioninfo.h"
         DEPENDS
             "${CMAKE_SOURCE_DIR}/tools/win32/winrc.py"
@@ -63,7 +63,7 @@ if (WIN32)
     )
 
     list(APPEND SOURCES
-        "${CMAKE_CURRENT_BINARY_DIR}/cov/versioninfo.rc"
+        "${CMAKE_CURRENT_BINARY_DIR}/gen/cov/versioninfo.rc"
         "${CMAKE_SOURCE_DIR}/data/icons/win32.ico"
     )
 endif()
@@ -73,7 +73,7 @@ target_compile_options(cov PRIVATE ${ADDITIONAL_WALL_FLAGS})
 target_link_options(cov PRIVATE ${ADDITIONAL_LINK_FLAGS})
 target_include_directories(cov PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CMAKE_CURRENT_BINARY_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR}/gen
 )
 target_link_libraries(cov PRIVATE cov-rt)
 set_target_properties(cov PROPERTIES FOLDER apps)

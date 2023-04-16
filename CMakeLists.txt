@@ -42,7 +42,7 @@ find_package(Python3 COMPONENTS Interpreter REQUIRED)
 find_package(libgit2 REQUIRED)
 find_package(fmt REQUIRED)
 find_package(date REQUIRED)
-find_package(args REQUIRED)
+find_package(mbits-args REQUIRED)
 find_program(LNGS lngs)
 
 if (LNGS)
@@ -80,8 +80,8 @@ if (COV_TESTING)
   set(TEST_REPORT_FILE "${CMAKE_SYSTEM_NAME}-${CMAKE_BUILD_TYPE}.xml")
 endif()
 
-include(${CMAKE_BINARY_DIR}/conan/conanbuildinfo.cmake)
-conan_basic_setup()
+include(output_dirs_setup)
+old_conan_output_dirs_setup()
 
 if (MSVC)
   set(ADDITIONAL_WALL_FLAGS
