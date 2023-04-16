@@ -15,14 +15,14 @@ jobs:
           - os: ubuntu-latest
             ubuntu: true
             home: /home/runner
-            latest_conan_hash: 29f24b8b55c4a367e3041c678c26b91149c8ab579a5f9c1dd2324f0f1f15831d
+            latest_conan_hash: 4a3a6f59b0837cf90623040405f12b15e81f2e4b0d168d85523bbf0b7be2750a
             conan_profile: settings.compiler.libcxx=libstdc++11
             build_generator: ninja
             # Windows ANY
           - os: windows-latest
             windows: true
             home: C:/Users/runneradmin
-            latest_conan_hash: 8c1370b4796ea7399cc31d9b362e5ec2532c434e75ed721cfbed7e3425f33b60
+            latest_conan_hash: 23bc910b051c6e0b5c0283ef9e86cc2850d74fe8460f315a70f9b8358bfd01b7
             build_generator: msbuild
             # ANY Release
           - build_type: Release
@@ -91,6 +91,7 @@ jobs:
         conan profile new ${{ matrix.build_profile }} --detect
         conan profile update ${{ matrix.conan_profile }} ${{ matrix.build_profile }}
         conan profile update settings.build_type=${{ matrix.build_type }} ${{ matrix.build_profile }}
+        conan profile show ${{ matrix.build_profile }}
 
     - name: Conan cache
       uses: actions/cache@v3
