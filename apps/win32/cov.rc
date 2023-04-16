@@ -1,0 +1,6 @@
+// Copyright (c) 2022 Marcin Zdun
+// This code is licensed under MIT license (see LICENSE for details)
+
+LANGUAGE 9, 1
+
+100 ICON "../../data/icons/win32.ico"

@@ -11,6 +11,7 @@
 #include <span>
 #include <string>
 #include <utility>
+#include <vector>
 
 namespace cov::app {
 	struct builtin_tool {
@@ -24,7 +25,6 @@ namespace cov::app {
 		    : cfg_{std::move(cfg)}, builtins_{builtins} {}
 
 		static std::filesystem::path get_sysroot();
-		static std::filesystem::path get_locale_dir();
 		static git::config cautiously_open_config(
 		    std::filesystem::path const& sysroot,
 		    std::filesystem::path const& current_directory);
@@ -53,6 +53,16 @@ namespace cov::app {
 		int run_tool(std::filesystem::path const& tooldir,
 		             std::string_view tool,
 		             args::arglist args);
-		std::filesystem::path const& sys_root();
+
+		struct captured_output {
+			std::vector<std::byte> output{};
+			std::vector<std::byte> error{};
+			int return_code{};
+		};
+
+		captured_output run_filter(std::filesystem::path const& filter_dir,
+		                           std::filesystem::path const& cwd,
+		                           std::string_view filter,
+		                           std::vector<std::byte> const& input);
 	}  // namespace platform
 }  // namespace cov::app

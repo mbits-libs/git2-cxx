@@ -27,7 +27,7 @@ namespace cov::testing {
 		}
 
 		auto backend =
-		    loose_backend_create(setup::test_dir() / "full_report"sv);
+		    backend::loose_backend(setup::test_dir() / "full_report"sv);
 		ASSERT_TRUE(backend);
 
 		report rprt = {
@@ -40,8 +40,6 @@ namespace cov::testing {
 		             .message = "Initial commit"s,
 		             .commit_time_utc = sys_seconds{0x11223344556677s}},
 		    .files = {{.name = "main.cpp"sv,
-		               .dirty = false,
-		               .modified = false,
 		               .lines = {{10, 1},
 		                         {11, 1},
 		                         {12, 1},
@@ -50,8 +48,6 @@ namespace cov::testing {
 		                         {18, 0},
 		                         {19, 0}}},
 		              {.name = "module.cpp"sv,
-		               .dirty = false,
-		               .modified = false,
 		               .lines = {{10, 15},
 		                         {11, 15},
 		                         {12, 10},
@@ -67,8 +63,7 @@ namespace cov::testing {
 		// write
 		{
 			auto total = io::v1::coverage_stats::init();
-			std::vector<std::unique_ptr<report_entry>> entries{};
-			entries.reserve(rprt.files.size());
+			report_files_builder builder{};
 			for (auto const& file : rprt.files) {
 				auto cvg_object = from_lines(file.lines, file.finish);
 				ASSERT_TRUE(cvg_object);
@@ -78,18 +73,18 @@ namespace cov::testing {
 				auto file_stats = stats(cvg_object->coverage());
 				total += file_stats;
 
-				entries.push_back(file.build(file_stats, line_cvg_id).create());
+				file.add_to(builder, file_stats, line_cvg_id);
 			}
 
-			auto cvg_files = report_files_create(std::move(entries));
+			auto cvg_files = builder.extract();
 			ASSERT_TRUE(cvg_files);
 			git_oid files_id{};
 			ASSERT_TRUE(backend->write(files_id, cvg_files));
 
-			auto cvg_report = report_create(
-			    git_oid{}, rprt.parent, files_id, rprt.head.commit,
-			    rprt.head.branch, rprt.head.author_name, rprt.head.author_email,
-			    rprt.head.committer_name, rprt.head.committer_email,
+			auto cvg_report = cov::report::create(
+			    rprt.parent, files_id, rprt.head.commit, rprt.head.branch,
+			    {rprt.head.author_name, rprt.head.author_email},
+			    {rprt.head.committer_name, rprt.head.committer_email},
 			    rprt.head.message, rprt.head.commit_time_utc, rprt.add_time_utc,
 			    total);
 			ASSERT_TRUE(cvg_report);
@@ -121,8 +116,6 @@ namespace cov::testing {
 				auto& entry = entries[index];
 				auto& file = rprt.files[index];
 				ASSERT_EQ(file.name, entry->path());
-				ASSERT_EQ(file.dirty, entry->is_dirty());
-				ASSERT_EQ(file.modified, entry->is_modified());
 
 				auto cvg_lines =
 				    backend->lookup<cov::line_coverage>(entry->line_coverage());
@@ -152,7 +145,7 @@ namespace cov::testing {
 		}
 
 		auto backend =
-		    loose_backend_create(setup::test_dir() / "read_nonexisting"sv);
+		    backend::loose_backend(setup::test_dir() / "read_nonexisting"sv);
 		ASSERT_TRUE(backend);
 
 		auto cvg_report = backend->lookup<cov::report>(report_id);
@@ -201,12 +194,12 @@ namespace cov::testing {
 		}
 
 		auto backend =
-		    loose_backend_create(setup::test_dir() / "read_unknown"sv);
+		    backend::loose_backend(setup::test_dir() / "read_unknown"sv);
 		ASSERT_TRUE(backend);
 
 		{
-			auto cvg_report = report_create({}, {}, {}, {}, {}, {}, {}, {}, {},
-			                                {}, {}, {}, {});
+			auto cvg_report =
+			    cov::report::create({}, {}, {}, {}, {}, {}, {}, {}, {}, {});
 			ASSERT_TRUE(cvg_report);
 			ASSERT_TRUE(backend->write(report_id, cvg_report));
 		}
@@ -228,7 +221,7 @@ namespace cov::testing {
 		}
 
 		auto backend =
-		    loose_backend_create(setup::test_dir() / "write_unknown"sv);
+		    backend::loose_backend(setup::test_dir() / "write_unknown"sv);
 		ASSERT_TRUE(backend);
 
 		auto none_ref = make_ref<none>();
@@ -260,7 +253,7 @@ namespace cov::testing {
 		}
 
 		auto backend =
-		    loose_backend_create(setup::test_dir() / "failed_z_stream"sv);
+		    backend::loose_backend(setup::test_dir() / "failed_z_stream"sv);
 		ASSERT_TRUE(backend);
 
 		auto obj = backend->lookup<none>(oid);

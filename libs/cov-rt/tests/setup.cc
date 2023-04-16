@@ -7,8 +7,9 @@
 #include <filesystem>
 #include <git2/global.hh>
 #include <string>
+#include <tar.hh>
 
-namespace cov::testing::setup {
+namespace cov::app::testing::setup {
 	using namespace ::std::literals;
 
 	namespace {
@@ -34,7 +35,8 @@ namespace cov::testing::setup {
 			int counter{};
 		};
 		std::filesystem::path get_test_dir() {
-			static constexpr auto playground = "runtime-tests"sv;
+			static constexpr auto playground =
+			    "runtime-tests-9e85987a06593f1112893578b2c8bc701b9d0ad6"sv;
 			std::error_code ec{};
 			auto const temp = std::filesystem::temp_directory_path(ec);
 			if (ec) {
@@ -49,43 +51,13 @@ namespace cov::testing::setup {
 		}
 	};  // namespace
 
-	test_initializer::test_initializer() {
-		test_globals::get().enter();
-	}
-	test_initializer::~test_initializer() {
-		test_globals::get().leave();
-	}
+	test_initializer::test_initializer() { test_globals::get().enter(); }
+	test_initializer::~test_initializer() { test_globals::get().leave(); }
 
 	std::filesystem::path test_dir() {
 		static std::filesystem::path dirname = get_test_dir();
 		return dirname;
 	}
-
-#ifdef __cpp_lib_char8_t
-	template <typename CharTo, typename Source>
-	std::basic_string_view<CharTo> conv(Source const& view) {
-		return {reinterpret_cast<CharTo const*>(view.data()), view.length()};
-	}
-
-	std::string get_path(path const& p) {
-		auto const s8 = p.generic_u8string();
-		auto const view = conv<char>(s8);
-		return {view.data(), view.length()};
-	}
-
-	path make_path(std::string_view utf8) {
-		return conv<char8_t>(utf8);
-	}
-
-#else
-	std::string get_path(path const& p) {
-		return p.generic_u8string();
-	}
-
-	path make_path(std::string_view utf8) {
-		return std::filesystem::u8path(utf8);
-	}
-#endif
 
 	std::string get_oid(git_oid const& id) {
 		char buffer[42] = "";
@@ -93,12 +65,23 @@ namespace cov::testing::setup {
 		return buffer;
 	}
 
+	git::repository open_verify_repo() {
+		std::error_code ec{};
+		return git::repository::open(test_dir() / "verify"sv, ec);
+	}
+
+	USE_TAR
+
+	namespace {
+#include "verify-tar.inc"
+	}  // namespace
+
 	void test_globals::setup_test_env() {
 		printf("Setting up test environment\n");
-		using namespace std::filesystem;
 
 		std::error_code ignore{};
 		remove_all(test_dir(), ignore);
+		unpack_files(test_dir(), subdirs, text, binary);
 	}
 
 	void test_globals::teardown_test_env() {
@@ -107,8 +90,4 @@ namespace cov::testing::setup {
 		std::error_code ignore{};
 		remove_all(test_dir(), ignore);
 	}
-}  // namespace cov::testing::setup
-
-void PrintTo(std::filesystem::path const& path, ::std::ostream* os) {
-	*os << cov::testing::setup::get_path(path);
-}
+}  // namespace cov::app::testing::setup

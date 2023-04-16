@@ -291,9 +291,7 @@ namespace cov::io {
 		            26 + FO:ES: entry (report_entry x EC)
 
 		        report_entry:
-		            0:31-31: is_dirty (flag)
-		            0:30-30: is_modified (flag)
-		            0:19-0: path (str)
+		            0:31-0: path (str)
 		            coverage_stats:
 		                1:1: total (uint)
 		                2:1: relevant (uint)
@@ -315,10 +313,7 @@ namespace cov::io {
 		              "report_files does not pack well here");
 
 		struct report_entry {
-			uint32_t path : 30;
-			uint32_t is_dirty : 1;     // 0 -- from index, 1 -- from workdir
-			uint32_t is_modified : 1;  // 0 -- workdir file is the one tested, 1
-			                           // -- workdir file was not the not tested
+			uint32_t path;
 			coverage_stats stats;
 			git_oid contents;
 			git_oid line_coverage;
@@ -346,6 +341,7 @@ namespace cov::io {
 		struct coverage {
 			uint32_t value : 31;
 			uint32_t is_null : 1;
+			bool operator==(coverage const&) const noexcept = default;
 		};
 
 		inline coverage_stats& coverage_stats::operator+=(

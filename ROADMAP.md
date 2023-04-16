@@ -28,33 +28,50 @@
     - [x] SetFileAttributes FILE_ATTRIBUTE_HIDDEN
   - [x] `cov config` _(0.11.0-beta)_
   - [x] flatten strings files structure _(0.11.1-beta)_
-  - [ ] `cov module` _(each is a M⬆️P)_
+  - [x] `cov module` _(0.12.0-beta)_
     - _[module "libraries"]_\
     _name=..._\
     _dir=..._\
     _dir=..._
-  - [ ] `cov report`
-    - [ ] coveralls _(separate M⬆️P)_
-    - [ ] cobertura _(separate M⬆️P)_
-  - [ ] `cov log`
-  - [ ] `cov show` _(only one M⬆️P)_
+  - [x] Patch-worth:
+    - [x] add win32 RC file _(0.12.1-beta)_
+    - [x] merge/split .po files _(0.12.2-beta)_
+  - [x] `cov report` _(0.13.0-beta)_
+    - [x] update report-creation API
+      - remove file builder
+      - introduce report builder
+      - get rid of is_dirty/is_modified
+    - [x] own format (either MD5 or SHA over the content, only commit and branch)
+    - [x] coveralls
+    - [x] cobertura
+    - [x] `cov report --amend`
+    - [x] extract `make_u8path`/`get_u8path` to cov-rt
+  - [x] code cleanup
+    - [x] add documentation
+    - [x] `cov::sth_create` -> `cov::sth::create`
+    - [x] drop &beta;
+  - [x] `cov log` _(0.14.0)_
+  - [ ] `cov show`
     - [ ] Report / component / directory view
     - [ ] File view
-  - [ ] `cov report --amend`
-  - [ ] `cov tag` / `branch` / `checkout` _(only one M⬆️P)_
+  - [ ] `cov tag` / `branch` / `checkout`
   - [ ] `cov remove`
-  - [ ] Support for `less` _(optional, M⬆️P)_
-  - _(⬆️FP)_
+  - [ ] Support for `less`
 - [ ] `cov serve`
   - [ ] Boost.Beast WS
   - [ ] React frontend
-  - [ ] Project list _(M⬆️P)_
-  - [ ] Project view _(M⬆️P)_
+  - [ ] Project list
+  - [ ] Project view
     - [ ] Coverage graph
     - [ ] Latest report / report list
   - [ ] Report / component / directory view
-  - [ ] File view _(M⬆️P)_
+  - [ ] File view
 ---
+- [ ] Multi-platform reports
+  - [ ] External build id / tag?
+  - [ ] `cov report` taking more, than one report
+    - with single filter?
+    - with filter per input?
 - [ ] Add report object cache
 - [ ] Highlight partial C++ strings
 - [ ] Add hilite for Python

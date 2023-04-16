@@ -87,6 +87,9 @@ namespace hash {
 		static constexpr size_t digest_length = length;
 
 		std::byte data[length];
+
+		bool operator==(digest_t const&) const noexcept = default;
+
 		std::string str() const {
 			static constexpr char alphabet[] = "0123456789abcdef";
 			std::string out;

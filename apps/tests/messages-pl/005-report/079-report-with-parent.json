@@ -1,0 +1,39 @@
+{
+    "lang": "pl",
+    "args": "report $DATA/build-coverage-2-files.json -f create-report",
+    "patches": {
+        "\u001b\\[0;49;90m\\[master [0-9a-fA-F]+\\] reported files\u001b\\[m": "\u001b[0;49;90m[master $COMMIT] reported files\u001b[m",
+        "\u001b\\[31m\\[main [0-9a-fA-F]+\\]\u001b\\[m reported files": "\u001b[31m[main $REPORT]\u001b[m reported files",
+        " \u001b\\[2;37mw oparciu o\u001b\\[m \u001b\\[2;33m[0-9a-fA-F]+@main\u001b\\[m": " \u001b[2;37mw oparciu o\u001b[m \u001b[2;33m$HEAD@main\u001b[m",
+        " rodzic [0-9a-fA-F]+": " rodzic $PARENT"
+    },
+    "expected": [
+        0,
+        [
+            "\u001b[31m[main $REPORT]\u001b[m reported files",
+            " 2 pliki, \u001b[33m 86%\u001b[m (6/7, -1)",
+            " \u001b[2;37mw oparciu o\u001b[m \u001b[2;33m$HEAD@main\u001b[m",
+            " rodzic $PARENT\n"
+        ],
+        [
+            "[ADD] src/main.cc",
+            "[ADD] src/greetings.cc",
+            "git config core.fsmonitor false",
+            "git add src/main.cc src/greetings.cc",
+            "git commit -m 'reported files'",
+            "\u001b[0;49;90m[master $COMMIT] reported files\u001b[m",
+            "\u001b[0;49;90m 2 files changed, 13 insertions(+)\u001b[m",
+            "\u001b[0;49;90m create mode 100644 src/greetings.cc\u001b[m",
+            "\u001b[0;49;90m create mode 100644 src/main.cc\u001b[m",
+            "cov report: ostrze\u017cenie: src/greetings.cc zosta\u0142 zmodyfikowany po raporcie\n"
+        ]
+    ],
+    "prepare": [
+        "unpack $DATA/repo.git.tar $TMP",
+        "cd '$TMP'",
+        "git clone repo.git",
+        "cd '$TMP/repo'",
+        "cov init",
+        "cov report $DATA/build-coverage.json -f create-report"
+    ]
+}

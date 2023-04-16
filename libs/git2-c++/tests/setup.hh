@@ -6,9 +6,11 @@
 #include <filesystem>
 #include <git2/repository.hh>
 #include <string>
+#include "path.hh"
 
 namespace git::testing::setup {
-	using std::filesystem::path;
+	using ::testing::path::get_path;
+	using ::testing::path::make_u8path;
 	using namespace ::std::literals;
 
 	struct test_initializer {
@@ -18,8 +20,6 @@ namespace git::testing::setup {
 	static test_initializer initializer{};
 
 	std::filesystem::path test_dir();
-	std::string get_path(path const& p);
-	path make_path(std::string_view utf8);
 	git::repository open_repo(std::error_code& ec);
 
 	namespace hash {
@@ -31,5 +31,3 @@ namespace git::testing::setup {
 		    "915365304fffc2cd8fe5b8e2b28cfcf94fdcf9de"sv;
 	}  // namespace hash
 }  // namespace git::testing::setup
-
-void PrintTo(std::filesystem::path const& path, ::std::ostream* os);

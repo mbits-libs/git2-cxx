@@ -1,0 +1,77 @@
+{
+    "lang": "pl",
+    "args": "log",
+    "check": {
+        "stderr": "begin"
+    },
+    "patches": {
+        "Added:     .*": "Added:     $DATE"
+    },
+    "expected": [
+        0,
+        [
+            "report 1be3ab82637c0bb22f2623d287871ab0e588731a",
+            "commit a7b27e91311d2197438f3787e45923da33cf1ffd",
+            "GitBranch: main",
+            "Coverage:  [  0%] 0/0 (fail)",
+            "Author:    Marcin Zdun <mzdun@midnightbits.com>",
+            "Added:     $DATE",
+            "",
+            "      Commit D",
+            "",
+            "report f8dcda75a34d7b3972c436ebc5adc4f0679392b4",
+            "commit b68195e9de89c2fb97626a95818f1b3f81572143",
+            "GitBranch: main",
+            "Coverage:  [  0%] 0/0 (fail)",
+            "Author:    Marcin Zdun <mzdun@midnightbits.com>",
+            "Added:     $DATE",
+            "",
+            "      Commit E",
+            "",
+            "report cb6394c0b1199077b0a47ade847161b32ef9feab",
+            "commit dbe4743823c8b735b98657f788e6af77d57aa53c",
+            "GitBranch: main",
+            "Coverage:  [  0%] 0/0 (fail)",
+            "Author:    Marcin Zdun <mzdun@midnightbits.com>",
+            "Added:     $DATE",
+            "",
+            "      Commit F",
+            "",
+            "report 8b9c7b3b788bf215eeba0c7409e246ab1d67469d",
+            "commit e9ef8f01ec50a1c6cf452f88b1c97874c0a13cc5",
+            "GitBranch: main",
+            "Coverage:  [  0%] 0/0 (fail)",
+            "Author:    Marcin Zdun <mzdun@midnightbits.com>",
+            "Added:     $DATE",
+            "",
+            "      Commit G",
+            "",
+            "report b61f9823ccda24042d5bf8cebdc6496ef17b4523",
+            "commit d09e4694ebf3895043b8e71494e30fcd938097db",
+            "GitBranch: main",
+            "Coverage:  [  0%] 0/0 (fail)",
+            "Author:    Marcin Zdun <mzdun@midnightbits.com>",
+            "Added:     $DATE",
+            "",
+            "      Commit H",
+            "\n"
+        ],
+        [
+            "\t\t#STDOFF\t2:05:08.9",
+            "\t\t#STDOFF\t8:05:43.2",
+            "\t\t#STDOFF\t7:36:41.7",
+            "\t\t#STDOFF\t-0:25:21.1",
+            "\t\t#STDOFF\t1:39:49.2",
+            "\t\t#STDOFF\t-0:36:44.68",
+            "\t\t#STDOFF\t-4:56:01.6",
+            "\t\t#STDOFF\t-3:58:29.2",
+            "\t\t#STDOFF\t-4:19:18.3",
+            "\t\t#STDOFF\t-5:36:13.3",
+            "\t\t#STDOFF\t-4:56:16.4\n"
+        ]
+    ],
+    "prepare": [
+        "unpack $DATA/revparse.tar $TMP",
+        "cd $TMP/revparse"
+    ]
+}

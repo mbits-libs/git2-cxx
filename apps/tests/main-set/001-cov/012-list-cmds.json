@@ -11,7 +11,10 @@
             "config",
             "first",
             "init",
+            "log",
+            "module",
             "name",
+            "report",
             "second",
             "third\n"
         ],

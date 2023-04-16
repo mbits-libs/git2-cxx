@@ -1,15 +1,29 @@
 cmake_minimum_required (VERSION 3.20)
 project (cov
-  DESCRIPTION "Code coverage presented localy"
-  VERSION 0.11.1
+  DESCRIPTION "Code coverage presented locally"
+  VERSION 0.14.0
   LANGUAGES CXX
 )
 
 set(PROJECT_VERSION_SHORT "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}")
-set(PROJECT_VERSION_STABILITY "-beta" # or "-alpha", or "-rc.1", or "-rc.2", or ""
+set(PROJECT_VERSION_STABILITY "" # or "-alpha", or "-beta", or "-rc.1", or "-rc.2"
     CACHE STRING "" FORCE)
 
-set(STRINGS args cov errors cov_init cov_config)
+if (${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR})
+  message(FATAL_ERROR "Building in source firectory is not supported")
+endif()
+
+set(STRINGS
+  args
+  cov
+  errors
+  log_format
+  cov_init
+  cov_config
+  cov_module
+  cov_report
+  cov_log
+)
 set(LANGUAGES pl en)
 
 set(COV_TESTING ON CACHE BOOL "Compile and/or run self-tests")
@@ -28,7 +42,7 @@ find_package(Python3 COMPONENTS Interpreter REQUIRED)
 find_package(libgit2 REQUIRED)
 find_package(fmt REQUIRED)
 find_package(date REQUIRED)
-find_package(args REQUIRED)
+find_package(mbits-args REQUIRED)
 find_program(LNGS lngs)
 
 if (LNGS)
@@ -66,8 +80,8 @@ if (COV_TESTING)
   set(TEST_REPORT_FILE "${CMAKE_SYSTEM_NAME}-${CMAKE_BUILD_TYPE}.xml")
 endif()
 
-include(${CMAKE_BINARY_DIR}/conan/conanbuildinfo.cmake)
-conan_basic_setup()
+include(output_dirs_setup)
+old_conan_output_dirs_setup()
 
 if (MSVC)
   set(ADDITIONAL_WALL_FLAGS

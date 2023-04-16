@@ -72,7 +72,21 @@ namespace cov {
 		file_diff::kind diff_kind{};
 	};
 
+	struct current_head_type {
+		std::string branch{};
+		std::optional<git_oid> tip{};
+
+		bool operator==(current_head_type const& other) const noexcept {
+			return branch == other.branch &&
+			       tip.has_value() == other.tip.has_value() &&
+			       (!tip.has_value() || git_oid_cmp(&*tip, &*other.tip) == 0);
+		}
+	};
+
 	struct repository {
+		repository();
+		repository(repository&&);
+		repository& operator=(repository&&);
 		~repository();
 
 		static std::filesystem::path discover(
@@ -112,9 +126,17 @@ namespace cov {
 			return git_.repo().commondir();
 		}
 
+		git::repository_handle git() const noexcept { return git_.repo(); }
+
 		git::config const& config() const noexcept { return cfg_; }
 		ref_ptr<references> const& refs() const noexcept { return refs_; }
+		current_head_type current_head() const;
+		bool update_current_head(git_oid const& ref,
+		                         current_head_type const& known) const;
 		ref_ptr<object> dwim(std::string_view) const;
+		ref_ptr<object> find_partial(std::string_view partial) const;
+		ref_ptr<object> find_partial(git_oid const& in,
+		                             size_t character_count) const;
 		template <typename Object>
 		ref_ptr<Object> lookup(git_oid const& id, std::error_code& ec) const {
 			return as_a<Object>(lookup_object(id, ec));
@@ -144,7 +166,6 @@ namespace cov {
 		        file_diff::initial_with_self) const;
 
 	protected:
-		repository();
 		explicit repository(std::filesystem::path const& sysroot,
 		                    std::filesystem::path const& common,
 		                    std::error_code&);

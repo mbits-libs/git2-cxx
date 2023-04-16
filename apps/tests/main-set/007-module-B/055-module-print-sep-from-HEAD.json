@@ -1,0 +1,14 @@
+{
+    "args": "module --show-sep HEAD",
+    "expected": [
+        0,
+        "::\n",
+        ""
+    ],
+    "prepare": [
+        "mkdirs $TMP/repo.covdata",
+        "unpack $DATA/repo.covmodule.tar $TMP",
+        "cd $TMP/repo.covdata",
+        "cov init --git-dir $TMP/repo ."
+    ]
+}

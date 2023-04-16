@@ -4,6 +4,7 @@
 #pragma once
 #include <git2/config.h>
 #include <git2/ptr.hh>
+#include <git2/transaction.hh>
 
 #include <filesystem>
 #include <optional>
@@ -40,6 +41,11 @@ namespace git {
 		                          bool for_writing,
 		                          std::error_code& ec);
 
+		std::error_code add_memory(
+		    std::string_view contents,
+		    git_config_level_t level = GIT_CONFIG_LEVEL_LOCAL,
+		    const git_repository* repo = nullptr,
+		    int force = 1) const noexcept;
 		std::error_code add_file_ondisk(
 		    char const* path,
 		    git_config_level_t level = GIT_CONFIG_LEVEL_LOCAL,
@@ -53,6 +59,9 @@ namespace git {
 		std::error_code add_local_config(std::filesystem::path const& directory,
 		                                 const git_repository* repo = nullptr,
 		                                 int force = 1) const;
+
+		transaction lock(std::error_code& ec) const noexcept;
+
 		std::error_code set_unsigned(char const* name,
 		                             unsigned value) const noexcept;
 		std::error_code set_bool(char const* name, bool value) const noexcept;

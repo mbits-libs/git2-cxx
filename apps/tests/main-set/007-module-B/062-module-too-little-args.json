@@ -1,0 +1,15 @@
+{
+    "args": "module --add module",
+    "expected": [
+        2,
+        "",
+        [
+            "usage: cov module [-h] [--show-sep [<git-commit>]] | [--set-sep <value> | --add <name> <dir> | --remove <name> <dir> | --remove-all <name>] | [<git-commit>]",
+            "cov module: error: --add argument needs exactly 2 arguments\n"
+        ]
+    ],
+    "prepare": [
+        "mkdirs $TMP/repo.git",
+        "cd $TMP/repo.git"
+    ]
+}

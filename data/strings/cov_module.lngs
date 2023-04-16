@@ -1,0 +1,58 @@
+[
+    project("cov"),
+	namespace("cov::app::str::cov_module"),
+    version("latest"),
+    serial(1)
+] strings {
+    [help("\"Argument\" name for no arguments"), id(-1)]
+    NOARGS_META = "no arguments";
+    [help("Name of a Git commit argument"), id(-1)]
+    COMMIT_META = "<git-commit>";
+    [help("Description for the no-command call, even without the commit"), id(-1)]
+    SHOW_WORKDIR_DESCRIPTION = "prints module list from git work directory and exits";
+    [help("Description for the no-command call with commit given as an argument"), id(-1)]
+    SHOW_COMMIT_DESCRIPTION = "prints module list for given commit and exits";
+    [help("Description for the --show-sep argument"), id(-1)]
+    SHOW_SEP_DESCRIPTION = "prints module name separator from either workdir or commit";
+    [help("Description for the --set-sep argument"), id(-1)]
+    SET_SEP_DESCRIPTION = "sets new module name separator";
+    [help("Description for the --add argument"), id(-1)]
+    ADD_DESCRIPTION = "adds a directory filter to a new or existing module";
+    [help("Description for the --remove argument"), id(-1)]
+    REMOVE_DESCRIPTION = "removes a directory filter from given module";
+    [help("Description for the --remove-all argument"), id(-1)]
+    REMOVA_ALL_DESCRIPTION = "removes all filters from the module, effectively removing it";
+    [help("Error message for conflicting arguments; used by arguments which cannot be part of series of options"), id(-1)]
+    ERROR_EXCLUSIVE = "{} argument cannot be used with other options";
+    [
+        help("Error message for a missing/redundant argument, this exact number is needed; first parameter becames name of the argument, second is the expected count"),
+        plural("{} argument needs exactly {} arguments"),
+        id(-1)
+    ]
+    ERROR_OPTS_NEEDS_EXACTLY = "{} argument needs exactly {} argument";
+    [
+        help("Error message for a missing/redundant argument, provided amount is lower than minimal expected; first parameter becames name of the argument, second is the expected count"),
+        plural("{} argument needs at least {} arguments"),
+        id(-1)
+    ]
+    ERROR_OPTS_NEEDS_AT_LEAST = "{} argument needs at least {} argument";
+    [
+        help("Error message for a missing/redundant argument, provided amount is larger than maximal expected; first parameter becames name of the argument, second is the expected count"),
+        plural("{} argument needs at most {} arguments"),
+        id(-1)
+    ]
+    ERROR_OPTS_NEEDS_AT_MOST = "{} argument needs at most {} argument";
+    [help("Error message for calling inside a bare Git repository"), id(-1)]
+    ERROR_NO_GIT_WORKDIR = "this operation must be run in a work tree";
+    [help("Error message for calling with a commit range (first..last)"), id(-1)]
+    ERROR_REVPARSE_NEEDS_SINGLE = "<git-commit> argument should describe a single object";
+    [
+        help("Error message for calling with reference to some other type of Git object,than commit (e.g. commited file or directory)"),
+        id(-1)
+    ]
+    ERROR_REVPARSE_NEEDS_COMMIT = "<git-commit> argument should describe a commit";
+    [help("Error message for trying to add a duplicate directory"), id(-1)]
+    ERROR_ADD_DUPLICATE = "module {} already contains directory {}";
+    [help("Error message for trying to remove a directory from non-existent module"), id(-1)]
+    ERROR_REMOVE_NO_MODULE = "there is no {} module";
+}

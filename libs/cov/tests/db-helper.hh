@@ -17,19 +17,13 @@ namespace cov::testing {
 
 	struct file {
 		std::string_view name;
-		bool dirty{}, modified{};
 		line_cvg lines{};
 		unsigned finish{};
 
-		report_entry_builder build(io::v1::coverage_stats const& stats,
-		                           git_oid const& lines_id) const {
-			report_entry_builder bldr{};
-			bldr.set_path(name)
-			    .set_dirty(dirty)
-			    .set_modifed(modified)
-			    .set_stats(stats)
-			    .set_line_coverage(lines_id);
-			return bldr;
+		void add_to(report_files_builder& builder,
+		            io::v1::coverage_stats const& stats,
+		            git_oid const& lines_id) const {
+			builder.add(name, stats, {}, lines_id);
 		}
 	};
 
@@ -80,7 +74,7 @@ namespace cov::testing {
 #pragma GCC diagnostic pop
 #endif
 
-		return line_coverage_create(std::move(result));
+		return line_coverage::create(std::move(result));
 	}
 
 	inline line_cvg from_coverage(std::vector<io::v1::coverage> const& lines,

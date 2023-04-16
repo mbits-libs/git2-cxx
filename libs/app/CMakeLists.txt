@@ -2,9 +2,11 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/dirs.hh.in ${CMAKE_CURRENT_BINARY
 
 set(SOURCES
   src/args.cc
+  src/path.cc
   src/tr.cc
 
   include/cov/app/args.hh
+  include/cov/app/path.hh
   include/cov/app/tr.hh
 )
 
@@ -18,7 +20,11 @@ string(REPLACE ";" ", " STRING_LIST "${STRINGS}")
 message(STATUS "Strings: ${STRING_LIST}")
 string(REPLACE ";" ", " LANGUAGE_LIST "${LANGUAGES}")
 message(STATUS "Languages: ${LANGUAGE_LIST}")
-include(strings)
+
+foreach(STRING_FILE ${STRINGS})
+  list(APPEND SOURCES src/strings/${STRING_FILE}.cc include/cov/app/strings/${STRING_FILE}.hh)
+endforeach()
+
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})
 source_group(TREE ${CMAKE_CURRENT_BINARY_DIR} FILES ${CMAKE_CURRENT_BINARY_DIR}/include/cov/app/dirs.hh)
 
@@ -42,6 +48,22 @@ if (WIN32)
 endif()
 
 set_target_properties(app app_main PROPERTIES FOLDER libs)
+
+foreach(STRING_FILE ${STRINGS})
+  foreach(LANG_ID ${LANGUAGES})
+    set(__lang_ID_int "intermediate/${LANG_ID}/${STRING_FILE}")
+    set(__lang_ID_dir "${PROJECT_BINARY_DIR}/${SHARE_DIR}/locale/${LANG_ID}")
+    set(__lang_ID_bin "${__lang_ID_dir}/${STRING_FILE}")
+
+    add_custom_command(TARGET app
+        POST_BUILD
+        COMMAND "${CMAKE_COMMAND}" -E make_directory "${__lang_ID_dir}"
+        COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_SOURCE_DIR}/data/${__lang_ID_int}" "${__lang_ID_bin}"
+        DEPENDS "${PROJECT_SOURCE_DIR}/data/${__lang_ID_int}"
+        COMMENT "[SHARE] ${LANG_ID}/${STRING_FILE}"
+    )
+  endforeach()
+endforeach()
 
 install(
   TARGETS app app_main

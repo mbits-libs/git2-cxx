@@ -1,0 +1,16 @@
+{
+    "args": "report $DATA/no-git-coverage.json",
+    "expected": [
+        2,
+        "",
+        [
+            "usage: cov report [-h] <report-file> [-f <filter>] [--amend]",
+            "cov report: error: there were issues with $DATA/no-git-coverage.json\n"
+        ]
+    ],
+    "prepare": [
+        "cd '$TMP'",
+        "git init",
+        "cov init"
+    ]
+}

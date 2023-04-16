@@ -49,10 +49,14 @@ namespace cov::app::str::args {
         REQUIRED = 1020,
         /// {0}: error: {1} (Error message template; placeholder 0 will get the name of program, placeholder 1 an actual message)
         ERROR_MSG = 1021,
+        /// {0}: warning: {1} (Warning message template; placeholder 0 will get the name of program, placeholder 1 an actual message)
+        WARNING_MSG = 1022,
         /// cannot open {0} (Needed file was not found)
-        FILE_NOT_FOUND = 1022,
+        FILE_NOT_FOUND = 1023,
         /// Cannot find a Cov repository in {0} (Error message for tool called outside Cov repository)
-        CANNOT_FIND_COV = 1023,
+        CANNOT_FIND_COV = 1024,
+        /// cannot find Git repository in {} (Error message for tool called outside Git repository)
+        CANNOT_FIND_GIT = 1025,
     }; // enum class lng
 
     struct Resource {

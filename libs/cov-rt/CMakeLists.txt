@@ -1,15 +1,27 @@
 set(SOURCES
   src/config.cc
+  src/module.cc
+  src/report_command.cc
+  src/report.cc
   src/root_command.cc
+  src/rt_path.cc
+  src/show_range.cc
   src/split_command.cc
   src/tools.cc
 
   include/cov/app/config.hh
+  include/cov/app/module.hh
   include/cov/app/cov_config_tr.hh
   include/cov/app/cov_init_tr.hh
+  include/cov/app/cov_module_tr.hh
+  include/cov/app/cov_report_tr.hh
   include/cov/app/cov_tr.hh
   include/cov/app/errors_tr.hh
+  include/cov/app/report_command.hh
+  include/cov/app/report.hh
   include/cov/app/root_command.hh
+  include/cov/app/rt_path.hh
+  include/cov/app//show_range.hh
   include/cov/app/split_command.hh
   include/cov/app/tools.hh
 )
@@ -27,7 +39,7 @@ target_link_options(cov-rt PRIVATE ${ADDITIONAL_LINK_FLAGS})
 target_include_directories(cov-rt PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}/include
   ${CMAKE_CURRENT_BINARY_DIR}/include)
-target_link_libraries(cov-rt PUBLIC app)
+target_link_libraries(cov-rt PUBLIC app json)
 
 set_target_properties(cov-rt PROPERTIES FOLDER libs)
 
@@ -55,14 +67,14 @@ if (COV_TESTING)
   set_target_properties(cov-rt-test cov-rt-stress-test PROPERTIES FOLDER tests)
 
   target_compile_options(cov-rt-test PRIVATE ${ADDITIONAL_WALL_FLAGS})
-  target_link_libraries(cov-rt-test cov-rt GTest::gmock_main)
+  target_link_libraries(cov-rt-test PRIVATE cov-rt testing-lib)
   target_include_directories(cov-rt-test
     PRIVATE
       ${CMAKE_CURRENT_SOURCE_DIR}/tests
       ${CMAKE_CURRENT_BINARY_DIR})
 
   target_compile_options(cov-rt-stress-test PRIVATE ${ADDITIONAL_WALL_FLAGS})
-  target_link_libraries(cov-rt-stress-test PRIVATE cov-rt GTest::gmock_main)
+  target_link_libraries(cov-rt-stress-test PRIVATE cov-rt testing-lib)
   target_include_directories(cov-rt-stress-test
     PRIVATE
       ${CMAKE_CURRENT_SOURCE_DIR}/tests

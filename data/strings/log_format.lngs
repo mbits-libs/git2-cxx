@@ -1,0 +1,35 @@
+[
+    project("cov"),
+    namespace("cov::app::str::log_format"),
+    version("latest"),
+    serial(1)
+] strings {
+	[help("Relative time, timestamp in future compared with 'now'."), id(-1)]
+	IN_THE_FUTURE = "in the future";
+	[help("Relative time, no more than few seconds ago"), plural("{} seconds ago"), id(-1)]
+	SECONDS_AGO = "one second ago";
+	[help("Relative time, no more than few minutes ago"), plural("{} minutes ago"), id(-1)]
+	MINUTES_AGO = "one minute ago";
+	[help("Relative time, no more than few hours ago"), plural("{} hours ago"), id(-1)]
+	HOURS_AGO = "one hour ago";
+	[help("Relative time, no more than few days ago"), plural("{} days ago"), id(-1)]
+	DAYS_AGO = "one day ago";
+	[help("Relative time, no more than few weeks ago"), plural("{} weeks ago"), id(-1)]
+	WEEKS_AGO = "one week ago";
+	[help("Relative time, no more than few months ago"), plural("{} months ago"), id(-1)]
+	MONTHS_AGO = "one month ago";
+	[
+        help("Relative time, no more than few 5 years, no less than a years ago; concatented with log_format.MONTHS_AGO to create 'X years, Y months ago'"),
+        plural("{} years,"),
+        id(-1)
+    ]
+	YEARS_MONTHS_AGO = "one year,";
+	[help("Relative time, longer than 5 years, or longer than 12 months, by whole years"), plural("{} years ago"), id(-1)]
+	YEARS_AGO = "one year ago";
+	[help("Result of location coverage below the \"incomplete\" mark"), id(-1)]
+	MARK_FAILING = "fail";
+	[help("Result of location coverage above the \"incomplete\" and below the \"pass\" mark"), id(-1)]
+	MARK_INCOMPLETE = "incomplete";
+	[help("Result of location coverage above the \"pass\" mark"), id(-1)]
+	MARK_PASSING = "pass";
+}

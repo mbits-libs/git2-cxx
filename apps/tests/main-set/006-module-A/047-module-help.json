@@ -1,0 +1,27 @@
+{
+    "args": "module --help",
+    "expected": [
+        0,
+        [
+            "usage: ",
+            " cov module [-h] [<git-commit>]",
+            " cov module [-h] --show-sep [<git-commit>]",
+            " cov module [-h] --set-sep <value>",
+            " cov module [-h] --add <name> <dir>",
+            " cov module [-h] --remove <name> <dir>",
+            " cov module [-h] --remove-all <name>",
+            "",
+            "positional arguments:",
+            " no arguments              prints module list from git work directory and exits",
+            " <git-commit>              prints module list for given commit and exits",
+            "",
+            "optional arguments:",
+            " --show-sep [<git-commit>] prints module name separator from either workdir or commit",
+            " --set-sep <value>         sets new module name separator",
+            " --add <name> <dir>        adds a directory filter to a new or existing module",
+            " --remove <name> <dir>     removes a directory filter from given module",
+            " --remove-all <name>       removes all filters from the module, effectively removing it\n"
+        ],
+        ""
+    ]
+}

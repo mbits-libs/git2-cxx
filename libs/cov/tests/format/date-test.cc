@@ -55,12 +55,12 @@ namespace cov::testing {
 		git_oid_fromstr(&parent_id, "8765432100ffeeddccbbaa998877665544332211");
 		git_oid_fromstr(&commit_id, "36109a1c35e0d5cf3e5e68d896c8b1b4be565525");
 
-		auto report =
-		    report_create(id, parent_id, zero, commit_id, "develop"s,
-		                  "Johnny Appleseed"s, "johnny@appleseed.com"s,
-		                  "Johnny Committer"s, "committer@appleseed.com"s,
-		                  "Subject, isn't it?\n\nBody para 1\n\nBody para 2\n"s,
-		                  commit, add, {1250, 300, 299});
+		auto report = report::create(
+		    id, parent_id, zero, commit_id, "develop"sv,
+		    {"Johnny Appleseed"sv, "johnny@appleseed.com"sv},
+		    {"Johnny Committer"sv, "committer@appleseed.com"sv},
+		    "Subject, isn't it?\n\nBody para 1\n\nBody para 2\n"sv, commit, add,
+		    {1250, 300, 299});
 		ASSERT_TRUE(report);
 
 		auto view = ph::report_view::from(*report);

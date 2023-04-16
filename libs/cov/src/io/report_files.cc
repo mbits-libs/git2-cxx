@@ -8,28 +8,32 @@
 namespace cov::io::handlers {
 	namespace {
 		struct report_entry_impl : report_entry {
-			report_entry_impl(report_entry_builder&& data)
-			    : data_{std::move(data)} {}
+			report_entry_impl(std::string_view path,
+			                  io::v1::coverage_stats const& stats,
+			                  git_oid const& contents,
+			                  git_oid const& line_coverage)
+			    : path_{path.data(), path.size()}
+			    , stats_{stats}
+			    , contents_{contents}
+			    , line_coverage_{line_coverage} {}
+
 			~report_entry_impl() = default;
-			bool is_dirty() const noexcept override { return data_.is_dirty; }
-			bool is_modified() const noexcept override {
-				return data_.is_modified;
-			}
-			std::string_view path() const noexcept override {
-				return data_.path;
-			}
+			std::string_view path() const noexcept override { return path_; }
 			io::v1::coverage_stats const& stats() const noexcept override {
-				return data_.stats;
+				return stats_;
 			}
 			git_oid const& contents() const noexcept override {
-				return data_.contents;
+				return contents_;
 			}
 			git_oid const& line_coverage() const noexcept override {
-				return data_.line_coverage;
+				return line_coverage_;
 			}
 
 		private:
-			report_entry_builder data_;
+			std::string path_{};
+			io::v1::coverage_stats stats_{};
+			git_oid contents_{};
+			git_oid line_coverage_{};
 		};
 
 		struct impl : counted_impl<cov::report_files> {
@@ -45,11 +49,13 @@ namespace cov::io::handlers {
 			std::vector<std::unique_ptr<report_entry>> files_{};
 		};
 
-		constexpr uint32_t uint_30(size_t value) {
-			return static_cast<uint32_t>(value & ((1u << 30) - 1u));
+		constexpr uint32_t uint_32(size_t value) {
+			return static_cast<uint32_t>(value &
+			                             std::numeric_limits<uint32_t>::max());
 		}
-		static_assert(uint_30(std::numeric_limits<size_t>::max()) ==
-		              0x3FFF'FFFF);
+		static_assert(sizeof(1ull) > 4);
+		static_assert(uint_32(std::numeric_limits<size_t>::max()) ==
+		              0xFFFF'FFFF);
 	}  // namespace
 
 	ref_ptr<counted> report_files::load(uint32_t,
@@ -76,40 +82,30 @@ namespace cov::io::handlers {
 		             sizeof(uint32_t)))
 			return {};
 
-		std::vector<std::unique_ptr<report_entry>> result(header.entries_count);
+		report_files_builder builder{};
 		std::vector<std::byte> buffer{};
 
-		for (auto& file : result) {
+		for (uint32_t index = 0; index < header.entries_count; ++index) {
 			if (!in.load(buffer, entry_size)) return {};
 			auto const& entry =
 			    *reinterpret_cast<v1::report_entry const*>(buffer.data());
 
 			if (!strings.is_valid(entry.path)) return {};
 
-			report_entry_builder builder{};
-			builder.set_dirty(entry.is_dirty)
-			    .set_modifed(entry.is_modified)
-			    .set_path(strings.at(entry.path))
-			    .set_stats(entry.stats)
-			    .set_contents(entry.contents)
-			    .set_line_coverage(entry.line_coverage);
-			file = std::move(builder).create();
+			builder.add(strings.at(entry.path), entry.stats, entry.contents,
+			            entry.line_coverage);
 		}
 
 		ec.clear();
-		return report_files_create(std::move(result));
+		return builder.extract();
 	}
 
 #if defined(__GNUC__)
 // The warning is legit, since as_a<> can return nullptr, if there is no
 // cov::report_files in type tree branch, but this should be called from within
 // db_object::store, which is guarded by report_files::recognized
-//
-// Conversion is turned off due to "out_entry.path = path30", which is mitigated
-// through uint_30()
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wnull-dereference"
-#pragma GCC diagnostic ignored "-Wconversion"
 #endif
 	bool report_files::store(ref_ptr<counted> const& value,
 	                         write_stream& out) const {
@@ -144,13 +140,11 @@ namespace cov::io::handlers {
 			auto& in = *entry_ptr;
 
 			auto const path = stg.locate_or(in.path(), stg.size() + 1);
-			auto const path30 = uint_30(path);
-			if (path != path30 || path30 > stg.size()) return false;
+			auto const path32 = uint_32(path);
+			if (path != path32 || path32 > stg.size()) return false;
 
 			v1::report_entry entry = {
-			    .path = path30,
-			    .is_dirty = in.is_dirty() ? 1u : 0u,
-			    .is_modified = in.is_modified() ? 1u : 0u,
+			    .path = path32,
 			    .stats = in.stats(),
 			    .contents = in.contents(),
 			    .line_coverage = in.line_coverage(),
@@ -169,13 +163,47 @@ namespace cov::io::handlers {
 namespace cov {
 	report_entry::~report_entry() {}
 
-	std::unique_ptr<report_entry> report_entry_builder::create() && {
-		return std::make_unique<io::handlers::report_entry_impl>(
-		    std::move(*this));
-	}
-
-	ref_ptr<report_files> report_files_create(
+	ref_ptr<report_files> report_files::create(
 	    std::vector<std::unique_ptr<report_entry>>&& entries) {
 		return make_ref<io::handlers::impl>(std::move(entries));
 	}
+
+	report_files_builder& report_files_builder::add(
+	    std::unique_ptr<report_entry>&& entry) {
+		auto const filename = entry->path();
+		entries_[filename] = std::move(entry);
+		return *this;
+	}
+
+	report_files_builder& report_files_builder::add(
+	    std::string_view path,
+	    io::v1::coverage_stats const& stats,
+	    git_oid const& contents,
+	    git_oid const& line_coverage) {
+		return add(std::make_unique<io::handlers::report_entry_impl>(
+		    path, stats, contents, line_coverage));
+	}
+
+	bool report_files_builder::remove(std::string_view path) {
+		auto it = entries_.find(path);
+		if (it == entries_.end()) return false;
+		entries_.erase(it);
+		return true;
+	}
+
+	ref_ptr<report_files> report_files_builder::extract() {
+		return report_files::create(release());
+	}
+
+	std::vector<std::unique_ptr<report_entry>> report_files_builder::release() {
+		std::vector<std::unique_ptr<report_entry>> entries{};
+		entries.reserve(entries_.size());
+		std::transform(std::move_iterator(entries_.begin()),
+		               std::move_iterator(entries_.end()),
+		               std::back_inserter(entries),
+		               [](auto&& pair) { return std::move(pair.second); });
+		entries_.clear();
+		return entries;
+	}  // GCOV_EXCL_LINE[GCC]
+
 }  // namespace cov

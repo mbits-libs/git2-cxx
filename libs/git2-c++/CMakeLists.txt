@@ -9,6 +9,7 @@ set(SOURCES
   src/ptr.cc
   src/repository.cc
   src/submodule.cc
+  src/transaction.cc
   src/tree.cc
   include/git2/bytes.hh
   include/git2/blob.hh
@@ -22,6 +23,7 @@ set(SOURCES
   include/git2/ptr.hh
   include/git2/repository.hh
   include/git2/submodule.hh
+  include/git2/transaction.hh
   include/git2/tree.hh
 )
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})
@@ -53,14 +55,14 @@ if (COV_TESTING)
   set_target_properties(git2-test git2-stress-test PROPERTIES FOLDER tests)
 
   target_compile_options(git2-test PRIVATE ${ADDITIONAL_WALL_FLAGS})
-  target_link_libraries(git2-test PRIVATE git2-c++ GTest::gmock_main fmt::fmt)
+  target_link_libraries(git2-test PRIVATE git2-c++ testing-lib)
   target_include_directories(git2-test
     PRIVATE
       ${CMAKE_CURRENT_SOURCE_DIR}/tests
       ${CMAKE_CURRENT_BINARY_DIR})
 
   target_compile_options(git2-stress-test PRIVATE ${ADDITIONAL_WALL_FLAGS})
-  target_link_libraries(git2-stress-test PRIVATE git2-c++ GTest::gmock_main fmt::fmt)
+  target_link_libraries(git2-stress-test PRIVATE git2-c++ testing-lib)
   target_include_directories(git2-stress-test
     PRIVATE
       ${CMAKE_CURRENT_SOURCE_DIR}/tests

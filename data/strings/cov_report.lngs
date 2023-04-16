@@ -1,0 +1,53 @@
+[
+    project("cov"),
+    namespace("cov::app::str::cov_report"),
+    version("latest"),
+    serial(1)
+] strings {
+	[help("Name of report file argument (be it Cobertura XML or Coveralls JSON)"), id(-1)]
+	REPORT_FILE_META = "<report-file>";
+	[help("Name of filter argument"), id(-1)]
+	FILTER_META = "<filter>";
+    [help("Description for the report file argument"), id(-1)]
+    REPORT_FILE_DESCRIPTION = "selects report to import";
+    [help("Description for the report file argument; the list at the end uses REPORT_FILE_DESCRIPTION_LIST_END"), id(-1)]
+    FILTER_DESCRIPTION = "filters other report formats to internal cov format; known filters are: {}";
+    [help("Final part of the report file argument description; together the list will be \"known filters are: 'first', 'second', 'third' and 'fourth'\""), id(-1)]
+    FILTER_DESCRIPTION_LIST_END = "{} and {}";
+    [help("Description for the --amend argument"), id(-1)]
+    AMEND_DESCRIPTION = "replaces the tip of the current branch by creating a new commit";
+    [help("Error message for non-0 result code from a filter"), id(-1)]
+    ERROR_FILTER_FAILED = "filter {} exited with return code {}";
+    [help("Error message for a missing filter file"), id(-1)]
+    ERROR_FILTER_NOENT = "filter {} could not be found";
+    [help("Error message for unusable filter file"), id(-1)]
+    ERROR_FILTER_ACCESS = "filter {} could not be used";
+    [help("Error message for issues with cov JSON"), id(-1)]
+    ERROR_REPORT_ISSUES = "there were issues with {}";
+    [help("Error message for issues with cov JSON, which was produced by a filter"), id(-1)]
+    ERROR_FILTERED_REPORT_ISSUES = "there were issues with {} processed by {} filter";
+    [help("Error message for failing to find the reported commit in the git repository"), id(-1)]
+    ERROR_CANNOT_LOAD_COMMIT = "cannot find the Git commit from report";
+    [help("Error message for failing to open a file"), id(-1)]
+    ERROR_CANNOT_FIND_FILE = "cannot find {}";
+    [help("Error message for failing to write repository objects"), id(-1)]
+    ERROR_CANNOT_WRITE_TO_DB = "cannot write to repository database";
+    [help("Error message for failing to read repository objects"), id(-1)]
+    ERROR_CANNOT_READ_FROM_DB = "cannot read current report back";
+    [help("Error message for calling the app in bare repository"), id(-1)]
+    ERROR_BARE_GIT = "this operation must be run in a work tree";
+    [help("Error message for trying to read from a missing file"), id(-1)]
+    ERROR_CANNOT_OPEN_FILE = "could not read {}";
+    [help("Error message for calling --amend before any reports"), id(-1)]
+    ERROR_AMEND_IN_FRESH_REPO = "you have nothing to amend";
+    [help("Warning message for adding a modified file"), id(-1)]
+    WARNING_FILE_MODIFIED = "{} was modified after the report";
+    [help("Name of a branch, when there is no branch"), id(-1)]
+    MESSAGE_DETACHED_HEAD = "detached HEAD";
+    [help("Number of files in current report"), plural("{} files"), id(-1)]
+    MESSAGE_FILE_COUNT = "{} file";
+    [help("Description for commit in current report; will become \"based on 13a39fbf9@main\""), id(-1)]
+    MESSAGE_FIELD_GIT_COMMIT = "based on";
+    [help("Description for parent of current report; will become \"parent d4965abfb\""), id(-1)]
+    MESSAGE_FIELD_PARENT_REPORT = "parent";
+}

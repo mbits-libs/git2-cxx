@@ -5,10 +5,21 @@
 #include <git2/oid.h>
 #include <cov/object.hh>
 #include <filesystem>
+#include <string>
 #include <string_view>
+#include <utility>
 
 namespace cov {
-	enum class reference_type : bool { direct = true, symbolic = false };
+	enum class reference_type : int { undetermined, direct, symbolic };
+	enum class ref_tgt : int;
+
+	struct reference_name {
+		ref_tgt tgt_kind;
+		std::string name;
+		size_t shorthand_prefix;
+	};
+
+	struct references;
 
 	struct reference : object {
 		obj_type type() const noexcept override { return obj_reference; };
@@ -22,6 +33,14 @@ namespace cov {
 		virtual std::string_view symbolic_target() const noexcept = 0;
 		virtual git_oid const* direct_target() const noexcept = 0;
 		virtual ref_ptr<reference> peel_target() noexcept = 0;
+
+		static ref_ptr<reference> direct(reference_name&& name,
+		                                 git_oid const& target);
+		static ref_ptr<reference> symbolic(
+		    reference_name&& name,
+		    std::string const& target,
+		    ref_ptr<references> const& peel_source);
+		static ref_ptr<reference> null(reference_name&& name);
 	};
 
 	template <typename ListType, typename ItemType>
@@ -65,10 +84,16 @@ namespace cov {
 		using iter_t = iterator_t<reference_list, reference>;
 		iter_t begin() { return {this}; }
 		iter_t end() { return {}; }
+
+		static ref_ptr<reference_list> create(
+		    std::filesystem::path const& path,
+		    std::string const& prefix,
+		    ref_ptr<references> const& source);
 	};
 
 	struct references : object {
 		static ref_ptr<references> make_refs(std::filesystem::path const& root);
+		static reference_name prefix_info(std::string_view name);
 		obj_type type() const noexcept override { return obj_references; };
 		bool is_references() const noexcept final { return true; }
 		virtual ref_ptr<reference> create(std::string_view name,

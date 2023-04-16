@@ -3,7 +3,9 @@
 
 #include <fmt/format.h>
 #include <cov/app/dirs.hh>
+#include <cov/app/path.hh>
 #include <cov/app/root_command.hh>
+#include <cov/app/rt_path.hh>
 #include <cov/app/tr.hh>
 #include <cov/version.hh>
 
@@ -70,25 +72,9 @@ namespace cov::app::root {
 			std::exit(0);
 		}  // GCOV_EXCL_LINE[WIN32]
 
-#ifdef __cpp_lib_char8_t
-		template <typename CharTo, typename Source>
-		inline std::basic_string_view<CharTo> conv(Source const& view) {
-			return {reinterpret_cast<CharTo const*>(view.data()),
-			        view.length()};
-		}
-
-		inline std::filesystem::path make_path(std::string_view utf8) {
-			return conv<char8_t>(utf8);
-		}
-#else
-		inline std::filesystem::path make_path(std::string_view utf8) {
-			return std::filesystem::u8path(utf8);
-		}
-#endif
-
 		void change_dir(args::parser& p, std::string const& dirname_str) {
 			std::error_code ec;
-			std::filesystem::current_path(make_path(dirname_str), ec);
+			std::filesystem::current_path(make_u8path(dirname_str), ec);
 			if (ec) p.error(dirname_str + ": " + platform::con_to_u8(ec));
 		}
 

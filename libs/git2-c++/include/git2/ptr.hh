@@ -2,6 +2,7 @@
 // This code is licensed under MIT license (see LICENSE for details)
 
 #pragma once
+#include <git2/object.h>
 #include <git2/types.h>
 #include <git2/error.hh>
 #include <memory>
@@ -11,6 +12,11 @@ namespace git {
 	template <typename Object>
 	struct ptr_closer;
 
+	template <>
+	struct ptr_closer<git_object> {
+		void operator()(git_object* ptr) { git_object_free(ptr); }
+	};
+
 	template <typename Object>
 	struct ptr : protected std::unique_ptr<Object, ptr_closer<Object>> {
 		using std::unique_ptr<Object, ptr_closer<Object>>::unique_ptr;
@@ -19,6 +25,8 @@ namespace git {
 		    typename std::unique_ptr<Object, ptr_closer<Object>>::pointer;
 		using element_type =
 		    typename std::unique_ptr<Object, ptr_closer<Object>>::element_type;
+
+		pointer raw() const noexcept { return this->get(); }
 	};
 
 	template <typename Object>
@@ -35,6 +43,8 @@ namespace git {
 		handle& operator=(handle&&) = default;
 
 		explicit operator bool() const noexcept { return !!ptr_; }
+
+		pointer raw() const noexcept { return ptr_; }
 
 	protected:
 		pointer get() const noexcept { return ptr_; }

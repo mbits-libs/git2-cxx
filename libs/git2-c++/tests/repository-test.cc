@@ -10,17 +10,17 @@
 namespace git::testing {
 	using namespace ::std::literals;
 	using setup::get_path;
-	using setup::make_path;
+	using setup::make_u8path;
 	using std::filesystem::path;
 	using ::testing::TestWithParam;
 	using ::testing::ValuesIn;
 
 	path append(path const& root, std::string_view utf8) {
-		return root / make_path(utf8);
+		return root / make_u8path(utf8);
 	}
 
 	path make_absolute(std::string_view utf8, bool absolute = false) {
-		if (absolute) return make_path(utf8);
+		if (absolute) return make_u8path(utf8);
 
 		return append(setup::test_dir(), utf8);
 	}

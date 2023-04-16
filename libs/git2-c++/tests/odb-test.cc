@@ -116,7 +116,7 @@ namespace git::testing {
 		auto [repo, hash, expected] = GetParam();
 		std::error_code ec{};
 		git::odb const odb =
-		    git::odb::open(setup::test_dir() / setup::make_path(repo), ec);
+		    git::odb::open(setup::test_dir() / setup::make_u8path(repo), ec);
 		ASSERT_FALSE(ec);
 		git_oid oid;
 		ASSERT_EQ(0, git_oid_fromstrn(&oid, hash.data(), hash.length()));

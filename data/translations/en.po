@@ -1,0 +1,811 @@
+# Code coverage presented locally.
+# Copyright (C) 2022 midnightBITS
+# This file is distributed under the same license as the cov package.
+# Marcin Zdun <mzdun@midnightbits.com>, 2022.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: cov latest\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-08-14 19:44+0200\n"
+"PO-Revision-Date: 2022-08-14 19:46+0200\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 2.4.2\n"
+
+#. Universal error message
+msgctxt "args.ARGUMENT_MSG"
+msgid "argument {0}: {1}"
+msgstr "argument {0}: {1}"
+
+#. Error message for tool called outside Cov repository
+msgctxt "args.CANNOT_FIND_COV"
+msgid "Cannot find a Cov repository in {0}"
+msgstr "Cannot find a Cov repository in {0}"
+
+#. Error message for tool called outside Git repository
+msgctxt "args.CANNOT_FIND_GIT"
+msgid "cannot find Git repository in {}"
+msgstr "cannot find a Git repository in {0}"
+
+#. Default name of an argument
+msgctxt "args.DEF_META"
+msgid "<arg>"
+msgstr "<arg>"
+
+#. Name of a directory argument
+msgctxt "args.DIR_META"
+msgid "<dir>"
+msgstr "<dir>"
+
+#. Error message template; placeholder 0 will get the name of program,
+#. placeholder 1 an actual message
+msgctxt "args.ERROR_MSG"
+msgid "{0}: error: {1}"
+msgstr "{0}: error: {1}"
+
+#. Error message for conflicting arguments; used with ARGUMENT_MSG
+msgctxt "args.EXCLUSIVE"
+msgid "not allowed with argument {0}"
+msgstr "not allowed with argument {0}"
+
+#. Name of a file argument
+msgctxt "args.FILE_META"
+msgid "<file>"
+msgstr "<file>"
+
+#. Needed file was not found
+msgctxt "args.FILE_NOT_FOUND"
+msgid "cannot open {0}"
+msgstr "cannot open {0}"
+
+#. Description for the -h/--help argument
+msgctxt "args.HELP_DESCRIPTION"
+msgid "shows this help message and exits"
+msgstr "shows this help message and exits"
+
+#. Name of a, well, name argument, e.g. in cov config
+msgctxt "args.NAME_META"
+msgid "<name>"
+msgstr "<name>"
+
+#. Error message for a numeric argument, when parsing would get outside of
+#. representable bounds
+msgctxt "args.NEEDED_NUMBER_EXCEEDED"
+msgid "argument {0}: number outside of expected bounds"
+msgstr "argument {0}: number outside of expected bounds"
+
+#. Help message presenting a list of possible values for a list-type argument
+msgctxt "args.NEEDS_ENUM_KNOWN_VALUES"
+msgid "known values for {0}: {1}"
+msgstr "known values for {0}: {1}"
+
+#. Error message for a list of arguments, when parsing failed
+msgctxt "args.NEEDS_ENUM_UNKNOWN"
+msgid "argument {0}: value {1} is not recognized"
+msgstr "argument {0}: value {1} is not recognized"
+
+#. Error message for unneeded value
+msgctxt "args.NEEDS_NO_PARAM"
+msgid "argument {0}: value was not expected"
+msgstr "argument {0}: value was not expected"
+
+#. Error message for a numeric argument, when parsing failed
+msgctxt "args.NEEDS_NUMBER"
+msgid "argument {0}: expected a number"
+msgstr "argument {0}: expected a number"
+
+#. Error message for a missing argument
+msgctxt "args.NEEDS_PARAM"
+msgid "argument {0}: expected one argument"
+msgstr "argument {0}: expected one argument"
+
+#. Header for list of optional arguments
+msgctxt "args.OPTIONALS"
+msgid "optional arguments"
+msgstr "optional arguments"
+
+#. Name of a file or directory argument
+msgctxt "args.PATH_META"
+msgid "<path>"
+msgstr "<path>"
+
+#. Header for list of positional arguments
+msgctxt "args.POSITIONALS"
+msgid "positional arguments"
+msgstr "positional arguments"
+
+#. Error message for a missing required argument
+msgctxt "args.REQUIRED"
+msgid "argument {0} is required"
+msgstr "argument {0} is required"
+
+#. Error message for an unrecognized argument; the placeholder will contain
+#. the name of the argument
+msgctxt "args.UNRECOGNIZED"
+msgid "unrecognized argument: {0}"
+msgstr "unrecognized argument: {0}"
+
+#. Synopsis header; please note there is one space at the end of this entry
+msgctxt "args.USAGE"
+msgid "usage: "
+msgstr "usage: "
+
+#. Name of a value argument, e.g. in cov config
+msgctxt "args.VALUE_META"
+msgid "<value>"
+msgstr "<value>"
+
+#. Warning message template; placeholder 0 will get the name of program,
+#. placeholder 1 an actual message
+msgctxt "args.WARNING_MSG"
+msgid "{0}: warning: {1}"
+msgstr "{0}: warning: {1}"
+
+#. Description for the -C argument
+msgctxt "cov.CWD_DESCRIPTION"
+msgid "runs as if cov was started in <dir> instead of the current working directory"
+msgstr "runs as if cov was started in <dir> instead of the current working directory"
+
+#. Description for windows binaries
+msgctxt "cov.DESCRIPTION"
+msgid "Cov for Windows"
+msgstr "Cov for Windows"
+
+#. Error message for alias, which is not properly created
+msgctxt "cov.ERROR_ALIAS"
+msgid "empty alias for '{}'"
+msgstr "empty alias for '{}'"
+
+#. Error mesage for a tool, which was not recognized
+msgctxt "cov.ERROR_TOOL_NOT_RECOGNIZED"
+msgid "\"{}\" is not a cov command"
+msgstr "\"{}\" is not a cov command"
+
+#. Answer for --help option for alias tool
+msgctxt "cov.HELP_ALIAS"
+msgid "'{}' is aliased to '{}'"
+msgstr "'{}' is aliased to '{}'"
+
+#. Description for the add tool
+msgctxt "cov.HELP_DESCRIPTION_ADD"
+msgid "appends a report to repo"
+msgstr "appends a report to repo"
+
+#. Description for the config tool
+msgctxt "cov.HELP_DESCRIPTION_CONFIG"
+msgid "shows and/or sets various settings"
+msgstr "shows and/or sets various settings"
+
+#. Description for the init tool
+msgctxt "cov.HELP_DESCRIPTION_INIT"
+msgid "creates a new cov repo"
+msgstr "creates a new cov repo"
+
+#. Description for the log tool
+msgctxt "cov.HELP_DESCRIPTION_LOG"
+msgid "prints a list of reports"
+msgstr "prints a list of reports"
+
+#. Description for the module tool
+msgctxt "cov.HELP_DESCRIPTION_MODULE"
+msgid "defines file groups"
+msgstr "defines file groups"
+
+#. Description for the remove tool
+msgctxt "cov.HELP_DESCRIPTION_REMOVE"
+msgid "removes a particular report from repo"
+msgstr "removes a particular report from repo"
+
+#. Description for the serve tool
+msgctxt "cov.HELP_DESCRIPTION_SERVE"
+msgid "starts a local webserver with reports"
+msgstr "starts a local webserver with reports"
+
+#. Description for the show tool
+msgctxt "cov.HELP_DESCRIPTION_SHOW"
+msgid "shows a specific report"
+msgstr "shows a specific report"
+
+#. Help group title for common tools
+msgctxt "cov.HELP_GROUP_COMMON"
+msgid "common commands"
+msgstr "common commands"
+
+#. Description for the --list-cmds argument
+msgctxt "cov.LIST_CMDS_DESCRIPTION"
+msgid "lists known commands from requested groups"
+msgstr "lists known commands from requested groups"
+
+#. Name of a command group argument
+msgctxt "cov.SPECS_MULTI_META"
+msgid "<spec>[,<spec>,...]"
+msgstr "<spec>[,<spec>,...]"
+
+#. Short usage description
+msgctxt "cov.USAGE"
+msgid "[-h] [-C <dir>] <command> [<args>]"
+msgstr "[-h] [-C <dir>] <command> [<args>]"
+
+#. Description for the -v/--version argument
+msgctxt "cov.VERSION_DESCRIPTION"
+msgid "shows version information and exits"
+msgstr "shows version information and exits"
+
+#. Answer for --version option
+msgctxt "cov.VERSION_IS"
+msgid "cov version {}"
+msgstr "cov version {}"
+
+#. Description for the --add scope
+msgctxt "cov_config.ADD"
+msgid "adds a new line to the option without altering any existing values"
+msgstr "adds a new line to the option without altering any existing values"
+
+#. Error message for --add with only one option
+msgctxt "cov_config.ADD_VALUE_MISSING"
+msgid "needs both <name> and <value>"
+msgstr "needs both <name> and <value>"
+
+#. Description for the --get scope
+msgctxt "cov_config.GET"
+msgid "prints the value matching the key name"
+msgstr "prints the value matching the key name"
+
+#. Description for the --get-all scope
+msgctxt "cov_config.GET_ALL"
+msgid "prints all values matching the key name"
+msgstr "prints all values matching the key name"
+
+#. Description for the --list scope
+msgctxt "cov_config.LIST_ENTRIES"
+msgid "lists all variables in a config files"
+msgstr "lists all variables in a config files"
+
+#. Description for the positional arguments (name and optional value)
+msgctxt "cov_config.NAME_VALUE"
+msgid "when only name is given, reads its value; otherwise sets the new value"
+msgstr "when only name is given, reads its value; otherwise sets the new value"
+
+#. Description for missing scope
+msgctxt "cov_config.NO_SCOPE_DESCRIPTION"
+msgid "reads from all visible scopes at once, writes to .covdata/config"
+msgstr "reads from all visible scopes at once, writes to .covdata/config"
+
+#. Name for the situation, when neither local, global, nor system scopes were
+#. chosen.
+msgctxt "cov_config.NO_SCOPE_META"
+msgid "<no option>"
+msgstr "<no option>"
+
+#. Description for the --file scope
+msgctxt "cov_config.SCOPE_FILE"
+msgid "chooses given file"
+msgstr "chooses given file"
+
+#. Description for the --global scope
+msgctxt "cov_config.SCOPE_GLOBAL"
+msgid "chooses ~/.config/cov/config"
+msgstr "chooses ~/.config/cov/config"
+
+#. Description for the --local scope
+msgctxt "cov_config.SCOPE_LOCAL"
+msgid "chooses .covdata/config"
+msgstr "chooses .covdata/config"
+
+#. Name of a file options argument(s)
+msgctxt "cov_config.SCOPE_META"
+msgid "<file-options>"
+msgstr "<file-options>"
+
+#. Description for the --system scope
+msgctxt "cov_config.SCOPE_SYSTEM"
+msgid "chooses $(prefix)/etc/covconfig"
+msgstr "chooses $(prefix)/etc/covconfig"
+
+#. Header for list of scopes
+msgctxt "cov_config.SCOPE_TITLE"
+msgid "file options"
+msgstr "file options"
+
+#. Error message for name/value pair, which seems to have a triplet
+msgctxt "cov_config.TOO_MANY_ARGUMENTS"
+msgid "too many arguments"
+msgstr "too many arguments"
+
+#. Description for the --unset scope
+msgctxt "cov_config.UNSET"
+msgid "removes the value matching the key name if there is exactly one"
+msgstr "removes the value matching the key name if there is exactly one"
+
+#. Description for the --unset-all scope
+msgctxt "cov_config.UNSET_ALL"
+msgid "removes all values matching the key name"
+msgstr "removes all values matching the key name"
+
+#. Description for the init's last argument
+msgctxt "cov_init.ARG_DIRECTORY"
+msgid "sets the directory to put the repository in; defaults to current directory"
+msgstr "sets the directory to put the repository in; defaults to current directory"
+
+#. Description for the --force argument
+msgctxt "cov_init.ARG_FORCE"
+msgid "will re-init the repository with a fresh database"
+msgstr "will re-init the repository with a fresh database"
+
+#. Description for the --git-dir argument
+msgctxt "cov_init.ARG_GITDIR"
+msgid "points to connected Git repository; defaults to current repo"
+msgstr "points to connected Git repository; defaults to current repo"
+
+#. Error message for filesystem issues with new repository
+msgctxt "cov_init.CANNOT_INITIALIZE"
+msgid "Cannot initialize Cov repository in {0}"
+msgstr "Cannot initialize Cov repository in {0}"
+
+#. Error message for removal of existing repository
+msgctxt "cov_init.CANNOT_REMOVE"
+msgid "Cannot remove Cov repository in {0}"
+msgstr "Cannot remove Cov repository in {0}"
+
+#. Name of the init's last argument; note this one does not have angle
+#. brackets
+msgctxt "cov_init.DIR_META"
+msgid "directory"
+msgstr "directory"
+
+#. Error message for pre-exisiting repository
+msgctxt "cov_init.EXISTS"
+msgid "Cov repository already exists in {0}"
+msgstr "Cov repository already exists in {0}"
+
+#. Message for successful initialization
+msgctxt "cov_init.INITIALIZED"
+msgid "Initialized empty Cov repository in {0}"
+msgstr "Initialized empty Cov repository in {0}"
+
+#. Error message for wrong initial directory
+msgctxt "cov_init.NOT_GIT"
+msgid "not git repo: {0}"
+msgstr "not git repo: {0}"
+
+#. Message for successful re-initialization
+msgctxt "cov_init.REINITIALIZED"
+msgid "Reinitialized empty Cov repository in {0}"
+msgstr "Reinitialized empty Cov repository in {0}"
+
+#. Message pointing to dependent git repository
+msgctxt "cov_init.USING_GIT"
+msgid "Using Git repository in {0}"
+msgstr "Using Git repository in {0}"
+
+#. Description for --abbrev-hash argument
+msgctxt "cov_log.ABBREV_HASH_DESCRIPTION"
+msgid ""
+"instead of showing the full 40-byte hexadecimal report object name, shows a prefix "
+"that names the objects uniquely"
+msgstr ""
+"instead of showing the full 40-byte hexadecimal report object name, shows a prefix "
+"that names the objects uniquely"
+
+#. Description for --format argument
+msgctxt "cov_log.FORMAT_DESCRIPTION"
+msgid ""
+"pretty-prints the contents of the report logs in a given format, where <format> "
+"can be one of 'oneline', 'short', 'medium', 'full', 'fuller', 'reference', 'raw' "
+"and 'pretty:<string>'; when <format> is none of the above, and has %placeholder in "
+"it, it acts as if --format=pretty:<format> were given"
+msgstr ""
+"pretty-prints the contents of the report logs in a given format, where <format> "
+"can be one of 'oneline', 'short', 'medium', 'full', 'fuller', 'reference', 'raw' "
+"and 'pretty:<string>'; when <format> is none of the above, and has %placeholder in "
+"it, it acts as if --format=pretty:<format> were given"
+
+#. Name of --format argument
+msgctxt "cov_log.FORMAT_META"
+msgid "<format>"
+msgstr "<format>"
+
+#. Description for --decorate argument
+msgctxt "cov_log.HOW_DESCRIPTION"
+msgid ""
+"prints out ref names of any reports that are shown; <how> is 'short', 'auto', or "
+"'no'"
+msgstr ""
+"prints out ref names of any reports that are shown; <how> is 'short', 'auto', or "
+"'no'"
+
+#. Name of --decorate argument
+msgctxt "cov_log.HOW_META"
+msgid "<how>"
+msgstr "<how>"
+
+#. Description for -n/--max-count argument
+msgctxt "cov_log.MAX_COUNT_DESCRIPTION"
+msgid "limits the number of reports to output"
+msgstr "limits the number of reports to output"
+
+#. Description for --no-abbrev-hash argument
+msgctxt "cov_log.NO_ABBREV_HASH_DESCRIPTION"
+msgid "shows the full 40-byte hexadecimal report object name"
+msgstr "shows the full 40-byte hexadecimal report object name"
+
+#. Name of a number argument
+msgctxt "cov_log.NUMBER_META"
+msgid "<number>"
+msgstr "<number>"
+
+#. Description for --oneline argument
+msgctxt "cov_log.ONELINE_DESCRIPTION"
+msgid "a shorthand for \"--format=oneline --abbrev-hash\" used together"
+msgstr "a shorthand for \"--format=oneline --abbrev-hash\" used together"
+
+#. Description for log and show target argument
+msgctxt "cov_log.REV_RANGE_DESCRIPTION"
+msgid "shows only reports in the specified revision range"
+msgstr "shows only reports in the specified revision range"
+
+#. Name of positional argument of cov log
+msgctxt "cov_log.REV_RANGE_META"
+msgid "<revision-range>"
+msgstr "<revision-range>"
+
+#. Description for --color argument
+msgctxt "cov_log.WHEN_DESCRIPTION"
+msgid "uses color in output; <when> is 'never', 'always', or 'auto'"
+msgstr "uses color in output; <when> is 'never', 'always', or 'auto'"
+
+#. Name of --color argument
+msgctxt "cov_log.WHEN_META"
+msgid "<when>"
+msgstr "<when>"
+
+#. Description for the --add argument
+msgctxt "cov_module.ADD_DESCRIPTION"
+msgid "adds a directory filter to a new or existing module"
+msgstr "adds a directory filter to a new or existing module"
+
+#. Name of a Git commit argument
+msgctxt "cov_module.COMMIT_META"
+msgid "<git-commit>"
+msgstr "<git-commit>"
+
+#. Error message for trying to add a duplicate directory
+msgctxt "cov_module.ERROR_ADD_DUPLICATE"
+msgid "module {} already contains directory {}"
+msgstr "module {} already contains directory {}"
+
+#. Error message for conflicting arguments; used by arguments which cannot be
+#. part of series of options
+msgctxt "cov_module.ERROR_EXCLUSIVE"
+msgid "{} argument cannot be used with other options"
+msgstr "{} argument cannot be used with other options"
+
+#. Error message for calling inside a bare Git repository
+msgctxt "cov_module.ERROR_NO_GIT_WORKDIR"
+msgid "this operation must be run in a work tree"
+msgstr "this operation must be run in a work tree"
+
+#. Error message for a missing/redundant argument, provided amount is lower
+#. than minimal expected; first parameter becames name of the argument, second
+#. is the expected count
+msgctxt "cov_module.ERROR_OPTS_NEEDS_AT_LEAST"
+msgid "{} argument needs at least {} argument"
+msgid_plural "{} argument needs at least {} arguments"
+msgstr[0] "{} argument needs at least one argument"
+msgstr[1] "{} argument needs at least {} arguments"
+
+#. Error message for a missing/redundant argument, provided amount is larger
+#. than maximal expected; first parameter becames name of the argument, second
+#. is the expected count
+msgctxt "cov_module.ERROR_OPTS_NEEDS_AT_MOST"
+msgid "{} argument needs at most {} argument"
+msgid_plural "{} argument needs at most {} arguments"
+msgstr[0] "{} argument needs at most one argument"
+msgstr[1] "{} argument needs at most {} arguments"
+
+#. Error message for a missing/redundant argument, this exact number is
+#. needed; first parameter becames name of the argument, second is the
+#. expected count
+msgctxt "cov_module.ERROR_OPTS_NEEDS_EXACTLY"
+msgid "{} argument needs exactly {} argument"
+msgid_plural "{} argument needs exactly {} arguments"
+msgstr[0] "{} argument needs exactly one argument"
+msgstr[1] "{} argument needs exactly {} arguments"
+
+#. Error message for trying to remove a directory from non-existent module
+msgctxt "cov_module.ERROR_REMOVE_NO_MODULE"
+msgid "there is no {} module"
+msgstr "there is no {} module"
+
+#. Error message for calling with reference to some other type of Git
+#. object,than commit (e.g. commited file or directory)
+msgctxt "cov_module.ERROR_REVPARSE_NEEDS_COMMIT"
+msgid "<git-commit> argument should describe a commit"
+msgstr "<git-commit> argument should describe a commit"
+
+#. Error message for calling with a commit range (first..last)
+msgctxt "cov_module.ERROR_REVPARSE_NEEDS_SINGLE"
+msgid "<git-commit> argument should describe a single object"
+msgstr "<git-commit> argument should describe a single object"
+
+#. "Argument" name for no arguments
+msgctxt "cov_module.NOARGS_META"
+msgid "no arguments"
+msgstr "no arguments"
+
+#. Description for the --remove-all argument
+msgctxt "cov_module.REMOVA_ALL_DESCRIPTION"
+msgid "removes all filters from the module, effectively removing it"
+msgstr "removes all filters from the module, effectively removing it"
+
+#. Description for the --remove argument
+msgctxt "cov_module.REMOVE_DESCRIPTION"
+msgid "removes a directory filter from given module"
+msgstr "removes a directory filter from given module"
+
+#. Description for the --set-sep argument
+msgctxt "cov_module.SET_SEP_DESCRIPTION"
+msgid "sets new module name separator"
+msgstr "sets new module name separator"
+
+#. Description for the no-command call with commit given as an argument
+msgctxt "cov_module.SHOW_COMMIT_DESCRIPTION"
+msgid "prints module list for given commit and exits"
+msgstr "prints module list for given commit and exits"
+
+#. Description for the --show-sep argument
+msgctxt "cov_module.SHOW_SEP_DESCRIPTION"
+msgid "prints module name separator from either workdir or commit"
+msgstr "prints module name separator from either workdir or commit"
+
+#. Description for the no-command call, even without the commit
+msgctxt "cov_module.SHOW_WORKDIR_DESCRIPTION"
+msgid "prints module list from git work directory and exits"
+msgstr "prints module list from git work directory and exits"
+
+#. Description for the --amend argument
+msgctxt "cov_report.AMEND_DESCRIPTION"
+msgid "replaces the tip of the current branch by creating a new commit"
+msgstr "replaces the tip of the current branch by creating a new commit"
+
+#. Error message for calling --amend before any reports
+msgctxt "cov_report.ERROR_AMEND_IN_FRESH_REPO"
+msgid "you have nothing to amend"
+msgstr "you have nothing to amend"
+
+#. Error message for calling the app in bare repository
+msgctxt "cov_report.ERROR_BARE_GIT"
+msgid "this operation must be run in a work tree"
+msgstr "this operation must be run in a work tree"
+
+#. Error message for failing to open a file
+msgctxt "cov_report.ERROR_CANNOT_FIND_FILE"
+msgid "cannot find {}"
+msgstr "cannot find {}"
+
+#. Error message for failing to find the reported commit in the git repository
+msgctxt "cov_report.ERROR_CANNOT_LOAD_COMMIT"
+msgid "cannot find the Git commit from report"
+msgstr "cannot find the Git commit from report"
+
+#. Error message for trying to read from a missing file
+msgctxt "cov_report.ERROR_CANNOT_OPEN_FILE"
+msgid "could not read {}"
+msgstr "could not read {}"
+
+#. Error message for failing to read repository objects
+msgctxt "cov_report.ERROR_CANNOT_READ_FROM_DB"
+msgid "cannot read current report back"
+msgstr "cannot read current report back"
+
+#. Error message for failing to write repository objects
+msgctxt "cov_report.ERROR_CANNOT_WRITE_TO_DB"
+msgid "cannot write to repository database"
+msgstr "cannot write to repository database"
+
+#. Error message for issues with cov JSON, which was produced by a filter
+msgctxt "cov_report.ERROR_FILTERED_REPORT_ISSUES"
+msgid "there were issues with {} processed by {} filter"
+msgstr "there were issues with {} processed by {} filter"
+
+#. Error message for unusable filter file
+msgctxt "cov_report.ERROR_FILTER_ACCESS"
+msgid "filter {} could not be used"
+msgstr "filter {} could not be used"
+
+#. Error message for non-0 result code from a filter
+msgctxt "cov_report.ERROR_FILTER_FAILED"
+msgid "filter {} exited with return code {}"
+msgstr "filter {} exited with return code {}"
+
+#. Error message for a missing filter file
+msgctxt "cov_report.ERROR_FILTER_NOENT"
+msgid "filter {} could not be found"
+msgstr "filter {} could not be found"
+
+#. Error message for issues with cov JSON
+msgctxt "cov_report.ERROR_REPORT_ISSUES"
+msgid "there were issues with {}"
+msgstr "there were issues with {}"
+
+#. Description for the report file argument; the list at the end uses
+#. REPORT_FILE_DESCRIPTION_LIST_END
+msgctxt "cov_report.FILTER_DESCRIPTION"
+msgid "filters other report formats to internal cov format; known filters are: {}"
+msgstr "filters other report formats to internal cov format; known filters are: {}"
+
+#. Final part of the report file argument description; together the list will
+#. be "known filters are: 'first', 'second', 'third' and 'fourth'"
+msgctxt "cov_report.FILTER_DESCRIPTION_LIST_END"
+msgid "{} and {}"
+msgstr "{} and {}"
+
+#. Name of filter argument
+msgctxt "cov_report.FILTER_META"
+msgid "<filter>"
+msgstr "<filter>"
+
+#. Name of a branch, when there is no branch
+msgctxt "cov_report.MESSAGE_DETACHED_HEAD"
+msgid "detached HEAD"
+msgstr "detached HEAD"
+
+#. Description for commit in current report; will become "based on
+#. 13a39fbf9@main"
+msgctxt "cov_report.MESSAGE_FIELD_GIT_COMMIT"
+msgid "based on"
+msgstr "based on"
+
+#. Description for parent of current report; will become "parent d4965abfb"
+msgctxt "cov_report.MESSAGE_FIELD_PARENT_REPORT"
+msgid "parent"
+msgstr "parent"
+
+#. Number of files in current report
+msgctxt "cov_report.MESSAGE_FILE_COUNT"
+msgid "{} file"
+msgid_plural "{} files"
+msgstr[0] "one file"
+msgstr[1] "{} files"
+
+#. Description for the report file argument
+msgctxt "cov_report.REPORT_FILE_DESCRIPTION"
+msgid "selects report to import"
+msgstr "selects report to import"
+
+#. Name of report file argument (be it Cobertura XML or Coveralls JSON)
+msgctxt "cov_report.REPORT_FILE_META"
+msgid "<report-file>"
+msgstr "<report-file>"
+
+#. Warning message for adding a modified file
+msgctxt "cov_report.WARNING_FILE_MODIFIED"
+msgid "{} was modified after the report"
+msgstr "{} was modified after the report"
+
+#. config_file.c:412, 442
+msgctxt "errors.CONFIG_CANNOT_DELETE"
+msgid "could not find key '{}' to delete"
+msgstr "could not find key '{}' to delete"
+
+#. config.c:1456
+msgctxt "errors.CONFIG_INVALID_NAME"
+msgid "invalid config item name '{}'"
+msgstr "invalid config item name '{}'"
+
+#. config_entries.c:191
+msgctxt "errors.CONFIG_NON_UNIQUE_INCLUDED"
+msgid "entry is not unique due to being included"
+msgstr "entry is not unique due to being included"
+
+#. config_entries.c:186
+msgctxt "errors.CONFIG_NON_UNIQUE_MULTIVAR"
+msgid "entry is not unique due to being a multivar"
+msgstr "entry is not unique due to being a multivar"
+
+#. Error message template; placeholder 0 will get the name of program,
+#. placeholder 1 the name of domain (such as "regex"), placeholder 2 an actual
+#. message
+msgctxt "errors.DOMAIN_ERROR_MSG"
+msgid "{0}: {1} error: {2}"
+msgstr "{0}: {1} error: {2}"
+
+#. Error message for unborn branch
+msgctxt "errors.SHOW_EMPTY_HEAD"
+msgid "HEAD refers to branch with no reports"
+msgstr "HEAD refers to branch with no reports"
+
+#. Error message for invalid pattern
+msgctxt "errors.SHOW_INVALID_PATTERN"
+msgid "invalid pattern '{}'"
+msgstr "invalid pattern '{}'"
+
+#. Error message for not found
+msgctxt "errors.SHOW_NOT_FOUND"
+msgid "requested object could not be found"
+msgstr "requested object could not be found"
+
+#. Relative time, no more than few days ago
+msgctxt "log_format.DAYS_AGO"
+msgid "one day ago"
+msgid_plural "{} days ago"
+msgstr[0] "one day ago"
+msgstr[1] "{} days ago"
+
+#. Relative time, no more than few hours ago
+msgctxt "log_format.HOURS_AGO"
+msgid "one hour ago"
+msgid_plural "{} hours ago"
+msgstr[0] "one hour ago"
+msgstr[1] "{} hours ago"
+
+#. Relative time, timestamp in future compared with 'now'.
+msgctxt "log_format.IN_THE_FUTURE"
+msgid "in the future"
+msgstr "in the future"
+
+#. Result of location coverage below the "incomplete" mark
+msgctxt "log_format.MARK_FAILING"
+msgid "fail"
+msgstr "fail"
+
+#. Result of location coverage above the "incomplete" and below the "pass"
+#. mark
+msgctxt "log_format.MARK_INCOMPLETE"
+msgid "incomplete"
+msgstr "incomplete"
+
+#. Result of location coverage above the "pass" mark
+msgctxt "log_format.MARK_PASSING"
+msgid "pass"
+msgstr "pass"
+
+#. Relative time, no more than few minutes ago
+msgctxt "log_format.MINUTES_AGO"
+msgid "one minute ago"
+msgid_plural "{} minutes ago"
+msgstr[0] "one minute ago"
+msgstr[1] "{} minutes ago"
+
+#. Relative time, no more than few months ago
+msgctxt "log_format.MONTHS_AGO"
+msgid "one month ago"
+msgid_plural "{} months ago"
+msgstr[0] "one month ago"
+msgstr[1] "{} months ago"
+
+#. Relative time, no more than few seconds ago
+msgctxt "log_format.SECONDS_AGO"
+msgid "one second ago"
+msgid_plural "{} seconds ago"
+msgstr[0] "one second ago"
+msgstr[1] "{} seconds ago"
+
+#. Relative time, no more than few weeks ago
+msgctxt "log_format.WEEKS_AGO"
+msgid "one week ago"
+msgid_plural "{} weeks ago"
+msgstr[0] "one week ago"
+msgstr[1] "{} weeks ago"
+
+#. Relative time, longer than 5 years, or longer than 12 months, by whole
+#. years
+msgctxt "log_format.YEARS_AGO"
+msgid "one year ago"
+msgid_plural "{} years ago"
+msgstr[0] "one year ago"
+msgstr[1] "{} years ago"
+
+#. Relative time, no more than few 5 years, no less than a years ago;
+#. concatented with log_format.MONTHS_AGO to create 'X years, Y months ago'
+msgctxt "log_format.YEARS_MONTHS_AGO"
+msgid "one year,"
+msgid_plural "{} years,"
+msgstr[0] "one year,"
+msgstr[1] "{} years,"

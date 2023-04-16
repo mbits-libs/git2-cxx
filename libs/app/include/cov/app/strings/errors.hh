@@ -17,6 +17,12 @@ namespace cov::app::str::errors {
         CONFIG_CANNOT_DELETE = 1004,
         /// invalid config item name '{}' (config.c:1456)
         CONFIG_INVALID_NAME = 1005,
+        /// HEAD refers to branch with no reports (Error message for unborn branch)
+        SHOW_EMPTY_HEAD = 1006,
+        /// requested object could not be found (Error message for not found)
+        SHOW_NOT_FOUND = 1007,
+        /// invalid pattern '{}' (Error message for invalid pattern)
+        SHOW_INVALID_PATTERN = 1008,
     }; // enum class lng
 
     struct Resource {

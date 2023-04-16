@@ -2,15 +2,15 @@
     "args": "init",
     "expected": [
         1,
-        "Cov repository already exists in $TMP/init-no-force/.git/.covdata\n",
+        "Cov repository already exists in $TMP/.git/.covdata\n",
         ""
     ],
     "prepare": [
-        "safe-rm '$TMP/init-no-force'",
-        "mkdirs '$TMP/init-no-force/subdir'",
-        "cd '$TMP/init-no-force'",
+        "safe-rm '$TMP'",
+        "mkdirs '$TMP/subdir'",
+        "cd '$TMP'",
         "git init",
         "cov init",
-        "cd '$TMP/init-no-force/subdir'"
+        "cd '$TMP/subdir'"
     ]
 }

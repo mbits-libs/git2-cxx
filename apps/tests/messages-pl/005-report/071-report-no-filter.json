@@ -1,0 +1,14 @@
+{
+    "lang": "pl",
+    "args": "report $DATA/basic-coverage.json -f no-filter",
+    "expected": [
+        1,
+        "",
+        "cov report: b\u0142\u0105d: nie mo\u017cna znale\u017a\u0107 filtra no-filter\n"
+    ],
+    "prepare": [
+        "cd '$TMP'",
+        "git init",
+        "cov init"
+    ]
+}

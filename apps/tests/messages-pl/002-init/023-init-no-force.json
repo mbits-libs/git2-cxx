@@ -3,15 +3,15 @@
     "args": "init",
     "expected": [
         1,
-        "Repozytorium Cov ju\u017c istnieje w $TMP/init-no-force/.git/.covdata\n",
+        "Repozytorium Cov ju\u017c istnieje w $TMP/.git/.covdata\n",
         ""
     ],
     "prepare": [
-        "safe-rm '$TMP/init-no-force'",
-        "mkdirs '$TMP/init-no-force/subdir'",
-        "cd '$TMP/init-no-force'",
+        "safe-rm '$TMP'",
+        "mkdirs '$TMP/subdir'",
+        "cd '$TMP'",
         "git init",
         "cov init",
-        "cd '$TMP/init-no-force/subdir'"
+        "cd '$TMP/subdir'"
     ]
 }

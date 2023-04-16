@@ -2,6 +2,11 @@
     "files.insertFinalNewline": true,
     "files.trimFinalNewlines": true,
     "cSpell.words": [
-        "covdata"
+        "cobertura",
+        "covdata",
+        "hilite",
+        "pofile",
+        "polib",
+        "workdir"
     ]
 }

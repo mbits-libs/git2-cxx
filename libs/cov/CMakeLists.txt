@@ -1,6 +1,9 @@
 configure_file(src/version.in.hh ${CMAKE_CURRENT_BINARY_DIR}/include/cov/version.hh @ONLY)
 
 set(SOURCES
+  src/format/defaults.cc
+  src/format/parser.cc
+  src/format/formatter.cc
   src/hash/md5.cc
   src/hash/sha1.cc
   src/io/db_object-error.cc
@@ -21,10 +24,12 @@ set(SOURCES
   src/counted.cc
   src/db.cc
   src/discover.cc
-  src/format.cc
   src/init.cc
+  src/module_config.cc
+  src/module.cc
   src/path-utils.hh
   src/repository.cc
+  src/revparse.cc
   src/streams.cc
   src/tag.cc
   src/zstream.cc
@@ -44,12 +49,15 @@ set(SOURCES
   include/cov/counted.hh
   include/cov/db.hh
   include/cov/discover.hh
+  include/cov/format_args.hh
   include/cov/format.hh
   include/cov/init.hh
+  include/cov/module.hh
   include/cov/object.hh
   include/cov/reference.hh
   include/cov/report.hh
   include/cov/repository.hh
+  include/cov/revparse.hh
   include/cov/streams.hh
   include/cov/tag.hh
   include/cov/zstream.hh
@@ -62,7 +70,7 @@ target_link_options(cov-api PRIVATE ${ADDITIONAL_LINK_FLAGS})
 target_include_directories(cov-api PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}/include
   ${CMAKE_CURRENT_BINARY_DIR}/include)
-target_link_libraries(cov-api PUBLIC git2-c++ fmt::fmt date::date PRIVATE OpenSSL::OpenSSL)
+target_link_libraries(cov-api PUBLIC git2-c++ fmt::fmt date::date mbits::args PRIVATE hilite openssl::openssl)
 
 set_target_properties(cov-api PROPERTIES FOLDER libs)
 
@@ -85,14 +93,14 @@ if (COV_TESTING)
   set_target_properties(cov-test cov-stress-test PROPERTIES FOLDER tests)
 
   target_compile_options(cov-test PRIVATE ${ADDITIONAL_WALL_FLAGS})
-  target_link_libraries(cov-test cov-api GTest::gmock_main)
+  target_link_libraries(cov-test PRIVATE cov-api testing-lib mbits::args)
   target_include_directories(cov-test
     PRIVATE
       ${CMAKE_CURRENT_SOURCE_DIR}/tests
       ${CMAKE_CURRENT_BINARY_DIR})
 
   target_compile_options(cov-stress-test PRIVATE ${ADDITIONAL_WALL_FLAGS})
-  target_link_libraries(cov-stress-test PRIVATE cov-api GTest::gmock_main)
+  target_link_libraries(cov-stress-test PRIVATE cov-api testing-lib)
   target_include_directories(cov-stress-test
     PRIVATE
       ${CMAKE_CURRENT_SOURCE_DIR}/tests

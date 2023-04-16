@@ -7,3 +7,6 @@
 [submodule "external/lngs"]
 	path = external/lngs
 	url = https://github.com/mbits-os/lngs.git
+[submodule "external/json"]
+	path = external/json
+	url = https://github.com/mbits-libs/json.git

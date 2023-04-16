@@ -30,8 +30,8 @@ namespace cov {
 		git::config open_config(std::filesystem::path const& sysroot,
 		                        std::filesystem::path const& common,
 		                        std::error_code& ec) {
-			auto result =
-			    git::config::open_default(sysroot, names::dot_config, "cov"sv, ec);
+			auto result = git::config::open_default(sysroot, names::dot_config,
+			                                        "cov"sv, ec);
 			if (!ec) ec = result.add_local_config(common);
 			if (ec) result = nullptr;
 			return result;
@@ -82,6 +82,8 @@ namespace cov {
 	}
 
 	repository::repository() = default;
+	repository::repository(repository&&) = default;
+	repository& repository::operator=(repository&&) = default;
 	repository::~repository() = default;
 
 	repository::repository(std::filesystem::path const& sysroot,
@@ -90,9 +92,48 @@ namespace cov {
 	    : commondir_{common}, cfg_{open_config(sysroot, common, ec)} {
 		if (!common.empty()) {
 			if (!ec) refs_ = references::make_refs(common);
-			if (!ec) db_ = loose_backend_create(common / names::coverage_dir);
+			if (!ec) db_ = backend::loose_backend(common / names::coverage_dir);
 			if (!ec) git_.open(common, cfg_, ec);
 		}
+	}
+
+	current_head_type repository::current_head() const {
+		auto const HEAD = dwim(names::HEAD);
+		auto const head_ref = as_a<cov::reference>(HEAD);
+
+		if (!head_ref) return {};
+
+		if (head_ref->direct_target())
+			return {.tip = *head_ref->direct_target()};
+
+		auto const peeled = head_ref->peel_target();
+		auto const name = peeled->shorthand();
+
+		if (peeled->references_branch() && peeled->direct_target()) {
+			return {.branch = {name.data(), name.size()},
+			        .tip = *peeled->direct_target()};
+		}
+		if (peeled->references_branch())
+			return {.branch = {name.data(), name.size()}};
+
+		if (peeled->direct_target()) return {.tip = *peeled->direct_target()};
+
+		return {};
+	}  // GCOV_EXCL_LINE[WIN32]
+
+	bool repository::update_current_head(git_oid const& ref,
+	                                     current_head_type const& known) const {
+		if (known != current_head()) return false;
+		std::string name{};
+		if (known.branch.empty()) {
+			name.assign(names::HEAD);
+		} else {
+			name.reserve(names::heads_dir_prefix.size() + known.branch.size());
+			name.append(names::heads_dir_prefix);
+			name.append(known.branch);
+		}
+		refs_->create(name, ref);
+		return true;
 	}
 
 	ref_ptr<object> repository::dwim(std::string_view name) const {
@@ -102,6 +143,18 @@ namespace cov {
 			if (ref->references_tag()) return tag::from(std::move(ref));
 		}
 		return ref;
+	}
+
+	ref_ptr<object> repository::find_partial(std::string_view partial) const {
+		git_oid oid{};
+		auto const length = (std::min)(partial.size(), size_t{GIT_OID_HEXSZ});
+		if (git_oid_fromstrn(&oid, partial.data(), length)) return {};
+		return find_partial(oid, length);
+	}
+
+	ref_ptr<object> repository::find_partial(git_oid const& in,
+	                                         size_t character_count) const {
+		return db_->lookup<object>(in, character_count);
 	}
 
 	ref_ptr<object> repository::lookup_object(git_oid const& id,

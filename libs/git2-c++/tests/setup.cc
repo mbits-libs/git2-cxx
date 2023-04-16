@@ -6,6 +6,7 @@
 #include <filesystem>
 #include <fstream>
 #include <git2/global.hh>
+#include <tar.hh>
 
 namespace git::testing::setup {
 	using namespace ::std::literals;
@@ -34,7 +35,8 @@ namespace git::testing::setup {
 			int counter{};
 		};
 		std::filesystem::path get_test_dir() {
-			static constexpr auto repos = "repos"sv;
+			static constexpr auto repos =
+			    "repos-8108d2eb7411beefc3f865a5ef918403cf37e70b"sv;
 			std::error_code ec{};
 			auto const temp = std::filesystem::temp_directory_path(ec);
 			if (ec) {
@@ -55,51 +57,13 @@ namespace git::testing::setup {
 		return dirname;
 	}
 
-#ifdef __cpp_lib_char8_t
-	template <typename CharTo, typename Source>
-	std::basic_string_view<CharTo> conv(Source const& view) {
-		return {reinterpret_cast<CharTo const*>(view.data()), view.length()};
-	}
-
-	std::string get_path(path const& p) {
-		auto const s8 = p.generic_u8string();
-		auto const view = conv<char>(s8);
-		return {view.data(), view.length()};
-	}
-
-	path make_path(std::string_view utf8) { return conv<char8_t>(utf8); }
-
-#else
-	std::string get_path(path const& p) { return p.generic_u8string(); }
-
-	path make_path(std::string_view utf8) {
-		return std::filesystem::u8path(utf8);
-	}
-#endif
-
 	git::repository open_repo(std::error_code& ec) {
-		return git::repository::open(test_dir() / make_path("bare.git/"sv), ec);
+		return git::repository::open(test_dir() / "bare.git/"sv, ec);
 	}
+
+	USE_TAR
 
 	namespace {
-		namespace file {
-			struct text {
-				std::string_view path{};
-				std::string_view content{};
-			};
-
-			struct binary {
-				std::string_view path{};
-				std::basic_string_view<unsigned char> content{};
-			};
-		}  // namespace file
-
-		template <size_t Length>
-		constexpr std::basic_string_view<unsigned char> span(
-		    unsigned char const (&v)[Length]) noexcept {
-			return {v, Length};
-		}
-
 		namespace file {
 			static constexpr auto text_1 =
 			    "[core]\n"
@@ -553,30 +517,10 @@ namespace git::testing::setup {
 
 	void test_globals::setup_test_env() {
 		printf("Setting up test environment\n");
-		using namespace std::filesystem;
 
 		std::error_code ignore{};
 		remove_all(test_dir(), ignore);
-
-		for (auto const subdir : setup::subdirs) {
-			create_directories(test_dir() / make_path(subdir), ignore);
-		}
-
-		for (auto const [filename, contents] : setup::text) {
-			auto const p = test_dir() / make_path(filename);
-			create_directories(p.parent_path(), ignore);
-			std::ofstream out{p, std::ios::binary};
-			out.write(contents.data(),
-			          static_cast<std::streamsize>(contents.size()));
-		}
-
-		for (auto const nfo : setup::binary) {
-			auto const p = test_dir() / make_path(nfo.path);
-			create_directories(p.parent_path(), ignore);
-			std::ofstream out{p, std::ios::binary};
-			out.write(reinterpret_cast<char const*>(nfo.content.data()),
-			          static_cast<std::streamsize>(nfo.content.size()));
-		}
+		unpack_files(test_dir(), setup::subdirs, setup::text, setup::binary);
 	}
 
 	void test_globals::teardown_test_env() {
@@ -586,7 +530,3 @@ namespace git::testing::setup {
 		remove_all(test_dir(), ignore);
 	}
 }  // namespace git::testing::setup
-
-void PrintTo(std::filesystem::path const& path, ::std::ostream* os) {
-	*os << git::testing::setup::get_path(path);
-}

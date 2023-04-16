@@ -2,6 +2,7 @@
 // This code is licensed under MIT license (see LICENSE for details)
 
 #pragma once
+#include <cov/format_args.hh>
 #include <cov/reference.hh>
 #include <cov/report.hh>
 #include <map>
@@ -11,6 +12,8 @@
 #include <vector>
 
 namespace cov {
+	struct repository;
+
 	enum translatable {
 		in_the_future,
 		seconds_ago,
@@ -31,28 +34,35 @@ namespace cov::placeholder {
 	enum class color {
 		normal,
 		reset,
-		bold,
 		red,
 		green,
 		yellow,
 		blue,
 		magenta,
 		cyan,
+		bold_normal,
 		bold_red,
 		bold_green,
 		bold_yellow,
 		bold_blue,
 		bold_magenta,
 		bold_cyan,
+		faint_normal,
+		faint_red,
+		faint_green,
+		faint_yellow,
+		faint_blue,
+		faint_magenta,
+		faint_cyan,
 		bg_red,
 		bg_green,
 		bg_yellow,
 		bg_blue,
 		bg_magenta,
 		bg_cyan,
-		faint,
-		faint_italic,
 		rating,
+		bold_rating,
+		faint_rating,
 		bg_rating,
 	};
 
@@ -68,8 +78,12 @@ namespace cov::placeholder {
 		hash_abbr,
 		parent_hash,
 		parent_hash_abbr,
+		file_list_hash,
+		file_list_hash_abbr,
 		ref_names,
 		ref_names_unwrapped,
+		magic_ref_names,
+		magic_ref_names_unwrapped,
 		branch,
 		lines_percent,
 		lines_total,
@@ -105,16 +119,25 @@ namespace cov::placeholder {
 	    variant<std::string, char, color, width, report, commit, person_info>;
 
 	using iterator = std::back_insert_iterator<std::string>;
+	struct internal_context;
 
 	struct refs {
-		std::string HEAD;
-		std::map<std::string, std::string> tags, heads;
-		std::string HEAD_ref;
-		iterator format(iterator out, git_oid const* id, bool wrapped) const;
+		std::string HEAD{};
+		std::map<std::string, std::string> tags{}, heads{};
+		std::string HEAD_ref{};
+		bool operator==(refs const&) const noexcept = default;
+		iterator format(iterator out,
+		                git_oid const* id,
+		                bool wrapped,
+		                bool magic_colors,
+		                struct report_view const&,
+		                internal_context&) const;
 	};
 
 	struct ratio {
 		unsigned num, den;
+
+		bool operator==(ratio const&) const noexcept = default;
 		constexpr ratio gcd() const noexcept {
 			auto const div = std::gcd(num, den);
 			if (!div) return *this;
@@ -125,12 +148,13 @@ namespace cov::placeholder {
 	struct rating {
 		ratio incomplete;
 		ratio passing;
+		bool operator==(rating const&) const noexcept = default;
 	};
 
 	struct context {
-		sys_seconds now;
-		unsigned hash_length;
-		refs names;
+		sys_seconds now{};
+		unsigned hash_length{};
+		refs names{};
 		rating marks{.incomplete{75, 100}, .passing{9, 10}};
 		std::string_view time_zone{};
 		std::string_view locale{};
@@ -139,8 +163,13 @@ namespace cov::placeholder {
 		                         translatable scale,
 		                         void* app) = {};
 		std::string (*colorize)(color, void* app) = {};
+		bool decorate{false};
+
+		bool operator==(context const&) const noexcept = default;
+		static context from(cov::repository const&,
+		                    color_feature clr,
+		                    decorate_feature decorate);
 	};
-	struct internal_context;
 
 	struct git_person {
 		std::string_view name;
@@ -193,6 +222,7 @@ namespace cov::placeholder {
 	struct report_view {
 		git_oid const* id{};
 		git_oid const* parent{};
+		git_oid const* file_list{};
 		sys_seconds date{};
 		git_commit_view git{};
 		io::v1::coverage_stats const* stats{};
@@ -219,6 +249,7 @@ namespace cov::placeholder {
 			return {
 			    .id = &report.oid(),
 			    .parent = &report.parent_report(),
+			    .file_list = &report.file_list(),
 			    .date = report.add_time_utc(),
 			    .git = git_commit_view::from(report),
 			    .stats = &report.stats(),
@@ -236,11 +267,9 @@ namespace cov::placeholder {
 namespace cov {
 	class formatter {
 	public:
-		explicit formatter(std::vector<placeholder::format>&& format)
-		    : format_{std::move(format)} {}
+		explicit formatter(std::vector<placeholder::format>&& format);
 
 		static formatter from(std::string_view input);
-
 		static std::string shell_colorize(placeholder::color, void*);
 
 		std::string format(placeholder::report_view const&,
@@ -251,6 +280,11 @@ namespace cov {
 		}
 
 	private:
+		static std::string no_translation(long long count,
+		                                  translatable scale,
+		                                  void*);
+
 		std::vector<placeholder::format> format_{};
+		bool needs_timezones_{true};
 	};
 }  // namespace cov

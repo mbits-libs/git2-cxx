@@ -1,0 +1,16 @@
+{
+    "lang": "pl",
+    "args": "module v1.0.0..HEAD",
+    "expected": [
+        2,
+        "",
+        [
+            "u\u017cycie: cov module [-h] [--show-sep [<zapis-gita>]] | [--set-sep <warto\u015b\u0107> | --add <nazwa> <katalog> | --remove <nazwa> <katalog> | --remove-all <nazwa>] | [<zapis-gita>]",
+            "cov module: b\u0142\u0105d: argument <zapis-gita> powinien opisywa\u0107 pojedynczy obiekt\n"
+        ]
+    ],
+    "prepare": [
+        "unpack $DATA/repo.git.tar $TMP",
+        "cd $TMP/repo.git"
+    ]
+}

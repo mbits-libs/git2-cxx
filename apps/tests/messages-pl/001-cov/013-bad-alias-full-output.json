@@ -6,7 +6,7 @@
         "",
         [
             "u\u017cycie: cov [-h] [-C <katalog>] <polecenie> [<argumenty>]",
-            "cov: \"definitely-not-a-tool\" nie jest poleceniem cov",
+            "cov: \u201edefinitely-not-a-tool\u201d nie jest poleceniem cov",
             "",
             "typowe polecenia:",
             " init   tworzy nowe repozytorium cov",

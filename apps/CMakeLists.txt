@@ -2,6 +2,14 @@
 set(BUILTINS
     init
     config
+    module
+    report
+    log
+)
+
+set(REPORT_FILTERS
+    cobertura
+    coveralls
 )
 
 set(SOURCES
@@ -13,42 +21,82 @@ foreach(NAME ${BUILTINS})
     list(APPEND SOURCES builtins/builtin_${SAFE_NAME}.cc)
 endforeach()
 
+foreach(NAME ${REPORT_FILTERS})
+    list(APPEND SOURCES filters/${NAME}.py)
+endforeach()
+
 string(REPLACE ";" ", " BUILTIN_LIST "${BUILTINS}")
 message(STATUS "Builtins: ${BUILTIN_LIST}")
 include(builtins)
 
-source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})
-source_group(TREE ${CMAKE_CURRENT_BINARY_DIR} FILES ${CMAKE_CURRENT_BINARY_DIR}/cov/builtins.hh)
+string(REPLACE ";" ", " REPORT_FILTER_LIST "${REPORT_FILTERS}")
+message(STATUS "Filters: ${REPORT_FILTER_LIST}")
 
-list(APPEND SOURCES ${CMAKE_CURRENT_BINARY_DIR}/cov/builtins.hh)
+if (WIN32)
+    list(APPEND SOURCES
+        win32/cov.rc
+    )
+endif()
+
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})
+source_group(TREE ${CMAKE_CURRENT_BINARY_DIR} FILES ${CMAKE_CURRENT_BINARY_DIR}/gen/cov/builtins.hh ${CMAKE_CURRENT_BINARY_DIR}/gen/cov/versioninfo.rc)
+
+list(APPEND SOURCES ${CMAKE_CURRENT_BINARY_DIR}/gen/cov/builtins.hh)
+
+if (WIN32)
+    foreach(LANG ${LANGUAGES})
+        list(APPEND PO_FILES "${CMAKE_SOURCE_DIR}/data/translations/${LANG}.po")
+    endforeach()
+
+    add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/gen/cov/versioninfo.rc"
+        COMMAND ${Python3_EXECUTABLE}
+        ARGS
+            "${CMAKE_SOURCE_DIR}/tools/win32/winrc.py"
+            "${CMAKE_CURRENT_BINARY_DIR}/gen/cov"
+            "${CMAKE_CURRENT_SOURCE_DIR}/win32/versioninfo.h"
+        DEPENDS
+            "${CMAKE_SOURCE_DIR}/tools/win32/winrc.py"
+            "${CMAKE_CURRENT_SOURCE_DIR}/win32/versioninfo.h"
+            ${PO_FILES}
+        VERBATIM
+        COMMENT "Generating VERSIONINFO for the executable."
+    )
+
+    list(APPEND SOURCES
+        "${CMAKE_CURRENT_BINARY_DIR}/gen/cov/versioninfo.rc"
+        "${CMAKE_SOURCE_DIR}/data/icons/win32.ico"
+    )
+endif()
 
 add_cov_tool(cov ${SOURCES})
 target_compile_options(cov PRIVATE ${ADDITIONAL_WALL_FLAGS})
 target_link_options(cov PRIVATE ${ADDITIONAL_LINK_FLAGS})
 target_include_directories(cov PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CMAKE_CURRENT_BINARY_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR}/gen
 )
 target_link_libraries(cov PRIVATE cov-rt)
 set_target_properties(cov PROPERTIES FOLDER apps)
 
 ########################################################
 
-# add_cov_ext(serve)
+foreach(NAME ${REPORT_FILTERS})
+    set(__input ${CMAKE_CURRENT_SOURCE_DIR}/filters/${NAME}.py)
+    set(__output ${CMAKE_BINARY_DIR}/${SHARE_DIR}/filters/${NAME})
 
-print_cov_ext()
+    add_custom_command(TARGET cov
+        POST_BUILD
+        COMMAND "${CMAKE_COMMAND}" -E make_directory "${CMAKE_BINARY_DIR}/${SHARE_DIR}/filters"
+        COMMAND "${CMAKE_COMMAND}" -E copy "${__input}" "${__output}"
+        COMMENT "[FILTER] ${NAME}"
+    )
+endforeach()
 
 ########################################################
 
-add_custom_target(copy-langs ALL)
-add_dependencies(cov copy-langs)
-set_target_properties(copy-langs PROPERTIES FOLDER apps/strings)
+# add_cov_ext(serve)
 
-foreach(STRING_FILE ${STRINGS})
-    foreach(LANG_ID ${LANGUAGES})
-        add_dependencies(copy-langs "${STRING_FILE}.${LANG_ID}")
-    endforeach()
-endforeach()
+print_cov_ext()
 
 ########################################################
 
@@ -71,7 +119,14 @@ if (COV_TESTING)
           )
     endforeach()
 
-    foreach(TEST_SET 001-cov 002-init 003-config-A 004-config-B 005-config-C)
+    foreach(TEST_SET
+        001-cov
+        002-init
+        003-config-A 004-config-B 005-config-C
+        006-module-A 007-module-B
+        008-report-A 009-report-B
+        010-log
+    )
         add_test(
             NAME cov-exec--${TEST_SET}
             COMMAND "${Python3_EXECUTABLE}"

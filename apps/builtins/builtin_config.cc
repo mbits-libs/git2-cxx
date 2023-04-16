@@ -2,9 +2,7 @@
 // This code is licensed under MIT license (see LICENSE for details)
 
 #include <cov/app/config.hh>
-
-#include <fmt/format.h>
-#include <cov/app/tools.hh>
+#include <cov/app/rt_path.hh>
 #include <git2/repository.hh>
 
 namespace cov::app::builtin::config {
@@ -66,7 +64,7 @@ namespace cov::app::builtin::config {
 	int handle(std::string_view tool, args::arglist args) {
 		using namespace str;
 		parser p{{tool, args},
-		         {tools::get_locale_dir(), ::lngs::system_locales()}};
+		         {platform::locale_dir(), ::lngs::system_locales()}};
 		p.parse();
 
 		std::error_code ec{};

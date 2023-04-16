@@ -7,17 +7,28 @@
 
 namespace cov::io::handlers {
 	namespace {
+		std::string S(std::string_view value) {
+			return {value.data(), value.size()};
+		}
+
+		struct signature {
+			std::string name;
+			std::string email;
+		};
+
+		signature S(cov::report::signature_view value) {
+			return {.name = S(value.name), .email = S(value.email)};
+		}
+
 		struct impl : counted_impl<cov::report> {
 			explicit impl(git_oid const& oid,
 			              git_oid const& parent_report,
 			              git_oid const& file_list,
 			              git_oid const& commit,
-			              std::string const& branch,
-			              std::string const& author_name,
-			              std::string const& author_email,
-			              std::string const& committer_name,
-			              std::string const& committer_email,
-			              std::string const& message,
+			              std::string_view branch,
+			              cov::report::signature_view author,
+			              cov::report::signature_view committer,
+			              std::string_view message,
 			              sys_seconds commit_time_utc,
 			              sys_seconds add_time_utc,
 			              io::v1::coverage_stats const& stats)
@@ -25,12 +36,10 @@ namespace cov::io::handlers {
 			    , parent_report_{parent_report}
 			    , file_list_{file_list}
 			    , commit_{commit}
-			    , branch_{branch}
-			    , author_name_{author_name}
-			    , author_email_{author_email}
-			    , committer_name_{committer_name}
-			    , committer_email_{committer_email}
-			    , message_{message}
+			    , branch_{S(branch)}
+			    , author_{S(author)}
+			    , committer_{S(committer)}
+			    , message_{S(message)}
 			    , commit_time_utc_{commit_time_utc}
 			    , add_time_utc_{add_time_utc}
 			    , stats_{stats} {}
@@ -47,16 +56,16 @@ namespace cov::io::handlers {
 				return branch_;
 			}
 			std::string_view author_name() const noexcept override {
-				return author_name_;
+				return author_.name;
 			}
 			std::string_view author_email() const noexcept override {
-				return author_email_;
+				return author_.email;
 			}
 			std::string_view committer_name() const noexcept override {
-				return committer_name_;
+				return committer_.name;
 			}
 			std::string_view committer_email() const noexcept override {
-				return committer_email_;
+				return committer_.email;
 			}
 			std::string_view message() const noexcept override {
 				return message_;
@@ -77,10 +86,8 @@ namespace cov::io::handlers {
 			git_oid file_list_;
 			git_oid commit_;
 			std::string branch_;
-			std::string author_name_;
-			std::string author_email_;
-			std::string committer_name_;
-			std::string committer_email_;
+			signature author_;
+			signature committer_;
 			std::string message_;
 			sys_seconds commit_time_utc_;
 			sys_seconds add_time_utc_;
@@ -111,10 +118,7 @@ namespace cov::io::handlers {
 		    !strings.is_valid(header.commit.message))
 			return {};
 
-		auto const at = [&](size_t offset) -> std::string {
-			auto view = strings.at(offset);
-			return {view.data(), view.size()};
-		};
+		auto const at = [&](size_t offset) { return strings.at(offset); };
 
 		auto branch = at(header.commit.branch),
 		     author_name = at(header.commit.author.name),
@@ -124,11 +128,12 @@ namespace cov::io::handlers {
 		     message = at(header.commit.message);
 
 		ec.clear();
-		return report_create(id, header.parent_report, header.file_list,
-		                     header.commit.commit_id, branch, author_name,
-		                     author_email, committer_name, committer_email,
-		                     message, header.commit.committed.to_seconds(),
-		                     header.added.to_seconds(), header.stats);
+		return cov::report::create(id, header.parent_report, header.file_list,
+		                           header.commit.commit_id, branch,
+		                           {author_name, author_email},
+		                           {committer_name, committer_email}, message,
+		                           header.commit.committed.to_seconds(),
+		                           header.added.to_seconds(), header.stats);
 	}
 
 #if defined(__GNUC__)
@@ -197,22 +202,19 @@ namespace cov::io::handlers {
 }  // namespace cov::io::handlers
 
 namespace cov {
-	ref_ptr<report> report_create(git_oid const& id,
-	                              git_oid const& parent_report,
-	                              git_oid const& file_list,
-	                              git_oid const& commit,
-	                              std::string const& branch,
-	                              std::string const& author_name,
-	                              std::string const& author_email,
-	                              std::string const& committer_name,
-	                              std::string const& committer_email,
-	                              std::string const& message,
-	                              sys_seconds commit_time_utc,
-	                              sys_seconds add_time_utc,
-	                              io::v1::coverage_stats const& stats) {
+	ref_ptr<report> report::create(git_oid const& oid,
+	                               git_oid const& parent_report,
+	                               git_oid const& file_list,
+	                               git_oid const& commit,
+	                               std::string_view branch,
+	                               signature_view author,
+	                               signature_view committer,
+	                               std::string_view message,
+	                               sys_seconds commit_time_utc,
+	                               sys_seconds add_time_utc,
+	                               io::v1::coverage_stats const& stats) {
 		return make_ref<io::handlers::impl>(
-		    id, parent_report, file_list, commit, branch, author_name,
-		    author_email, committer_name, committer_email, message,
-		    commit_time_utc, add_time_utc, stats);
+		    oid, parent_report, file_list, commit, branch, author, committer,
+		    message, commit_time_utc, add_time_utc, stats);
 	}
 }  // namespace cov

@@ -13,9 +13,9 @@
         ]
     ],
     "prepare": [
-        "safe-rm '$TMP/init-git-dir-no-cwd'",
-        "mkdirs '$TMP/init-git-dir-no-cwd/subdir'",
-        "cd '$TMP/init-git-dir-no-cwd/subdir'",
-        "rm '$TMP/init-git-dir-no-cwd'"
+        "safe-rm '$TMP'",
+        "mkdirs '$TMP/subdir'",
+        "cd '$TMP/subdir'",
+        "rm '$TMP'"
     ]
 }

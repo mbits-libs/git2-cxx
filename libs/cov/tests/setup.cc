@@ -5,7 +5,7 @@
 #include <cov/io/file.hh>
 #include <cstdio>
 #include <filesystem>
-#include <git2/global.hh>
+#include <tar.hh>
 
 namespace cov::testing::setup {
 	using namespace ::std::literals;
@@ -33,7 +33,8 @@ namespace cov::testing::setup {
 			int counter{};
 		};
 		std::filesystem::path get_test_dir() {
-			static constexpr auto playground = "libcov-tests"sv;
+			static constexpr auto playground =
+			    "libcov-tests-c1e671e2b66e37396b593fa98488c1656813af29"sv;
 			std::error_code ec{};
 			auto const temp = std::filesystem::temp_directory_path(ec);
 			if (ec) {
@@ -56,63 +57,18 @@ namespace cov::testing::setup {
 		return dirname;
 	}
 
-#ifdef __cpp_lib_char8_t
-	template <typename CharTo, typename Source>
-	std::basic_string_view<CharTo> conv(Source const& view) {
-		return {reinterpret_cast<CharTo const*>(view.data()), view.length()};
-	}
-
-	std::string get_path(path const& p) {
-		auto const s8 = p.generic_u8string();
-		auto const view = conv<char>(s8);
-		return {view.data(), view.length()};
-	}
-
-	path make_path(std::string_view utf8) { return conv<char8_t>(utf8); }
-
-#else
-	std::string get_path(path const& p) { return p.generic_u8string(); }
-
-	path make_path(std::string_view utf8) {
-		return std::filesystem::u8path(utf8);
-	}
-#endif
-
 	std::string get_oid(git_oid const& id) {
 		char buffer[42] = "";
 		git_oid_fmt(buffer, &id);
 		return buffer;
 	}
 
+	USE_TAR
+
 	namespace {
 		namespace file {
 			static constexpr auto safe = "first line\nsecond line\n"sv;
 
-			struct text {
-				std::string_view path{};
-				std::string_view content{};
-			};
-
-			struct binary {
-				std::string_view path{};
-				std::basic_string_view<unsigned char> content{};
-			};
-		}  // namespace file
-
-		template <size_t Length>
-		constexpr std::basic_string_view<unsigned char> span(
-		    unsigned char const (&v)[Length]) noexcept {
-			return {v, Length};
-		}
-
-		constexpr file::text text_2[] = {
-		    {"secured.txt"sv, file::safe},
-		    {"unsecured.txt"sv, file::safe},
-		};
-	}  // namespace
-
-	namespace {
-		namespace file {
 			static constexpr auto text_1 = "build/\n"sv;
 			static constexpr auto text_2 =
 			    "project(test CXX)\n"
@@ -544,6 +500,8 @@ namespace cov::testing::setup {
 		    {"diffs/src/greetings.cc"sv, file::text_9},
 		    {"diffs/src/greetings.hh"sv, file::text_10},
 		    {"diffs/src/main.cc"sv, file::text_11},
+		    {"secured.txt"sv, file::safe},
+		    {"unsecured.txt"sv, file::safe},
 		};
 
 		constexpr file::binary binary[] = {
@@ -601,35 +559,7 @@ namespace cov::testing::setup {
 
 	void test_globals::setup_test_env() {
 		printf("Setting up test environment\n");
-		using namespace std::filesystem;
-
-		std::error_code ignore{};
-		remove_all(test_dir(), ignore);
-
-		for (auto const subdir : setup::subdirs) {
-			create_directories(test_dir() / make_path(subdir), ignore);
-		}
-
-		for (auto const& [filename, contents] : setup::text) {
-			auto const p = test_dir() / make_path(filename);
-			create_directories(p.parent_path(), ignore);
-			auto out = io::fopen(p, "wb");
-			out.store(contents.data(), contents.size());
-		}
-
-		for (auto const& [filename, contents] : setup::text_2) {
-			auto const p = test_dir() / make_path(filename);
-			create_directories(p.parent_path(), ignore);
-			auto out = io::fopen(p, "wb");
-			out.store(contents.data(), contents.size());
-		}
-
-		for (auto const& [filename, contents] : setup::binary) {
-			auto const p = test_dir() / make_path(filename);
-			create_directories(p.parent_path(), ignore);
-			auto out = io::fopen(p, "wb");
-			out.store(contents.data(), contents.size());
-		}
+		unpack_files(test_dir(), setup::subdirs, setup::text, setup::binary);
 	}
 
 	void test_globals::teardown_test_env() {
@@ -639,7 +569,3 @@ namespace cov::testing::setup {
 		remove_all(test_dir(), ignore);
 	}
 }  // namespace cov::testing::setup
-
-void PrintTo(std::filesystem::path const& path, ::std::ostream* os) {
-	*os << cov::testing::setup::get_path(path);
-}

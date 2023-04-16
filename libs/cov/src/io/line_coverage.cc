@@ -31,7 +31,7 @@ namespace cov::io::handlers {
 		std::vector<v1::coverage> result{};
 		if (!in.load(result, count)) return {};
 		ec.clear();
-		return line_coverage_create(std::move(result));
+		return cov::line_coverage::create(std::move(result));
 	}
 
 #if defined(__GNUC__)
@@ -58,7 +58,7 @@ namespace cov::io::handlers {
 }  // namespace cov::io::handlers
 
 namespace cov {
-	ref_ptr<line_coverage> line_coverage_create(
+	ref_ptr<line_coverage> line_coverage::create(
 	    std::vector<io::v1::coverage>&& lines) {
 		return make_ref<io::handlers::impl>(std::move(lines));
 	}

@@ -3,9 +3,9 @@
 
 #include <cov/app/config.hh>
 #include <cov/app/dirs.hh>
+#include <cov/app/path.hh>
 #include <cov/app/tools.hh>
 #include <cov/repository.hh>
-#include <variant>
 
 namespace cov::app::config {
 	using namespace std::literals;
@@ -21,85 +21,7 @@ namespace cov::app::config {
 		using namespace std::filesystem;
 		using namespace app::config;
 
-		inline std::string as_str(std::string_view view) {
-			return {view.data(), view.size()};
-		}
-
-		struct string : std::variant<std::string_view, str::args::lng, cfglng> {
-			using base = std::variant<std::string_view, str::args::lng, cfglng>;
-			using base::base;
-			string(const char*) = delete;
-			string(std::string const&) = delete;
-		};
-
-		struct string_ex : std::variant<std::string,
-		                                std::string_view,
-		                                str::args::lng,
-		                                cfglng> {
-			using base = std::
-			    variant<std::string, std::string_view, str::args::lng, cfglng>;
-			using base::base;
-			string_ex(const char*) = delete;
-		};
-
-		struct str_visitor {
-			str::args_translator<errlng, cfglng> const& tr;
-			template <typename String>
-			std::string_view visit(String const& s) const {
-				using base = typename String::base;
-				return std::visit(*this, static_cast<base const&>(s));
-			}
-			std::string_view operator()(std::string_view view) const noexcept {
-				return view;
-			}
-			std::string_view operator()(std::string const& str) const noexcept {
-				return str;
-			}
-			std::string_view operator()(auto id) const noexcept {
-				return tr(id);
-			}
-		};
-
-		template <typename String>
-		struct string_pair {
-			String args;
-			String description;
-			std::optional<String> meta1{};
-			std::optional<String> meta2{};
-
-			std::pair<std::string, std::string> with(
-			    str_visitor const& visitor) const {
-				auto const a = visitor.visit(args);
-				auto const d = visitor.visit(description);
-				if (meta1) {
-					if (meta2) {
-						return {
-						    fmt::format("{} {} {}", a, visitor.visit(*meta1),
-						                visitor.visit(*meta2)),
-						    as_str(d),
-						};
-					}
-					return {fmt::format("{} {}", a, visitor.visit(*meta1)),
-					        as_str(d)};
-				}
-				return {as_str(a), as_str(d)};
-			}
-		};
-
-		template <typename String, size_t Length>
-		static void group(str::args_translator<errlng, cfglng> const& tr,
-		                  String const& title,
-		                  string_pair<String> const (&items)[Length],
-		                  ::args::chunk& out) {
-			str_visitor visitor{tr};
-			out.title = as_str(visitor.visit(title));
-			out.items.reserve(Length);
-			for (auto const& item : items) {
-				out.items.push_back(item.with(visitor));
-			}
-		}
-
-		inline string name_of(command cmd) {
+		inline parser::string name_of(command cmd) {
 			using enum command;
 			switch (cmd) {
 				case set_or_get:
@@ -124,25 +46,6 @@ namespace cov::app::config {
 			return {};     // GCOV_EXCL_LINE
 		}
 
-		path make_path(std::string_view u8) {
-#ifdef __cpp_lib_char8_t
-			return std::u8string_view{
-			    reinterpret_cast<char8_t const*>(u8.data()), u8.size()};
-#else
-			return std::filesystem::u8path(utf8);
-#endif
-		}
-
-		std::string get_path(path copy) {
-			copy.make_preferred();
-#ifdef __cpp_lib_char8_t
-			auto u8 = copy.u8string();
-			return {reinterpret_cast<char const*>(u8.data()), u8.size()};
-#else
-			return copy.u8string();
-#endif
-		}
-
 		[[noreturn]] void show_help(::args::parser& p) {
 			using namespace std::literals;
 			using str::args::lng;
@@ -150,7 +53,7 @@ namespace cov::app::config {
 			auto prn = args::printer{stdout};
 			auto& _ = base_parser<errlng, cfglng>::tr(p);
 
-			auto const _s = [&](auto arg) { return as_str(_(arg)); };
+			auto const _s = [&](auto arg) { return to_string(_(arg)); };
 
 			auto file = _(cfglng::SCOPE_META);
 			auto name = _(lng::NAME_META);
@@ -170,7 +73,7 @@ namespace cov::app::config {
 				    fmt::format(fmt::runtime(synopsis), file, name, value), 7);
 			}
 
-			static constexpr string_pair<string> scopes[] = {
+			static constexpr parser::args_description scopes[] = {
 			    {cfglng::NO_SCOPE_META, cfglng::NO_SCOPE_DESCRIPTION},
 			    {"--local"sv, cfglng::SCOPE_LOCAL},
 			    {"--global"sv, cfglng::SCOPE_GLOBAL},
@@ -178,11 +81,11 @@ namespace cov::app::config {
 			    {"-f, --file"sv, cfglng::SCOPE_FILE, lng::FILE_META},
 			};
 
-			static const string_pair<string_ex> positionals[] = {
-			    {fmt::format("{} [{}]"sv, name, value), cfglng::NAME_VALUE},
+			static constexpr parser::args_description positionals[] = {
+			    {lng::NAME_META, cfglng::NAME_VALUE, opt{lng::VALUE_META}},
 			};
 
-			static constexpr string_pair<string> optionals[] = {
+			static constexpr parser::args_description optionals[] = {
 			    {"-h, --help"sv, lng::HELP_DESCRIPTION},
 			    {"--add"sv, cfglng::ADD, lng::NAME_META, lng::VALUE_META},
 			    {"--get"sv, cfglng::GET, lng::NAME_META},
@@ -193,9 +96,12 @@ namespace cov::app::config {
 			};
 
 			args::fmt_list args(3);
-			group<string>(_, cfglng::SCOPE_TITLE, scopes, args[0]);
-			group<string_ex>(_, lng::POSITIONALS, positionals, args[1]);
-			group<string>(_, lng::OPTIONALS, optionals, args[2]);
+			parser::args_description::group(_, cfglng::SCOPE_TITLE, scopes,
+			                                args[0]);
+			parser::args_description::group(_, lng::POSITIONALS, positionals,
+			                                args[1]);
+			parser::args_description::group(_, lng::OPTIONALS, optionals,
+			                                args[2]);
 
 			prn.format_list(args);
 			std::exit(0);
@@ -220,7 +126,7 @@ namespace cov::app::config {
 		parser_
 		    .custom(
 		        [&](std::string const& val) {
-			        file = make_path(val);
+			        file = make_u8path(val);
 			        which = scope::file;
 		        },
 		        "f", "file")
@@ -325,7 +231,7 @@ namespace cov::app::config {
 			    cov::repository::discover(current_directory, ec);
 			if (ec)
 				error(tr_.format(args::lng::CANNOT_FIND_COV,
-				                 get_path(current_directory)));
+				                 get_u8path(current_directory)));
 			file = commondir / "config"sv;
 			which = scope::file;
 		} else if (which == scope::unspecified) {

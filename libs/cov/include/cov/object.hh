@@ -16,7 +16,8 @@ namespace cov {
 	X(tag)               \
 	X(tag_list)          \
 	X(branch)            \
-	X(branch_list)
+	X(branch_list)       \
+	X(modules)
 
 	enum obj_type {
 		obj_unknown,
@@ -32,14 +33,10 @@ namespace cov {
 	struct object : counted {
 		bool is_object() const noexcept override { return true; }
 		virtual obj_type type() const noexcept = 0;
-		// virtual std::error_code write() = 0;
-		// virtual std::error_code read() = 0;
 		template <typename Derived>
 		inline bool is_a() const noexcept;
-#define IS_A(NAME)                            \
-	virtual bool is_##NAME() const noexcept { \
-		return false;                         \
-	}
+#define IS_A(NAME) \
+	virtual bool is_##NAME() const noexcept { return false; }
 		KNOWN_OBJECTS(IS_A)
 #undef IS_A
 	};

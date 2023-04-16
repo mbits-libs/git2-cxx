@@ -1,0 +1,13 @@
+{
+    "args": "report $DATA/basic-coverage.json -f replace-head",
+    "expected": [
+        1,
+        "",
+        "cov report: error: cannot find src/main.cc\n"
+    ],
+    "prepare": [
+        "unpack $DATA/repo.git.tar $TMP",
+        "cd '$TMP/repo.git'",
+        "cov init"
+    ]
+}

@@ -117,9 +117,6 @@ namespace cov::testing {
 		auto const& front = lines->entries().front();
 		ASSERT_TRUE(front);
 		auto const& entry = *front;
-		ASSERT_FALSE(entry.in_workdir());
-		ASSERT_TRUE(entry.in_index());
-		ASSERT_FALSE(entry.is_modified());
 		ASSERT_EQ("file path"sv, entry.path());
 		ASSERT_EQ(1250u, entry.stats().total);
 		ASSERT_EQ(300u, entry.stats().relevant);
@@ -296,11 +293,28 @@ namespace cov::testing {
 		dbo.add_handler<io::OBJECT::FILES, io::handlers::report_files>();
 
 		auto const obj = make_ref<report_files_impl>();
-		report_entry_builder builder{};
-		builder.set_path("file path"s).set_stats(1250, 300, 299);
-		obj->files.push_back(std::move(builder).create());
+		report_files_builder builder{};
+		builder.add_nfo({.path = "file path"sv, .stats = {1250, 300, 299}});
+		obj->files = builder.release();
 		auto const result = dbo.store(obj, stream);
 		ASSERT_TRUE(result);
 		ASSERT_EQ(expected, stream.view());
+	}
+
+	TEST(report_files, remove) {
+		report_files_builder builder{};
+		builder.add_nfo({.path = "Alpha"})
+		    .add_nfo({.path = "Beta"})
+		    .add_nfo({.path = "Gamma"})
+		    .add_nfo({.path = "Delta"});
+		ASSERT_TRUE(builder.remove("Beta"));
+		ASSERT_FALSE(builder.remove("Epsilon"));
+		std::vector<std::string_view> expected = {"Alpha", "Delta", "Gamma"};
+		auto result = builder.release();
+		std::vector<std::string_view> actual{};
+		actual.reserve(result.size());
+		for (auto const& ptr : result)
+			actual.push_back(ptr->path());
+		ASSERT_EQ(expected, actual);
 	}
 }  // namespace cov::testing

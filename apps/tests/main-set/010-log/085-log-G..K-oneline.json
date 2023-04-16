@@ -1,0 +1,19 @@
+{
+    "args": "log --oneline G..K",
+    "expected": [
+        0,
+        [
+            "0a3ec94f3    0%  Commit K 305ad7d05@feat/git-1",
+            "8cd0b0755    0%  Commit L e54a0bd0e@feat/git-1",
+            "6ec526731    0%  Commit M 58e92c410@feat/git-1",
+            "c63dcf6ed    0%  Commit N 3324aa6f9@feat/git-1",
+            "2b793aa8b    0%  Commit O e9c6e04d6@feat/git-1",
+            "cb6394c0b    0%  Commit F dbe474382@main\n"
+        ],
+        ""
+    ],
+    "prepare": [
+        "unpack $DATA/revparse.tar $TMP",
+        "cd $TMP/revparse"
+    ]
+}

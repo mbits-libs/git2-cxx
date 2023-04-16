@@ -71,21 +71,16 @@ namespace cov {
 
 	class reference_base : public counted_impl<reference> {
 	public:
-		reference_base(ref_tgt tgt_kind,
-		               std::string const& name,
-		               size_t shorthand_prefix)
-		    : tgt_kind_{tgt_kind}
-		    , name_{name}
-		    , shorthand_prefix_{shorthand_prefix} {}
+		reference_base(reference_name&& name) : name_{std::move(name)} {}
 		bool references_branch() const noexcept override {
-			return tgt_kind_ == ref_tgt::branch;
+			return name_.tgt_kind == ref_tgt::branch;
 		}
 		bool references_tag() const noexcept override {
-			return tgt_kind_ == ref_tgt::tag;
+			return name_.tgt_kind == ref_tgt::tag;
 		}
-		std::string_view name() const noexcept override { return name_; };
+		std::string_view name() const noexcept override { return name_.name; };
 		std::string_view shorthand() const noexcept override {
-			return std::string_view{name_}.substr(shorthand_prefix_);
+			return std::string_view{name_.name}.substr(name_.shorthand_prefix);
 		}
 		std::string_view symbolic_target() const noexcept override {
 			return {};
@@ -95,21 +90,15 @@ namespace cov {
 		}
 
 	private:
-		ref_tgt tgt_kind_;
-		std::string name_;
-		size_t shorthand_prefix_;
+		reference_name name_;
 	};
 
 	class direct_reference
 	    : public reference_base,
 	      public enable_ref_from_this<reference, direct_reference> {
 	public:
-		direct_reference(ref_tgt tgt_kind,
-		                 std::string const& name,
-		                 size_t shorthand_prefix,
-		                 git_oid const& target)
-		    : reference_base{tgt_kind, name, shorthand_prefix}
-		    , target_{target} {}
+		direct_reference(reference_name&& name, git_oid const& target)
+		    : reference_base{std::move(name)}, target_{target} {}
 		cov::reference_type reference_type() const noexcept override {
 			return cov::reference_type::direct;
 		}
@@ -124,24 +113,19 @@ namespace cov {
 		git_oid target_;
 	};
 
-	ref_ptr<reference> direct_reference_create(ref_tgt tgt_kind,
-	                                           std::string const& name,
-	                                           size_t shorthand_prefix,
-	                                           git_oid const& target) {
-		return make_ref<direct_reference>(tgt_kind, name, shorthand_prefix,
-		                                  target);
+	ref_ptr<reference> reference::direct(reference_name&& name,
+	                                     git_oid const& target) {
+		return make_ref<direct_reference>(std::move(name), target);
 	}
 
 	class symbolic_reference
 	    : public reference_base,
 	      public enable_ref_from_this<reference, symbolic_reference> {
 	public:
-		symbolic_reference(ref_tgt tgt_kind,
-		                   std::string const& name,
-		                   size_t shorthand_prefix,
+		symbolic_reference(reference_name&& name,
 		                   std::string const& target,
 		                   ref_ptr<references> const& peel_source)
-		    : reference_base{tgt_kind, name, shorthand_prefix}
+		    : reference_base{std::move(name)}
 		    , target_{target}
 		    , peel_source_{peel_source} {}
 		cov::reference_type reference_type() const noexcept override {
@@ -153,8 +137,14 @@ namespace cov {
 		ref_ptr<reference> peel_target() noexcept override {
 			auto bead = ref_from_this();
 			while (bead &&
-			       bead->reference_type() != cov::reference_type::direct) {
-				bead = peel_source_->lookup(bead->symbolic_target());
+			       bead->reference_type() == cov::reference_type::symbolic) {
+				auto name = bead->symbolic_target();
+				auto next = peel_source_->lookup(name);
+				if (!next) {
+					next = reference::null(references::prefix_info(name));
+				}
+
+				bead = std::move(next);
 			}
 			return bead;
 		}
@@ -164,13 +154,30 @@ namespace cov {
 		ref_ptr<references> peel_source_;
 	};
 
-	ref_ptr<reference> symbolic_reference_create(
-	    ref_tgt tgt_kind,
-	    std::string const& name,
-	    size_t shorthand_prefix,
+	ref_ptr<reference> reference::symbolic(
+	    reference_name&& name,
 	    std::string const& target,
 	    ref_ptr<references> const& peel_source) {
-		return make_ref<symbolic_reference>(tgt_kind, name, shorthand_prefix,
-		                                    target, peel_source);
+		return make_ref<symbolic_reference>(std::move(name), target,
+		                                    peel_source);
 	}
+
+	class null_reference
+	    : public reference_base,
+	      public enable_ref_from_this<reference, null_reference> {
+	public:
+		using reference_base::reference_base;
+
+		cov::reference_type reference_type() const noexcept override {
+			return cov::reference_type::undetermined;
+		}
+		ref_ptr<reference> peel_target() noexcept override {
+			return ref_from_this();
+		}
+	};
+
+	ref_ptr<reference> reference::null(reference_name&& name) {
+		return make_ref<null_reference>(std::move(name));
+	}
+
 }  // namespace cov

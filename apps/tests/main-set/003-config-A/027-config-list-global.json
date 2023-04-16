@@ -1,6 +1,6 @@
 {
     "env": {
-        "HOME": "$TMP/config-list-global/home",
+        "HOME": "$TMP/home",
         "XDG_CONFIG_HOME": null,
         "USERPROFILE": null
     },
@@ -11,9 +11,8 @@
         ""
     ],
     "prepare": [
-        "safe-rm $TMP/config-list-global",
         "touch '$DATA/../copy/etc/covconfig' '[group]\nkey = system\n'",
-        "touch '$TMP/config-list-global/home/.config/cov/config' '[group]\nkey = global\n'",
-        "cd $TMP/config-list-global"
+        "touch '$TMP/home/.config/cov/config' '[group]\nkey = global\n'",
+        "cd $TMP"
     ]
 }

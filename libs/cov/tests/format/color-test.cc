@@ -48,11 +48,11 @@ namespace cov::testing {
 			                "36109a1c35e0d5cf3e5e68d896c8b1b4be565525");
 
 			io::v1::coverage_stats const default_stats{1250, 300, 299};
-			return report_create(
-			    id, parent_id, zero, commit_id, "develop"s, "Johnny Appleseed"s,
-			    "johnny@appleseed.com"s, "Johnny Committer"s,
-			    "committer@appleseed.com"s,
-			    "Subject, isn't it?\n\nBody para 1\n\nBody para 2\n"s, feb29,
+			return report::create(
+			    id, parent_id, zero, commit_id, "develop"sv,
+			    {"Johnny Appleseed"sv, "johnny@appleseed.com"sv},
+			    {"Johnny Committer"sv, "committer@appleseed.com"sv},
+			    "Subject, isn't it?\n\nBody para 1\n\nBody para 2\n"sv, feb29,
 			    feb29, stats.value_or(default_stats));
 		}
 	};
@@ -72,6 +72,7 @@ namespace cov::testing {
 		                       "112233445566778899aabbccddeeff0012345678"s},
 		                  },
 		              .HEAD_ref = "112233445566778899aabbccddeeff0012345678"s},
+		    .decorate = true,
 		};
 
 		git_oid id{};
@@ -122,7 +123,7 @@ namespace cov::testing {
 
 	static constexpr auto rating_tmplt =
 	    "%C(red)%hr%Creset%C(yellow)%d%Creset %C(bg rating) %pP %Creset "
-	    "%C(faint)%pC/%pR%Creset %C(rating)(%pr)%Creset - "
+	    "%C(faint normal)%pC/%pR%Creset %C(bold rating)(%pr)%Creset - "
 	    "%Cred[%hc@%rD]%Creset %s %Cblue<%an>%Creset %C(green)(committed %cr, "
 	    "added %rr)%C(reset)"sv;
 
@@ -139,8 +140,8 @@ namespace cov::testing {
 	            "112233445 (HEAD, main)  100%  299/300 (pass) - "
 	            "[36109a1c3@develop] Subject, isn't it? <Johnny Appleseed> "
 	            "(committed 4 months ago, added 4 months ago)"sv,
-	            "\x1B[31m112233445\x1B[m\x1B[33m (HEAD, main)\x1B[m \x1B[42m "
-	            "100% \x1B[m \x1B[2m299/300\x1B[m \x1B[32m(pass)\x1B[m - "
+	            "\x1B[31m112233445\x1B[m\x1B[33m\x1B[m \x1B[42m 100% \x1B[m "
+	            "\x1B[2;37m299/300\x1B[m \x1B[1;32m(pass)\x1B[m - "
 	            "\x1B[31m[36109a1c3@develop]\x1B[m Subject, isn't it? "
 	            "\x1B[34m<Johnny Appleseed>\x1B[m \x1B[32m(committed 4 months "
 	            "ago, added 4 months ago)\x1B[m"sv,
@@ -150,11 +151,11 @@ namespace cov::testing {
 	        "Rating: incomplete"sv,
 	        rating_tmplt,
 	        {
-	            "112233445 (HEAD, main)  79%  790/1000 (incomplete) - "
+	            "112233445 (HEAD, main)   79%  790/1000 (incomplete) - "
 	            "[36109a1c3@develop] Subject, isn't it? <Johnny Appleseed> "
 	            "(committed 4 months ago, added 4 months ago)"sv,
-	            "\x1B[31m112233445\x1B[m\x1B[33m (HEAD, main)\x1B[m \x1B[43m "
-	            "79% \x1B[m \x1B[2m790/1000\x1B[m \x1B[33m(incomplete)\x1B[m - "
+	            "\x1B[31m112233445\x1B[m\x1B[33m\x1B[m \x1B[43m  79% \x1B[m "
+	            "\x1B[2;37m790/1000\x1B[m \x1B[1;33m(incomplete)\x1B[m - "
 	            "\x1B[31m[36109a1c3@develop]\x1B[m Subject, isn't it? "
 	            "\x1B[34m<Johnny Appleseed>\x1B[m \x1B[32m(committed 4 months "
 	            "ago, added 4 months ago)\x1B[m"sv,
@@ -165,11 +166,11 @@ namespace cov::testing {
 	        "Rating: bad"sv,
 	        rating_tmplt,
 	        {
-	            "112233445 (HEAD, main)  50%  300/600 (fail) - "
+	            "112233445 (HEAD, main)   50%  300/600 (fail) - "
 	            "[36109a1c3@develop] Subject, isn't it? <Johnny Appleseed> "
 	            "(committed 4 months ago, added 4 months ago)"sv,
-	            "\x1B[31m112233445\x1B[m\x1B[33m (HEAD, main)\x1B[m \x1B[41m "
-	            "50% \x1B[m \x1B[2m300/600\x1B[m \x1B[31m(fail)\x1B[m - "
+	            "\x1B[31m112233445\x1B[m\x1B[33m\x1B[m \x1B[41m  50% \x1B[m "
+	            "\x1B[2;37m300/600\x1B[m \x1B[1;31m(fail)\x1B[m - "
 	            "\x1B[31m[36109a1c3@develop]\x1B[m Subject, isn't it? "
 	            "\x1B[34m<Johnny Appleseed>\x1B[m \x1B[32m(committed 4 months "
 	            "ago, added 4 months ago)\x1B[m"sv,

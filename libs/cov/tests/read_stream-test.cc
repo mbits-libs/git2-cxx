@@ -25,8 +25,7 @@ namespace cov::testing {
 		template <>
 		struct storage<io::direct_read_stream> {
 			static io::direct_read_stream open(std::error_code& ec) {
-				auto const filename =
-				    setup::test_dir() / setup::make_path("file"sv);
+				auto const filename = setup::test_dir() / "file"sv;
 				std::filesystem::remove(filename, ec);
 				io::fopen(filename, "wb").store(readme_z, std::size(readme_z));
 				return io::direct_read_stream{io::fopen(filename, "rb")};

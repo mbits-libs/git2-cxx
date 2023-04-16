@@ -50,8 +50,15 @@ namespace cov::testing {
 		ASSERT_EQ(obj_branch, branch->type());
 		ASSERT_TRUE(is_a<cov::branch>(static_cast<object*>(branch.get())));
 		ASSERT_TRUE(!is_a<cov::tag>(static_cast<object*>(branch.get())));
+		ASSERT_TRUE(branch->id());
 		ASSERT_EQ(0, git_oid_cmp(&id, branch->id()));
 		ASSERT_EQ("feat/task-1"sv, branch->name());
+	}
+
+	TEST(branch, from_empty_to_hollow) {
+		ref_ptr<reference> to_nothing{};
+		auto branch = cov::branch::from(std::move(to_nothing));
+		ASSERT_FALSE(branch);
 	}
 
 	TEST(branch, lookup_dangling) {
@@ -73,7 +80,23 @@ namespace cov::testing {
 		ASSERT_TRUE(refs);
 
 		auto branch = cov::branch::lookup("feat/task-1"sv, *refs);
-		ASSERT_FALSE(branch);
+		ASSERT_TRUE(branch);
+		ASSERT_FALSE(branch->id());
+		ASSERT_EQ("feat/task-1"sv, branch->name());
+
+		auto null_ref_looked_up = refs->lookup("refs/not-a-commitish"sv);
+		ASSERT_FALSE(null_ref_looked_up);
+		auto task_1 = refs->lookup("refs/heads/feat/task-1"sv);
+		ASSERT_TRUE(task_1);
+		auto null_ref = task_1->peel_target();
+		ASSERT_TRUE(null_ref);
+		ASSERT_FALSE(null_ref->direct_target());
+		ASSERT_TRUE(null_ref->symbolic_target().empty());
+		ASSERT_EQ("not-a-commitish"sv, null_ref->shorthand());
+		ASSERT_EQ("refs/not-a-commitish"sv, null_ref->name());
+
+		auto peeled = null_ref->peel_target();
+		ASSERT_EQ(peeled, null_ref);
 	}
 
 	TEST(branch, create) {
@@ -92,6 +115,7 @@ namespace cov::testing {
 
 		auto branch = cov::branch::create("feat/task-1"sv, id, *refs);
 		ASSERT_TRUE(branch);
+		ASSERT_TRUE(branch->id());
 		ASSERT_EQ(0, git_oid_cmp(&id, branch->id()));
 		ASSERT_EQ("feat/task-1"sv, branch->name());
 
