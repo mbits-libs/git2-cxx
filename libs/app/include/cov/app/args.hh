@@ -10,12 +10,17 @@
 #include <cov/app/strings/args.hh>
 #include <cov/app/strings/errors.hh>
 #include <cov/app/tr.hh>
+#include <cov/error.hh>
 #include <git2/error.hh>
 #include <string>
 #include <utility>
 #include <variant>
 
 namespace cov::app {
+	[[noreturn]] void simple_error(str::args::Strings const& tr,
+	                               std::string_view tool,
+	                               std::string_view message);
+
 	class parser_holder {
 	public:
 		parser_holder(::args::args_view const& arguments,
@@ -83,6 +88,26 @@ namespace cov::app {
 	template <>
 	struct opt<char const*>;
 
+	template <typename T>
+	struct multi {
+		T payload;
+	};
+	template <>
+	struct multi<char const*>;
+
+	template <typename T>
+	struct opt_multi {
+		T payload;
+	};
+	template <>
+	struct opt_multi<char const*>;
+
+	template <typename T>
+	struct multi<opt<T>> : opt_multi<T> {};
+
+	template <typename T>
+	struct opt<multi<T>> : opt_multi<T> {};
+
 	inline std::string to_string(std::string_view view) {
 		return {view.data(), view.size()};
 	}
@@ -117,19 +142,10 @@ namespace cov::app {
 		    str_visitor const& visitor) const {
 			auto const arguments = visitor.visit(args);
 			auto const descr = visitor.visit(description);
-			std::string stg_m1, stg_m2;
 			if (meta1) {
-				auto m1 = visitor.visit(*meta1);
-				if (meta1->is_optional) {
-					stg_m1 = fmt::format("[{}]", m1);
-					m1 = stg_m1;
-				}
+				auto const m1 = meta1->with(visitor);
 				if (meta2) {
-					auto m2 = visitor.visit(*meta2);
-					if (meta2->is_optional) {
-						stg_m2 = fmt::format("[{}]", m2);
-						m2 = stg_m2;
-					}
+					auto const m2 = meta2->with(visitor);
 					return {
 					    fmt::format("{} {} {}", arguments, m1, m2),
 					    to_string(descr),
@@ -173,32 +189,43 @@ namespace cov::app {
 		                                                                value)
 		    : base{value.payload}, is_optional{true} {}
 
-		bool is_optional{false};
-	};
-
-	template <typename... Enum>
-	requires(std::is_enum_v<Enum>&&...) struct rt_string
-	    : std::variant<std::string, std::string_view, str::args::lng, Enum...> {
-		using str_visitor = app::str_visitor<Enum...>;
-		using args_description = app::args_description<rt_string>;
-
-		using base = std::
-		    variant<std::string, std::string_view, str::args::lng, Enum...>;
-		using base::base;
-		rt_string(const char*) = delete;
+		template <typename Arg>
+		requires(
+		    std::same_as<Arg, Enum> || ... ||
+		    (std::same_as<Arg, str::args::lng> ||
+		     std::same_as<Arg, std::string_view>)) constexpr string(multi<Arg>
+		                                                                value)
+		    : base{value.payload}, is_multi{true} {}
 
 		template <typename Arg>
 		requires(
 		    std::same_as<Arg, Enum> || ... ||
 		    (std::same_as<Arg, str::args::lng> ||
 		     std::same_as<Arg,
-		                  std::string_view>)) constexpr rt_string(opt<Arg>
-		                                                              value)
-		    : base{value.payload}, is_optional{true} {}
-		rt_string(opt<std::string> value)
-		    : base{std::move(value.payload)}, is_optional{true} {}
+		                  std::string_view>)) constexpr string(opt_multi<Arg>
+		                                                           value)
+		    : base{value.payload}, is_optional{true}, is_multi{true} {}
+
+		template <typename Arg>
+		requires(
+		    std::same_as<Arg, Enum> || ... ||
+		    (std::same_as<Arg, str::args::lng> ||
+		     std::same_as<Arg,
+		                  std::string_view>)) constexpr string(opt<multi<Arg>>
+		                                                           value)
+		    : base{value.payload.payload}, is_optional{true}, is_multi{true} {}
 
 		bool is_optional{false};
+		bool is_multi{false};
+
+		std::string with(str_visitor const& visitor) const {
+			std::string stg;
+			stg.assign(visitor.visit(*this));
+			if (is_multi) stg = fmt::format("{}...", stg);
+			if (is_optional) stg = fmt::format("[{}]", stg);
+
+			return stg;
+		}
 	};
 
 	template <typename... Enum>
@@ -207,9 +234,7 @@ namespace cov::app {
 	      public parser_holder {
 	public:
 		using string = app::string<Enum...>;
-		using rt_string = app::rt_string<Enum...>;
 		using args_description = string::args_description;
-		using rt_args_description = rt_string::args_description;
 
 		base_parser(str::translator_open_info const& langs,
 		            ::args::args_view const& arguments,

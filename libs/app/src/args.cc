@@ -58,6 +58,16 @@ namespace cov::app {
 		};
 	}  // namespace
 
+	[[noreturn]] void simple_error(str::args::Strings const& tr,
+	                               std::string_view tool,
+	                               std::string_view message) {
+		auto const fmt = tr(str::args::lng::ERROR_MSG);
+		auto const msg = fmt::format(fmt::runtime(fmt), tool, message);
+		std::fputs(msg.c_str(), stderr);
+		std::fputc('\n', stderr);
+		std::exit(2);
+	}  // GCOV_EXCL_LINE
+
 	[[noreturn]] void parser_holder::error(
 	    std::error_code const& ec,
 	    str::errors::Strings const& tr,
