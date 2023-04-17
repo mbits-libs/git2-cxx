@@ -1,4 +1,5 @@
 set(SOURCES
+  src/branches.cc
   src/config.cc
   src/module.cc
   src/report_command.cc
@@ -9,6 +10,7 @@ set(SOURCES
   src/split_command.cc
   src/tools.cc
 
+  include/cov/app/branches.hh
   include/cov/app/config.hh
   include/cov/app/module.hh
   include/cov/app/cov_config_tr.hh
