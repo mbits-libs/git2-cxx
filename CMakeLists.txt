@@ -23,6 +23,7 @@ set(STRINGS
   cov_module
   cov_report
   cov_log
+  cov_refs
 )
 set(LANGUAGES pl en)
 

@@ -18,6 +18,21 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 2.4.2\n"
 
+#. Error message for creating a branch with a name, which is already taken
+msgctxt "BRANCH_EXISTS"
+msgid "branch '{}' already exists"
+msgstr "branch '{}' already exists"
+
+#. Error message for creating a branch with an invalid name
+msgctxt "BRANCH_NAME_INVALID"
+msgid "'{}' is not a valid branch name"
+msgstr "'{}' is not a valid branch name"
+
+#. Error message for trying to delete current branch
+msgctxt "BRANCH_NOT_DELETABLE"
+msgid "cannot delete branch '{0}' selected in '{1}'"
+msgstr "cannot delete branch '{0}' selected in '{1}'"
+
 #. config_file.c:412, 442
 msgctxt "CONFIG_CANNOT_DELETE"
 msgid "could not find key '{}' to delete"
@@ -59,3 +74,13 @@ msgstr "invalid pattern '{}'"
 msgctxt "SHOW_NOT_FOUND"
 msgid "requested object could not be found"
 msgstr "requested object could not be found"
+
+#. Error message for creating a tag with a name, which is already taken
+msgctxt "TAG_EXISTS"
+msgid "tag '{}' already exists"
+msgstr "tag '{}' already exists"
+
+#. Error message for creating a tag with an invalid name
+msgctxt "TAG_NAME_INVALID"
+msgid "'{}' is not a valid tag name"
+msgstr "'{}' is not a valid tag name"

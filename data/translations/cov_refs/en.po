@@ -1,0 +1,98 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2023 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the cov package.
+# marcin.zdun@midnightbits.com, 2023.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: cov latest\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-04-22 14:28+0200\n"
+"PO-Revision-Date: 2023-04-22 14:33+0200\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.4.2\n"
+"Last-Translator: \n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: en\n"
+
+#. Description for the branch --delete argument
+msgctxt "BRANCH_DELETE_DESCRIPTION"
+msgid "deletes existing branches with given names"
+msgstr "deletes existing branches with given names"
+
+#. Description for the branch --force argument
+msgctxt "BRANCH_FORCE_DESCRIPTION"
+msgid "forces creation of new branch even, if it already exists"
+msgstr "forces creation of new branch even, if it already exists"
+
+#. Description for the branch --list argument
+msgctxt "BRANCH_LIST_DESCRIPTION"
+msgid ""
+"lists known branches; if any shell wildcard pattern is present, it only "
+"shows branches matching the pattern(s); when multiple patterns are given, if "
+"any of them matches, the branch is shown"
+msgstr ""
+"lists known branches; if any shell wildcard pattern is present, it only "
+"shows branches matching the pattern(s); when multiple patterns are given, if "
+"any of them matches, the branch is shown"
+
+#. Description for the branch name positional argument
+msgctxt "BRANCH_NAME_DESCRIPTION"
+msgid ""
+"creates a new branch with given name; if the branch already exists, this "
+"command will fail"
+msgstr ""
+"creates a new branch with given name; if the branch already exists, this "
+"command will fail"
+
+#. Description for the branch --quiet argument
+msgctxt "BRANCH_QUIET_DESCRIPTION"
+msgid "suppresses non-error messages, when creating or deleting a branch"
+msgstr "suppresses non-error messages, when creating or deleting a branch"
+
+#. Description for the branch --show-current argument
+msgctxt "BRANCH_SHOW_CURRENT_DESCRIPTION"
+msgid ""
+"prints the name of the current branch; in detached HEAD state, nothing is "
+"printed"
+msgstr ""
+"prints the name of the current branch; in detached HEAD state, nothing is "
+"printed"
+
+#. Name of pattern argument
+msgctxt "PATTERN_META"
+msgid "<pattern>"
+msgstr "<pattern>"
+
+#. Description for the tag --delete argument
+msgctxt "TAG_DELETE_DESCRIPTION"
+msgid "deletes existing tags with given names"
+msgstr "deletes existing tags with given names"
+
+#. Description for the tag --force argument
+msgctxt "TAG_FORCE_DESCRIPTION"
+msgid "forces creation of new tag even, if it already exists"
+msgstr "forces creation of new tag even, if it already exists"
+
+#. Description for the tag --list argument
+msgctxt "TAG_LIST_DESCRIPTION"
+msgid ""
+"lists known tags; if any shell wildcard pattern is present, it only shows "
+"tags matching the pattern(s); when multiple patterns are given, if any of "
+"them matches, the tag is shown"
+msgstr ""
+"lists known tags; if any shell wildcard pattern is present, it only shows "
+"tags matching the pattern(s); when multiple patterns are given, if any of "
+"them matches, the tag is shown"
+
+#. Description for the tag name positional argument
+msgctxt "TAG_NAME_DESCRIPTION"
+msgid ""
+"creates a new tag with given name; if the tag already exists, this command "
+"will fail"
+msgstr ""
+"creates a new tag with given name; if the tag already exists, this command "
+"will fail"
