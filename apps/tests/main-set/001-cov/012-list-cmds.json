@@ -8,6 +8,7 @@
     "expected": [
         0,
         [
+            "branch",
             "config",
             "first",
             "init",
@@ -16,6 +17,7 @@
             "name",
             "report",
             "second",
+            "tag",
             "third\n"
         ],
         ""
