@@ -1,0 +1,29 @@
+[
+    project("cov"),
+    namespace("cov::app::str::cov_refs"),
+    version("latest"),
+    serial(1)
+] strings {
+	[help("Name of pattern argument"), id(-1)]
+	PATTERN_META = "<pattern>";
+    [help("Description for the branch name positional argument"), id(-1)]
+    BRANCH_NAME_DESCRIPTION = "creates a new branch with given name; if the branch already exists, this command will fail";
+    [help("Description for the tag name positional argument"), id(-1)]
+    TAG_NAME_DESCRIPTION = "creates a new tag with given name; if the tag already exists, this command will fail";
+    [help("Description for the branch --force argument"), id(-1)]
+    BRANCH_FORCE_DESCRIPTION = "forces creation of new branch even, if it already exists";
+    [help("Description for the tag --force argument"), id(-1)]
+    TAG_FORCE_DESCRIPTION = "forces creation of new tag even, if it already exists";
+    [help("Description for the branch --list argument"), id(-1)]
+    BRANCH_LIST_DESCRIPTION = "lists known branches; if any shell wildcard pattern is present, it only shows branches matching the pattern(s); when multiple patterns are given, if any of them matches, the branch is shown";
+    [help("Description for the tag --list argument"), id(-1)]
+    TAG_LIST_DESCRIPTION = "lists known tags; if any shell wildcard pattern is present, it only shows tags matching the pattern(s); when multiple patterns are given, if any of them matches, the tag is shown";
+    [help("Description for the branch --delete argument"), id(-1)]
+    BRANCH_DELETE_DESCRIPTION = "deletes existing branches with given names";
+    [help("Description for the tag --delete argument"), id(-1)]
+    TAG_DELETE_DESCRIPTION = "deletes existing tags with given names";
+    [help("Description for the branch --show-current argument"), id(-1)]
+    BRANCH_SHOW_CURRENT_DESCRIPTION = "prints the name of the current branch; in detached HEAD state, nothing is printed";
+    [help("Description for the branch --quiet argument"), id(-1)]
+    BRANCH_QUIET_DESCRIPTION = "suppresses non-error messages, when creating or deleting a branch";
+}
