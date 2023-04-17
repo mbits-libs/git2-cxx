@@ -6,6 +6,7 @@
 #include <cov/app/args.hh>
 #include <cov/app/cov_log_tr.hh>
 #include <cov/app/cov_module_tr.hh>
+#include <cov/app/cov_refs_tr.hh>
 #include <cov/app/errors_tr.hh>
 #include <cov/format.hh>
 #include <cov/format_args.hh>
@@ -21,7 +22,7 @@ namespace cov::app {
 	enum class command { unspecified, list, create, remove, current };
 	enum class target : bool { tag = false, branch = true };
 
-	using branches_base_parser = base_parser<errlng, modlng, loglng>;
+	using branches_base_parser = base_parser<errlng, modlng, loglng, refslng>;
 
 	struct params {
 		target tgt;

@@ -5,6 +5,8 @@ set(BUILTINS
     module
     report
     log
+    branch
+    tag
 )
 
 set(REPORT_FILTERS
