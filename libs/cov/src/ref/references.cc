@@ -88,7 +88,9 @@ namespace cov {
 				full_name.append(shorthand);
 
 				auto candidate = lookup(full_name);
-				if (candidate) return candidate;
+				if (candidate &&
+				    candidate->reference_type() != reference_type::undetermined)
+					return candidate;
 			}
 
 			return {};
@@ -174,9 +176,6 @@ namespace cov {
 			    curr->symbolic_target() != ref.symbolic_target()) {
 				return git::make_error_code(git::errc::modified);
 			}
-
-			// no FS behind this one
-			if (ref.reference_type() == reference_type::undetermined) return {};
 
 			std::error_code ec{};
 			std::filesystem::remove(root_ / make_path(ref.name()), ec);

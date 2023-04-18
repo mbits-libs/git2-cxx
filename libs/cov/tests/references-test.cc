@@ -6,6 +6,10 @@
 #include "path-utils.hh"
 #include "setup.hh"
 
+#ifdef WIN32
+#include <winerror.h>
+#endif
+
 namespace cov::testing {
 	using namespace std::literals;
 	using ::testing::TestWithParam;
@@ -212,6 +216,22 @@ namespace cov::testing {
 	                   create_directories("refs-direct"sv),
 	                   touch("refs-direct/refs/ref-name"sv, ID_)),
 	    },
+	    {
+	        "peel-invalid"sv,
+	        "refs/tags/ref-name"sv,
+	        {
+	            "refs/in:out"sv,
+	            {},
+	            "refs/in:out"sv,
+	            "in:out"sv,
+	            REF::tag,
+	            REF::neither,
+	        },
+	        make_setup(remove_all("refs-direct"sv),
+	                   create_directories("refs-direct"sv),
+	                   touch("refs-direct/refs/tags/ref-name"sv,
+	                         "ref: refs/in:out\n")),
+	    },
 	};
 
 	INSTANTIATE_TEST_SUITE_P(tests, references, ::testing::ValuesIn(tests));
@@ -235,8 +255,12 @@ namespace cov::testing {
 		ASSERT_EQ(valid, cov::reference::is_valid_name(name));
 	}
 
-	constexpr refnames_test good(std::string_view view) { return {view, true}; }
-	constexpr refnames_test bad(std::string_view view) { return {view, false}; }
+	constexpr refnames_test good(std::string_view view) {
+		return {view, true};
+	}
+	constexpr refnames_test bad(std::string_view view) {
+		return {view, false};
+	}
 
 	static refnames_test const goods[] = {
 	    good("HEAD"sv),
@@ -304,4 +328,172 @@ namespace cov::testing {
 	};
 
 	INSTANTIATE_TEST_SUITE_P(ctrls, ctrl_refnames, ::testing::ValuesIn(ctrls));
+
+	void ping(const char* id) {
+		std::fprintf(stderr, ">>> %s\n", id);
+	}
+
+	bool onlyhex(std::string_view oid) {
+		for (auto c : oid) {
+			if (!std::isxdigit(static_cast<unsigned char>(c))) return false;
+		}
+		return true;
+	};
+
+	struct remove_refs_test {
+		std::string_view name;
+		struct ref_info {
+			std::string_view name;
+			std::string_view ref;
+
+			ref_ptr<reference> create_with(
+			    ref_ptr<cov::references> const& peel_source) const {
+				git_oid oid{};
+				if (ref.size() == 40 && onlyhex(ref) &&
+				    !git_oid_fromstr(&oid, ref.data())) {
+					return reference::direct(cov::references::prefix_info(name),
+					                         oid);
+				}
+				return reference::symbolic(cov::references::prefix_info(name),
+				                           {ref.data(), ref.size()},
+				                           peel_source);
+			}
+		} ref_info;
+		std::error_code expected;
+		std::vector<path_info> steps;
+
+		friend std::ostream& operator<<(std::ostream& out,
+		                                remove_refs_test const& param) {
+			return out << param.name;
+		}
+	};
+
+	class remove_refs : public TestWithParam<remove_refs_test> {};
+
+	TEST_P(remove_refs, rm) {
+		auto const& [_, ref_info, expected, steps] = GetParam();
+
+		{
+			std::error_code ec{};
+			path_info::op(steps, ec);
+			ASSERT_FALSE(ec) << "   Error: " << ec.message() << " ("
+			                 << ec.category().name() << ')';
+		}
+
+		auto refs =
+		    cov::references::make_refs(setup::test_dir() / steps.front().name);
+		ASSERT_TRUE(refs);
+		ASSERT_EQ(obj_references, refs->type());
+		ASSERT_TRUE(is_a<cov::references>(static_cast<object*>(refs.get())));
+		ASSERT_FALSE(is_a<cov::reference>(static_cast<object*>(refs.get())));
+
+		auto const ref = ref_info.create_with(refs);
+		ASSERT_TRUE(ref);
+		ASSERT_TRUE(
+		    is_a<cov::reference>(static_cast<object const*>(ref.get())));
+
+		auto const actual = refs->remove_ref(*ref);
+		ASSERT_EQ(expected, actual) << "  exp. message: " << expected.message()
+		                            << "\n  act. message: " << actual.message();
+	}
+
+	static remove_refs_test const removes[] = {
+	    {
+	        "remove HEAD"sv,
+	        {"HEAD"sv, ID},
+	        git::make_error_code(git::errc::error),
+	        make_setup(remove_all("never-HEAD"sv),
+	                   create_directories("never-HEAD"sv),
+	                   touch("never-HEAD/HEAD"sv,
+	                         "112233445566778899aabbccddeeff00gg345678\n"sv)),
+
+	    },
+	    {
+	        "mismatched types"sv,
+	        {"refs/heads/symbolic"sv, "tags/not-an-oid"sv},
+	        git::make_error_code(git::errc::modified),
+	        make_setup(remove_all("mismatched-types"sv),
+	                   create_directories("mismatched-types"sv),
+	                   touch("mismatched-types/refs/heads/symbolic"sv, ID_)),
+
+	    },
+	    {
+	        "mismatched oids"sv,
+	        {"refs/heads/main"sv, ID},
+	        git::make_error_code(git::errc::modified),
+	        make_setup(remove_all("mismatched-oids"sv),
+	                   create_directories("mismatched-oids"sv),
+	                   touch("mismatched-oids/refs/heads/main"sv,
+	                         "112233445566778899aabbccddeeff0087654321\n"sv)),
+
+	    },
+	    {
+	        "mismatched symlinks"sv,
+	        {"refs/tags/tag"sv, "old value"},
+	        git::make_error_code(git::errc::modified),
+	        make_setup(remove_all("mismatched-symlinks"sv),
+	                   create_directories("mismatched-symlinks"sv),
+	                   touch("mismatched-symlinks/refs/tags/tag"sv,
+	                         "ref: new value\n"sv)),
+
+	    },
+	    {
+	        "bad ref"sv,
+	        {"refs/tags/faulty"sv, "ok-ish"sv},
+	        git::make_error_code(git::errc::notfound),
+	        make_setup(remove_all("bad-ref"sv),
+	                   create_directories("bad-ref"sv),
+	                   touch("bad-ref/refs/tags/faulty"sv,
+	                         "112233445566778899aabbccddeeff00gg345678\n"sv)),
+
+	    },
+	    {
+	        "invalid ref"sv,
+	        {"refs/tags/not:ok"sv, "ok-ish"sv},
+	        git::make_error_code(git::errc::invalidspec),
+	        make_setup(remove_all("invalid-ref"sv),
+	                   create_directories("invalid-ref"sv),
+	                   touch("invalid-ref/refs/tags/tag"sv, "ref: ok-ish\n"sv)),
+
+	    },
+	    {
+	        "bad ref contents"sv,
+	        {"refs/tags/bad"sv, "ok-ish"sv},
+	        git::make_error_code(git::errc::notfound),
+	        make_setup(remove_all("bad-ref"sv),
+	                   create_directories("bad-ref"sv),
+	                   touch("bad-ref/refs/tags/bad"sv,
+	                         "112233445566778899aabbccddeeff00gg345678\n"sv)),
+
+	    },
+	    {
+	        "nothing found"sv,
+	        {"refs/tags/tag"sv, "ok-ish"sv},
+	        git::make_error_code(git::errc::notfound),
+	        make_setup(remove_all("nothing found"sv),
+	                   create_directories("nothing found"sv),
+	                   touch("nothing found/refs/tags/another-tag"sv, ID_)),
+
+	    },
+	    {
+	        "something found"sv,
+	        {"refs/tags/tag"sv, ID},
+	        {},
+	        make_setup(remove_all("something found"sv),
+	                   create_directories("something found"sv),
+	                   touch("something found/refs/tags/tag"sv, ID_)),
+
+	    },
+	    {
+	        "a directory"sv,
+	        {"refs/tags/dir"sv, ID},
+	        git::make_error_code(git::errc::notfound),
+	        make_setup(remove_all("a directory"sv),
+	                   create_directories("a directory"sv),
+	                   touch("a directory/refs/tags/dir/tag"sv, ID_)),
+
+	    },
+	};
+
+	INSTANTIATE_TEST_SUITE_P(named, remove_refs, ::testing::ValuesIn(removes));
 }  // namespace cov::testing
