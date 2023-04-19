@@ -1,0 +1,14 @@
+{
+    "args": "tag",
+    "expected": [
+        2,
+        "",
+        [
+            "usage: cov tag [-h] [<name> | -d <name>... | -l [<pattern>...]]",
+            "cov tag: error: Cannot find a Cov repository in $TMP\n"
+        ]
+    ],
+    "prepare": [
+        "cd '$TMP'"
+    ]
+}

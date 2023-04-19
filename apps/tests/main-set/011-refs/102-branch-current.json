@@ -1,0 +1,14 @@
+{
+    "args": "branch --show-current",
+    "expected": [
+        0,
+        [
+            "main\n"
+        ],
+        ""
+    ],
+    "prepare": [
+        "unpack $DATA/revparse.tar $TMP",
+        "cd $TMP/revparse"
+    ]
+}

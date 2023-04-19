@@ -1,0 +1,12 @@
+{
+    "args": "tag \"bad:name\"",
+    "expected": [
+        2,
+        "",
+        "cov tag: error: 'bad:name' is not a valid tag name\n"
+    ],
+    "prepare": [
+        "unpack $DATA/revparse.tar $TMP",
+        "cd $TMP/revparse"
+    ]
+}

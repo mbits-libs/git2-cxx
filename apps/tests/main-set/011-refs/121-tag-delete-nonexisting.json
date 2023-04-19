@@ -1,0 +1,15 @@
+{
+    "args": "tag -d nonexisting",
+    "expected": [
+        2,
+        "",
+        [
+            "usage: cov tag [-h] [<name> | -d <name>... | -l [<pattern>...]]",
+            "cov tag: error: requested object could not be found\n"
+        ]
+    ],
+    "prepare": [
+        "unpack $DATA/revparse.tar $TMP",
+        "cd $TMP/revparse"
+    ]
+}

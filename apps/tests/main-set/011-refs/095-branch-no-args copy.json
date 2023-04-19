@@ -1,0 +1,14 @@
+{
+    "args": "branch",
+    "expected": [
+        2,
+        "",
+        [
+            "usage: cov branch [-h] [<name> | -d <name>... | -l [<pattern>...] | --show-current]",
+            "cov branch: error: Cannot find a Cov repository in $TMP\n"
+        ]
+    ],
+    "prepare": [
+        "cd '$TMP'"
+    ]
+}

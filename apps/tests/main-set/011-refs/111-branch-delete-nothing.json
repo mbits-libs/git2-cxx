@@ -1,0 +1,15 @@
+{
+    "args": "branch --delete",
+    "expected": [
+        2,
+        "",
+        [
+            "usage: cov branch [-h] [<name> | -d <name>... | -l [<pattern>...] | --show-current]",
+            "cov branch: error: --delete argument needs at least one argument\n"
+        ]
+    ],
+    "prepare": [
+        "unpack $DATA/revparse.tar $TMP",
+        "cd $TMP/revparse"
+    ]
+}

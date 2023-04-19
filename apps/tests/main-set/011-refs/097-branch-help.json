@@ -1,0 +1,25 @@
+{
+    "args": "branch --help",
+    "expected": [
+        0,
+        [
+            "usage: cov branch [-h] [<name> | -d <name>... | -l [<pattern>...] | --show-current]",
+            "",
+            "positional arguments:",
+            " <name>                    creates a new branch with given name; if the branch already exists, this command will fail",
+            "",
+            "optional arguments:",
+            " -h, --help                shows this help message and exits",
+            " -f, --force               forces creation of new branch even, if it already exists",
+            " -l, --list [<pattern>...] lists known branches; if any shell wildcard pattern is present, it only shows branches matching the pattern(s); when multiple patterns are given, if any of them matches, the branch is shown",
+            " -d, --delete <name>...    deletes existing branches with given names",
+            " --show-current            prints the name of the current branch; in detached HEAD state, nothing is printed",
+            " -q, --quiet               suppresses non-error messages, when creating or deleting a branch",
+            " --color <when>            uses color in output; <when> is 'never', 'always', or 'auto'\n"
+        ],
+        ""
+    ],
+    "prepare": [
+        "cd '$TMP'"
+    ]
+}

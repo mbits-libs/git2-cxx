@@ -1,0 +1,12 @@
+{
+    "args": "branch -d main",
+    "expected": [
+        2,
+        "",
+        "cov branch: error: cannot delete branch 'main' selected in '$TMP/revparse/.git/.covdata'\n"
+    ],
+    "prepare": [
+        "unpack $DATA/revparse.tar $TMP",
+        "cd $TMP/revparse"
+    ]
+}

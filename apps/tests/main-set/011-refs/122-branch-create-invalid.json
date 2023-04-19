@@ -1,0 +1,12 @@
+{
+    "args": "branch \"bad:name\"",
+    "expected": [
+        2,
+        "",
+        "cov branch: error: 'bad:name' is not a valid branch name\n"
+    ],
+    "prepare": [
+        "unpack $DATA/revparse.tar $TMP",
+        "cd $TMP/revparse"
+    ]
+}

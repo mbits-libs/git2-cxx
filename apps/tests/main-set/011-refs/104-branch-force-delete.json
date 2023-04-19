@@ -1,0 +1,15 @@
+{
+    "args": "branch --delete main --force",
+    "expected": [
+        2,
+        "",
+        [
+            "usage: cov branch [-h] [<name> | -d <name>... | -l [<pattern>...] | --show-current]",
+            "cov branch: error: argument --force: not allowed with argument --delete\n"
+        ]
+    ],
+    "prepare": [
+        "unpack $DATA/revparse.tar $TMP",
+        "cd $TMP/revparse"
+    ]
+}

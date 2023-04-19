@@ -1,0 +1,22 @@
+{
+    "args": "tag --help",
+    "expected": [
+        0,
+        [
+            "usage: cov tag [-h] [<name> | -d <name>... | -l [<pattern>...]]",
+            "",
+            "positional arguments:",
+            " <name>                    creates a new tag with given name; if the tag already exists, this command will fail",
+            "",
+            "optional arguments:",
+            " -h, --help                shows this help message and exits",
+            " -f, --force               forces creation of new tag even, if it already exists",
+            " -l, --list [<pattern>...] lists known tags; if any shell wildcard pattern is present, it only shows tags matching the pattern(s); when multiple patterns are given, if any of them matches, the tag is shown",
+            " -d, --delete <name>...    deletes existing tags with given names\n"
+        ],
+        ""
+    ],
+    "prepare": [
+        "cd '$TMP'"
+    ]
+}

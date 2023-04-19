@@ -1,0 +1,17 @@
+{
+    "args": "branch name",
+    "expected": [
+        2,
+        "",
+        [
+            "usage: cov branch [-h] [<name> | -d <name>... | -l [<pattern>...] | --show-current]",
+            "cov branch: error: HEAD refers to branch with no reports\n"
+        ]
+    ],
+    "prepare": [
+        "cd $TMP",
+        "git init unborn",
+        "cd unborn",
+        "cov init"
+    ]
+}

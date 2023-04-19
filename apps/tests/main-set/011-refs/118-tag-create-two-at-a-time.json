@@ -1,0 +1,15 @@
+{
+    "args": "tag tag-1 tag-2",
+    "expected": [
+        2,
+        "",
+        [
+            "usage: cov tag [-h] [<name> | -d <name>... | -l [<pattern>...]]",
+            "cov tag: error: <name> argument needs exactly one argument\n"
+        ]
+    ],
+    "prepare": [
+        "unpack $DATA/revparse.tar $TMP",
+        "cd $TMP/revparse"
+    ]
+}
