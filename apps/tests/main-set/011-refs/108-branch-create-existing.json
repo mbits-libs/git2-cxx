@@ -1,0 +1,12 @@
+{
+    "args": "branch cov-separate",
+    "expected": [
+        2,
+        "",
+        "cov branch: error: branch 'cov-separate' already exists\n"
+    ],
+    "prepare": [
+        "unpack $DATA/revparse.tar $TMP",
+        "cd $TMP/revparse"
+    ]
+}

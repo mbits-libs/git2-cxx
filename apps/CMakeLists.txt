@@ -128,6 +128,7 @@ if (COV_TESTING)
         006-module-A 007-module-B
         008-report-A 009-report-B
         010-log
+        011-refs
     )
         add_test(
             NAME cov-exec--${TEST_SET}

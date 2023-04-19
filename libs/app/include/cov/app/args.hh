@@ -225,7 +225,7 @@ namespace cov::app {
 			if (is_optional) stg = fmt::format("[{}]", stg);
 
 			return stg;
-		}
+		}  // GCOV_EXCL_LINE
 	};
 
 	template <typename... Enum>

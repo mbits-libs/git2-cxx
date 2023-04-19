@@ -1,0 +1,12 @@
+{
+    "args": "tag H",
+    "expected": [
+        2,
+        "",
+        "cov tag: error: tag 'H' already exists\n"
+    ],
+    "prepare": [
+        "unpack $DATA/revparse.tar $TMP",
+        "cd $TMP/revparse"
+    ]
+}

@@ -194,10 +194,12 @@ namespace cov::app {
 				return remove(repo);
 			case command::current:
 				return show_current(repo), OK;
-			case command::unspecified:
-				break;
+			case command::unspecified:  // GCOV_EXCL_LINE
+				[[unlikely]];           // GCOV_EXCL_LINE
+				break;                  // GCOV_EXCL_LINE
 		}
-		return OK;
+		[[unlikely]];  // GCOV_EXCL_LINE
+		return OK;     // GCOV_EXCL_LINE
 	}
 
 	void params::list(cov::repository const& repo) const {
@@ -215,7 +217,7 @@ namespace cov::app {
 		auto colorize =
 		    clr == use_feature::yes ? formatter::shell_colorize : nullptr;
 
-		lister{.prefix = heads,
+		lister{.prefix = heads,  // GCOV_EXCL_LINE
 		       .index = true,
 		       .current = HEAD.branch,
 		       .colorize = colorize}

@@ -61,8 +61,8 @@ namespace cov::app::builtin::tag {
 			auto prn = args::printer{stdout};
 			prn.format_list(args);
 			std::exit(0);
-		}
-	}  // namespace
+		}  // GCOV_EXCL_LINE
+	}      // namespace
 
 	parser::parser(::args::args_view const& arguments,
 	               str::translator_open_info const& langs)

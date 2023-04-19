@@ -1,0 +1,12 @@
+{
+    "args": "branch feat/cov-4",
+    "expected": [
+        0,
+        "",
+        ""
+    ],
+    "prepare": [
+        "unpack $DATA/revparse.tar $TMP",
+        "cd $TMP/revparse"
+    ]
+}

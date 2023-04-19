@@ -1,0 +1,17 @@
+{
+    "args": "tag name",
+    "expected": [
+        2,
+        "",
+        [
+            "usage: cov tag [-h] [<name> | -d <name>... | -l [<pattern>...]]",
+            "cov tag: error: HEAD refers to branch with no reports\n"
+        ]
+    ],
+    "prepare": [
+        "cd $TMP",
+        "git init unborn",
+        "cd unborn",
+        "cov init"
+    ]
+}

@@ -1,0 +1,15 @@
+{
+    "args": "branch --show-current -l feat/cov-*",
+    "expected": [
+        2,
+        "",
+        [
+            "usage: cov branch [-h] [<name> | -d <name>... | -l [<pattern>...] | --show-current]",
+            "cov branch: error: argument --show-current: not allowed with argument --list\n"
+        ]
+    ],
+    "prepare": [
+        "unpack $DATA/revparse.tar $TMP",
+        "cd $TMP/revparse"
+    ]
+}

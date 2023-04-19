@@ -1,0 +1,15 @@
+{
+    "args": "branch branch-1 branch-2",
+    "expected": [
+        2,
+        "",
+        [
+            "usage: cov branch [-h] [<name> | -d <name>... | -l [<pattern>...] | --show-current]",
+            "cov branch: error: <name> argument needs exactly one argument\n"
+        ]
+    ],
+    "prepare": [
+        "unpack $DATA/revparse.tar $TMP",
+        "cd $TMP/revparse"
+    ]
+}
