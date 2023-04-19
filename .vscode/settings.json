@@ -8,5 +8,15 @@
         "pofile",
         "polib",
         "workdir"
-    ]
+    ],
+    "files.associations": {
+        "*.lngs": "idl",
+        "*.widl": "idl",
+        "iosfwd": "cpp",
+        "chrono": "cpp",
+        "type_traits": "cpp",
+        "*.inc": "cpp",
+        "typeindex": "cpp",
+        "typeinfo": "cpp"
+    }
 }

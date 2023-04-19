@@ -43,11 +43,7 @@ find_package(libgit2 REQUIRED)
 find_package(fmt REQUIRED)
 find_package(date REQUIRED)
 find_package(mbits-args REQUIRED)
-find_program(LNGS lngs)
-
-if (LNGS)
-  message(STATUS "lngs is ${LNGS}")
-endif()
+find_package(mbits-lngs REQUIRED)
 
 if (COV_TESTING)
   enable_testing()
