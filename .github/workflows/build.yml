@@ -52,6 +52,7 @@ jobs:
 
     env:
       BUILD_TYPE: ${{ matrix.build_type }}
+      CONAN_REVISIONS_ENABLED: 1
 
     runs-on: ${{ matrix.os }}
 
@@ -93,6 +94,8 @@ jobs:
         conan profile new default --detect
         conan profile update ${{ matrix.conan_profile }} default
         conan profile update settings.build_type=${{ matrix.build_type }} default
+        conan remote add mbits-conan https://mbits.jfrog.io/artifactory/api/conan/mbits-conan
+        conan user -p ${{ secrets.JFROG_KEY }} -r mbits-conan ${{ secrets.JFROG_USER }}
         conan profile show default
 
     - name: Conan cache
