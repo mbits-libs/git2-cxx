@@ -1,0 +1,110 @@
+# Code coverage presented locally.
+# Copyright (C) 2022 midnightBITS
+# This file is distributed under the same license as the cov package.
+# Marcin Zdun <mzdun@midnightbits.com>, 2022.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: cov latest\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-08-14 19:44+0200\n"
+"PO-Revision-Date: 2022-08-14 19:46+0200\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: pl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : 2);\n"
+"X-Generator: Poedit 2.4.2\n"
+
+#. Description for the --add scope
+msgctxt "ADD"
+msgid "adds a new line to the option without altering any existing values"
+msgstr "dodaje nowy wiersz do opcji bez zmieniania istniejących wartości"
+
+#. Error message for --add with only one option
+msgctxt "ADD_VALUE_MISSING"
+msgid "needs both <name> and <value>"
+msgstr "potrzebuje zarówno <nazwy>, jak i <wartości>"
+
+#. Description for the --get scope
+msgctxt "GET"
+msgid "prints the value matching the key name"
+msgstr "drukuje wartość odpowiadającej nazwie klucza"
+
+#. Description for the --get-all scope
+msgctxt "GET_ALL"
+msgid "prints all values matching the key name"
+msgstr "drukuje wszystkie wartości pasujące do nazwy klucza"
+
+#. Description for the --list scope
+msgctxt "LIST_ENTRIES"
+msgid "lists all variables in a config files"
+msgstr "wyświetla listę wszystkich zmiennych w plikach konfiguracyjnych"
+
+#. Description for the positional arguments (name and optional value)
+msgctxt "NAME_VALUE"
+msgid "when only name is given, reads its value; otherwise sets the new value"
+msgstr ""
+"gdy podana jest tylko nazwa, odczytuje jej wartość; w przeciwnym razie "
+"ustawia nową wartość"
+
+#. Description for missing scope
+msgctxt "NO_SCOPE_DESCRIPTION"
+msgid "reads from all visible scopes at once, writes to .covdata/config"
+msgstr ""
+"odczytuje ze wszystkich dostępnych plików jednocześnie, zapisuje do "
+".covdata/config"
+
+#. Name for the situation, when neither local, global, nor system scopes were
+#. chosen.
+msgctxt "NO_SCOPE_META"
+msgid "<no option>"
+msgstr "<brak opcji>"
+
+#. Description for the --file scope
+msgctxt "SCOPE_FILE"
+msgid "chooses given file"
+msgstr "wybiera podany plik"
+
+#. Description for the --global scope
+msgctxt "SCOPE_GLOBAL"
+msgid "chooses ~/.config/cov/config"
+msgstr "wybiera ~/.config/cov/config"
+
+#. Description for the --local scope
+msgctxt "SCOPE_LOCAL"
+msgid "chooses .covdata/config"
+msgstr "wybiera .covdata/config"
+
+#. Name of a file options argument(s)
+msgctxt "SCOPE_META"
+msgid "<file-options>"
+msgstr "<opcje-pliku>"
+
+#. Description for the --system scope
+msgctxt "SCOPE_SYSTEM"
+msgid "chooses $(prefix)/etc/covconfig"
+msgstr "wybiera $(prefix)/etc/covconfig"
+
+#. Header for list of scopes
+msgctxt "SCOPE_TITLE"
+msgid "file options"
+msgstr "opcje pliku"
+
+#. Error message for name/value pair, which seems to have a triplet
+msgctxt "TOO_MANY_ARGUMENTS"
+msgid "too many arguments"
+msgstr "zbyt wiele argumentów"
+
+#. Description for the --unset scope
+msgctxt "UNSET"
+msgid "removes the value matching the key name if there is exactly one"
+msgstr ""
+"usuwa wartość pasującą do nazwy klucza, jeśli istnieje dokładnie jedna"
+
+#. Description for the --unset-all scope
+msgctxt "UNSET_ALL"
+msgid "removes all values matching the key name"
+msgstr "usuwa wszystkie wartości pasujące do nazwy klucza"

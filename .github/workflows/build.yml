@@ -92,11 +92,12 @@ jobs:
     - name: Configure Conan (library and build type)
       run: |
         conan profile new default --detect
-        conan profile update ${{ matrix.conan_profile }} default
-        conan profile update settings.build_type=${{ matrix.build_type }} default
+        conan profile new ${{ matrix.build_profile }} --detect
+        conan profile update ${{ matrix.conan_profile }} ${{ matrix.build_profile }}
+        conan profile update settings.build_type=${{ matrix.build_type }} ${{ matrix.build_profile }}
         conan remote add mbits-conan https://mbits.jfrog.io/artifactory/api/conan/mbits-conan
         conan user -p ${{ secrets.JFROG_KEY }} -r mbits-conan ${{ secrets.JFROG_USER }}
-        conan profile show default
+        conan profile show ${{ matrix.build_profile }}
 
     - name: Conan cache
       uses: actions/cache@v3
@@ -110,7 +111,7 @@ jobs:
 
     - name: Configure Conan
       working-directory: ${{github.workspace}}/build/conan
-      run: conan install ../.. --build missing -pr:b default -pr:h default
+      run: conan install ../.. --build missing -pr:b ${{ matrix.build_profile }} -pr:h ${{ matrix.build_profile }}
 
     - name: Configure CMake
       run: cmake --preset ${{ matrix.build_profile }}-${{ matrix.build_generator }} -DCOV_CUTDOWN_OS=ON

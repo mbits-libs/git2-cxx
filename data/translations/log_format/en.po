@@ -1,0 +1,98 @@
+# Code coverage presented locally.
+# Copyright (C) 2022 midnightBITS
+# This file is distributed under the same license as the cov package.
+# Marcin Zdun <mzdun@midnightbits.com>, 2022.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: cov latest\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-08-14 19:44+0200\n"
+"PO-Revision-Date: 2022-08-14 19:46+0200\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 2.4.2\n"
+
+#. Relative time, no more than few days ago
+msgctxt "DAYS_AGO"
+msgid "one day ago"
+msgid_plural "{} days ago"
+msgstr[0] "one day ago"
+msgstr[1] "{} days ago"
+
+#. Relative time, no more than few hours ago
+msgctxt "HOURS_AGO"
+msgid "one hour ago"
+msgid_plural "{} hours ago"
+msgstr[0] "one hour ago"
+msgstr[1] "{} hours ago"
+
+#. Relative time, timestamp in future compared with 'now'.
+msgctxt "IN_THE_FUTURE"
+msgid "in the future"
+msgstr "in the future"
+
+#. Result of location coverage below the "incomplete" mark
+msgctxt "MARK_FAILING"
+msgid "fail"
+msgstr "fail"
+
+#. Result of location coverage above the "incomplete" and below the "pass"
+#. mark
+msgctxt "MARK_INCOMPLETE"
+msgid "incomplete"
+msgstr "incomplete"
+
+#. Result of location coverage above the "pass" mark
+msgctxt "MARK_PASSING"
+msgid "pass"
+msgstr "pass"
+
+#. Relative time, no more than few minutes ago
+msgctxt "MINUTES_AGO"
+msgid "one minute ago"
+msgid_plural "{} minutes ago"
+msgstr[0] "one minute ago"
+msgstr[1] "{} minutes ago"
+
+#. Relative time, no more than few months ago
+msgctxt "MONTHS_AGO"
+msgid "one month ago"
+msgid_plural "{} months ago"
+msgstr[0] "one month ago"
+msgstr[1] "{} months ago"
+
+#. Relative time, no more than few seconds ago
+msgctxt "SECONDS_AGO"
+msgid "one second ago"
+msgid_plural "{} seconds ago"
+msgstr[0] "one second ago"
+msgstr[1] "{} seconds ago"
+
+#. Relative time, no more than few weeks ago
+msgctxt "WEEKS_AGO"
+msgid "one week ago"
+msgid_plural "{} weeks ago"
+msgstr[0] "one week ago"
+msgstr[1] "{} weeks ago"
+
+#. Relative time, longer than 5 years, or longer than 12 months, by whole
+#. years
+msgctxt "YEARS_AGO"
+msgid "one year ago"
+msgid_plural "{} years ago"
+msgstr[0] "one year ago"
+msgstr[1] "{} years ago"
+
+#. Relative time, no more than few 5 years, no less than a years ago;
+#. concatented with log_format.MONTHS_AGO to create 'X years, Y months ago'
+msgctxt "YEARS_MONTHS_AGO"
+msgid "one year,"
+msgid_plural "{} years,"
+msgstr[0] "one year,"
+msgstr[1] "{} years,"

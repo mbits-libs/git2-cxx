@@ -1,0 +1,141 @@
+# Code coverage presented locally.
+# Copyright (C) 2022 midnightBITS
+# This file is distributed under the same license as the cov package.
+# Marcin Zdun <mzdun@midnightbits.com>, 2022.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: cov latest\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-08-14 19:44+0200\n"
+"PO-Revision-Date: 2022-08-14 19:46+0200\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 2.4.2\n"
+
+#. Description for the --amend argument
+msgctxt "AMEND_DESCRIPTION"
+msgid "replaces the tip of the current branch by creating a new commit"
+msgstr "replaces the tip of the current branch by creating a new commit"
+
+#. Error message for calling --amend before any reports
+msgctxt "ERROR_AMEND_IN_FRESH_REPO"
+msgid "you have nothing to amend"
+msgstr "you have nothing to amend"
+
+#. Error message for calling the app in bare repository
+msgctxt "ERROR_BARE_GIT"
+msgid "this operation must be run in a work tree"
+msgstr "this operation must be run in a work tree"
+
+#. Error message for failing to open a file
+msgctxt "ERROR_CANNOT_FIND_FILE"
+msgid "cannot find {}"
+msgstr "cannot find {}"
+
+#. Error message for failing to find the reported commit in the git repository
+msgctxt "ERROR_CANNOT_LOAD_COMMIT"
+msgid "cannot find the Git commit from report"
+msgstr "cannot find the Git commit from report"
+
+#. Error message for trying to read from a missing file
+msgctxt "ERROR_CANNOT_OPEN_FILE"
+msgid "could not read {}"
+msgstr "could not read {}"
+
+#. Error message for failing to read repository objects
+msgctxt "ERROR_CANNOT_READ_FROM_DB"
+msgid "cannot read current report back"
+msgstr "cannot read current report back"
+
+#. Error message for failing to write repository objects
+msgctxt "ERROR_CANNOT_WRITE_TO_DB"
+msgid "cannot write to repository database"
+msgstr "cannot write to repository database"
+
+#. Error message for issues with cov JSON, which was produced by a filter
+msgctxt "ERROR_FILTERED_REPORT_ISSUES"
+msgid "there were issues with {} processed by {} filter"
+msgstr "there were issues with {} processed by {} filter"
+
+#. Error message for unusable filter file
+msgctxt "ERROR_FILTER_ACCESS"
+msgid "filter {} could not be used"
+msgstr "filter {} could not be used"
+
+#. Error message for non-0 result code from a filter
+msgctxt "ERROR_FILTER_FAILED"
+msgid "filter {} exited with return code {}"
+msgstr "filter {} exited with return code {}"
+
+#. Error message for a missing filter file
+msgctxt "ERROR_FILTER_NOENT"
+msgid "filter {} could not be found"
+msgstr "filter {} could not be found"
+
+#. Error message for issues with cov JSON
+msgctxt "ERROR_REPORT_ISSUES"
+msgid "there were issues with {}"
+msgstr "there were issues with {}"
+
+#. Description for the report file argument; the list at the end uses
+#. REPORT_FILE_DESCRIPTION_LIST_END
+msgctxt "FILTER_DESCRIPTION"
+msgid ""
+"filters other report formats to internal cov format; known filters are: {}"
+msgstr ""
+"filters other report formats to internal cov format; known filters are: {}"
+
+#. Final part of the report file argument description; together the list will
+#. be "known filters are: 'first', 'second', 'third' and 'fourth'"
+msgctxt "FILTER_DESCRIPTION_LIST_END"
+msgid "{} and {}"
+msgstr "{} and {}"
+
+#. Name of filter argument
+msgctxt "FILTER_META"
+msgid "<filter>"
+msgstr "<filter>"
+
+#. Name of a branch, when there is no branch
+msgctxt "MESSAGE_DETACHED_HEAD"
+msgid "detached HEAD"
+msgstr "detached HEAD"
+
+#. Description for commit in current report; will become "based on
+#. 13a39fbf9@main"
+msgctxt "MESSAGE_FIELD_GIT_COMMIT"
+msgid "based on"
+msgstr "based on"
+
+#. Description for parent of current report; will become "parent d4965abfb"
+msgctxt "MESSAGE_FIELD_PARENT_REPORT"
+msgid "parent"
+msgstr "parent"
+
+#. Number of files in current report
+msgctxt "MESSAGE_FILE_COUNT"
+msgid "{} file"
+msgid_plural "{} files"
+msgstr[0] "one file"
+msgstr[1] "{} files"
+
+#. Description for the report file argument
+msgctxt "REPORT_FILE_DESCRIPTION"
+msgid "selects report to import"
+msgstr "selects report to import"
+
+#. Name of report file argument (be it Cobertura XML or Coveralls JSON)
+msgctxt "REPORT_FILE_META"
+msgid "<report-file>"
+msgstr "<report-file>"
+
+#. Warning message for adding a modified file
+msgctxt "WARNING_FILE_MODIFIED"
+msgid "{} was modified after the report"
+msgstr "{} was modified after the report"
