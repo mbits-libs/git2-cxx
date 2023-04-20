@@ -4,9 +4,6 @@
 [submodule "tools/testing"]
 	path = tools/testing
 	url = https://github.com/mbits-libs/testing.git
-[submodule "external/lngs"]
-	path = external/lngs
-	url = https://github.com/mbits-os/lngs.git
 [submodule "external/json"]
 	path = external/json
 	url = https://github.com/mbits-libs/json.git
