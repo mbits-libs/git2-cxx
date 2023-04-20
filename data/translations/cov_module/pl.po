@@ -1,0 +1,127 @@
+# Code coverage presented locally.
+# Copyright (C) 2022 midnightBITS
+# This file is distributed under the same license as the cov package.
+# Marcin Zdun <mzdun@midnightbits.com>, 2022.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: cov latest\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-08-14 19:44+0200\n"
+"PO-Revision-Date: 2022-08-14 19:46+0200\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: pl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : 2);\n"
+"X-Generator: Poedit 2.4.2\n"
+
+#. Description for the --add argument
+msgctxt "ADD_DESCRIPTION"
+msgid "adds a directory filter to a new or existing module"
+msgstr "dodaje filtr katalogu do nowego lub istniejącego modułu"
+
+#. Name of a Git commit argument
+msgctxt "COMMIT_META"
+msgid "<git-commit>"
+msgstr "<zapis-gita>"
+
+#. Error message for trying to add a duplicate directory
+msgctxt "ERROR_ADD_DUPLICATE"
+msgid "module {} already contains directory {}"
+msgstr "moduł {} zawiera już katalog {}"
+
+#. Error message for conflicting arguments; used by arguments which cannot be
+#. part of series of options
+msgctxt "ERROR_EXCLUSIVE"
+msgid "{} argument cannot be used with other options"
+msgstr "argument {} nie może być używany z innymi opcjami"
+
+#. Error message for calling inside a bare Git repository
+msgctxt "ERROR_NO_GIT_WORKDIR"
+msgid "this operation must be run in a work tree"
+msgstr "ta operacja musi być uruchomiona w drzewie roboczym"
+
+#. Error message for a missing/redundant argument, provided amount is lower
+#. than minimal expected; first parameter becames name of the argument, second
+#. is the expected count
+msgctxt "ERROR_OPTS_NEEDS_AT_LEAST"
+msgid "{} argument needs at least {} argument"
+msgid_plural "{} argument needs at least {} arguments"
+msgstr[0] "argument {} wymaga co najmniej jednego argumentu"
+msgstr[1] "argument {} wymaga co najmniej {} argumentów"
+msgstr[2] "argument {} wymaga co najmniej {} argumentów"
+
+#. Error message for a missing/redundant argument, provided amount is larger
+#. than maximal expected; first parameter becames name of the argument, second
+#. is the expected count
+msgctxt "ERROR_OPTS_NEEDS_AT_MOST"
+msgid "{} argument needs at most {} argument"
+msgid_plural "{} argument needs at most {} arguments"
+msgstr[0] "{} argument wymaga co najwyżej jednego argumentu"
+msgstr[1] "{} argument wymaga co najwyżej {} argumentów"
+msgstr[2] "{} argument wymaga co najwyżej {} argumentów"
+
+#. Error message for a missing/redundant argument, this exact number is
+#. needed; first parameter becames name of the argument, second is the
+#. expected count
+msgctxt "ERROR_OPTS_NEEDS_EXACTLY"
+msgid "{} argument needs exactly {} argument"
+msgid_plural "{} argument needs exactly {} arguments"
+msgstr[0] "argument {} wymaga dokładnie jednego argumentu"
+msgstr[1] "argument {} wymaga dokładnie {} argumentów"
+msgstr[2] "argument {} wymaga dokładnie {} argumentów"
+
+#. Error message for trying to remove a directory from non-existent module
+msgctxt "ERROR_REMOVE_NO_MODULE"
+msgid "there is no {} module"
+msgstr "nie ma modułu {}"
+
+#. Error message for calling with reference to some other type of Git
+#. object,than commit (e.g. commited file or directory)
+msgctxt "ERROR_REVPARSE_NEEDS_COMMIT"
+msgid "<git-commit> argument should describe a commit"
+msgstr "argument <zapis-gita> powinien opisywać złożony zapis"
+
+#. Error message for calling with a commit range (first..last)
+msgctxt "ERROR_REVPARSE_NEEDS_SINGLE"
+msgid "<git-commit> argument should describe a single object"
+msgstr "argument <zapis-gita> powinien opisywać pojedynczy obiekt"
+
+#. "Argument" name for no arguments
+msgctxt "NOARGS_META"
+msgid "no arguments"
+msgstr "brak_argumentów"
+
+#. Description for the --remove-all argument
+msgctxt "REMOVA_ALL_DESCRIPTION"
+msgid "removes all filters from the module, effectively removing it"
+msgstr "usuwa wszystkie filtry z modułu, w efekcie go usuwając"
+
+#. Description for the --remove argument
+msgctxt "REMOVE_DESCRIPTION"
+msgid "removes a directory filter from given module"
+msgstr "usuwa filtr katalogu z danego modułu"
+
+#. Description for the --set-sep argument
+msgctxt "SET_SEP_DESCRIPTION"
+msgid "sets new module name separator"
+msgstr "ustawia nowy separator nazw modułów"
+
+#. Description for the no-command call with commit given as an argument
+msgctxt "SHOW_COMMIT_DESCRIPTION"
+msgid "prints module list for given commit and exits"
+msgstr "drukuje listę modułów dla danego zapisu i wychodzi"
+
+#. Description for the --show-sep argument
+msgctxt "SHOW_SEP_DESCRIPTION"
+msgid "prints module name separator from either workdir or commit"
+msgstr ""
+"drukuje separator nazwy modułu albo z katalogu roboczego, albo z zapisu"
+
+#. Description for the no-command call, even without the commit
+msgctxt "SHOW_WORKDIR_DESCRIPTION"
+msgid "prints module list from git work directory and exits"
+msgstr "drukuje listę modułów z katalogu roboczego git i wychodzi"

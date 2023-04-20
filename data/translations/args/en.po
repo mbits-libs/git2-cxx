@@ -1,0 +1,148 @@
+# Code coverage presented locally.
+# Copyright (C) 2022 midnightBITS
+# This file is distributed under the same license as the cov package.
+# Marcin Zdun <mzdun@midnightbits.com>, 2022.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: cov latest\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-08-14 19:44+0200\n"
+"PO-Revision-Date: 2023-04-21 20:05+0200\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 2.4.2\n"
+
+#. Universal error message
+msgctxt "ARGUMENT_MSG"
+msgid "argument {0}: {1}"
+msgstr "argument {0}: {1}"
+
+#. Error message for tool called outside Cov repository
+msgctxt "CANNOT_FIND_COV"
+msgid "Cannot find a Cov repository in {0}"
+msgstr "Cannot find a Cov repository in {0}"
+
+#. Error message for tool called outside Git repository
+msgctxt "CANNOT_FIND_GIT"
+msgid "cannot find Git repository in {}"
+msgstr "cannot find a Git repository in {0}"
+
+#. Default name of an argument
+msgctxt "DEF_META"
+msgid "<arg>"
+msgstr "<arg>"
+
+#. Name of a directory argument
+msgctxt "DIR_META"
+msgid "<dir>"
+msgstr "<dir>"
+
+#. Error message template; placeholder 0 will get the name of program,
+#. placeholder 1 an actual message
+msgctxt "ERROR_MSG"
+msgid "{0}: error: {1}"
+msgstr "{0}: error: {1}"
+
+#. Error message for conflicting arguments; used with ARGUMENT_MSG
+msgctxt "EXCLUSIVE"
+msgid "not allowed with argument {0}"
+msgstr "not allowed with argument {0}"
+
+#. Name of a file argument
+msgctxt "FILE_META"
+msgid "<file>"
+msgstr "<file>"
+
+#. Needed file was not found
+msgctxt "FILE_NOT_FOUND"
+msgid "cannot open {0}"
+msgstr "cannot open {0}"
+
+#. Description for the -h/--help argument
+msgctxt "HELP_DESCRIPTION"
+msgid "shows this help message and exits"
+msgstr "shows this help message and exits"
+
+#. Name of a, well, name argument, e.g. in cov config
+msgctxt "NAME_META"
+msgid "<name>"
+msgstr "<name>"
+
+#. Error message for a numeric argument, when parsing would get outside of
+#. representable bounds
+msgctxt "NEEDED_NUMBER_EXCEEDED"
+msgid "argument {0}: number outside of expected bounds"
+msgstr "argument {0}: number outside of expected bounds"
+
+#. Help message presenting a list of possible values for a list-type argument
+msgctxt "NEEDS_ENUM_KNOWN_VALUES"
+msgid "known values for {0}: {1}"
+msgstr "known values for {0}: {1}"
+
+#. Error message for a list of arguments, when parsing failed
+msgctxt "NEEDS_ENUM_UNKNOWN"
+msgid "argument {0}: value {1} is not recognized"
+msgstr "argument {0}: value {1} is not recognized"
+
+#. Error message for unneeded value
+msgctxt "NEEDS_NO_PARAM"
+msgid "argument {0}: value was not expected"
+msgstr "argument {0}: value was not expected"
+
+#. Error message for a numeric argument, when parsing failed
+msgctxt "NEEDS_NUMBER"
+msgid "argument {0}: expected a number"
+msgstr "argument {0}: expected a number"
+
+#. Error message for a missing argument
+msgctxt "NEEDS_PARAM"
+msgid "argument {0}: expected one argument"
+msgstr "argument {0}: expected one argument"
+
+#. Header for list of optional arguments
+msgctxt "OPTIONALS"
+msgid "optional arguments"
+msgstr "optional arguments"
+
+#. Name of a file or directory argument
+msgctxt "PATH_META"
+msgid "<path>"
+msgstr "<path>"
+
+#. Header for list of positional arguments
+msgctxt "POSITIONALS"
+msgid "positional arguments"
+msgstr "positional arguments"
+
+#. Error message for a missing required argument
+msgctxt "REQUIRED"
+msgid "argument {0} is required"
+msgstr "argument {0} is required"
+
+#. Error message for an unrecognized argument; the placeholder will contain
+#. the name of the argument
+msgctxt "UNRECOGNIZED"
+msgid "unrecognized argument: {0}"
+msgstr "unrecognized argument: {0}"
+
+#. Synopsis header; please note there is one space at the end of this entry
+msgctxt "USAGE"
+msgid "usage: "
+msgstr "usage: "
+
+#. Name of a value argument, e.g. in cov config
+msgctxt "VALUE_META"
+msgid "<value>"
+msgstr "<value>"
+
+#. Warning message template; placeholder 0 will get the name of program,
+#. placeholder 1 an actual message
+msgctxt "WARNING_MSG"
+msgid "{0}: warning: {1}"
+msgstr "{0}: warning: {1}"
