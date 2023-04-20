@@ -46,7 +46,7 @@ target_link_options(app PRIVATE ${ADDITIONAL_LINK_FLAGS})
 target_include_directories(app PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}/include
   ${CMAKE_CURRENT_BINARY_DIR}/include)
-target_link_libraries(app PUBLIC cov-api lighter liblngs mbits::args)
+target_link_libraries(app PUBLIC cov-api lighter mbits::liblngs mbits::args)
 
 add_library(app_main STATIC src/main.cc)
 target_compile_options(app_main PRIVATE ${ADDITIONAL_WALL_FLAGS})
