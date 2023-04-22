@@ -21,7 +21,7 @@ This project will use [Conventional Commits v1.0.0](https://www.conventionalcomm
 
 |Scope|Usage|
 |-|-|
-|`lang`|either .lang or .po files; until I have proper `lang` exec on CI, also files, which should be generated (.cc, .hh and .pot)|
+|`lang`|either .lang or .po files|
 |`api`|`git2-c++` or `cov-api` libraries|
 |`lighter`|any of the `hilite` libraries|
 |`app`|`app` library|

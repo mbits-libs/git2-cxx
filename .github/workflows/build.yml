@@ -17,14 +17,14 @@ jobs:
           - os: ubuntu-latest
             ubuntu: true
             home: /home/runner
-            latest_conan_hash: 4a3a6f59b0837cf90623040405f12b15e81f2e4b0d168d85523bbf0b7be2750a
+            latest_conan_hash: 0f3f06020ba5f7092804535236503b979b27a6c542fccbe5bd9bde9510d51848
             conan_profile: settings.compiler.libcxx=libstdc++11
             build_generator: ninja
             # Windows ANY
           - os: windows-latest
             windows: true
             home: C:/Users/runneradmin
-            latest_conan_hash: 23bc910b051c6e0b5c0283ef9e86cc2850d74fe8460f315a70f9b8358bfd01b7
+            latest_conan_hash: d034cfa8159c39cac72ed0778e3562f9ff079013f95df4df24393bdd186614c5
             build_generator: msbuild
             # ANY Release
           - build_type: Release
@@ -117,7 +117,7 @@ jobs:
       run: cmake --preset ${{ matrix.build_profile }}-${{ matrix.build_generator }} -DCOV_CUTDOWN_OS=ON
 
     - name: Build
-      run: cmake --build --preset ${{ matrix.build_profile }}
+      run: cmake --build --preset ${{ matrix.build_profile }} --parallel
 
     - name: Pack
       if: ${{ matrix.cpack_generator != '' }}
