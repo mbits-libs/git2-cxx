@@ -39,6 +39,8 @@ foreach(STRING_FILE ${STRINGS})
     ${CMAKE_CURRENT_BINARY_DIR}/src/strings/${STRING_FILE}.cc
     ${CMAKE_CURRENT_BINARY_DIR}/include/cov/app/strings/${STRING_FILE}.hh)
 
+  list(APPEND DATA_SOURCES "${TR_DIR}/${STRING_FILE}.pot" "${LNGS_DIR}/${STRING_FILE}.lngs")
+
   foreach(LANG ${LANGUAGES})
     set(__po "${TR_DIR}/${STRING_FILE}/${LANG}.po")
     set(__lng "${LOCALE_DIR}/${LANG}/${STRING_FILE}")
@@ -76,6 +78,13 @@ set_target_properties(app app_main PROPERTIES FOLDER libs)
 foreach(STRING_FILE ${STRINGS})
   set(__LNGS_FILE "${LNGS_DIR}/${STRING_FILE}.lngs")
 
+  add_custom_command(OUTPUT "${TR_DIR}/${STRING_FILE}.pot"
+    COMMAND mbits::lngs
+    ARGS pot "${__LNGS_FILE}" -o "${TR_DIR}/${STRING_FILE}.pot" -a "marcin.zdun@midnightbits.com"
+    DEPENDS "${__LNGS_FILE}"
+    COMMENT "[POT] ${STRING_FILE}"
+    VERBATIM)
+
   add_custom_command(
     OUTPUT
       "${CMAKE_CURRENT_BINARY_DIR}/src/strings/${STRING_FILE}.cc"
@@ -95,7 +104,7 @@ foreach(STRING_FILE ${STRINGS})
       --resource
       -o "${CMAKE_CURRENT_BINARY_DIR}/include/cov/app/strings/${STRING_FILE}.hh"
     DEPENDS "${__LNGS_FILE}"
-    COMMENT "[ENUM] ${STRING_FILE}"
+    COMMENT "[ENUM+RES] ${STRING_FILE}"
     VERBATIM)
 
   foreach(LANG ${LANGUAGES})
