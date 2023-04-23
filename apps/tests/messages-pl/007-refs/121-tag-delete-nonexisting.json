@@ -1,0 +1,16 @@
+{
+    "lang": "pl",
+    "args": "tag -d nonexisting",
+    "expected": [
+        2,
+        "",
+        [
+            "u\u017cycie: cov tag [-h] [<nazwa> | -d <nazwa>... | -l [<wzorzec>...]]",
+            "cov tag: b\u0142\u0105d: nie mo\u017cna odnale\u017a\u0107 \u017c\u0105danego obiektu\n"
+        ]
+    ],
+    "prepare": [
+        "unpack $DATA/revparse.tar $TMP",
+        "cd $TMP/revparse"
+    ]
+}

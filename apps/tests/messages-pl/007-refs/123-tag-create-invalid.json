@@ -1,0 +1,13 @@
+{
+    "lang": "pl",
+    "args": "tag \"bad:name\"",
+    "expected": [
+        2,
+        "",
+        "cov tag: b\u0142\u0105d: \u201ebad:name\u201d nie jest prawid\u0142ow\u0105 nazw\u0105 znacznika\n"
+    ],
+    "prepare": [
+        "unpack $DATA/revparse.tar $TMP",
+        "cd $TMP/revparse"
+    ]
+}
