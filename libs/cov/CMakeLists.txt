@@ -1,12 +1,18 @@
 configure_file(src/version.in.hh ${CMAKE_CURRENT_BINARY_DIR}/include/cov/version.hh @ONLY)
 
 set(SOURCES
+  src/branch-tag.hh
+  src/branch.cc
+  src/counted.cc
+  src/db.cc
+  src/discover.cc
   src/error.cc
   src/format/defaults.cc
-  src/format/parser.cc
   src/format/formatter.cc
+  src/format/parser.cc
   src/hash/md5.cc
   src/hash/sha1.cc
+  src/init.cc
   src/io/db_object-error.cc
   src/io/db_object.cc
   src/io/file.cc
@@ -16,28 +22,29 @@ set(SOURCES
   src/io/report.cc
   src/io/safe_stream.cc
   src/io/strings.cc
+  src/module_config.cc
+  src/module.cc
+  src/path-utils.hh
   src/ref/internal.hh
   src/ref/reference_list.cc
   src/ref/reference.cc
   src/ref/references.cc
-  src/branch-tag.hh
-  src/branch.cc
-  src/counted.cc
-  src/db.cc
-  src/discover.cc
-  src/init.cc
-  src/module_config.cc
-  src/module.cc
-  src/path-utils.hh
   src/repository.cc
   src/revparse.cc
   src/streams.cc
   src/tag.cc
   src/zstream.cc
+  include/cov/branch.hh
+  include/cov/counted.hh
+  include/cov/db.hh
+  include/cov/discover.hh
   include/cov/error.hh
+  include/cov/format_args.hh
+  include/cov/format.hh
   include/cov/hash/hash.hh
   include/cov/hash/md5.hh
   include/cov/hash/sha1.hh
+  include/cov/init.hh
   include/cov/io/db_object.hh
   include/cov/io/file.hh
   include/cov/io/line_coverage.hh
@@ -47,13 +54,6 @@ set(SOURCES
   include/cov/io/safe_stream.hh
   include/cov/io/strings.hh
   include/cov/io/types.hh
-  include/cov/branch.hh
-  include/cov/counted.hh
-  include/cov/db.hh
-  include/cov/discover.hh
-  include/cov/format_args.hh
-  include/cov/format.hh
-  include/cov/init.hh
   include/cov/module.hh
   include/cov/object.hh
   include/cov/reference.hh
