@@ -1,0 +1,23 @@
+{
+    "lang": "pl",
+    "args": "tag --help",
+    "expected": [
+        0,
+        [
+            "u\u017cycie: cov tag [-h] [<nazwa> | -d <nazwa>... | -l [<wzorzec>...]]",
+            "",
+            "argumenty pozycyjne:",
+            " <nazwa>                   tworzy nowy znacznik o podanej nazwie; je\u015bli znacznik ju\u017c istnieje, to polecenie zako\u0144czy si\u0119 niepowodzeniem",
+            "",
+            "argumenty opcjonalne:",
+            " -h, --help                pokazuje ten komunikat pomocy i wychodzi",
+            " -f, --force               wymusza utworzenie nowego znacznika nawet, je\u015bli ten ju\u017c istnieje",
+            " -l, --list [<wzorzec>...] wy\u015bwietla znane znaczniki; je\u015bli istnieje jakikolwiek wzorzec z symbolem wieloznacznym pow\u0142oki, pokazuje tylko znaczniki pasuj\u0105ce do wzorca (wzorc\u00f3w); gdy podano wiele wzor\u00f3w, je\u015bli kt\u00f3rykolwiek z nich pasuje, znacznik jest wy\u015bwietlany",
+            " -d, --delete <nazwa>...   usuwa istniej\u0105ce znaczniki o podanych nazwach\n"
+        ],
+        ""
+    ],
+    "prepare": [
+        "cd '$TMP'"
+    ]
+}

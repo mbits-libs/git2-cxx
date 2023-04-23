@@ -1,0 +1,13 @@
+{
+    "lang": "pl",
+    "args": "branch cov-separate",
+    "expected": [
+        2,
+        "",
+        "cov branch: b\u0142\u0105d: ga\u0142\u0105\u017a \u201ecov-separate\u201d ju\u017c istnieje\n"
+    ],
+    "prepare": [
+        "unpack $DATA/revparse.tar $TMP",
+        "cd $TMP/revparse"
+    ]
+}
