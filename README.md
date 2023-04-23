@@ -62,7 +62,19 @@ If a command allows a range, either `..<rev>`, `<rev>..` or `<rev>..<rev>` (but 
 
   The _report file_ format is a JSON described by the [report-schema.json](apps/report-schema.json), but it can be filtered from other formats by **-f \<filter\>** argument. Currently, the **cov report** has filters for Cobertura and Coveralls.
 
-- **Branches and Tags** _(soon)_: branch, checkout, log, tag
+- **Branches and Tags**: branch, tag, checkout _(soon)_ \
+  `cov branch [-h] [--color <when>]`
+  - `[--force] <name>`
+  - `--list [<pattern>...]`
+  - `--delete <name>`
+  - `--show-current`
+
+  `cov tag [-h]`
+  - `[--force] <name>`
+  - `--list [<pattern>...]`
+  - `--delete <name>`
+
+  Again, **cov branch** and **cov tag** are simplified versions of **git branch** and **git tag**, respectively, working on Cov structure.
 
 - **Inspection and Comparison**: log, show  _(soon)_, serve  _(soon)_\
   `cov log [-h] [<options>] [<revision-range>|<revision>]`
