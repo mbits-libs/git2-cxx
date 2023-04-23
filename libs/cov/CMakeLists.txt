@@ -1,6 +1,7 @@
 configure_file(src/version.in.hh ${CMAKE_CURRENT_BINARY_DIR}/include/cov/version.hh @ONLY)
 
 set(SOURCES
+  src/error.cc
   src/format/defaults.cc
   src/format/parser.cc
   src/format/formatter.cc
@@ -33,6 +34,7 @@ set(SOURCES
   src/streams.cc
   src/tag.cc
   src/zstream.cc
+  include/cov/error.hh
   include/cov/hash/hash.hh
   include/cov/hash/md5.hh
   include/cov/hash/sha1.hh
