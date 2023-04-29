@@ -1,0 +1,20 @@
+{
+    "lang": "pl",
+    "args": "checkout --orphan branch-name",
+    "post": [
+        "branch --show-current",
+        "log --oneline -n1"
+    ],
+    "expected": [
+        2,
+        "branch-name\n",
+        [
+            "u\u017cycie: cov log [-h] [<zakres-rewizji>] [-n <liczba>] [--oneline] [--format <format>] [--abbrev-hash] [--no-abbrev-hash] [--color <kiedy>] [--decorate <jak>]",
+            "cov log: b\u0142\u0105d: HEAD odnosi si\u0119 do ga\u0142\u0119zi bez raport\u00f3w\n"
+        ]
+    ],
+    "prepare": [
+        "unpack $DATA/revparse.tar $TMP",
+        "cd $TMP/revparse"
+    ]
+}

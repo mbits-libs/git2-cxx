@@ -1,0 +1,20 @@
+[
+    project("cov"),
+    namespace("cov::app::str::cov_checkout"),
+    version("latest"),
+    serial(1)
+] strings {
+    [help("Description for the named argument"), id(-1)]
+    NAME_DESCRIPTION = "checks out a branch, if it exists; if the name refers to a report or a tag, detaches after checking out";
+    [help("Description for the --detach argument"), id(-1)]
+    DETACH_DESCRIPTION = "detaches the HEAD; if a name is given, the referenced raport is checked out first";
+    [help("Description for the -b argument"), id(-1)]
+    BRANCH_DESCRIPTION = "for non-existing branches, creates a branch and checks it out";
+    [help("Description for the --orphan argument"), id(-1)]
+    ORPHAN_DESCRIPTION = "creates and checks out an orphan branch";
+
+    [help("Error message for command without any arguments"), id(-1)]
+    ERROR_NEEDS_SOMEHTING = "at least one argument is needed";
+    [help("Error message for filesystem issues, when updateing the HEAD file"), id(-1)]
+    ERROR_HEAD_READONLY = "cannot write to HEAD";
+}
