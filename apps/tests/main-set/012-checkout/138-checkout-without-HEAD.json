@@ -11,6 +11,7 @@
     "prepare": [
         "unpack $DATA/revparse.tar $TMP",
         "cd $TMP/revparse",
-        "ro .git/.covdata"
+        "ro .git/.covdata",
+        "ro .git/.covdata/HEAD"
     ]
 }
