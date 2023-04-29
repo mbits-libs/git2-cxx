@@ -16,6 +16,12 @@
 	LIST_CMDS_DESCRIPTION = "lists known commands from requested groups";
 	[help("Name of a command group argument"), id(-1)]
 	SPECS_MULTI_META = "<spec>[,<spec>,...]";
+	[help("Name of branch start point argument"), id(-1)]
+	START_POINT_META = "<start-point>";
+	[help("Description for the <start-point> argument"), id(-1)]
+	START_POINT_DESCRIPTION = "uses specified reference instead of HEAD";
+	[help("Name of report argument"), id(-1)]
+	REPORT_META = "<report>";
 
 	[help("Answer for --version option"), id(-1)]
 	VERSION_IS = "cov version {}";

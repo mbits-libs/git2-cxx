@@ -6,6 +6,7 @@
 #include <cov/app/path.hh>
 #include <cov/format.hh>
 #include <cov/repository.hh>
+#include <cov/revparse.hh>
 
 namespace fs = std::filesystem;
 using namespace std::literals;
@@ -170,16 +171,19 @@ namespace cov::app {
 		}
 
 		std::optional<modcnt> error{};
+		intmax_t count = 1;
 
-		if (cmd == command::create && names.size() != 1)
-			error = modcnt::ERROR_OPTS_NEEDS_EXACTLY;
-		else if (cmd == command::remove && names.empty())
+		if (cmd == command::create && names.size() > 2) {
+			// there is no way there could be zero names and still a command...
+			error = modcnt::ERROR_OPTS_NEEDS_AT_MOST;
+			count = 2;
+		} else if (cmd == command::remove && names.empty())
 			error = modcnt::ERROR_OPTS_NEEDS_AT_LEAST;
 
 		if (error) {
 			str_visitor visitor{tr};
-			cli.error(fmt::format(fmt::runtime(tr(*error, 1)),
-			                      visitor.visit(name_of(cmd)), 1));
+			cli.error(fmt::format(fmt::runtime(tr(*error, count)),
+			                      visitor.visit(name_of(cmd)), count));
 		}
 	}
 
@@ -225,11 +229,14 @@ namespace cov::app {
 	}
 
 	std::error_code params::create(cov::repository const& repo) const {
-		auto const HEAD = repo.current_head();
-		if (!HEAD.ref) return git::make_error_code(git::errc::error);
-		std::error_code result{};
-		repo.refs()->copy_ref(HEAD.ref, names.front(), tgt == target::branch,
-		                      force, result);
+		git_oid oid{};
+		auto result = revs::parse_single(
+		    repo, names.size() < 2 ? "HEAD"sv : names[1], oid);
+		if (result) return result;
+		auto ref = reference::direct(references::prefix_info(""), oid);
+
+		repo.refs()->copy_ref(ref, names.front(), tgt == target::branch, force,
+		                      result);
 		return result;
 	}
 

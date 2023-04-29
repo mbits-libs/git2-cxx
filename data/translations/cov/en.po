@@ -95,10 +95,25 @@ msgctxt "LIST_CMDS_DESCRIPTION"
 msgid "lists known commands from requested groups"
 msgstr "lists known commands from requested groups"
 
+#. Name of report argument
+msgctxt "REPORT_META"
+msgid "<report>"
+msgstr "<report>"
+
 #. Name of a command group argument
 msgctxt "SPECS_MULTI_META"
 msgid "<spec>[,<spec>,...]"
 msgstr "<spec>[,<spec>,...]"
+
+#. Description for the <start-point> argument
+msgctxt "START_POINT_DESCRIPTION"
+msgid "uses specified reference instead of HEAD"
+msgstr "uses specified reference instead of HEAD"
+
+#. Name of branch start point argument
+msgctxt "START_POINT_META"
+msgid "<start-point>"
+msgstr "<start-point>"
 
 #. Short usage description
 msgctxt "USAGE"
