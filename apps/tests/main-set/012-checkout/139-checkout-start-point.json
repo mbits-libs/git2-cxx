@@ -1,0 +1,21 @@
+{
+    "args": "checkout -b branch-name G~",
+    "post": [
+        "branch --show-current",
+        "log --oneline -n1"
+    ],
+    "expected": [
+        0,
+        [
+            "branch-name",
+            "",
+            "b61f9823c    0%  Commit H d09e4694e@main\n"
+        ],
+        ""
+    ],
+    "prepare": [
+        "unpack $DATA/revparse.tar $TMP",
+        "cd $TMP/revparse",
+        "cov log --oneline"
+    ]
+}

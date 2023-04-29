@@ -4,7 +4,7 @@
         2,
         "",
         [
-            "usage: cov tag [-h] [<name> | -d <name>... | -l [<pattern>...]]",
+            "usage: cov tag [-h] [<name> [<start-point>] | -d <name>... | -l [<pattern>...]]",
             "cov tag: error: requested object could not be found\n"
         ]
     ],

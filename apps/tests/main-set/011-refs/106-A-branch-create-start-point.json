@@ -1,0 +1,15 @@
+{
+    "args": "branch feat/cov-4 G~2",
+    "post": "log --oneline -n1",
+    "expected": [
+        0,
+        [
+            "1be3ab826    0%  Commit D a7b27e913@main\n"
+        ],
+        ""
+    ],
+    "prepare": [
+        "unpack $DATA/revparse.tar $TMP",
+        "cd $TMP/revparse"
+    ]
+}

@@ -38,6 +38,7 @@ namespace cov::app::builtin::tag {
 
 			static constexpr parser::args_description positionals[] = {
 			    {lng::NAME_META, refslng::TAG_NAME_DESCRIPTION},
+			    {covlng::START_POINT_META, covlng::START_POINT_DESCRIPTION},
 			};
 
 			static constexpr parser::args_description optionals[] = {
@@ -70,9 +71,10 @@ namespace cov::app::builtin::tag {
 		using namespace str;
 		using enum command;
 
-		parser_.usage(fmt::format("[-h] [{0} | -d {0}... | -l [{1}...]]"sv,
-		                          tr_(args::lng::NAME_META),
-		                          tr_(refslng::PATTERN_META)));
+		parser_.usage(
+		    fmt::format("[-h] [{0} [{2}] | -d {0}... | -l [{1}...]]"sv,
+		                tr_(args::lng::NAME_META), tr_(refslng::PATTERN_META),
+		                tr_(covlng::START_POINT_META)));
 		parser_.provide_help(false);
 		parser_.custom(show_help, "h", "help").opt();
 		params.setup(parser_, *this);

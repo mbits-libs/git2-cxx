@@ -1,18 +1,16 @@
 {
     "lang": "pl",
-    "args": "tag name",
+    "args": "tag tag-1 tag-2 tag-3",
     "expected": [
         2,
         "",
         [
             "u\u017cycie: cov tag [-h] [<nazwa> [<punkt-startowy>] | -d <nazwa>... | -l [<wzorzec>...]]",
-            "cov tag: b\u0142\u0105d: HEAD odnosi si\u0119 do ga\u0142\u0119zi bez raport\u00f3w\n"
+            "cov tag: b\u0142\u0105d: <nazwa> argument wymaga co najwy\u017cej 2 argument\u00f3w\n"
         ]
     ],
     "prepare": [
-        "cd $TMP",
-        "git init unborn",
-        "cd unborn",
-        "cov init"
+        "unpack $DATA/revparse.tar $TMP",
+        "cd $TMP/revparse"
     ]
 }

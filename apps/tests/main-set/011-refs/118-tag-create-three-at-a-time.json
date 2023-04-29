@@ -1,14 +1,15 @@
 {
-    "args": "tag",
+    "args": "tag tag-1 tag-2 tag-3",
     "expected": [
         2,
         "",
         [
             "usage: cov tag [-h] [<name> [<start-point>] | -d <name>... | -l [<pattern>...]]",
-            "cov tag: error: Cannot find a Cov repository in $TMP\n"
+            "cov tag: error: <name> argument needs at most 2 arguments\n"
         ]
     ],
     "prepare": [
-        "cd '$TMP'"
+        "unpack $DATA/revparse.tar $TMP",
+        "cd $TMP/revparse"
     ]
 }
