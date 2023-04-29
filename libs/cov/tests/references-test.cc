@@ -340,25 +340,26 @@ namespace cov::testing {
 		return true;
 	};
 
+	struct ref_info {
+		std::string_view name;
+		std::string_view ref;
+
+		ref_ptr<reference> create_with(
+		    ref_ptr<cov::references> const& peel_source) const {
+			git_oid oid{};
+			if (ref.size() == 40 && onlyhex(ref) &&
+			    !git_oid_fromstr(&oid, ref.data())) {
+				return reference::direct(cov::references::prefix_info(name),
+				                         oid);
+			}
+			return reference::symbolic(cov::references::prefix_info(name),
+			                           {ref.data(), ref.size()}, peel_source);
+		}
+	};
+
 	struct remove_refs_test {
 		std::string_view name;
-		struct ref_info {
-			std::string_view name;
-			std::string_view ref;
-
-			ref_ptr<reference> create_with(
-			    ref_ptr<cov::references> const& peel_source) const {
-				git_oid oid{};
-				if (ref.size() == 40 && onlyhex(ref) &&
-				    !git_oid_fromstr(&oid, ref.data())) {
-					return reference::direct(cov::references::prefix_info(name),
-					                         oid);
-				}
-				return reference::symbolic(cov::references::prefix_info(name),
-				                           {ref.data(), ref.size()},
-				                           peel_source);
-			}
-		} ref_info;
+		testing::ref_info ref_info;
 		std::error_code expected;
 		std::vector<path_info> steps;
 
@@ -383,16 +384,11 @@ namespace cov::testing {
 		auto refs =
 		    cov::references::make_refs(setup::test_dir() / steps.front().name);
 		ASSERT_TRUE(refs);
-		ASSERT_EQ(obj_references, refs->type());
-		ASSERT_TRUE(is_a<cov::references>(static_cast<object*>(refs.get())));
-		ASSERT_FALSE(is_a<cov::reference>(static_cast<object*>(refs.get())));
 
 		auto const ref = ref_info.create_with(refs);
 		ASSERT_TRUE(ref);
-		ASSERT_TRUE(
-		    is_a<cov::reference>(static_cast<object const*>(ref.get())));
 
-		auto const actual = refs->remove_ref(*ref);
+		auto const actual = refs->remove_ref(ref);
 		ASSERT_EQ(expected, actual) << "  exp. message: " << expected.message()
 		                            << "\n  act. message: " << actual.message();
 	}
@@ -496,4 +492,126 @@ namespace cov::testing {
 	};
 
 	INSTANTIATE_TEST_SUITE_P(named, remove_refs, ::testing::ValuesIn(removes));
+
+	struct copy_refs_test {
+		std::string_view name;
+		testing::ref_info ref_info;
+		struct copy_info {
+			std::string_view new_name;
+			bool as_branch{true};
+			bool force{false};
+		} copy_info;
+		std::error_code expected;
+		std::vector<path_info> steps;
+
+		friend std::ostream& operator<<(std::ostream& out,
+		                                copy_refs_test const& param) {
+			return out << param.name;
+		}
+	};
+
+	class copy_refs : public TestWithParam<copy_refs_test> {};
+
+	TEST_P(copy_refs, cp) {
+		auto const& [_, ref_info, copy_info, expected, steps] = GetParam();
+
+		{
+			std::error_code ec{};
+			path_info::op(steps, ec);
+			ASSERT_FALSE(ec) << "   Error: " << ec.message() << " ("
+			                 << ec.category().name() << ')';
+		}
+
+		auto refs =
+		    cov::references::make_refs(setup::test_dir() / steps.front().name);
+		ASSERT_TRUE(refs);
+
+		auto const ref = ref_info.create_with(refs);
+		ASSERT_TRUE(ref);
+
+		std::error_code actual{};
+		auto const new_ref =
+		    refs->copy_ref(ref, copy_info.new_name, copy_info.as_branch,
+		                   copy_info.force, actual);
+
+		ASSERT_EQ(expected, actual) << "  exp. message: " << expected.message()
+		                            << "\n  act. message: " << actual.message();
+		ASSERT_EQ(!expected, !!new_ref);
+	}
+
+	static copy_refs_test const copies[] = {
+	    {
+	        "HEAD-to-branch"sv,
+	        {"HEAD"sv, ID},
+	        {"branch"sv},
+	        {},
+	        make_setup(remove_all("HEAD-to-branch"sv),
+	                   create_directories("HEAD-to-branch"sv),
+	                   touch("HEAD-to-branch/HEAD"sv, ID_)),
+
+	    },
+	    {
+	        "duplicate-branch"sv,
+	        {"HEAD"sv, ID},
+	        {"main"sv},
+	        git::make_error_code(git::errc::exists),
+	        make_setup(
+	            remove_all("duplicate-branch"sv),
+	            create_directories("duplicate-branch"sv),
+	            touch("duplicate-branch/HEAD"sv, "ref: refs/heads/main\n"),
+	            touch("duplicate-branch/refs/heads/main"sv, ID_)),
+	    },
+	    {
+	        "duplicate-branch (force)"sv,
+	        {"HEAD"sv, ID},
+	        {.new_name = "main"sv, .force = true},
+	        {},
+	        make_setup(remove_all("duplicate-branch-force"sv),
+	                   create_directories("duplicate-branch-force"sv),
+	                   touch("duplicate-branch-force/HEAD"sv,
+	                         "ref: refs/heads/main\n"),
+	                   touch("duplicate-branch-force/refs/heads/main"sv, ID_)),
+	    },
+	    {
+	        "duplicate-tag"sv,
+	        {"HEAD"sv, ID},
+	        {.new_name = "main"sv, .as_branch = false},
+	        {},
+	        make_setup(remove_all("duplicate-tag"sv),
+	                   create_directories("duplicate-tag"sv),
+	                   touch("duplicate-tag/HEAD"sv, "ref: refs/heads/main\n"),
+	                   touch("duplicate-tag/refs/heads/main"sv, ID_)),
+	    },
+	    {
+	        "unborn"sv,
+	        {"HEAD"sv, "refs/heads/main"},
+	        {.new_name = "task/cov-branches"sv, .as_branch = false},
+	        git::make_error_code(git::errc::unbornbranch),
+	        make_setup(remove_all("unborn"sv),
+	                   create_directories("unborn"sv),
+	                   touch("unborn/HEAD"sv, "ref: refs/heads/main\n")),
+	    },
+	    {
+	        "invalid-spec"sv,
+	        {"HEAD"sv, ID},
+	        {.new_name = "task/cov:branches"sv, .as_branch = false},
+	        git::make_error_code(git::errc::invalidspec),
+	        make_setup(remove_all("invalid-spec"sv),
+	                   create_directories("invalid-spec"sv),
+	                   touch("invalid-spec/HEAD"sv, ID_),
+	                   touch("invalid-spec/refs/heads/main"sv, ID_)),
+	    },
+	    {
+	        "indirect"sv,
+	        {"HEAD"sv, "refs/heads/main"},
+	        {.new_name = "copy"sv},
+	        {},
+	        make_setup(remove_all("indirect"sv),
+	                   create_directories("indirect"sv),
+	                   touch("indirect/HEAD"sv, "ref: refs/heads/main\n"),
+	                   touch("indirect/refs/heads/main"sv, ID_)),
+	    },
+	};
+
+	INSTANTIATE_TEST_SUITE_P(named, copy_refs, ::testing::ValuesIn(copies));
 }  // namespace cov::testing

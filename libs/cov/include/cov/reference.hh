@@ -112,6 +112,11 @@ namespace cov {
 		virtual ref_ptr<reference> lookup(std::string_view) = 0;
 		virtual ref_ptr<reference_list> iterator() = 0;
 		virtual ref_ptr<reference_list> iterator(std::string_view prefix) = 0;
-		virtual std::error_code remove_ref(reference const& ref) = 0;
+		virtual std::error_code remove_ref(ref_ptr<reference> const& ref) = 0;
+		virtual ref_ptr<reference> copy_ref(ref_ptr<reference> const& ref,
+		                                    std::string_view new_name,
+		                                    bool as_branch,
+		                                    bool force,
+		                                    std::error_code& ec) = 0;
 	};
 }  // namespace cov

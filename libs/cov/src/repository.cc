@@ -104,21 +104,23 @@ namespace cov {
 		if (!head_ref) return {};
 
 		if (head_ref->direct_target())
-			return {.tip = *head_ref->direct_target()};
+			return {.tip = *head_ref->direct_target(), .ref = head_ref};
 
 		auto const peeled = head_ref->peel_target();
 		auto const name = peeled->shorthand();
 
 		if (peeled->references_branch() && peeled->direct_target()) {
 			return {.branch = {name.data(), name.size()},
-			        .tip = *peeled->direct_target()};
+			        .tip = *peeled->direct_target(),
+			        .ref = peeled};
 		}
 		if (peeled->references_branch())
-			return {.branch = {name.data(), name.size()}};
+			return {.branch = {name.data(), name.size()}, .ref = peeled};
 
-		if (peeled->direct_target()) return {.tip = *peeled->direct_target()};
+		if (peeled->direct_target())
+			return {.tip = *peeled->direct_target(), .ref = peeled};
 
-		return {};
+		return {.ref = peeled};
 	}  // GCOV_EXCL_LINE[WIN32]
 
 	bool repository::update_current_head(git_oid const& ref,
