@@ -64,17 +64,19 @@ If a command allows a range, either `..<rev>`, `<rev>..` or `<rev>..<rev>` (but 
 
 - **Branches and Tags**: branch, tag, checkout _(soon)_ \
   `cov branch [-h] [--color <when>]`
-  - `[--force] <name>`
+  - `[--force] <name> [<start-point>]`
   - `--list [<pattern>...]`
   - `--delete <name>`
   - `--show-current`
 
   `cov tag [-h]`
-  - `[--force] <name>`
+  - `[--force] <name> [<start-point>]`
   - `--list [<pattern>...]`
   - `--delete <name>`
 
-  Again, **cov branch** and **cov tag** are simplified versions of **git branch** and **git tag**, respectively, working on Cov structure.
+  `cov checkout [--detach|-b|--orphan] <name> [<start-point>]`
+
+  Again, **cov branch**, **cov tag** and **cov checkout** are simplified versions of **git branch**, **git tag** and **git checkout**, respectively, but instead of Git data, they work on Cov data.
 
 - **Inspection and Comparison**: log, show  _(soon)_, serve  _(soon)_\
   `cov log [-h] [<options>] [<revision-range>|<revision>]`
