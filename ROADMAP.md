@@ -57,6 +57,8 @@
     - [ ] File view
   - [ ] `cov remove`
   - [ ] Support for `less`
+  - [ ] Major release
+    - Update schema id and references in filters
 - [ ] `cov serve`
   - [ ] Boost.Beast WS
   - [ ] React frontend

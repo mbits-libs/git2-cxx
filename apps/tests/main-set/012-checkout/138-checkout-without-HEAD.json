@@ -1,0 +1,16 @@
+{
+    "args": "checkout --detach",
+    "expected": [
+        2,
+        "",
+        [
+            "usage: cov checkout [-h] [--detach|-b|--orphan] <name> [<start-point>]",
+            "cov checkout: error: cannot write to HEAD\n"
+        ]
+    ],
+    "prepare": [
+        "unpack $DATA/revparse.tar $TMP",
+        "cd $TMP/revparse",
+        "ro .git/.covdata"
+    ]
+}

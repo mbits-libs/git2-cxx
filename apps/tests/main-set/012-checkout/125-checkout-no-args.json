@@ -1,0 +1,14 @@
+{
+    "args": "checkout",
+    "expected": [
+        2,
+        "",
+        [
+            "usage: cov checkout [-h] [--detach|-b|--orphan] <name> [<start-point>]",
+            "cov checkout: error: at least one argument is needed\n"
+        ]
+    ],
+    "prepare": [
+        "cd '$TMP'"
+    ]
+}

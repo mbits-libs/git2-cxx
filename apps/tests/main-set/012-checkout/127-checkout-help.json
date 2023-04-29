@@ -1,0 +1,27 @@
+{
+    "args": "checkout -h",
+    "expected": [
+        0,
+        [
+            "usage: ",
+            " cov checkout [-h] <name>",
+            " cov checkout [-h] --detach [<name>]",
+            " cov checkout [-h] [--detach] <commit>",
+            " cov checkout [-h] [-b|-B] <name> [<start-point>]",
+            " cov checkout [-h] --orphan <name>",
+            "",
+            "positional arguments:",
+            " <name>                    checks out a branch, if it exists; otherwise, checks out and detaches from a commit or a tag",
+            "",
+            "optional arguments:",
+            " -h, --help                shows this help message and exits",
+            " --detach [<name>]         detaches the HEAD, checking out if the name is provided",
+            " -b <name> [<start-point>] for non-existing branches, creates a branch and checks it out",
+            " --orphan <name>           creates and checks out an orphan branch\n"
+        ],
+        ""
+    ],
+    "prepare": [
+        "cd '$TMP'"
+    ]
+}

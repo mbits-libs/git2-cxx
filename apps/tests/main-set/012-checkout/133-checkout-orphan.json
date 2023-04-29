@@ -1,0 +1,19 @@
+{
+    "args": "checkout --orphan branch-name",
+    "post": [
+        "branch --show-current",
+        "log --oneline -n1"
+    ],
+    "expected": [
+        2,
+        "branch-name\n",
+        [
+            "usage: cov log [-h] [<revision-range>] [-n <number>] [--oneline] [--format <format>] [--abbrev-hash] [--no-abbrev-hash] [--color <when>] [--decorate <how>]",
+            "cov log: error: HEAD refers to branch with no reports\n"
+        ]
+    ],
+    "prepare": [
+        "unpack $DATA/revparse.tar $TMP",
+        "cd $TMP/revparse"
+    ]
+}
