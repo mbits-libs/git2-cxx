@@ -4,10 +4,11 @@
     "expected": [
         0,
         [
-            "u\u017cycie: cov branch [-h] [<nazwa> | -d <nazwa>... | -l [<wzorzec>...] | --show-current]",
+            "u\u017cycie: cov branch [-h] [<nazwa> [<punkt-startowy>] | -d <nazwa>... | -l [<wzorzec>...] | --show-current]",
             "",
             "argumenty pozycyjne:",
             " <nazwa>                   tworzy now\u0105 ga\u0142\u0105\u017a o podanej nazwie; je\u015bli ga\u0142\u0105\u017a ju\u017c istnieje, to polecenie zako\u0144czy si\u0119 niepowodzeniem",
+            " <punkt-startowy>          u\u017cywa podanej referencji zamiast HEAD",
             "",
             "argumenty opcjonalne:",
             " -h, --help                pokazuje ten komunikat pomocy i wychodzi",

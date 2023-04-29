@@ -4,10 +4,11 @@
     "expected": [
         0,
         [
-            "u\u017cycie: cov tag [-h] [<nazwa> | -d <nazwa>... | -l [<wzorzec>...]]",
+            "u\u017cycie: cov tag [-h] [<nazwa> [<punkt-startowy>] | -d <nazwa>... | -l [<wzorzec>...]]",
             "",
             "argumenty pozycyjne:",
             " <nazwa>                   tworzy nowy znacznik o podanej nazwie; je\u015bli znacznik ju\u017c istnieje, to polecenie zako\u0144czy si\u0119 niepowodzeniem",
+            " <punkt-startowy>          u\u017cywa podanej referencji zamiast HEAD",
             "",
             "argumenty opcjonalne:",
             " -h, --help                pokazuje ten komunikat pomocy i wychodzi",

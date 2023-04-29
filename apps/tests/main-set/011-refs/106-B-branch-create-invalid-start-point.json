@@ -1,11 +1,11 @@
 {
-    "args": "branch --delete",
+    "args": "branch feat/cov-4 non-existing",
     "expected": [
         2,
         "",
         [
             "usage: cov branch [-h] [<name> [<start-point>] | -d <name>... | -l [<pattern>...] | --show-current]",
-            "cov branch: error: --delete argument needs at least one argument\n"
+            "cov branch: error: requested object could not be found\n"
         ]
     ],
     "prepare": [

@@ -3,10 +3,11 @@
     "expected": [
         0,
         [
-            "usage: cov tag [-h] [<name> | -d <name>... | -l [<pattern>...]]",
+            "usage: cov tag [-h] [<name> [<start-point>] | -d <name>... | -l [<pattern>...]]",
             "",
             "positional arguments:",
             " <name>                    creates a new tag with given name; if the tag already exists, this command will fail",
+            " <start-point>             uses specified reference instead of HEAD",
             "",
             "optional arguments:",
             " -h, --help                shows this help message and exits",

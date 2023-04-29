@@ -3,10 +3,11 @@
     "expected": [
         0,
         [
-            "usage: cov branch [-h] [<name> | -d <name>... | -l [<pattern>...] | --show-current]",
+            "usage: cov branch [-h] [<name> [<start-point>] | -d <name>... | -l [<pattern>...] | --show-current]",
             "",
             "positional arguments:",
             " <name>                    creates a new branch with given name; if the branch already exists, this command will fail",
+            " <start-point>             uses specified reference instead of HEAD",
             "",
             "optional arguments:",
             " -h, --help                shows this help message and exits",
