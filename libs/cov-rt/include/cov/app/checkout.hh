@@ -5,6 +5,7 @@
 
 #include <cov/app/args.hh>
 #include <cov/app/cov_module_tr.hh>
+#include <cov/app/cov_tr.hh>
 #include <cov/app/errors_tr.hh>
 #include <git2/repository.hh>
 #include <string>
@@ -23,8 +24,8 @@ namespace cov::app::checkout {
 		checkout_orphaned,
 	};
 
-	struct parser : base_parser<errlng, modlng> {
-		using base = base_parser<errlng, modlng>;
+	struct parser : base_parser<covlng, errlng, modlng> {
+		using base = base_parser<covlng, errlng, modlng>;
 		parser(::args::args_view const& arguments,
 		       str::translator_open_info const& langs);
 

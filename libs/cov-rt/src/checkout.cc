@@ -76,18 +76,18 @@ namespace cov::app::checkout {
 			auto const _s = [&](auto arg) { return to_string(_(arg)); };
 
 			auto name_meta = _(lng::NAME_META);
-			auto commit_meta = "<commit>"sv;
-			auto start_point_meta = "<start-point>"sv;
+			auto report_meta = _(covlng::REPORT_META);
+			auto start_point_meta = _(covlng::START_POINT_META);
 			prn.format_paragraph(_s(lng::USAGE), 7);
 			for (auto synopsis : {
 			         " cov checkout [-h] {0}"sv,
 			         " cov checkout [-h] --detach [{0}]"sv,
 			         " cov checkout [-h] [--detach] {1}"sv,
-			         " cov checkout [-h] [-b|-B] {0} [{2}]"sv,
+			         " cov checkout [-h] -b {0} [{2}]"sv,
 			         " cov checkout [-h] --orphan {0}"sv,
 			     }) {
 				prn.format_paragraph(
-				    fmt::format(fmt::runtime(synopsis), name_meta, commit_meta,
+				    fmt::format(fmt::runtime(synopsis), name_meta, report_meta,
 				                start_point_meta),
 				    7);
 			}
@@ -145,13 +145,15 @@ namespace cov::app::checkout {
 
 		std::error_code branch_checkout_ref(parser const& p,
 		                                    repository const& repo,
-		                                    std::string_view name) {
-			auto const HEAD = repo.current_head();
-			if (!HEAD.ref) return git::make_error_code(git::errc::error);
+		                                    std::string_view name,
+		                                    std::string_view start_point) {
+			git_oid oid{};
+			auto ec = revs::parse_single(repo, start_point, oid);
+			if (ec) return ec;
+			auto ref = reference::direct(references::prefix_info(""), oid);
 
-			std::error_code ec{};
 			auto const branch =
-			    repo.refs()->copy_ref(HEAD.ref, name, true, false, ec);
+			    repo.refs()->copy_ref(ref, name, true, false, ec);
 			if (ec && ec != git::errc::unbornbranch) return ec;
 
 			return set_head(
@@ -243,7 +245,9 @@ namespace cov::app::checkout {
 			case command::checkout:
 				return checkout_ref(*this, repo, names_.front());
 			case command::branch_and_checkout:
-				return branch_checkout_ref(*this, repo, names_.front());
+				return branch_checkout_ref(
+				    *this, repo, names_.front(),
+				    names_.size() < 2 ? "HEAD"sv : names_[1]);
 			case command::checkout_orphaned:
 				return checkout_orphaned(*this, repo, names_.front());
 
