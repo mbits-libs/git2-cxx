@@ -22,20 +22,14 @@ namespace cov::app::checkout {
 		};
 
 		static constexpr cmd_info items[] = {
-		    {{1, 1},
-		     {lng::NAME_META,
-		      "checks out a branch, if it exists; otherwise, checks out and detaches from a commit or a tag"sv}},
+		    {{1, 1}, {lng::NAME_META, co_lng::NAME_DESCRIPTION}},
 		    {{0, 1},
-		     {"--detach"sv,
-		      "detaches the HEAD, checking out if the name is provided"sv,
-		      opt{lng::NAME_META}}},
+		     {"--detach"sv, co_lng::DETACH_DESCRIPTION, opt{lng::NAME_META}}},
 		    {{1, 2},
-		     {"-b"sv,
-		      "for non-existing branches, creates a branch and checks it out"sv,
-		      lng::NAME_META, opt{"<start-point>"sv}}},
+		     {"-b"sv, co_lng::BRANCH_DESCRIPTION, lng::NAME_META,
+		      opt{covlng::START_POINT_META}}},
 		    {{1, 1},
-		     {"--orphan"sv, "creates and checks out an orphan branch"sv,
-		      lng::NAME_META}},
+		     {"--orphan"sv, co_lng::ORPHAN_DESCRIPTION, lng::NAME_META}},
 		};
 
 		template <auto index, size_t size>
@@ -65,6 +59,11 @@ namespace cov::app::checkout {
 		    command cmd) noexcept {
 			auto const index = std::to_underlying(cmd) - 1;
 			return items[index].minmax;
+		}
+
+		std::string as_str(CheckoutStrings const& tr, co_lng msg) {
+			auto const view = tr(msg);
+			return {view.data(), view.size()};
 		}
 
 		[[noreturn]] void show_help(::args::parser& p) {
@@ -118,7 +117,7 @@ namespace cov::app::checkout {
 		                         repository const& repo,
 		                         Reference const& full_name_or_oid) {
 			if (!repo.refs()->create("HEAD"sv, full_name_or_oid))
-				p.error("cannot write to HEAD");
+				p.error(as_str(p.tr(), co_lng::ERROR_HEAD_READONLY));
 			return {};
 		}
 
@@ -179,7 +178,8 @@ namespace cov::app::checkout {
 	    : base{langs, arguments} {
 		using enum command;
 		parser_.usage(fmt::format("[-h] [--detach|-b|--orphan] {0} [{1}]"sv,
-		                          tr_(lng::NAME_META), "<start-point>"sv));
+		                          tr_(lng::NAME_META),
+		                          tr_(covlng::START_POINT_META)));
 		parser_.provide_help(false);
 		parser_.custom(show_help, "h", "help").opt();
 		parser_.custom(set_command<branch_and_checkout>(), "b").opt();
@@ -208,7 +208,7 @@ namespace cov::app::checkout {
 	void parser::parse() {
 		parser_.parse();
 		if (cmd_ == command::unspecified) {
-			error("at least one argument is needed");
+			error(as_str(tr_, co_lng::ERROR_NEEDS_SOMEHTING));
 		}
 
 		str_visitor visitor{tr_};

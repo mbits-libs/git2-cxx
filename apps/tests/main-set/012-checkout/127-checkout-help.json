@@ -11,11 +11,11 @@
             " cov checkout [-h] --orphan <name>",
             "",
             "positional arguments:",
-            " <name>                    checks out a branch, if it exists; otherwise, checks out and detaches from a commit or a tag",
+            " <name>                    checks out a branch, if it exists; if the name refers to a report or a tag, detaches after checking out",
             "",
             "optional arguments:",
             " -h, --help                shows this help message and exits",
-            " --detach [<name>]         detaches the HEAD, checking out if the name is provided",
+            " --detach [<name>]         detaches the HEAD; if a name is given, the referenced raport is checked out first",
             " -b <name> [<start-point>] for non-existing branches, creates a branch and checks it out",
             " --orphan <name>           creates and checks out an orphan branch\n"
         ],

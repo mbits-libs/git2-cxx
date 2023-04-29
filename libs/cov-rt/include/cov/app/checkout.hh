@@ -4,6 +4,7 @@
 #pragma once
 
 #include <cov/app/args.hh>
+#include <cov/app/cov_checkout_tr.hh>
 #include <cov/app/cov_module_tr.hh>
 #include <cov/app/cov_tr.hh>
 #include <cov/app/errors_tr.hh>
@@ -24,8 +25,8 @@ namespace cov::app::checkout {
 		checkout_orphaned,
 	};
 
-	struct parser : base_parser<covlng, errlng, modlng> {
-		using base = base_parser<covlng, errlng, modlng>;
+	struct parser : base_parser<covlng, errlng, modlng, co_lng> {
+		using base = base_parser<covlng, errlng, modlng, co_lng>;
 		parser(::args::args_view const& arguments,
 		       str::translator_open_info const& langs);
 

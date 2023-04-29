@@ -122,6 +122,8 @@ foreach(STRING_FILE ${STRINGS})
         DEPENDS ${__po} "${__LNGS_FILE}"
         COMMENT "[SHARE] ${LANG}/${STRING_FILE}"
         VERBATIM)
+    else()
+      message(STATUS "waiting for ${__po}")
     endif()
   endforeach()
 endforeach()

@@ -1,0 +1,57 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2023 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the cov package.
+# marcin.zdun@midnightbits.com, 2023.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: cov latest\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-04-29 20:57+0200\n"
+"PO-Revision-Date: 2023-04-29 21:11+0200\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.4.2\n"
+"Last-Translator: \n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: en\n"
+
+#. Description for the -b argument
+msgctxt "BRANCH_DESCRIPTION"
+msgid "for non-existing branches, creates a branch and checks it out"
+msgstr "for non-existing branches, creates a branch and checks it out"
+
+#. Description for the --detach argument
+msgctxt "DETACH_DESCRIPTION"
+msgid ""
+"detaches the HEAD; if a name is given, the referenced raport is checked out "
+"first"
+msgstr ""
+"detaches the HEAD; if a name is given, the referenced raport is checked out "
+"first"
+
+#. Error message for filesystem issues, when updateing the HEAD file
+msgctxt "ERROR_HEAD_READONLY"
+msgid "cannot write to HEAD"
+msgstr "cannot write to HEAD"
+
+#. Error message for command without any arguments
+msgctxt "ERROR_NEEDS_SOMEHTING"
+msgid "at least one argument is needed"
+msgstr "at least one argument is needed"
+
+#. Description for the named argument
+msgctxt "NAME_DESCRIPTION"
+msgid ""
+"checks out a branch, if it exists; if the name refers to a report or a tag, "
+"detaches after checking out"
+msgstr ""
+"checks out a branch, if it exists; if the name refers to a report or a tag, "
+"detaches after checking out"
+
+#. Description for the --orphan argument
+msgctxt "ORPHAN_DESCRIPTION"
+msgid "creates and checks out an orphan branch"
+msgstr "creates and checks out an orphan branch"
