@@ -226,16 +226,11 @@ namespace cov::app {
 
 	std::error_code params::create(cov::repository const& repo) const {
 		auto const HEAD = repo.current_head();
-		if (!HEAD.tip) return git::make_error_code(git::errc::unbornbranch);
-		auto const full_name = name_for(names.front(), tgt);
-		if (!force) {
-			auto prev = repo.refs()->lookup(full_name);
-			if (prev) return git::make_error_code(git::errc::exists);
-		}
-
-		auto const fresh = repo.refs()->create(full_name, *HEAD.tip);
-		return fresh ? std::error_code{}
-		             : git::make_error_code(git::errc::invalidspec);
+		if (!HEAD.ref) return git::make_error_code(git::errc::error);
+		std::error_code result{};
+		repo.refs()->copy_ref(HEAD.ref, names.front(), tgt == target::branch,
+		                      force, result);
+		return result;
 	}
 
 	std::error_code params::remove(cov::repository const& repo) const {
@@ -246,7 +241,7 @@ namespace cov::app {
 		if (tgt == target::branch && HEAD.branch == curr->shorthand())
 			return cov::make_error_code(cov::errc::current_branch);
 
-		return repo.refs()->remove_ref(*curr);
+		return repo.refs()->remove_ref(curr);
 	}
 
 	void params::show_current(cov::repository const& repo) const {
