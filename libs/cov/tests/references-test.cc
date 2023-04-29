@@ -338,7 +338,7 @@ namespace cov::testing {
 			if (!std::isxdigit(static_cast<unsigned char>(c))) return false;
 		}
 		return true;
-	};
+	}
 
 	struct ref_info {
 		std::string_view name;
@@ -402,7 +402,6 @@ namespace cov::testing {
 	                   create_directories("never-HEAD"sv),
 	                   touch("never-HEAD/HEAD"sv,
 	                         "112233445566778899aabbccddeeff00gg345678\n"sv)),
-
 	    },
 	    {
 	        "mismatched types"sv,
@@ -411,7 +410,6 @@ namespace cov::testing {
 	        make_setup(remove_all("mismatched-types"sv),
 	                   create_directories("mismatched-types"sv),
 	                   touch("mismatched-types/refs/heads/symbolic"sv, ID_)),
-
 	    },
 	    {
 	        "mismatched oids"sv,
@@ -421,7 +419,6 @@ namespace cov::testing {
 	                   create_directories("mismatched-oids"sv),
 	                   touch("mismatched-oids/refs/heads/main"sv,
 	                         "112233445566778899aabbccddeeff0087654321\n"sv)),
-
 	    },
 	    {
 	        "mismatched symlinks"sv,
@@ -431,7 +428,6 @@ namespace cov::testing {
 	                   create_directories("mismatched-symlinks"sv),
 	                   touch("mismatched-symlinks/refs/tags/tag"sv,
 	                         "ref: new value\n"sv)),
-
 	    },
 	    {
 	        "bad ref"sv,
@@ -441,7 +437,6 @@ namespace cov::testing {
 	                   create_directories("bad-ref"sv),
 	                   touch("bad-ref/refs/tags/faulty"sv,
 	                         "112233445566778899aabbccddeeff00gg345678\n"sv)),
-
 	    },
 	    {
 	        "invalid ref"sv,
@@ -450,7 +445,6 @@ namespace cov::testing {
 	        make_setup(remove_all("invalid-ref"sv),
 	                   create_directories("invalid-ref"sv),
 	                   touch("invalid-ref/refs/tags/tag"sv, "ref: ok-ish\n"sv)),
-
 	    },
 	    {
 	        "bad ref contents"sv,
@@ -460,7 +454,6 @@ namespace cov::testing {
 	                   create_directories("bad-ref"sv),
 	                   touch("bad-ref/refs/tags/bad"sv,
 	                         "112233445566778899aabbccddeeff00gg345678\n"sv)),
-
 	    },
 	    {
 	        "nothing found"sv,
@@ -469,7 +462,6 @@ namespace cov::testing {
 	        make_setup(remove_all("nothing found"sv),
 	                   create_directories("nothing found"sv),
 	                   touch("nothing found/refs/tags/another-tag"sv, ID_)),
-
 	    },
 	    {
 	        "something found"sv,
@@ -478,7 +470,6 @@ namespace cov::testing {
 	        make_setup(remove_all("something found"sv),
 	                   create_directories("something found"sv),
 	                   touch("something found/refs/tags/tag"sv, ID_)),
-
 	    },
 	    {
 	        "a directory"sv,
@@ -487,7 +478,6 @@ namespace cov::testing {
 	        make_setup(remove_all("a directory"sv),
 	                   create_directories("a directory"sv),
 	                   touch("a directory/refs/tags/dir/tag"sv, ID_)),
-
 	    },
 	};
 
@@ -548,7 +538,6 @@ namespace cov::testing {
 	        make_setup(remove_all("HEAD-to-branch"sv),
 	                   create_directories("HEAD-to-branch"sv),
 	                   touch("HEAD-to-branch/HEAD"sv, ID_)),
-
 	    },
 	    {
 	        "duplicate-branch"sv,
