@@ -1,0 +1,15 @@
+{
+    "args": "checkout -b result starting-point something else",
+    "expected": [
+        2,
+        "",
+        [
+            "usage: cov checkout [-h] [--detach|-b|--orphan] <name> [<start-point>]",
+            "cov checkout: error: -b argument needs at most 2 arguments\n"
+        ]
+    ],
+    "prepare": [
+        "unpack $DATA/revparse.tar $TMP",
+        "cd $TMP/revparse"
+    ]
+}

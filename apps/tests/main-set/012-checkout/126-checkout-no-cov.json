@@ -1,0 +1,14 @@
+{
+    "args": "checkout main",
+    "expected": [
+        2,
+        "",
+        [
+            "usage: cov checkout [-h] [--detach|-b|--orphan] <name> [<start-point>]",
+            "cov checkout: error: Cannot find a Cov repository in $TMP\n"
+        ]
+    ],
+    "prepare": [
+        "cd '$TMP'"
+    ]
+}

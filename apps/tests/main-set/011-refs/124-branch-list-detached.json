@@ -1,0 +1,20 @@
+{
+    "args": "branch",
+    "expected": [
+        0,
+        [
+            "* (detached HEAD)",
+            "  cov-separate",
+            "  feat/cov-1",
+            "  feat/cov-2",
+            "  feat/cov-3",
+            "  main\n"
+        ],
+        ""
+    ],
+    "prepare": [
+        "unpack $DATA/revparse.tar $TMP",
+        "cd $TMP/revparse",
+        "cov checkout --detach"
+    ]
+}

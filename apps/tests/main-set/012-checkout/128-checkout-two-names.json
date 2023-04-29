@@ -1,0 +1,15 @@
+{
+    "args": "checkout two names",
+    "expected": [
+        2,
+        "",
+        [
+            "usage: cov checkout [-h] [--detach|-b|--orphan] <name> [<start-point>]",
+            "cov checkout: error: <name> argument needs exactly one argument\n"
+        ]
+    ],
+    "prepare": [
+        "unpack $DATA/revparse.tar $TMP",
+        "cd $TMP/revparse"
+    ]
+}

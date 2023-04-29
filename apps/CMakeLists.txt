@@ -7,6 +7,7 @@ set(BUILTINS
     log
     branch
     tag
+    checkout
 )
 
 set(REPORT_FILTERS
@@ -129,6 +130,7 @@ if (COV_TESTING)
         008-report-A 009-report-B
         010-log
         011-refs
+        012-checkout
     )
         add_test(
             NAME cov-exec--${TEST_SET}

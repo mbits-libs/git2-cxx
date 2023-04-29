@@ -1,0 +1,16 @@
+{
+    "args": "checkout G",
+    "post": [
+        "branch --show-current",
+        "log --oneline -n1"
+    ],
+    "expected": [
+        0,
+        "8b9c7b3b7    0%  Commit G e9ef8f01e@main\n",
+        ""
+    ],
+    "prepare": [
+        "unpack $DATA/revparse.tar $TMP",
+        "cd $TMP/revparse"
+    ]
+}

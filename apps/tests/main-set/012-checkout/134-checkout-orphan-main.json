@@ -1,0 +1,15 @@
+{
+    "args": "checkout --orphan main",
+    "expected": [
+        2,
+        "",
+        [
+            "usage: cov checkout [-h] [--detach|-b|--orphan] <name> [<start-point>]",
+            "cov checkout: git::category error: Object exists preventing operation\n"
+        ]
+    ],
+    "prepare": [
+        "unpack $DATA/revparse.tar $TMP",
+        "cd $TMP/revparse"
+    ]
+}

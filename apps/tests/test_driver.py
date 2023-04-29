@@ -216,6 +216,12 @@ def unzip(src, dst):
 ARCHIVES = {".tar": untar, ".zip": unzip}
 
 
+def cat(args):
+    filename = args[0]
+    with open(filename) as f:
+        sys.stdout.write(f.read())
+
+
 def unpack(args):
     archive = args[0]
     dst = args[1]
@@ -251,6 +257,7 @@ op_types = {
     "git": (0, git),
     "cov": (0, cov),
     "detach": (1, detach),
+    "cat": (1, cat),
 }
 
 
@@ -258,6 +265,7 @@ class Test:
     def __init__(self, data, filename, count):
         self.data = data
         self.ok = True
+        self.post_args = []
 
         renovate = False
 
@@ -280,6 +288,22 @@ class Test:
         except KeyError:
             self.ok = False
             return
+
+        try:
+            post_args = data["post"]
+            if isinstance(post_args, str):
+                post_args = [post_args]
+            for index in range(len(post_args)):
+                cmd = post_args[index]
+                if isinstance(cmd, str):
+                    cmd = shlex.split(cmd)
+                else:
+                    data["post"][index] = shlex.join(cmd)
+                    renovate = True
+                self.post_args.append(cmd)
+
+        except KeyError:
+            pass
 
         if self.expected is not None:
             if not isinstance(self.expected[1], str):
@@ -376,6 +400,9 @@ class Test:
             return None
 
         expanded = [expand(arg, tempdir) for arg in self.args]
+        post_expanded = [
+            [expand(arg, tempdir) for arg in cmd] for cmd in self.post_args
+        ]
 
         env = {name: os.environ[name] for name in os.environ}
         env["LANGUAGE"] = self.lang
@@ -387,6 +414,21 @@ class Test:
                 del env[key]
 
         proc = subprocess.run([target, *expanded], capture_output=True, env=env)
+        returncode = proc.returncode
+        test_stdout = proc.stdout
+        test_stderr = proc.stderr
+
+        for sub_expanded in post_expanded:
+            if returncode != 0:
+                break
+            proc = subprocess.run([target, *sub_expanded], capture_output=True, env=env)
+            returncode = proc.returncode
+            if len(test_stdout) and len(proc.stdout):
+                test_stdout += b"\n"
+            if len(test_stderr) and len(proc.stderr):
+                test_stderr += b"\n"
+            test_stdout += proc.stdout
+            test_stderr += proc.stderr
 
         clean = Test.run_cmds(self.cleanup, tempdir)
         if clean is None:
@@ -395,9 +437,9 @@ class Test:
         os.chdir(current_directory)
 
         return [
-            proc.returncode,
-            fix(proc.stdout, self.patches, tempdir, tempdir_alt),
-            fix(proc.stderr, self.patches, tempdir, tempdir_alt),
+            returncode,
+            fix(test_stdout, self.patches, tempdir, tempdir_alt),
+            fix(test_stderr, self.patches, tempdir, tempdir_alt),
         ]
 
     def clip(self, actual):
