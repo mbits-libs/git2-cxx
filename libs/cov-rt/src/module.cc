@@ -190,7 +190,7 @@ namespace cov::app::module {
 				// GCOV_EXCL_START -- currently only min != max ranges are
 				// (0, 1), so this is not testable
 				parser_.error(fmt::format(
-				    fmt::runtime(tr_(modcnt::ERROR_OPTS_NEEDS_AT_LEAST, max)),
+				    fmt::runtime(tr_(modcnt::ERROR_OPTS_NEEDS_AT_LEAST, min)),
 				    visitor.visit(name_of(op.cmd)), min));
 				// GCOV_EXCL_STOP
 			}
