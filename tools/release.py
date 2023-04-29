@@ -379,7 +379,15 @@ def link_str(link: CommitLink, show_breaking: bool, for_github: bool) -> str:
 def show_links(
     links: List[CommitLink], show_breaking: bool, for_github: bool
 ) -> List[str]:
-    result = [link_str(link, show_breaking, for_github) for link in links]
+    issues: Dict[str, List[str]] = {}
+    for link in links:
+        scope = link.scope
+        if scope not in issues:
+            issues[scope] = []
+        issues[scope].append(link_str(link, show_breaking, for_github))
+    result = []
+    for scope in sorted(issues.keys()):
+        result.extend(issues[scope])
     if len(result):
         result.append("")
     return result
