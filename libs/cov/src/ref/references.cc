@@ -1,12 +1,22 @@
 // Copyright (c) 2022 Marcin Zdun
 // This code is licensed under MIT license (see LICENSE for details)
 
+#include <fmt/format.h>
 #include <cov/io/file.hh>
 #include <cov/io/safe_stream.hh>
 #include "../path-utils.hh"
 #include "internal.hh"
 
 namespace cov {
+	namespace {
+		static constexpr auto heads = "refs/heads"sv;
+		static constexpr auto tags = "refs/tags"sv;
+
+		std::string name_for(std::string_view name, bool as_branch) {
+			return fmt::format("{}/{}", as_branch ? heads : tags, name);
+		}
+	}  // namespace
+
 	class references_impl
 	    : public counted_impl<references>,
 	      public enable_ref_from_this<references, references_impl> {
@@ -143,43 +153,70 @@ namespace cov {
 			                              ref_from_this());
 		}
 
-		std::error_code remove_ref(reference const& ref) {
-			if (ref.name() == names::HEAD) {
+		std::error_code remove_ref(ref_ptr<reference> const& ref) override {
+			auto const full_name = ref->name();
+			if (full_name == names::HEAD) {
 				// never HEAD!
 				return git::make_error_code(git::errc::error);
 			}
 
-			if (!reference::is_valid_name(ref.name())) {
+			if (!reference::is_valid_name(full_name)) {
 				// clean an invalid name, if it exists...
 				std::error_code ec{};
-				std::filesystem::remove(root_ / make_path(ref.name()), ec);
+				std::filesystem::remove(root_ / make_path(full_name), ec);
 				if (ec) return ec;
 				return git::make_error_code(git::errc::invalidspec);
 			}
 
-			auto const curr = lookup(ref.name());
+			auto const curr = lookup(full_name);
 
 			if (!curr) {
 				return git::make_error_code(git::errc::notfound);
 			}
 
-			if (curr->reference_type() != ref.reference_type()) {
+			auto const type = ref->reference_type();
+			if (curr->reference_type() != type) {
 				return git::make_error_code(git::errc::modified);
 			}
 
-			if (ref.reference_type() == reference_type::direct &&
-			    git_oid_cmp(curr->direct_target(), ref.direct_target())) {
+			if (type == reference_type::direct &&
+			    git_oid_cmp(curr->direct_target(), ref->direct_target())) {
 				return git::make_error_code(git::errc::modified);
 			}
 
-			if (ref.reference_type() == reference_type::symbolic &&
-			    curr->symbolic_target() != ref.symbolic_target()) {
+			if (type == reference_type::symbolic &&
+			    curr->symbolic_target() != ref->symbolic_target()) {
 				return git::make_error_code(git::errc::modified);
 			}
 
 			std::error_code ec{};
-			std::filesystem::remove(root_ / make_path(ref.name()), ec);
+			std::filesystem::remove(root_ / make_path(full_name), ec);
 			return ec;
+		}
+
+		inline ref_ptr<reference> error(git::errc code, std::error_code& ec) {
+			ec = git::make_error_code(code);
+			return {};
+		}
+
+		ref_ptr<reference> copy_ref(ref_ptr<reference> const& ref,
+		                            std::string_view new_name,
+		                            bool as_branch,
+		                            bool force,
+		                            std::error_code& ec) override {
+			ec.clear();
+			auto const full_name = name_for(new_name, as_branch);
+			if (!force && lookup(full_name))
+				return error(git::errc::exists, ec);
+
+			auto peeled = ref->peel_target();
+			if (!peeled->direct_target())
+				return error(git::errc::unbornbranch, ec);
+
+			auto result = create(full_name, *peeled->direct_target());
+			if (!result) return error(git::errc::invalidspec, ec);
+
+			return result;
 		}
 
 	private:

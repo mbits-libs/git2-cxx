@@ -75,6 +75,7 @@ namespace cov {
 	struct current_head_type {
 		std::string branch{};
 		std::optional<git_oid> tip{};
+		ref_ptr<cov::reference> ref{};
 
 		bool operator==(current_head_type const& other) const noexcept {
 			return branch == other.branch &&

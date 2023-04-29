@@ -185,6 +185,7 @@ namespace cov::testing {
 		auto const head = repo.current_head();
 		ASSERT_EQ("main"sv, head.branch);
 		ASSERT_FALSE(head.tip);
+		ASSERT_TRUE(head.ref);
 	}
 
 	TEST_F(repository, detached) {
