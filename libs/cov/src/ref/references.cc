@@ -231,10 +231,10 @@ namespace cov {
 			auto endl = '\n';
 			auto result = out.store({line.data(), line.size()});
 			if (result) result = out.store({&endl, 1});
-			if (result)
-				out.commit();
-			else
-				out.rollback();  // GCOV_EXCL_LINE -- untestable
+			if (result) result = out.commit() == std::error_code{};
+			if (!result) {
+				out.rollback();  // GCOV_EXCL_LINE[GCC] -- untestable
+			}
 			return result;
 		}
 		std::filesystem::path root_;
