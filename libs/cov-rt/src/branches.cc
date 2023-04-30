@@ -177,8 +177,9 @@ namespace cov::app {
 			// there is no way there could be zero names and still a command...
 			error = modcnt::ERROR_OPTS_NEEDS_AT_MOST;
 			count = 2;
-		} else if (cmd == command::remove && names.empty())
+		} else if (cmd == command::remove && names.empty()) {
 			error = modcnt::ERROR_OPTS_NEEDS_AT_LEAST;
+		}
 
 		if (error) {
 			str_visitor visitor{tr};

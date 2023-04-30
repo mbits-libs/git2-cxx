@@ -13,6 +13,8 @@
 #include <cov/format_args.hh>
 #include <filesystem>
 #include <span>
+#include <string>
+#include <vector>
 
 namespace cov::app::platform {
 	bool glob_matches(std::filesystem::path const& match,
