@@ -2,6 +2,33 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) and [COMMITS.md](COMMITS.md) for commit guidelines.
 
+## [0.15.0](https://github.com/mzdun/cov/compare/v0.14.0...v0.15.0) (2023-04-30)
+
+### New Features
+
+- allow TTY-check from outside the formatting ([f40f536](https://github.com/mzdun/cov/commit/f40f536e588e903f10031279a0a7e16a544b38b0))
+- **api**: expose common code for branching ([2039d38](https://github.com/mzdun/cov/commit/2039d38db123953a1db3d17e2ea875828b7da10b))
+- **api**: allow removing references ([55083b4](https://github.com/mzdun/cov/commit/55083b442f5b2235ed1e2a7b9bd7682b212d853a))
+- **api**: add error codes specific to cov-api ([9082d91](https://github.com/mzdun/cov/commit/9082d918838f5abdc152346ca086f92b3394c066))
+- **app**: allow help args be both opt an multi ([b53da41](https://github.com/mzdun/cov/commit/b53da411c79d8428cb4869f6fe548aa84b0ab614))
+- **core**: provide checkout builtin commands ([863ddaa](https://github.com/mzdun/cov/commit/863ddaa4b80b06314cb6a9890210c636fe3bd3a1))
+- **core**: provide branch/tag builtin commands ([f55ba7a](https://github.com/mzdun/cov/commit/f55ba7a73434be76ec78dde10749bc3dd08dc3c0))
+- **lang**: add strings for checkout ([b352c4d](https://github.com/mzdun/cov/commit/b352c4d5b661c9aabd5fb00329603a0f659cb734))
+- **lang**: add strings for branch and tag ([b2f54db](https://github.com/mzdun/cov/commit/b2f54db8cc50b3bc24b8b3d0e8a9612ea5a6d153))
+- **rt**: support branch start point ([d192fa5](https://github.com/mzdun/cov/commit/d192fa577377b916d1986456212f916674634b04))
+- **rt**: add code behind `cov checkout` ([ce07c33](https://github.com/mzdun/cov/commit/ce07c338162f395e1a9815a990d412bcb701c368))
+- **rt**: adapt to API changes ([6bfc2d8](https://github.com/mzdun/cov/commit/6bfc2d828cd4f5d793fba058a3bd15d62ac90efe))
+- **rt**: backend for tag and branch commands ([407481a](https://github.com/mzdun/cov/commit/407481a6ed260fca7b709194715730ec40c6a8b0))
+
+### Bug Fixes
+
+- patch CVE-2007-4559 (#25) ([da48ace](https://github.com/mzdun/cov/commit/da48ace0744040b8479a42f910e2a80b8dd1bdba))
+- **api**: appease linter (cont'd) ([47316f2](https://github.com/mzdun/cov/commit/47316f2fe577746aad57c9cc18315db5390677c8))
+- **api**: appease linter ([5bc6421](https://github.com/mzdun/cov/commit/5bc6421bfd2a4fd74ddce397b2678240b1251adb))
+- **api**: react to safe stream failure on rename ([7cd8ddb](https://github.com/mzdun/cov/commit/7cd8ddbfb81a9954ba13948e25f6b061dcbc68a3))
+- **api**: remove crash in remove_ref ([a7f65bf](https://github.com/mzdun/cov/commit/a7f65bf1fd9fee945fb1460c8a90fd369a12fa0c))
+- **core**: adapt to start point API ([c768457](https://github.com/mzdun/cov/commit/c7684579ff6ca73482bb1d8ccb54d750921f9af8))
+
 ## [0.14.0](https://github.com/mzdun/cov/compare/v0.13.1...v0.14.0) (2022-08-15)
 
 ### New Features

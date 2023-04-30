@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+# pulls github/super-linter:slim-latest as needed
+
 import os
 import sys
 import shlex

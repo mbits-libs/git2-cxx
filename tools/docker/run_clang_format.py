@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+# docker build -t clang-format-lint github.com/DoozyX/clang-format-lint-action
+
 import sys
 import subprocess
 

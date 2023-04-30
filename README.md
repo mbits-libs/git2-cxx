@@ -62,7 +62,7 @@ If a command allows a range, either `..<rev>`, `<rev>..` or `<rev>..<rev>` (but 
 
   The _report file_ format is a JSON described by the [report-schema.json](apps/report-schema.json), but it can be filtered from other formats by **-f \<filter\>** argument. Currently, the **cov report** has filters for Cobertura and Coveralls.
 
-- **Branches and Tags**: branch, tag, checkout _(soon)_ \
+- **Branches and Tags**: branch, tag, checkout \
   `cov branch [-h] [--color <when>]`
   - `[--force] <name> [<start-point>]`
   - `--list [<pattern>...]`

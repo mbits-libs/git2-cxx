@@ -51,7 +51,7 @@
     - [x] `cov::sth_create` -> `cov::sth::create`
     - [x] drop &beta;
   - [x] `cov log` _(0.14.0)_
-  - [ ] `cov tag` / `branch` / `checkout`
+  - [x] `cov tag` / `branch` / `checkout` _(0.15.0)_
   - [ ] `cov show`
     - [ ] Report / component / directory view
     - [ ] File view
