@@ -1,8 +1,6 @@
 // Copyright (c) 2022 Marcin Zdun
 // This code is licensed under MIT license (see LICENSE for details)
 
-#include <cov/app/branches.hh>
-
 #include <fmt/format.h>
 #include <args/actions.hpp>
 #include <cov/app/args.hh>

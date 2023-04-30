@@ -255,12 +255,8 @@ namespace cov::testing {
 		ASSERT_EQ(valid, cov::reference::is_valid_name(name));
 	}
 
-	constexpr refnames_test good(std::string_view view) {
-		return {view, true};
-	}
-	constexpr refnames_test bad(std::string_view view) {
-		return {view, false};
-	}
+	constexpr refnames_test good(std::string_view view) { return {view, true}; }
+	constexpr refnames_test bad(std::string_view view) { return {view, false}; }
 
 	static refnames_test const goods[] = {
 	    good("HEAD"sv),
@@ -329,9 +325,7 @@ namespace cov::testing {
 
 	INSTANTIATE_TEST_SUITE_P(ctrls, ctrl_refnames, ::testing::ValuesIn(ctrls));
 
-	void ping(const char* id) {
-		std::fprintf(stderr, ">>> %s\n", id);
-	}
+	void ping(const char* id) { std::fprintf(stderr, ">>> %s\n", id); }
 
 	bool onlyhex(std::string_view oid) {
 		for (auto c : oid) {
