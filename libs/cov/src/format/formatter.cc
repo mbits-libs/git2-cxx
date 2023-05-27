@@ -353,8 +353,8 @@ namespace cov::placeholder {
 		git_oid_fmt(buffer, id);
 		auto const hash = std::string_view{buffer, GIT_OID_HEXSZ};
 
-		auto const color_str = [&, this](iterator out_iter, color clr,
-		                                 std::string_view str) {
+		auto const color_str = [&](iterator out_iter, color clr,
+		                           std::string_view str) {
 			if (magic_colors) out_iter = view.format(out_iter, ctx, clr);
 			out_iter = format_str(out_iter, str);
 			if (magic_colors)

@@ -324,8 +324,9 @@ namespace cov::testing {
 
 		auto copy{all_files};
 		if (!prefix.empty()) {
-			std::erase_if(copy,
-			              [=](auto path) { return !path.starts_with(prefix); });
+			std::erase_if(copy, [prefix = prefix](auto path) {
+				return !path.starts_with(prefix);
+			});
 		}
 
 		ref_ptr<report_files> file_list;
@@ -355,7 +356,7 @@ namespace cov::testing {
 		               [](auto const& ptr) { return ptr.get(); });
 
 		if (!prefix.empty()) {
-			std::erase_if(copy, [=](auto ptr) {
+			std::erase_if(copy, [prefix = prefix](auto ptr) {
 				return !ptr->path().starts_with(prefix);
 			});
 		}

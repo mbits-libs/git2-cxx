@@ -14,13 +14,15 @@
 		template <class Context>                                            \
 		void operator()(Context& context) const;                            \
 	};                                                                      \
-	constexpr auto on_##name = on_##name##_handler{};                       \
+	[[maybe_unused]] constexpr auto on_##name = on_##name##_handler{};      \
 	template <class Context>                                                \
 	void on_##name##_handler::operator()([[maybe_unused]] Context& context) \
 	    const
 
 #define RULE_EMIT(name, tok) \
-	RULE_MAP(name) { _emit(context, tok); }
+	RULE_MAP(name) {         \
+		_emit(context, tok); \
+	}
 
 namespace hl {
 	struct endline_t {

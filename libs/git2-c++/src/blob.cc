@@ -41,7 +41,14 @@ namespace git {
 	git_buf blob::filtered(char const* as_path,
 	                       std::error_code& ec) const noexcept {
 		git_buf buf{};
+#ifdef __clang__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+#endif
 		git_blob_filter_options options = GIT_BLOB_FILTER_OPTIONS_INIT;
+#ifdef __clang__
+#pragma GCC diagnostic pop
+#endif
 		ec = as_error(git_blob_filter(&buf, get(), as_path, &options));
 		return buf;
 	}

@@ -50,6 +50,7 @@ namespace cov::parser {
 
 	struct dbg {
 		std::string_view tag;
+		constexpr dbg(std::string_view tag) : tag{tag} {}
 		void operator()([[maybe_unused]] auto& context) const {
 #if 0
 			auto const view = _view(context);

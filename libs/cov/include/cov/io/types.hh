@@ -131,11 +131,8 @@ namespace cov::io {
 				return tmp;
 			}
 
-			static coverage_stats stats(
-			    std::vector<coverage> const& lines) noexcept {
-				return std::accumulate(lines.begin(), lines.end(),
-				                       coverage_stats{});
-			}
+			inline static coverage_stats stats(
+			    std::vector<coverage> const& lines) noexcept;
 
 			template <typename Int = unsigned>
 			struct ratio {
@@ -355,5 +352,12 @@ namespace cov::io {
 			if (rhs.value) inc_u32(covered);
 			return *this;
 		}
+
+		inline coverage_stats coverage_stats::stats(
+		    std::vector<coverage> const& lines) noexcept {
+			return std::accumulate(lines.begin(), lines.end(),
+			                       coverage_stats{});
+		}
+
 	};  // namespace v1
 }  // namespace cov::io

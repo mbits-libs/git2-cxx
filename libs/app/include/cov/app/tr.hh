@@ -90,7 +90,7 @@ namespace cov::app::str {
 	template <typename Enum>
 	requires std::is_enum_v<Enum>
 	struct strings : lngs_traits<Enum>::strings {
-		using base = lngs_traits<Enum>::strings;
+		using base = typename lngs_traits<Enum>::strings;
 		using base::operator();
 
 		void setup_path_manager(std::filesystem::path const& base) {
@@ -153,9 +153,10 @@ namespace cov::app::str {
 			fmt::vprint(out, (*this)(id), fmt::make_format_args(args...));
 		}
 
-	private : std::string operator()(::args::lng id,
-		                             std::string_view arg1,
-		                             std::string_view arg2) const override {
+	private:
+		std::string operator()(::args::lng id,
+		                       std::string_view arg1,
+		                       std::string_view arg2) const override {
 			return Strings::args(id, arg1, arg2);
 		}
 	};

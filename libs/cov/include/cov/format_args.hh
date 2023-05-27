@@ -19,6 +19,7 @@ namespace cov {
 			value = v;
 			return *this;
 		}
+		feature(feature const&) = default;
 		feature& operator=(feature const&) = default;
 
 		bool operator==(feature const&) const noexcept = default;

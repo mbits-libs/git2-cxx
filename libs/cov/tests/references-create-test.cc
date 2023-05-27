@@ -49,7 +49,7 @@ namespace cov::testing {
 		ASSERT_TRUE(refs);
 
 		auto result = std::visit(
-		    [refs, ref_name](auto const& tgt) {
+		    [refs, ref_name = ref_name](auto const& tgt) {
 			    return refs->create(ref_name, tgt);
 		    },
 		    target);
@@ -91,7 +91,8 @@ namespace cov::testing {
 
 		bool modified = false;
 		auto result = std::visit(
-		    [refs, ref_name, &modified](auto const& tgt, auto const& match) {
+		    [refs, ref_name = ref_name, &modified](auto const& tgt,
+		                                           auto const& match) {
 			    if constexpr (!std::is_same_v<decltype(tgt), decltype(match)>) {
 				    return ref_ptr<cov::reference>{};
 			    } else {

@@ -73,6 +73,11 @@
 - refs: employ tortoise and hare in peel_target
 - refs: windows fs string equivalence (possibly through canonicity when reading from FS)
 ---
+- [ ] Analytical tools
+  - [ ] build with clang
+  - [ ] gcc
+  - [ ] clang?
+  - [ ] msvc
 - [ ] Multi-platform reports
   - [ ] External build id / tag?
   - [ ] `cov report` taking more, than one report

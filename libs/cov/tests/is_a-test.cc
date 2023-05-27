@@ -36,9 +36,11 @@ namespace cov::testing {
 		}
 
 		class base2 {
+#ifndef __clang__
 			unsigned x{};
 			unsigned y{};
 			unsigned z{};
+#endif
 		};
 
 		class derived1 : public base {

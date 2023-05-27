@@ -57,8 +57,10 @@ namespace cov::testing {
 		ASSERT_EQ(expected, ref->name());
 	}
 
-	static constexpr auto ID = "112233445566778899aabbccddeeff0012345678"sv;
-	static constexpr auto ID_ = "112233445566778899aabbccddeeff0012345678\n"sv;
+	[[maybe_unused]] static constexpr auto ID =
+	    "112233445566778899aabbccddeeff0012345678"sv;
+	[[maybe_unused]] static constexpr auto ID_ =
+	    "112233445566778899aabbccddeeff0012345678\n"sv;
 
 	static references_dwim_test const tests[] = {
 	    {
