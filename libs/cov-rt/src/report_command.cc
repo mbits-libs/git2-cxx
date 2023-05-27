@@ -75,7 +75,8 @@ namespace cov::app::builtin::report {
 		    platform::sys_root() / directory_info::share / "filters"sv, cwd,
 		    filter, contents);
 
-		fwrite(output.error.data(), 1, output.error.size(), stderr);
+		if (!output.error.empty())
+			fwrite(output.error.data(), 1, output.error.size(), stderr);
 
 		if (output.return_code) {
 			if (output.error.size()) fputc('\n', stderr);
