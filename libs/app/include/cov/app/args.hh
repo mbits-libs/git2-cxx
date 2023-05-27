@@ -84,6 +84,7 @@ namespace cov::app {
 	template <typename T>
 	struct opt {
 		T payload;
+		constexpr opt(T payload) : payload(payload) {}
 	};
 	template <>
 	struct opt<char const*>;
@@ -91,6 +92,7 @@ namespace cov::app {
 	template <typename T>
 	struct multi {
 		T payload;
+		constexpr multi(T payload) : payload(payload) {}
 	};
 	template <>
 	struct multi<char const*>;
@@ -98,6 +100,7 @@ namespace cov::app {
 	template <typename T>
 	struct opt_multi {
 		T payload;
+		constexpr opt_multi(T payload) : payload(payload) {}
 	};
 	template <>
 	struct opt_multi<char const*>;
@@ -115,6 +118,7 @@ namespace cov::app {
 	template <typename... Enum>
 	requires(std::is_enum_v<Enum>&&...) struct str_visitor {
 		str::args_translator<Enum...> const& tr;
+		str_visitor(str::args_translator<Enum...> const& tr) : tr{tr} {}
 		template <typename String>
 		std::string_view visit(String const& s) const {
 			using base = typename String::base;
@@ -234,7 +238,7 @@ namespace cov::app {
 	      public parser_holder {
 	public:
 		using string = app::string<Enum...>;
-		using args_description = string::args_description;
+		using args_description = typename string::args_description;
 
 		base_parser(str::translator_open_info const& langs,
 		            ::args::args_view const& arguments,

@@ -13,7 +13,7 @@
 #include <vector>
 
 namespace cov {
-	class repository;
+	struct repository;
 }
 
 namespace cov::app::checkout {

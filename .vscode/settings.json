@@ -76,6 +76,11 @@
         "semaphore": "cpp",
         "list": "cpp",
         "unordered_set": "cpp",
-        "charconv": "cpp"
+        "charconv": "cpp",
+        "shared_mutex": "cpp",
+        "stop_token": "cpp",
+        "any": "cpp",
+        "iostream": "cpp",
+        "cinttypes": "cpp"
     }
 }

@@ -91,10 +91,10 @@ namespace cov {
 
 			std::string_view stripped(std::string_view value) {
 				while (!value.empty() &&
-				       std::isspace(static_cast<unsigned>(value.front())))
+				       std::isspace(static_cast<unsigned char>(value.front())))
 					value = value.substr(1);
 				while (!value.empty() &&
-				       std::isspace(static_cast<unsigned>(value.back())))
+				       std::isspace(static_cast<unsigned char>(value.back())))
 					value = value.substr(0, value.size() - 1);
 				return value;
 			}

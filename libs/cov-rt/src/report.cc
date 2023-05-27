@@ -250,7 +250,8 @@ namespace cov::app::report {
 		                          [&](unsigned, bool) { ++size; });
 		coverage.reserve(size);
 		visit_lines(line_coverage, line_count,
-		            [&](unsigned count, bool is_null) {
+		            [&coverage = coverage, &stats = stats](unsigned count,
+		                                                   bool is_null) {
 			            coverage.push_back(
 			                io::v1::coverage{.value = count & ((1u << 31) - 1),
 			                                 .is_null = is_null ? 1u : 0u});
