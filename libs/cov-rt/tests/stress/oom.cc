@@ -15,7 +15,8 @@
 #endif
 #endif
 
-#if defined(__ADDRESS_SANITIZER__) && !defined(HAS_ADDRESS_SANITIZER)
+#if (defined(__ADDRESS_SANITIZER__) || defined(__SANITIZE_ADDRESS__)) && \
+    !defined(HAS_ADDRESS_SANITIZER)
 #define HAS_ADDRESS_SANITIZER 1
 #endif
 
