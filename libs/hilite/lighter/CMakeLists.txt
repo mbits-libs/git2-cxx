@@ -20,6 +20,7 @@ endif()
 
 add_library(lighter STATIC ${SOURCES})
 target_compile_options(lighter PRIVATE ${ADDITIONAL_WALL_FLAGS})
+target_link_options(lighter PRIVATE ${ADDITIONAL_LINK_FLAGS})
 target_include_directories(lighter PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_link_libraries(lighter PUBLIC ${DEPS})
 set_target_properties(lighter PROPERTIES FOLDER libs/hilite)
@@ -44,6 +45,7 @@ if (COV_TESTING)
   set_target_properties(lighter-test lighter-stress-test PROPERTIES FOLDER tests)
 
   target_compile_options(lighter-test PRIVATE ${ADDITIONAL_WALL_FLAGS})
+  target_link_options(lighter-test PRIVATE ${ADDITIONAL_LINK_FLAGS})
   target_link_libraries(lighter-test lighter GTest::gmock_main fmt::fmt)
   target_include_directories(lighter-test
     PRIVATE
@@ -51,6 +53,7 @@ if (COV_TESTING)
       ${CMAKE_CURRENT_BINARY_DIR})
 
   target_compile_options(lighter-stress-test PRIVATE ${ADDITIONAL_WALL_FLAGS})
+  target_link_options(lighter-stress-test PRIVATE ${ADDITIONAL_LINK_FLAGS})
   target_link_libraries(lighter-stress-test PRIVATE lighter GTest::gmock_main)
   target_include_directories(lighter-stress-test
     PRIVATE

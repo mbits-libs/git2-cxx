@@ -95,6 +95,7 @@ if (COV_TESTING)
   set_target_properties(cov-test cov-stress-test PROPERTIES FOLDER tests)
 
   target_compile_options(cov-test PRIVATE ${ADDITIONAL_WALL_FLAGS})
+  target_link_options(cov-test PRIVATE ${ADDITIONAL_LINK_FLAGS})
   target_link_libraries(cov-test PRIVATE cov-api testing-lib mbits::args)
   target_include_directories(cov-test
     PRIVATE
@@ -102,6 +103,7 @@ if (COV_TESTING)
       ${CMAKE_CURRENT_BINARY_DIR})
 
   target_compile_options(cov-stress-test PRIVATE ${ADDITIONAL_WALL_FLAGS})
+  target_link_options(cov-stress-test PRIVATE ${ADDITIONAL_LINK_FLAGS})
   target_link_libraries(cov-stress-test PRIVATE cov-api testing-lib)
   target_include_directories(cov-stress-test
     PRIVATE

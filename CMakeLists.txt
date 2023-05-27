@@ -29,6 +29,7 @@ set(STRINGS
 set(LANGUAGES pl en)
 
 set(COV_TESTING ON CACHE BOOL "Compile and/or run self-tests")
+set(COV_SANITIZE OFF CACHE BOOL "Compile with sanitizers enabled")
 set(COV_CUTDOWN_OS OFF CACHE BOOL "Run tests on cutdown OS (e.g. GitHub docker)")
 
 set(CMAKE_CXX_STANDARD 23)
@@ -109,6 +110,11 @@ if (MSVC)
     /w14906
     /w14928
     /w14946)
+  if (COV_SANITIZE)
+    list(APPEND ADDITIONAL_WALL_FLAGS
+      /fsanitize=address
+    )
+  endif()
 else()
   set(ADDITIONAL_WALL_FLAGS
       -Wall -Wextra
@@ -140,6 +146,21 @@ else()
       -Wuseless-cast
       )
   endif()
+  if (COV_SANITIZE)
+    list(APPEND ADDITIONAL_WALL_FLAGS
+      -fsanitize=address
+      -fsanitize=undefined
+      
+    )
+    list(APPEND ADDITIONAL_LINK_FLAGS
+      -fsanitize=address
+      -fsanitize=undefined
+    )
+  endif()
+endif()
+
+if (COV_SANITIZE)
+  message(STATUS "This build is prepared for sanitization")
 endif()
 
 include(prepare_pack)

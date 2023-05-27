@@ -71,6 +71,7 @@ if (COV_TESTING)
   set_target_properties(cov-rt-test cov-rt-stress-test PROPERTIES FOLDER tests)
 
   target_compile_options(cov-rt-test PRIVATE ${ADDITIONAL_WALL_FLAGS})
+  target_link_options(cov-rt-test PRIVATE ${ADDITIONAL_LINK_FLAGS})
   target_link_libraries(cov-rt-test PRIVATE cov-rt testing-lib)
   target_include_directories(cov-rt-test
     PRIVATE
@@ -78,6 +79,7 @@ if (COV_TESTING)
       ${CMAKE_CURRENT_BINARY_DIR})
 
   target_compile_options(cov-rt-stress-test PRIVATE ${ADDITIONAL_WALL_FLAGS})
+  target_link_options(cov-rt-stress-test PRIVATE ${ADDITIONAL_LINK_FLAGS})
   target_link_libraries(cov-rt-stress-test PRIVATE cov-rt testing-lib)
   target_include_directories(cov-rt-stress-test
     PRIVATE
