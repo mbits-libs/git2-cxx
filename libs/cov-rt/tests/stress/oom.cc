@@ -9,6 +9,16 @@
 #include "../path-utils.hh"
 #include "new.hh"
 
+#if defined(__has_feature)
+#if __has_feature(address_sanitizer)
+#define HAS_ADDRESS_SANITIZER 1
+#endif
+#endif
+
+#if defined(__ADDRESS_SANITIZER__) && !defined(HAS_ADDRESS_SANITIZER)
+#define HAS_ADDRESS_SANITIZER 1
+#endif
+
 namespace cov::app::testing {
 	class oom : public ::testing::Test {
 		git::init globals{};
@@ -22,6 +32,8 @@ namespace cov::app::testing {
 		}
 	};
 
+	// those two tests intentionally leak some memory in C...
+#if !defined(HAS_ADDRESS_SANITIZER)
 	TEST_F(oom, tools_resolve) {
 		run_setup(make_setup(
 		    touch("a-config"sv,
@@ -77,6 +89,7 @@ namespace cov::app::testing {
 		handler.list_tools("alias"sv, {});
 		OOM_END
 	}
+#endif  // !defined(HAS_ADDRESS_SANITIZER)
 
 	TEST_F(oom, tools_cautiously_open_config) {
 		path root_dir =

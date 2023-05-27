@@ -11,6 +11,7 @@ namespace cov {
 		virtual void acquire() = 0;
 		virtual void release() = 0;
 		virtual bool is_object() const noexcept { return false; }
+		virtual long counter() const noexcept = 0;
 
 	protected:
 		virtual ~counted();
@@ -23,6 +24,8 @@ namespace cov {
 		void release() override {
 			if (!--counter_) delete this;
 		}
+
+		long counter() const noexcept override { return counter_; }
 
 	private:
 		std::atomic<long> counter_{1};
@@ -59,11 +62,13 @@ namespace cov {
 		~ref_ptr() { release(); }
 
 		ref_ptr& operator=(ref_ptr&& other) noexcept {
+			if (this == &other) return *this;
 			reset(other.unlink());
 			return *this;
 		}
 		template <std::derived_from<Object> Other>
 		ref_ptr& operator=(ref_ptr<Other>&& other) noexcept {
+			if (this == &other) return *this;
 			reset(other.unlink());
 			return *this;
 		}
@@ -99,10 +104,11 @@ namespace cov {
 		}
 
 		void reset(pointer ptr = {}) noexcept {
-			if (ptr == ptr_) return;
 			release();
 			ptr_ = ptr;
 		}
+
+		long counter() const noexcept { return ptr_ ? ptr_->counter() : -1; }
 
 	private:
 		void release() const {
