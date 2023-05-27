@@ -34,6 +34,7 @@ namespace git {
 		    std::basic_string_view<Byte> const& view) noexcept
 		    : bytes(view.data(), view.size()) {}
 
+		constexpr bool empty() const noexcept { return !data_ || !length_; }
 		constexpr std::byte const* data() const noexcept { return data_; }
 		constexpr std::byte const* begin() const noexcept { return data_; }
 		constexpr std::byte const* end() const noexcept {

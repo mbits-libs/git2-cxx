@@ -121,6 +121,8 @@ namespace hash {
 		basic_hash() = default;
 
 		Derived& update(git::bytes const& data) noexcept {
+			if (data.empty()) return *static_cast<Derived*>(this);
+
 			auto it = data.begin();
 			auto length = data.size();
 
