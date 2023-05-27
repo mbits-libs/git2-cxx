@@ -55,6 +55,7 @@ if (COV_TESTING)
   set_target_properties(git2-test git2-stress-test PROPERTIES FOLDER tests)
 
   target_compile_options(git2-test PRIVATE ${ADDITIONAL_WALL_FLAGS})
+  target_link_options(git2-test PRIVATE ${ADDITIONAL_LINK_FLAGS})
   target_link_libraries(git2-test PRIVATE git2-c++ testing-lib)
   target_include_directories(git2-test
     PRIVATE
@@ -62,6 +63,7 @@ if (COV_TESTING)
       ${CMAKE_CURRENT_BINARY_DIR})
 
   target_compile_options(git2-stress-test PRIVATE ${ADDITIONAL_WALL_FLAGS})
+  target_link_options(git2-stress-test PRIVATE ${ADDITIONAL_LINK_FLAGS})
   target_link_libraries(git2-stress-test PRIVATE git2-c++ testing-lib)
   target_include_directories(git2-stress-test
     PRIVATE
