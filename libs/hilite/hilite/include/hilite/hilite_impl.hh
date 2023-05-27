@@ -20,9 +20,7 @@
 	    const
 
 #define RULE_EMIT(name, tok) \
-	RULE_MAP(name) {         \
-		_emit(context, tok); \
-	}
+	RULE_MAP(name) { _emit(context, tok); }
 
 namespace hl {
 	struct endline_t {
