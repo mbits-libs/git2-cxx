@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) and [COMMITS.md](COMMITS.md) for commit guidelines.
 
+## [0.15.1](https://github.com/mzdun/cov/compare/v0.15.0...v0.15.1) (2023-05-28)
+
+### Bug Fixes
+
+- build with g++-12 and clang-15 ([437081c](https://github.com/mzdun/cov/commit/437081c454e6c6b4de652189371d9534fb114e6a))
+- clang-format arguing ([fcc30ec](https://github.com/mzdun/cov/commit/fcc30ecb3afe0ae46d6f968a3abc363f974dd75c))
+- remove percived ub (gcc) ([6ec4f44](https://github.com/mzdun/cov/commit/6ec4f443043451f671a73bdf65471078fe046231))
+- remove leaks and an ub (clang) ([e78fa5f](https://github.com/mzdun/cov/commit/e78fa5fdd08d40c76fc3be1c3d2c740783f445b0))
+- compile with clang ([c831cd4](https://github.com/mzdun/cov/commit/c831cd4f81df4b418136aad80a67a45272bea50c))
+
 ## [0.15.0](https://github.com/mzdun/cov/compare/v0.14.0...v0.15.0) (2023-04-30)
 
 ### New Features
