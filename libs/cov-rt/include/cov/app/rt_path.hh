@@ -14,8 +14,8 @@ namespace cov::app {
 	                          str::args::Strings const&);
 
 	template <typename Strings>
-	requires std::derived_from<Strings, str::errors::Strings> &&
-	    std::derived_from<Strings, str::args::Strings>
+	    requires std::derived_from<Strings, str::errors::Strings> &&
+	             std::derived_from<Strings, str::args::Strings>
 	inline cov::repository open_here(class parser_holder const& parser,
 	                                 Strings const& str) {
 		return open_here(parser, str, str);

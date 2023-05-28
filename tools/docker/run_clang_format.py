@@ -25,7 +25,7 @@ subprocess.run(
         f"{__dir__}:/src",
         "clang-format-lint",
         "--clang-format-executable",
-        "/clang-format/clang-format12",
+        "/clang-format/clang-format16",
         "-r",
         "--style",
         "file",

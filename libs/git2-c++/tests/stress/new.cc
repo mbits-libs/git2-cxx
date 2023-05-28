@@ -32,9 +32,7 @@ void set_oom_as_limit(size_t limit) {
 	argument = limit;
 }
 
-void reset_oom() {
-	policy = POLICY::USE_EVERYTHING;
-}
+void reset_oom() { policy = POLICY::USE_EVERYTHING; }
 
 namespace {
 	bool can_allocate(size_t size) {
@@ -90,18 +88,18 @@ namespace {
 
 #define FREE \
 	noexcept { std::free(ptr); }
-void operator delete(void* ptr)FREE;
+void operator delete(void* ptr) FREE;
 void operator delete[](void* ptr) FREE;
-void operator delete(void* ptr, std::align_val_t)FREE;
+void operator delete(void* ptr, std::align_val_t) FREE;
 void operator delete[](void* ptr, std::align_val_t) FREE;
-void operator delete(void* ptr, std::size_t)FREE;
+void operator delete(void* ptr, std::size_t) FREE;
 void operator delete[](void* ptr, std::size_t) FREE;
-void operator delete(void* ptr, std::size_t, std::align_val_t)FREE;
+void operator delete(void* ptr, std::size_t, std::align_val_t) FREE;
 void operator delete[](void* ptr, std::size_t, std::align_val_t) FREE;
 
-void operator delete(void* ptr, const std::nothrow_t&)FREE;
+void operator delete(void* ptr, const std::nothrow_t&) FREE;
 void operator delete[](void* ptr, const std::nothrow_t&) FREE;
-void operator delete(void* ptr, std::align_val_t, const std::nothrow_t&)FREE;
+void operator delete(void* ptr, std::align_val_t, const std::nothrow_t&) FREE;
 void operator delete[](void* ptr, std::align_val_t, const std::nothrow_t&) FREE;
 
 #include <gtest/gtest.h>

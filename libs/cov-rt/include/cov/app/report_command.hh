@@ -47,32 +47,34 @@ namespace cov::app::builtin::report {
 		                  cov::report const& report);
 
 		template <typename Enum, typename... Args>
-		[[noreturn]] void data_error(Enum id, Args&&... args)
-		    const requires std::is_enum_v<Enum> {
+		[[noreturn]] void data_error(Enum id, Args&&... args) const
+		    requires std::is_enum_v<Enum>
+		{
 			data_msg(str::args::lng::ERROR_MSG, id,
 			         std::forward<Args>(args)...);
 			std::exit(1);
 		}  // GCOV_EXCL_LINE[WIN32]
 
 		template <typename Enum, typename... Args>
-		void data_warning(Enum id,
-		                  Args&&... args) const requires std::is_enum_v<Enum> {
+		void data_warning(Enum id, Args&&... args) const
+		    requires std::is_enum_v<Enum>
+		{
 			data_msg(str::args::lng::WARNING_MSG, id,
 			         std::forward<Args>(args)...);
 		}
 
-	private :
+	private:
 		// isolate this from acces to force clang-format to _not_ fix it to
 		// "private : std::vector"
-		std::vector<std::byte>
-		filter(std::vector<std::byte> const& contents,
-		       std::string_view filter,
-		       std::filesystem::path const& cwd) const;
+		std::vector<std::byte> filter(std::vector<std::byte> const& contents,
+		                              std::string_view filter,
+		                              std::filesystem::path const& cwd) const;
 		// visual space
 
 		template <typename Enum1, typename Enum2, typename... Args>
-		void data_msg(Enum1 type, Enum2 id, Args&&... args)
-		    const requires std::is_enum_v<Enum1> && std::is_enum_v<Enum2> {
+		void data_msg(Enum1 type, Enum2 id, Args&&... args) const
+		    requires std::is_enum_v<Enum1> && std::is_enum_v<Enum2>
+		{
 			auto const vargs2 = fmt::make_format_args(args...);
 			auto const message = fmt::vformat(tr_(id), vargs2);
 

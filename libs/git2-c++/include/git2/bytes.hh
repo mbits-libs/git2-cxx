@@ -20,9 +20,8 @@ namespace git {
 		    : data_{data}, length_{length} {}
 
 		template <typename Byte>
-		requires(!std::same_as<std::byte, Byte> && (sizeof(Byte) == 1))
-		    bytes(Byte const* data, size_type length)
-		noexcept
+		    requires(!std::same_as<std::byte, Byte> && (sizeof(Byte) == 1))
+		bytes(Byte const* data, size_type length) noexcept
 		    : data_{reinterpret_cast<std::byte const*>(data)}
 		    , length_{length} {}
 
@@ -30,8 +29,8 @@ namespace git {
 		    : bytes(buf.ptr, static_cast<size_type>(buf.size)) {}
 
 		template <typename Byte>
-		requires(sizeof(Byte) == 1) explicit bytes(
-		    std::basic_string_view<Byte> const& view) noexcept
+		    requires(sizeof(Byte) == 1)
+		explicit bytes(std::basic_string_view<Byte> const& view) noexcept
 		    : bytes(view.data(), view.size()) {}
 
 		constexpr bool empty() const noexcept { return !data_ || !length_; }
