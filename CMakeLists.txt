@@ -76,7 +76,7 @@ if (COV_TESTING)
   include(${PROJECT_SOURCE_DIR}/tools/coveralls/Coveralls.cmake)
 
   set(TEST_REPORT_DIR "${PROJECT_BINARY_DIR}/test-results")
-  set(TEST_REPORT_FILE "${CMAKE_SYSTEM_NAME}-${CMAKE_BUILD_TYPE}.xml")
+  set(TEST_REPORT_FILE "${CMAKE_SYSTEM_NAME}-${CMAKE_CXX_COMPILER_ID}-${CMAKE_BUILD_TYPE}.xml")
 endif()
 
 include(output_dirs_setup)
