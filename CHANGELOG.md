@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) and [COMMITS.md](COMMITS.md) for commit guidelines.
 
+## [0.15.2](https://github.com/mzdun/cov/compare/v0.15.1...v0.15.2) (2023-05-28)
+
+### Bug Fixes
+
+- sort gcc/clang issues on GitHub dockers ([0d037a7](https://github.com/mzdun/cov/commit/0d037a721fd1c2d5d32b0bab75f61a80ba12566b))
+
 ## [0.15.1](https://github.com/mzdun/cov/compare/v0.15.0...v0.15.1) (2023-05-28)
 
 ### Bug Fixes
