@@ -35,8 +35,8 @@ namespace cov::app {
 		}  // GCOV_EXCL_LINE[WIN32]
 
 		template <typename Strings>
-		requires std::derived_from<Strings, str::errors::Strings> &&
-		    std::derived_from<Strings, str::args::Strings>
+		    requires std::derived_from<Strings, str::errors::Strings> &&
+		             std::derived_from<Strings, str::args::Strings>
 		[[noreturn]] void error(std::error_code const& ec,
 		                        Strings const& str) const {
 			error(ec, str, str);
@@ -46,11 +46,12 @@ namespace cov::app {
 		                        str::args::Strings const&) const;
 
 		template <typename Strings>
-		requires std::derived_from<Strings, str::errors::Strings> &&
-		    std::derived_from<Strings, str::args::Strings>
-		        std::string message(std::error_code const& ec,
-		                            Strings const& str)
-		const { return message(ec, str, str); }
+		    requires std::derived_from<Strings, str::errors::Strings> &&
+		             std::derived_from<Strings, str::args::Strings>
+		std::string message(std::error_code const& ec,
+		                    Strings const& str) const {
+			return message(ec, str, str);
+		}
 
 		static std::pair<char const*, std::string> message_from_libgit(
 		    str::errors::Strings const&,
@@ -66,7 +67,8 @@ namespace cov::app {
 	};
 
 	template <typename... Enum>
-	requires(std::is_enum_v<Enum>&&...) class translator_holder {
+	    requires(std::is_enum_v<Enum> && ...)
+	class translator_holder {
 	public:
 		translator_holder(str::translator_open_info const& langs)
 		    : tr_{langs} {}
@@ -116,7 +118,8 @@ namespace cov::app {
 	}
 
 	template <typename... Enum>
-	requires(std::is_enum_v<Enum>&&...) struct str_visitor {
+	    requires(std::is_enum_v<Enum> && ...)
+	struct str_visitor {
 		str::args_translator<Enum...> const& tr;
 		str_visitor(str::args_translator<Enum...> const& tr) : tr{tr} {}
 		template <typename String>
@@ -175,8 +178,8 @@ namespace cov::app {
 	};
 
 	template <typename... Enum>
-	requires(std::is_enum_v<Enum>&&...) struct string
-	    : std::variant<std::string_view, str::args::lng, Enum...> {
+	    requires(std::is_enum_v<Enum> && ...)
+	struct string : std::variant<std::string_view, str::args::lng, Enum...> {
 		using str_visitor = app::str_visitor<Enum...>;
 		using args_description = app::args_description<string>;
 
@@ -186,37 +189,31 @@ namespace cov::app {
 		string(std::string const&) = delete;
 
 		template <typename Arg>
-		requires(
-		    std::same_as<Arg, Enum> || ... ||
-		    (std::same_as<Arg, str::args::lng> ||
-		     std::same_as<Arg, std::string_view>)) constexpr string(opt<Arg>
-		                                                                value)
+		    requires(std::same_as<Arg, Enum> || ... ||
+		             (std::same_as<Arg, str::args::lng> ||
+		              std::same_as<Arg, std::string_view>))
+		constexpr string(opt<Arg> value)
 		    : base{value.payload}, is_optional{true} {}
 
 		template <typename Arg>
-		requires(
-		    std::same_as<Arg, Enum> || ... ||
-		    (std::same_as<Arg, str::args::lng> ||
-		     std::same_as<Arg, std::string_view>)) constexpr string(multi<Arg>
-		                                                                value)
+		    requires(std::same_as<Arg, Enum> || ... ||
+		             (std::same_as<Arg, str::args::lng> ||
+		              std::same_as<Arg, std::string_view>))
+		constexpr string(multi<Arg> value)
 		    : base{value.payload}, is_multi{true} {}
 
 		template <typename Arg>
-		requires(
-		    std::same_as<Arg, Enum> || ... ||
-		    (std::same_as<Arg, str::args::lng> ||
-		     std::same_as<Arg,
-		                  std::string_view>)) constexpr string(opt_multi<Arg>
-		                                                           value)
+		    requires(std::same_as<Arg, Enum> || ... ||
+		             (std::same_as<Arg, str::args::lng> ||
+		              std::same_as<Arg, std::string_view>))
+		constexpr string(opt_multi<Arg> value)
 		    : base{value.payload}, is_optional{true}, is_multi{true} {}
 
 		template <typename Arg>
-		requires(
-		    std::same_as<Arg, Enum> || ... ||
-		    (std::same_as<Arg, str::args::lng> ||
-		     std::same_as<Arg,
-		                  std::string_view>)) constexpr string(opt<multi<Arg>>
-		                                                           value)
+		    requires(std::same_as<Arg, Enum> || ... ||
+		             (std::same_as<Arg, str::args::lng> ||
+		              std::same_as<Arg, std::string_view>))
+		constexpr string(opt<multi<Arg>> value)
 		    : base{value.payload.payload}, is_optional{true}, is_multi{true} {}
 
 		bool is_optional{false};
@@ -233,9 +230,9 @@ namespace cov::app {
 	};
 
 	template <typename... Enum>
-	requires(std::is_enum_v<Enum>&&...) class base_parser
-	    : public translator_holder<Enum...>,
-	      public parser_holder {
+	    requires(std::is_enum_v<Enum> && ...)
+	class base_parser : public translator_holder<Enum...>,
+	                    public parser_holder {
 	public:
 		using string = app::string<Enum...>;
 		using args_description = typename string::args_description;

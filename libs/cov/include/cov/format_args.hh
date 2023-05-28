@@ -53,9 +53,8 @@ namespace args {
 	};
 
 	template <typename tag>
-	requires std::derived_from<tag, cov::feature<tag>>
-	struct converter<tag> : enum_converter<cov::feature<tag>> {
-	};
+	    requires std::derived_from<tag, cov::feature<tag>>
+	struct converter<tag> : enum_converter<cov::feature<tag>> {};
 }  // namespace args
 
 #define MAKE_FEATURE(NAME, YES, NO)                                \

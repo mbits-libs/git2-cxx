@@ -88,7 +88,7 @@ namespace cov::app {
 
 namespace cov::app::str {
 	template <typename Enum>
-	requires std::is_enum_v<Enum>
+	    requires std::is_enum_v<Enum>
 	struct strings : lngs_traits<Enum>::strings {
 		using base = typename lngs_traits<Enum>::strings;
 		using base::operator();
@@ -102,7 +102,8 @@ namespace cov::app::str {
 	};
 
 	template <typename... Enum>
-	requires(std::is_enum_v<Enum>&&...) struct with : strings<Enum>... {
+	    requires(std::is_enum_v<Enum> && ...)
+	struct with : strings<Enum>... {
 		using strings<Enum>::operator()...;
 
 		void setup_path_manager(std::filesystem::path const& base) {
@@ -136,20 +137,23 @@ namespace cov::app::str {
 		}
 
 		template <typename Enum, typename... Args>
-		std::string format(Enum id,
-		                   Args... args) const requires std::is_enum_v<Enum> {
+		std::string format(Enum id, Args... args) const
+		    requires std::is_enum_v<Enum>
+		{
 			return fmt::vformat((*this)(id), fmt::make_format_args(args...));
 		}
 
 		template <typename Enum, typename... Args>
-		void print(Enum id, Args... args) const requires std::is_enum_v<Enum> {
+		void print(Enum id, Args... args) const
+		    requires std::is_enum_v<Enum>
+		{
 			fmt::vprint((*this)(id), fmt::make_format_args(args...));
 		}
 
 		template <typename Enum, typename... Args>
-		void print(FILE* out,
-		           Enum id,
-		           Args... args) const requires std::is_enum_v<Enum> {
+		void print(FILE* out, Enum id, Args... args) const
+		    requires std::is_enum_v<Enum>
+		{
 			fmt::vprint(out, (*this)(id), fmt::make_format_args(args...));
 		}
 
@@ -162,6 +166,6 @@ namespace cov::app::str {
 	};
 
 	template <typename... Enum>
-	requires(std::is_enum_v<Enum>&&...) using args_translator =
-	    translator<with<str::args::lng, Enum...>>;
+	    requires(std::is_enum_v<Enum> && ...)
+	using args_translator = translator<with<str::args::lng, Enum...>>;
 }  // namespace cov::app::str
