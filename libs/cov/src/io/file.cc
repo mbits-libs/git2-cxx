@@ -1,6 +1,7 @@
 // Copyright (c) 2022 Marcin Zdun
 // This code is licensed under MIT license (see LICENSE for details)
 
+#include <algorithm>
 #include <cov/io/file.hh>
 
 namespace cov::io {
@@ -75,9 +76,10 @@ namespace cov::io {
 				break;
 				// GCOV_EXCL_STOP
 			}
-			auto it = std::find(buffer, buffer + ret, '\n');
-			if (it == std::end(buffer)) {
-				out.insert(end(out), buffer, buffer + ret);
+			auto buf_end = buffer + ret;
+			auto it = std::find(buffer, buf_end, '\n');
+			if (it == buf_end) {
+				out.insert(end(out), buffer, buf_end);
 				continue;
 			}
 

@@ -8,6 +8,7 @@
 #include <map>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <variant>
 #include <vector>
 
@@ -21,9 +22,12 @@ namespace lighter {
 	struct span_node;
 	struct span {
 		using contents_type = std::vector<span_node>;
-		unsigned kind{};
-		contents_type contents{};
+		unsigned kind = 0;
+		contents_type contents;
 
+		inline span();
+		inline span(unsigned kind, contents_type&& contents);
+		inline ~span();
 		inline bool operator==(span const&) const noexcept;
 		inline std::size_t furthest_end() const noexcept;
 		static inline void cleanup(contents_type& items);
@@ -77,6 +81,10 @@ namespace lighter {
 		}
 	};
 
+	inline span::span() = default;
+	inline span::span(unsigned kind, contents_type&& contents)
+	    : kind{kind}, contents{std::move(contents)} {}
+	inline span::~span() = default;
 	inline bool span::operator==(span const& other) const noexcept = default;
 
 	inline size_t span::furthest_end() const noexcept {
