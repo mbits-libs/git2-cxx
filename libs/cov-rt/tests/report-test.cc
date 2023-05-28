@@ -88,8 +88,17 @@ namespace cov::app::report {
 				*out << ", .algorithm = "sv << print_digest{file.algorithm};
 				cov::testing::print_view(*out << ", .digest = "sv, file.digest)
 				    << ", .line_coverage = {"sv;
+#if defined(__GNUC__)
+// Both line and hits are integers of some type. Adding a reference will create
+// a need for dereference...
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wrange-loop-construct"
+#endif
 				for (auto const [line, hits] : file.line_coverage)
 					*out << '{' << line << ',' << hits << "},"sv;
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
 				*out << "}}, "sv;
 			}
 			*out << '}';

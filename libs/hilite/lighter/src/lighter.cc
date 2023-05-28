@@ -167,8 +167,8 @@ namespace lighter {
 						});
 
 					result.push_back(span{
-					    .kind = static_cast<std::uint32_t>(child.tok.kind),
-					    .contents = child.spans(),
+					    static_cast<std::uint32_t>(child.tok.kind),
+					    child.spans(),
 					});
 					prev = child.tok.stop;
 				}

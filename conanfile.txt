@@ -8,6 +8,7 @@ mbits-lngs/0.7.5
 
 openssl/1.1.1l
 zlib/1.2.12
+mbits-diags/0.9.5
 
 [options]
 libgit2:with_libssh2=False

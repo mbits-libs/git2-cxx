@@ -54,7 +54,14 @@ namespace cov {
 		Byte output[buffer_size];
 
 		z_.avail_in = 0;
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdangling-pointer"
+#endif
 		z_.next_in = &input;
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
 
 		auto ret = Z_OK;
 		while (ret != Z_STREAM_END) {
