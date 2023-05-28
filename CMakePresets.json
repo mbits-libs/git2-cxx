@@ -22,5 +22,19 @@
             "configurePreset": "debug",
             "configuration": "Debug"
         }
+    ],
+    "testPresets": [
+        {
+            "name": "debug",
+            "displayName": "Test a Debug build",
+            "configurePreset": "debug",
+            "configuration": "Debug"
+        },
+        {
+            "name": "release",
+            "displayName": "Test a Release build",
+            "configurePreset": "release",
+            "configuration": "Release"
+        }
     ]
 }
