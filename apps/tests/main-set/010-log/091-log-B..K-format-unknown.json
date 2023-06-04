@@ -1,8 +1,5 @@
 {
     "args": "log --format=unknown --color always --decorate short Q..M",
-    "check": {
-        "stderr": "begin"
-    },
     "patches": {
         "Added:     .*": "Added:     $DATE"
     },
@@ -64,19 +61,7 @@
             "      Commit H",
             "\n"
         ],
-        [
-            "\t\t#STDOFF\t2:05:08.9",
-            "\t\t#STDOFF\t8:05:43.2",
-            "\t\t#STDOFF\t7:36:41.7",
-            "\t\t#STDOFF\t-0:25:21.1",
-            "\t\t#STDOFF\t1:39:49.2",
-            "\t\t#STDOFF\t-0:36:44.68",
-            "\t\t#STDOFF\t-4:56:01.6",
-            "\t\t#STDOFF\t-3:58:29.2",
-            "\t\t#STDOFF\t-4:19:18.3",
-            "\t\t#STDOFF\t-5:36:13.3",
-            "\t\t#STDOFF\t-4:56:16.4\n"
-        ]
+        ""
     ],
     "prepare": [
         "unpack $DATA/revparse.tar $TMP",

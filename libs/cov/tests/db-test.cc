@@ -119,7 +119,7 @@ namespace cov::testing {
 
 				auto cvg_lines =
 				    backend->lookup<cov::line_coverage>(entry->line_coverage());
-				ASSERT_TRUE(cvg_files);
+				ASSERT_TRUE(cvg_lines);
 				unsigned finish{0};
 				auto const cvg = from_coverage(cvg_lines->coverage(), finish);
 				ASSERT_EQ(file.finish, finish);
