@@ -3,7 +3,15 @@
 
 #pragma once
 
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#endif
 #include <date/date.h>
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
+#include <fmt/format.h>
 #include <git2/oid.h>
 #include <algorithm>
 #include <cstddef>
