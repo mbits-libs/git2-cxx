@@ -66,19 +66,20 @@ def load_matrix(json_path: str) -> Tuple[List[dict], List[str]]:
     with open(json_path, encoding="UTF-8") as f:
         setup: dict = json.load(f)
 
-    full = cartesian(setup.get("matrix", {}))
-
-    excludes = setup.get("exclude", [])
-    matrix = [obj for obj in full if not matches_any(obj, excludes)]
-    keys = list(setup.get("matrix", {}).keys())
+    raw = setup.get("matrix", {})
+    keys = list(raw.keys())
+    full = cartesian(raw)
 
     includes = _split_keys(setup.get("include", []), keys)
-    for obj in matrix:
+    for obj in full:
         for include_key, include_value in includes:
             if not matches(obj, include_key):
                 continue
             for key, value in include_value.items():
                 obj[key] = value
+
+    excludes = setup.get("exclude", [])
+    matrix = [obj for obj in full if not matches_any(obj, excludes)]
 
     return matrix, keys
 

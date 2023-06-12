@@ -62,11 +62,11 @@ def _prn(config, indent=""):
         if key == "compiler":
             comp = config["--orig-compiler"]
             if len(value) == 1 and value[0] == comp:
-                print(f"{intro} {_prn2(comp)}")
+                print(f"{intro} {_prn2(comp)}", file=sys.stderr)
             else:
-                print(f"{intro} {_prn2(comp)}, {_prn2(value)}")
+                print(f"{intro} {_prn2(comp)}, {_prn2(value)}", file=sys.stderr)
             continue
-        print(f"{intro} {_prn2(value)}")
+        print(f"{intro} {_prn2(value)}", file=sys.stderr)
         prefix = "  "
 
 
@@ -106,7 +106,7 @@ _print_prefix = ""
 def print_args(*args: str):
     cmd = shlex.join([args[0]])
     args = " ".join([_print_arg(arg) for arg in args[1:]])
-    print(f"{_print_prefix}\033[33m{cmd}\033[m {args}")
+    print(f"{_print_prefix}\033[33m{cmd}\033[m {args}", file=sys.stderr)
 
 
 def _ls(dirname):
@@ -129,7 +129,7 @@ class runner:
         prefix = "\033[1;34m|\033[m "
         first_step = True
 
-        print(f"\033[1;34m+--[BUILD] {title}\033[m")
+        print(f"\033[1;34m+--[BUILD] {title}\033[m", file=sys.stderr)
         if runner.DRY_RUN:
             _prn(config, prefix)
             first_step = False
@@ -139,7 +139,7 @@ class runner:
                 if step(config, prefix, first_step):
                     first_step = False
 
-        print(f"\033[1;34m+--------- \033[2;34m{title}\033[m")
+        print(f"\033[1;34m+--------- \033[2;34m{title}\033[m", file=sys.stderr)
 
     @staticmethod
     def run_step(
@@ -158,12 +158,14 @@ class runner:
             return False
 
         if not first_step:
-            print(prefix)
+            print(prefix, file=sys.stderr)
 
-        print(f"{prefix}\033[1;35m+-[STEP] {step_name}\033[m")
+        print(f"{prefix}\033[1;35m+-[STEP] {step_name}\033[m", file=sys.stderr)
         _print_prefix = f"{prefix}\033[1;35m|\033[m "
         step(config)
-        print(f"{prefix}\033[1;35m+------- \033[2;35m{step_name}\033[m")
+        print(
+            f"{prefix}\033[1;35m+------- \033[2;35m{step_name}\033[m", file=sys.stderr
+        )
         return True
 
     @staticmethod
