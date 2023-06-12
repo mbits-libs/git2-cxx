@@ -3,16 +3,16 @@ mbits-args/0.12.3
 libgit2/1.5.0
 fmt/9.1.0
 gtest/cci.20210126
-mbits-lngs/0.7.5
+mbits-lngs/0.7.6
 
 openssl/1.1.1l
 zlib/1.2.12
-mbits-diags/0.9.5
 libcurl/8.1.2
 
 [options]
-libgit2:with_libssh2=False
+libgit2/*:with_libssh2=False
 
 [generators]
 CMakeDeps
 CMakeToolchain
+VirtualRunEnv

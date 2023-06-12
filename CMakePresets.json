@@ -1,5 +1,5 @@
 {
-    "version": 4,
+    "version": 6,
     "cmakeMinimumRequired": {
         "major": 3,
         "minor": 23,
@@ -35,6 +35,18 @@
             "displayName": "Test a Release build",
             "configurePreset": "release",
             "configuration": "Release"
+        }
+    ],
+    "packagePresets": [
+        {
+            "name": "debug",
+            "displayName": "Pack a Debug build",
+            "configurePreset": "debug"
+        },
+        {
+            "name": "release",
+            "displayName": "Pack a Release build",
+            "configurePreset": "release"
         }
     ]
 }
