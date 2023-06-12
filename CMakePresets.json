@@ -28,13 +28,19 @@
             "name": "debug",
             "displayName": "Test a Debug build",
             "configurePreset": "debug",
-            "configuration": "Debug"
+            "configuration": "Debug",
+            "output": {
+                "outputOnFailure": true
+            }
         },
         {
             "name": "release",
             "displayName": "Test a Release build",
             "configurePreset": "release",
-            "configuration": "Release"
+            "configuration": "Release",
+            "output": {
+                "outputOnFailure": true
+            }
         }
     ],
     "packagePresets": [
