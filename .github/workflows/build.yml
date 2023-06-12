@@ -42,39 +42,14 @@ jobs:
           - os: ubuntu-latest
             ubuntu: true
             home: /home/runner
+            run_os: ubuntu
             latest_conan_hash: 111b1001009e07646d901bc7f4c1f6288c65deb6757bc615c38b2dfc8174207f
-            conan_profile: settings.compiler.libcxx=libstdc++11
-            build_generator: ninja
             # Windows ANY
           - os: windows-latest
             windows: true
             home: C:/Users/runneradmin
+            run_os: windows
             latest_conan_hash: 701d0a420b7f8c0168f6d14ed46ca0520792087cccf5d2254afd92583d58c1f8
-            build_generator: msbuild
-            # ANY Release
-          - build_type: Release
-            build_profile: release
-            # ANY Debug
-          - build_type: Debug
-            build_profile: debug
-            # Ubuntu Release
-          - os: ubuntu-latest
-            build_type: Release
-            sanitizer: no-sanitizer
-            cpack_generator: TGZ
-            # Ubuntu Debug
-          - os: ubuntu-latest
-            build_type: Debug
-            coverage: true
-            # Windows Release
-          - os: windows-latest
-            build_type: Release
-            cpack_generator: ZIP
-            conan_profile: settings.compiler.runtime=MD
-            # Windows Debug
-          - os: windows-latest
-            build_type: Debug
-            conan_profile: settings.compiler.runtime=MDd
 
     env:
       BUILD_TYPE: ${{ matrix.build_type }}
@@ -92,6 +67,14 @@ jobs:
       run: |
         echo ${{ hashFiles('conanfile.txt') }}
         echo ${{ matrix.latest_conan_hash }}
+
+#     ######## ##    ## ##     ## #### ########   #######  ##    ## ##     ## ######## ##    ## ########
+#     ##       ###   ## ##     ##  ##  ##     ## ##     ## ###   ## ###   ### ##       ###   ##    ##   
+#     ##       ####  ## ##     ##  ##  ##     ## ##     ## ####  ## #### #### ##       ####  ##    ##   
+#     ######   ## ## ## ##     ##  ##  ########  ##     ## ## ## ## ## ### ## ######   ## ## ##    ##   
+#     ##       ##  ####  ##   ##   ##  ##   ##   ##     ## ##  #### ##     ## ##       ##  ####    ##   
+#     ##       ##   ###   ## ##    ##  ##    ##  ##     ## ##   ### ##     ## ##       ##   ###    ##   
+#     ######## ##    ##    ###    #### ##     ##  #######  ##    ## ##     ## ######## ##    ##    ##   
 
     - name: Install GCC 12 & Ninja
       if: ${{ matrix.ubuntu }}
@@ -124,29 +107,16 @@ jobs:
         sudo rm -rf `which clang++-14`
         sudo rm -rf `which clang-14`
 
-    - name: Conan output
-      run: |
-        import os
-        dirname = os.path.join('build', 'conan')
-        os.makedirs(dirname, exist_ok=True)
-        print('>>>', os.getcwd(), '::', dirname, '::', os.path.isdir(dirname))
-      shell: python
-
     - name: Install Conan
       id: conan
       uses: turtlebrowser/get-conan@main
       with:
         version: 1.57.0
 
-    - name: Configure Conan (library and build type)
+    - name: Configure Conan (deprecated)
       run: |
-        conan profile new default --detect
-        conan profile new ${{ matrix.build_profile }} --detect
-        conan profile update ${{ matrix.conan_profile }} ${{ matrix.build_profile }}
-        conan profile update settings.build_type=${{ matrix.build_type }} ${{ matrix.build_profile }}
         conan remote add mbits-conan https://mbits.jfrog.io/artifactory/api/conan/mbits-conan
         conan user -p ${{ secrets.JFROG_KEY }} -r mbits-conan ${{ secrets.JFROG_USER }}
-        conan profile show ${{ matrix.build_profile }}
 
     - name: Conan cache
       uses: actions/cache@v3
@@ -159,36 +129,43 @@ jobs:
           ${{ matrix.os }}-${{ matrix.build_type }}-${{ matrix.latest_conan_hash }}
           ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.build_type }}-${{ matrix.latest_conan_hash }}
 
-    - name: Configure Conan
-      working-directory: ${{github.workspace}}/build/conan
-      run: conan install ../.. --build missing -pr:b ${{ matrix.build_profile }} -pr:h ${{ matrix.build_profile }}
+#     ########  ########   #######        ## ########  ######  ########
+#     ##     ## ##     ## ##     ##       ## ##       ##    ##    ##   
+#     ##     ## ##     ## ##     ##       ## ##       ##          ##   
+#     ########  ########  ##     ##       ## ######   ##          ##   
+#     ##        ##   ##   ##     ## ##    ## ##       ##          ##   
+#     ##        ##    ##  ##     ## ##    ## ##       ##    ##    ##   
+#     ##        ##     ##  #######   ######  ########  ######     ##   
 
-    - name: Configure CMake
-      run: cmake --preset ${{ matrix.build_profile }}-${{ matrix.build_generator }} -DCOV_CUTDOWN_OS=ON -DCOV_SANITIZE:BOOL=${{ matrix.cov_sanitize }}
+    - name: Configure
+      run: python tools/flow/run.py -c os=${{ matrix.run_os }} build_type=${{ matrix.build_type }} compiler=${{ matrix.compiler }} sanitizer=${{ matrix.cov_sanitize }} -s Conan,CMake
 
     - name: Build
-      run: cmake --build --preset ${{ matrix.build_profile }} --parallel
+      run: python tools/flow/run.py -c os=${{ matrix.run_os }} build_type=${{ matrix.build_type }} compiler=${{ matrix.compiler }} sanitizer=${{ matrix.cov_sanitize }} -s Build
+
+    - name: Test
+      run: python tools/flow/run.py -c os=${{ matrix.run_os }} build_type=${{ matrix.build_type }} compiler=${{ matrix.compiler }} sanitizer=${{ matrix.cov_sanitize }} -s Test
 
     - name: Pack
-      if: ${{ matrix.cpack_generator != '' }}
-      working-directory: ${{github.workspace}}/build/${{ matrix.build_profile }}
-      run: cpack -G ${{ matrix.cpack_generator }}
+      run: python tools/flow/run.py -c os=${{ matrix.run_os }} build_type=${{ matrix.build_type }} compiler=${{ matrix.compiler }} sanitizer=${{ matrix.cov_sanitize }} -s Pack,Artifacts
+
+#     ##     ## ########  ##        #######     ###    ######## 
+#     ##     ## ##     ## ##       ##     ##   ## ##   ##     ##
+#     ##     ## ##     ## ##       ##     ##  ##   ##  ##     ##
+#     ##     ## ########  ##       ##     ## ##     ## ##     ##
+#     ##     ## ##        ##       ##     ## ######### ##     ##
+#     ##     ## ##        ##       ##     ## ##     ## ##     ##
+#      #######  ##        ########  #######  ##     ## ######## 
 
     - name: Upload packages
       uses: actions/upload-artifact@v3
-      if: ${{ matrix.cpack_generator != '' }}
       with:
         name: Packages
-        path: ${{github.workspace}}/build/${{ matrix.build_profile }}/packages/cov-*
-
-    - name: Test
-      working-directory: ${{github.workspace}}/build/${{ matrix.build_profile }}
-      run: |
-        ctest -C ${{env.BUILD_TYPE}} --output-on-failure
+        path: ${{github.workspace}}/build/artifacts/packages/
 
     - name: Upload test results
       uses: actions/upload-artifact@v3
       if: always()
       with:
         name: Test results
-        path: ${{github.workspace}}/build/${{ matrix.build_profile }}/test-results/
+        path: ${{github.workspace}}/build/artifacts/test-results/
