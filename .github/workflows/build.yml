@@ -138,16 +138,16 @@ jobs:
 #     ##        ##     ##  #######   ######  ########  ######     ##   
 
     - name: Configure
-      run: python tools/flow/run.py -c os=${{ matrix.run_os }} build_type=${{ matrix.build_type }} compiler=${{ matrix.compiler }} sanitizer=${{ matrix.cov_sanitize }} -s Conan,CMake
+      run: python tools/flow/run.py --cutdown-os -c os=${{ matrix.run_os }} build_type=${{ matrix.build_type }} compiler=${{ matrix.compiler }} sanitizer=${{ matrix.cov_sanitize }} -s Conan,CMake
 
     - name: Build
-      run: python tools/flow/run.py -c os=${{ matrix.run_os }} build_type=${{ matrix.build_type }} compiler=${{ matrix.compiler }} sanitizer=${{ matrix.cov_sanitize }} -s Build
+      run: python tools/flow/run.py --cutdown-os -c os=${{ matrix.run_os }} build_type=${{ matrix.build_type }} compiler=${{ matrix.compiler }} sanitizer=${{ matrix.cov_sanitize }} -s Build
 
     - name: Test
-      run: python tools/flow/run.py -c os=${{ matrix.run_os }} build_type=${{ matrix.build_type }} compiler=${{ matrix.compiler }} sanitizer=${{ matrix.cov_sanitize }} -s Test
+      run: python tools/flow/run.py --cutdown-os -c os=${{ matrix.run_os }} build_type=${{ matrix.build_type }} compiler=${{ matrix.compiler }} sanitizer=${{ matrix.cov_sanitize }} -s Test
 
     - name: Pack
-      run: python tools/flow/run.py -c os=${{ matrix.run_os }} build_type=${{ matrix.build_type }} compiler=${{ matrix.compiler }} sanitizer=${{ matrix.cov_sanitize }} -s Pack,Artifacts
+      run: python tools/flow/run.py --cutdown-os -c os=${{ matrix.run_os }} build_type=${{ matrix.build_type }} compiler=${{ matrix.compiler }} sanitizer=${{ matrix.cov_sanitize }} -s Pack,Artifacts
 
 #     ##     ## ########  ##        #######     ###    ######## 
 #     ##     ## ##     ## ##       ##     ##   ## ##   ##     ##
