@@ -89,6 +89,14 @@ def _known_steps():
 
 _default_compiler = {"ubuntu": "gcc", "windows": "msvc"}
 
+
+def default_compiler():
+    try:
+        return os.environ["DEV_CXX"]
+    except KeyError:
+        return _default_compiler[matrix.platform]
+
+
 parser = argparse.ArgumentParser(description="Unified action runner")
 parser.add_argument(
     "--dry-run",
@@ -101,7 +109,7 @@ parser.add_argument(
     required=False,
     action="store_true",
     help=f'shortcut for "-c os={matrix.platform} '
-    f'compiler={_default_compiler[matrix.platform]} build_type=Debug sanitizer=OFF"',
+    f'compiler={default_compiler()} build_type=Debug sanitizer=OFF"',
 )
 parser.add_argument(
     "--cutdown-os",
@@ -139,7 +147,7 @@ def main():
         args.configs.append(
             [
                 f"os={matrix.platform}",
-                f"compiler={_default_compiler[matrix.platform]}",
+                f"compiler={default_compiler()}",
                 "build_type=Debug",
                 "sanitizer=OFF",
             ]
