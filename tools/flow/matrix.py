@@ -4,9 +4,9 @@
 import json
 import os
 import sys
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Union
 
-from runner import runner, step_call, copy_file, print_args
+from runner import runner, step_call, copy_file, print_args, step_info
 
 platform = {
     "linux": "ubuntu",
@@ -112,6 +112,85 @@ def find_compiler(compiler: str) -> Tuple[str, List[str]]:
     return filename, compilers
 
 
+def _stats(coverage: List[Union[None, int]]):
+    total = 0
+    relevant = 0
+    covered = 0
+    for count in coverage:
+        total += 1
+        if count is not None:
+            relevant += 1
+            if count != 0:
+                covered += 1
+
+    return total, relevant, covered
+
+
+def _append_coverage(GITHUB_STEP_SUMMARY: str, coveralls: dict):
+    total = 0
+    relevant = 0
+    covered = 0
+    list_of_shame: List[Tuple[int, float, Union[str, None], int, int, int]] = []
+
+    for file in coveralls.get("source_files", []):
+        stats_total, stats_relevant, stats_covered = _stats(file.get("coverage", []))
+        if stats_relevant != stats_covered:
+            list_of_shame.append(
+                (
+                    stats_relevant - stats_covered,
+                    1.0 - stats_covered / stats_relevant,
+                    file.get("name"),
+                    stats_total,
+                    stats_relevant,
+                    stats_covered,
+                )
+            )
+        total += stats_total
+        relevant += stats_relevant
+        covered += stats_covered
+
+    list_of_shame.sort(reverse=True)
+    list_of_shame = list_of_shame[:5]
+
+    SLASH_LINE = " \\\n"
+    SPAN_GREEN = '<span style="color: green">'
+    SPAN_ORANGE = '<span style="color: orange">'
+    SPAN_RED = '<span style="color: red">'
+    SPAN_C = "</span>"
+
+    with open(GITHUB_STEP_SUMMARY, "a", encoding="UTF-8") as out:
+        percentage_100 = int(covered * 100_00 / relevant + 0.5)
+        print(
+            f"**Coverage:** _{percentage_100//100}.{percentage_100%100:02}% ({covered}/{relevant})_",
+            end=SLASH_LINE,
+            file=out,
+        )
+        print(
+            f"**Missing lines:** _{relevant - covered}_",
+            file=out,
+        )
+        if len(list_of_shame):
+            print(
+                f"\n|Name|Coverage|Covered|Relevant|{SPAN_RED}Missing{SPAN_C}|",
+                file=out,
+            )
+            print("|----|-------:|------:|-------:|------:|", file=out)
+        for M, ratio, name, _total, R, C in list_of_shame:
+            P100 = int(C * 100_00 / R + 0.5)
+            SPAN = (
+                SPAN_GREEN
+                if ratio <= 0.1
+                else SPAN_ORANGE
+                if ratio <= 0.25
+                else SPAN_RED
+            )
+            code_name = "_unknown_" if name is None else f"`{name}`"
+            print(
+                f"|{code_name}|{SPAN}{P100//100}.{P100%100:02}%{SPAN_C}|{C}|{R}|{SPAN_RED}{M}{SPAN_C}|",
+                file=out,
+            )
+
+
 class steps:
     @staticmethod
     @step_call("Conan")
@@ -199,6 +278,16 @@ class steps:
                 "--target",
                 "cov_coveralls",
             )
+
+            if runner.GITHUB_ANNOTATE:
+                try:
+                    GITHUB_STEP_SUMMARY = os.environ["GITHUB_STEP_SUMMARY"]
+                    with open(
+                        f"build/{config['preset']}/coveralls.json", encoding="UTF-8"
+                    ) as f:
+                        _append_coverage(GITHUB_STEP_SUMMARY, json.load(f))
+                except KeyError:
+                    pass
         else:
             runner.call("ctest", "--preset", config["preset"])
 
@@ -225,6 +314,21 @@ class steps:
             print_args("cp", f"build/{preset}/coveralls.json", output)
             if not runner.DRY_RUN:
                 copy_file(f"build/{preset}/coveralls.json", output)
+        if runner.GITHUB_ANNOTATE:
+            try:
+                GITHUB_OUTPUT = os.environ["GITHUB_OUTPUT"]
+                with open(GITHUB_OUTPUT, "a", encoding="UTF-8") as github_output:
+                    generators = ",".join(config.get("cpack_generator", []))
+                    print(f"CPACK_GENERATORS={generators}", file=github_output)
+            except KeyError:
+                pass
+
+    @staticmethod
+    @step_call("DevInst", flags=step_info.VERBOSE)
+    def inst(_: dict):
+        if not runner.DRY_RUN:
+            os.makedirs("build/.local", exist_ok=True)
+        runner.extract("build/artifacts/packages", "build/.local", r"^cov-.*-apps\..*$")
 
     @staticmethod
     def build_steps():
@@ -235,11 +339,16 @@ class steps:
             steps.test,
             steps.pack,
             steps.store,
+            steps.inst,
         ]
 
     @staticmethod
     def build_config(config: dict, keys: list, wanted_steps: list):
         program = steps.build_steps()
-        if len(wanted_steps):
-            program = [step for step in program if step(None).lower() in wanted_steps]
+        use_step = (
+            (lambda step: step(None).name.lower() in wanted_steps)
+            if len(wanted_steps)
+            else (lambda step: not step(None).only_verbose())
+        )
+        program = [step for step in program if use_step(step)]
         runner.run_steps(config, keys, program)
