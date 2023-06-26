@@ -54,6 +54,7 @@ jobs:
     env:
       BUILD_TYPE: ${{ matrix.build_type }}
       CONAN_REVISIONS_ENABLED: 1
+      FLOW_COMMAND: python tools/flow/run.py --github --cutdown-os -c os=${{ matrix.run_os }} build_type=${{ matrix.build_type }} compiler=${{ matrix.compiler }} sanitizer=${{ matrix.cov_sanitize }}
 
     runs-on: ${{ matrix.os }}
 
@@ -138,16 +139,17 @@ jobs:
 #     ##        ##     ##  #######   ######  ########  ######     ##   
 
     - name: Configure
-      run: python tools/flow/run.py --cutdown-os -c os=${{ matrix.run_os }} build_type=${{ matrix.build_type }} compiler=${{ matrix.compiler }} sanitizer=${{ matrix.cov_sanitize }} -s Conan,CMake
+      run: ${{ env.FLOW_COMMAND }} -s Conan,CMake
 
     - name: Build
-      run: python tools/flow/run.py --cutdown-os -c os=${{ matrix.run_os }} build_type=${{ matrix.build_type }} compiler=${{ matrix.compiler }} sanitizer=${{ matrix.cov_sanitize }} -s Build
+      run: ${{ env.FLOW_COMMAND }} -s Build
 
     - name: Test
-      run: python tools/flow/run.py --cutdown-os -c os=${{ matrix.run_os }} build_type=${{ matrix.build_type }} compiler=${{ matrix.compiler }} sanitizer=${{ matrix.cov_sanitize }} -s Test
+      run: ${{ env.FLOW_COMMAND }} -s Test
 
     - name: Pack
-      run: python tools/flow/run.py --cutdown-os -c os=${{ matrix.run_os }} build_type=${{ matrix.build_type }} compiler=${{ matrix.compiler }} sanitizer=${{ matrix.cov_sanitize }} -s Pack,Artifacts
+      id: artifacts
+      run: ${{ env.FLOW_COMMAND }} -s Pack,Artifacts
 
 #     ##     ## ########  ##        #######     ###    ######## 
 #     ##     ## ##     ## ##       ##     ##   ## ##   ##     ##
@@ -159,6 +161,7 @@ jobs:
 
     - name: Upload packages
       uses: actions/upload-artifact@v3
+      if: ${{ steps.artifacts.outputs.CPACK_GENERATORS != '' }}
       with:
         name: Packages
         path: ${{github.workspace}}/build/artifacts/packages/

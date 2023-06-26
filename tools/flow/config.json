@@ -1,9 +1,9 @@
 {
   "matrix": {
-    "os": ["ubuntu", "windows"],
     "compiler": ["gcc", "clang", "msvc"],
     "build_type": ["Release", "Debug"],
-    "sanitizer": [true, false]
+    "sanitizer": [true, false],
+    "os": ["ubuntu", "windows"]
   },
   "exclude": [
     {"os": "windows", "compiler": "clang"},

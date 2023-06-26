@@ -8,8 +8,38 @@ import shutil
 import shlex
 import subprocess
 import sys
+import tarfile
+import zipfile
 from contextlib import contextmanager
-from typing import Callable, List, Union
+from dataclasses import dataclass
+from typing import Callable, List, Union, ClassVar
+
+
+def _untar(src, dst):
+    with tarfile.open(src) as TAR:
+
+        def is_within_directory(directory, target):
+            abs_directory = os.path.abspath(directory)
+            abs_target = os.path.abspath(target)
+
+            prefix = os.path.commonprefix([abs_directory, abs_target])
+
+            return prefix == abs_directory
+
+        for member in TAR.getmembers():
+            member_path = os.path.join(dst, member.name)
+            if not is_within_directory(dst, member_path):
+                raise Exception(f"Attempted path traversal in Tar file: {member.name}")
+
+        TAR.extractall(dst)
+
+
+def _unzip(src, dst):
+    with zipfile.ZipFile(src) as ZIP:
+        ZIP.extractall(dst)
+
+
+ARCHIVES = {".tar": _untar, ".tar.gz": _untar, ".zip": _unzip}
 
 
 def copy_file(src, dst):
@@ -57,6 +87,7 @@ def _prn(config, indent=""):
     prefix = "- "
     for key, value in config.items():
         intro = f"{indent}{prefix}\033[2;37m{key}:\033[m"
+        prefix = "  "
         if key[:2] == "--":
             continue
         if key == "compiler":
@@ -67,7 +98,6 @@ def _prn(config, indent=""):
                 print(f"{intro} {_prn2(comp)}, {_prn2(value)}", file=sys.stderr)
             continue
         print(f"{intro} {_prn2(value)}", file=sys.stderr)
-        prefix = "  "
 
 
 def _sanitizer_str(value: bool):
@@ -119,9 +149,23 @@ def _ls(dirname):
     return result
 
 
+@dataclass
+class step_info:
+    VERBOSE: ClassVar[int] = 1
+
+    name: str
+    impl: Callable[[dict], None]
+    visible: Union[Callable[[dict], bool], None]
+    flags: int
+
+    def only_verbose(self):
+        return self.flags & step_info.VERBOSE == step_info.VERBOSE
+
+
 class runner:
     DRY_RUN = False
     CUTDOWN_OS = False
+    GITHUB_ANNOTATE = False
 
     @staticmethod
     def run_steps(config: dict, keys: list, steps: List[callable]):
@@ -129,43 +173,63 @@ class runner:
         prefix = "\033[1;34m|\033[m "
         first_step = True
 
-        print(f"\033[1;34m+--[BUILD] {title}\033[m", file=sys.stderr)
+        if not runner.GITHUB_ANNOTATE:
+            print(f"\033[1;34m+--[BUILD] {title}\033[m", file=sys.stderr)
         if runner.DRY_RUN:
             _prn(config, prefix)
             first_step = False
 
         with _set_env(config["compiler"]):
+            total = len(steps)
+            counter = 0
             for step in steps:
-                if step(config, prefix, first_step):
+                counter += 1
+                if step(config, counter, total, prefix, first_step):
                     first_step = False
 
-        print(f"\033[1;34m+--------- \033[2;34m{title}\033[m", file=sys.stderr)
+        if not runner.GITHUB_ANNOTATE:
+            print(f"\033[1;34m+--------- \033[2;34m{title}\033[m", file=sys.stderr)
 
     @staticmethod
     def run_step(
-        step_name: str,
-        step: Callable[[dict], None],
-        visible: Union[Callable[[dict], bool], None],
+        step: step_info,
         config: Union[dict, None],
+        counter: int,
+        total: int,
         prefix: str,
         first_step: bool,
     ):
         global _print_prefix
         if config is None:
-            return step_name
+            return step
 
-        if visible and not visible(config):
+        if step.visible and not step.visible(config):
             return False
 
-        if not first_step:
+        if not first_step and not runner.GITHUB_ANNOTATE:
             print(prefix, file=sys.stderr)
 
-        print(f"{prefix}\033[1;35m+-[STEP] {step_name}\033[m", file=sys.stderr)
-        _print_prefix = f"{prefix}\033[1;35m|\033[m "
-        step(config)
-        print(
-            f"{prefix}\033[1;35m+------- \033[2;35m{step_name}\033[m", file=sys.stderr
-        )
+        if runner.GITHUB_ANNOTATE:
+            print(f"::group::STEP {counter}/{total}: {step.name}", file=sys.stderr)
+        else:
+            total_s = f"{total}"
+            counter_s = f"{counter}"
+            counter_pre = " " * (len(total_s) - len(counter_s))
+            counter_s = f"{counter_pre}{counter_s}/{total_s}"
+
+            print(
+                f"{prefix}\033[1;35m+-[STEP] {counter_s} {step.name}\033[m",
+                file=sys.stderr,
+            )
+            _print_prefix = f"{prefix}\033[1;35m|\033[m "
+        step.impl(config)
+        if runner.GITHUB_ANNOTATE:
+            print(f"::endgroup::", file=sys.stderr)
+        else:
+            print(
+                f"{prefix}\033[1;35m+------- \033[2;35m{counter_s} {step.name}\033[m",
+                file=sys.stderr,
+            )
         return True
 
     @staticmethod
@@ -198,12 +262,50 @@ class runner:
         for name in files:
             copy_file(os.path.join(src_dir, name), os.path.join(dst_dir, name))
 
+    @staticmethod
+    def extract(src_dir: str, dst_dir: str, regex: str):
+        files = _ls(src_dir)
+        if regex:
+            files = [name for name in files if re.match(regex, name)]
+        matching_file = regex if len(files) == 0 else files[0]
+        archive = os.path.join(src_dir, matching_file)
 
-def step_call(step_name: str, visible: Union[Callable[[dict], bool], None] = None):
+        if runner.DRY_RUN:
+            print_args("tar", "-xf", archive, dst_dir)
+            return
+
+        if len(files) == 0:
+            print(f"No files matching {regex}", file=sys.stderr)
+            sys.exit(1)
+        if len(files) > 1:
+            print(f"Multiple file matching {regex}:", file=sys.stderr)
+            for name in files:
+                print(f" - {name}", file=sys.stderr)
+            sys.exit(1)
+
+        print_args("tar", "-xf", archive, dst_dir)
+
+        reminder, ext = os.path.splitext(archive)
+        _, mid = os.path.splitext(reminder)
+        if mid == ".tar":
+            ext = ".tar"
+        ARCHIVES[ext](archive, dst_dir)
+
+
+def step_call(
+    step_name: str, visible: Union[Callable[[dict], bool], None] = None, flags: int = 0
+):
     def decorator(step: Callable[[dict], None]):
         @functools.wraps(step)
-        def run_step(config: Union[dict, None], prefix: str = "", first_step=True):
-            return runner.run_step(step_name, step, visible, config, prefix, first_step)
+        def run_step(
+            config: Union[dict, None],
+            counter: int = 0,
+            total: int = 0,
+            prefix: str = "",
+            first_step=True,
+        ):
+            info = step_info(name=step_name, impl=step, visible=visible, flags=flags)
+            return runner.run_step(info, config, counter, total, prefix, first_step)
 
         return run_step
 
