@@ -324,11 +324,18 @@ class steps:
                 pass
 
     @staticmethod
-    @step_call("DevInst", flags=step_info.VERBOSE)
-    def inst(_: dict):
+    @step_call("BinInst", flags=step_info.VERBOSE)
+    def bin_inst(_: dict):
         if not runner.DRY_RUN:
             os.makedirs("build/.local", exist_ok=True)
         runner.extract("build/artifacts/packages", "build/.local", r"^cov-.*-apps\..*$")
+
+    @staticmethod
+    @step_call("DevInst", flags=step_info.VERBOSE)
+    def dev_inst(_: dict):
+        if not runner.DRY_RUN:
+            os.makedirs("build/.user", exist_ok=True)
+        runner.extract("build/artifacts/packages", "build/.user", r"^cov-.*-devel\..*$")
 
     @staticmethod
     def build_steps():
@@ -339,7 +346,8 @@ class steps:
             steps.test,
             steps.pack,
             steps.store,
-            steps.inst,
+            steps.bin_inst,
+            steps.dev_inst,
         ]
 
     @staticmethod
