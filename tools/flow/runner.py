@@ -12,7 +12,7 @@ import tarfile
 import zipfile
 from contextlib import contextmanager
 from dataclasses import dataclass
-from typing import Callable, List, Union, ClassVar
+from typing import Callable, List, Union, ClassVar, Dict, Tuple
 
 
 def _untar(src, dst):
@@ -39,7 +39,12 @@ def _unzip(src, dst):
         ZIP.extractall(dst)
 
 
-ARCHIVES = {".tar": _untar, ".tar.gz": _untar, ".zip": _unzip}
+_tar = (_untar, ["tar", "-xf"])
+ARCHIVES: Dict[str, Tuple[Callable[[str, str], None], List[str]]] = {
+    ".tar": _tar,
+    ".tar.gz": _tar,
+    ".zip": (_unzip, ["unzip"]),
+}
 
 
 def copy_file(src, dst):
@@ -283,13 +288,14 @@ class runner:
                 print(f" - {name}", file=sys.stderr)
             sys.exit(1)
 
-        print_args("tar", "-xf", archive, dst_dir)
-
         reminder, ext = os.path.splitext(archive)
         _, mid = os.path.splitext(reminder)
         if mid == ".tar":
             ext = ".tar"
-        ARCHIVES[ext](archive, dst_dir)
+        unpack, msg = ARCHIVES[ext]
+        print_args(*msg, archive, dst_dir)
+
+        unpack(archive, dst_dir)
 
 
 def step_call(
