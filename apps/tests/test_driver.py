@@ -2,6 +2,7 @@
 # This code is licensed under MIT license (see LICENSE for details)
 
 import argparse
+import concurrent.futures
 import json
 import os
 import random
@@ -15,7 +16,9 @@ import sys
 import tarfile
 import tempfile
 import zipfile
+from dataclasses import dataclass
 from difflib import unified_diff
+from typing import Tuple, Union
 
 if os.name == "nt":
     from ctypes import create_unicode_buffer, windll  # type: ignore
@@ -152,19 +155,20 @@ def diff(expected, actual):
     return "".join(list(unified_diff(expected, actual))[2:])
 
 
-def touch(args):
-    os.makedirs(os.path.dirname(args[0]), exist_ok=True)
-    with open(args[0], "wb") as f:
+def touch(test: "Test", args):
+    filename = test.path(args[0])
+    os.makedirs(os.path.dirname(filename), exist_ok=True)
+    with open(filename, "wb") as f:
         if len(args) > 1:
             f.write(args[1].encode("UTF-8"))
 
 
-def git(args):
-    subprocess.run(["git", *args], shell=False)
+def git(test: "Test", args):
+    subprocess.run(["git", *args], shell=False, cwd=test.cwd)
 
 
-def cov(aditional):
-    subprocess.run([target, *aditional], shell=False)
+def cov(test: "Test", aditional):
+    subprocess.run([target, *aditional], shell=False, cwd=test.cwd)
 
 
 file_cache = {}
@@ -172,21 +176,21 @@ rw_mask = stat.S_IWRITE | stat.S_IWGRP | stat.S_IWOTH
 ro_mask = 0o777 ^ rw_mask
 
 
-def make_RO(args):
+def make_RO(test: "Test", args):
     mode = os.stat(args[0]).st_mode
     file_cache[args[0]] = mode
-    os.chmod(args[0], mode & ro_mask)
+    os.chmod(test.path(args[0]), mode & ro_mask)
 
 
-def make_RW(args):
+def make_RW(test: "Test", args):
     try:
         mode = file_cache[args[0]]
     except KeyError:
         mode = os.stat(args[0]).st_mode | rw_mask
-    os.chmod(args[0], mode)
+    os.chmod(test.path(args[0]), mode)
 
 
-def untar(src, dst):
+def untar(test: "Test", src, dst):
     with tarfile.open(src) as TAR:
 
         def is_within_directory(directory, target):
@@ -205,35 +209,35 @@ def untar(src, dst):
 
             tar.extractall(path, members, numeric_owner=numeric_owner)
 
-        safe_extract(TAR, dst)
+        safe_extract(TAR, test.path(dst))
 
 
-def unzip(src, dst):
+def unzip(test: "Test", src, dst):
     with zipfile.ZipFile(src) as ZIP:
-        ZIP.extractall(dst)
+        ZIP.extractall(test.path(dst))
 
 
 ARCHIVES = {".tar": untar, ".zip": unzip}
 
 
-def cat(args):
+def cat(test: "Test", args):
     filename = args[0]
-    with open(filename) as f:
+    with open(test.path(filename)) as f:
         sys.stdout.write(f.read())
 
 
-def unpack(args):
+def unpack(test: "Test", args):
     archive = args[0]
     dst = args[1]
     reminder, ext = os.path.splitext(archive)
     _, mid = os.path.splitext(reminder)
     if mid == ".tar":
         ext = ".tar"
-    ARCHIVES[ext](archive, dst)
+    ARCHIVES[ext](test, archive, dst)
 
 
-def detach(args):
-    dirname = args[0]
+def detach(test: "Test", args):
+    dirname = test.path(args[0])
     with open(os.path.join(dirname, "HEAD")) as f:
         link = f.readline().strip()
     print(link)
@@ -247,12 +251,12 @@ def detach(args):
 
 
 op_types = {
-    "mkdirs": (1, lambda args: os.makedirs(args[0], exist_ok=True)),
-    "rm": (1, lambda args: shutil.rmtree(args[0])),
+    "mkdirs": (1, lambda test, args: test.makedirs(args[0], exist_ok=True)),
+    "rm": (1, lambda test, args: test.rmtree(args[0])),
     "ro": (1, make_RO),
     "rw": (1, make_RW),
     "touch": (1, touch),
-    "cd": (1, lambda args: os.chdir(args[0])),
+    "cd": (1, lambda test, args: test.chdir(args[0])),
     "unpack": (2, unpack),
     "git": (0, git),
     "cov": (0, cov),
@@ -263,6 +267,7 @@ op_types = {
 
 class Test:
     def __init__(self, data, filename, count):
+        self.cwd = os.getcwd()
         self.data = data
         self.ok = True
         self.post_args = []
@@ -366,8 +371,7 @@ class Test:
                 json.dump(data, f, indent=4)
                 print(file=f)
 
-    @staticmethod
-    def run_cmds(ops, tempdir):
+    def run_cmds(self, ops, tempdir):
         for op in ops:
             orig = op
             if isinstance(op, str):
@@ -382,7 +386,7 @@ class Test:
                 op = op[1:]
                 if len(op) < min_args:
                     return None
-                cb([expand(o, tempdir) for o in op])
+                cb(self, [expand(o, tempdir) for o in op])
             except Exception as ex:
                 if op[0] != "safe-rm":
                     print("Problem while handling", orig)
@@ -393,9 +397,15 @@ class Test:
         return True
 
     def run(self, tempdir, tempdir_alt):
-        current_directory = os.getcwd()
+        root = os.path.join(
+            "build",
+            ".testing",
+            "".join(random.choice(string.ascii_letters) for _ in range(16)),
+        )
+        root = self.cwd = os.path.join(self.cwd, root)
+        os.makedirs(root, exist_ok=True)
 
-        prep = Test.run_cmds(self.prepare, tempdir)
+        prep = self.run_cmds(self.prepare, tempdir)
         if prep is None:
             return None
 
@@ -413,7 +423,9 @@ class Test:
             elif key in env:
                 del env[key]
 
-        proc = subprocess.run([target, *expanded], capture_output=True, env=env)
+        proc = subprocess.run(
+            [target, *expanded], capture_output=True, env=env, cwd=self.cwd
+        )
         returncode = proc.returncode
         test_stdout = proc.stdout
         test_stderr = proc.stderr
@@ -421,7 +433,9 @@ class Test:
         for sub_expanded in post_expanded:
             if returncode != 0:
                 break
-            proc = subprocess.run([target, *sub_expanded], capture_output=True, env=env)
+            proc = subprocess.run(
+                [target, *sub_expanded], capture_output=True, env=env, cwd=self.cwd
+            )
             returncode = proc.returncode
             if len(test_stdout) and len(proc.stdout):
                 test_stdout += b"\n"
@@ -430,11 +444,9 @@ class Test:
             test_stdout += proc.stdout
             test_stderr += proc.stderr
 
-        clean = Test.run_cmds(self.cleanup, tempdir)
+        clean = self.run_cmds(self.cleanup, tempdir)
         if clean is None:
             return None
-
-        os.chdir(current_directory)
 
         return [
             returncode,
@@ -456,6 +468,7 @@ class Test:
         return clipped
 
     def report(self, actual, tempdir):
+        result = ""
         for ndx in range(len(actual)):
             if actual[ndx] == self.expected[ndx]:
                 continue
@@ -463,24 +476,22 @@ class Test:
                 check = self.check[ndx - 1]
                 pre_mark = "..." if check == "end" else ""
                 post_mark = "..." if check == "begin" else ""
-                print(
-                    f"""{flds[ndx]}
+                result += f"""{flds[ndx]}
   Expected:
     {pre_mark}{repr(self.expected[ndx])}{post_mark}
   Actual:
     {pre_mark}{repr(actual[ndx])}{post_mark}
 
 Diff:
-{diff(self.expected[ndx], actual[ndx])}"""
-                )
+{diff(self.expected[ndx], actual[ndx])}
+"""
             else:
-                print(
-                    f"""{flds[ndx]}
+                result += f"""{flds[ndx]}
   Expected:
     {repr(self.expected[ndx])}
   Actual:
-    {repr(actual[ndx])}"""
-                )
+    {repr(actual[ndx])}
+"""
 
         env = {}
         env["LANGUAGE"] = self.lang
@@ -492,16 +503,22 @@ Diff:
                 del env[key]
 
         expanded = [expand(arg, tempdir) for arg in self.args]
-        print(
-            " ".join(
-                shlex.quote(arg)
-                for arg in [
-                    *["{}={}".format(key, env[key]) for key in env],
-                    target,
-                    *expanded,
-                ]
-            )
+        result += " ".join(
+            shlex.quote(arg)
+            for arg in [
+                *["{}={}".format(key, env[key]) for key in env],
+                target,
+                *expanded,
+            ]
         )
+
+        return result
+
+    def path(self, filename):
+        return os.path.join(self.cwd, filename)
+
+    def chdir(self, sub):
+        self.cwd = os.path.abspath(os.path.join(self.cwd, sub))
 
     @staticmethod
     def load(filename, count):
@@ -587,29 +604,23 @@ class color:
 
 
 counter = 0
-error_counter = 0
-skip_counter = 0
-save_counter = 0
 run = args.run
+
 if not len(run):
     run = list(range(1, len(testsuite) + 1))
 else:
     print("running:", ", ".join(str(x) for x in run))
-for filename in sorted(testsuite):
-    counter += 1
-    if counter not in run:
-        continue
 
-    test = Test.load(filename, counter)
-    if not test.ok:
-        continue
 
-    test_counter = f"{color.counter}[{counter:>{digits}}/{len(testsuite)}]{color.reset}"
-    test_name = f"{color.name}{test.name}{color.reset}"
-    test_id = f"{test_counter} {test_name}"
+class TaskResult:
+    OK = 0
+    SKIPPED = 1
+    SAVED = 2
+    FAILED = 3
+    CLIP_FAILED = 4
 
-    print(test_id)
 
+def task(test: Test, current_counter: int) -> Tuple[int, str, Union[str, None]]:
     temp_instance = "".join(random.choice(string.ascii_letters) for _ in range(16))
     tempdir = f"{TEMP}/{temp_instance}"
     tempdir_alt = None
@@ -617,13 +628,18 @@ for filename in sorted(testsuite):
     if TEMP_ALT is not None:
         tempdir_alt = f"{TEMP_ALT}{os.sep}{temp_instance}"
 
+    test_counter = (
+        f"{color.counter}[{current_counter:>{digits}}/{len(testsuite)}]{color.reset}"
+    )
+    test_name = f"{color.name}{test.name}{color.reset}"
+    test_id = f"{test_counter} {test_name}"
+
+    print(test_id)
     os.makedirs(tempdir, exist_ok=True)
 
     actual = test.run(tempdir, tempdir_alt)
     if actual is None:
-        print(f"{test_id} {color.skipped}SKIPPED{color.reset}")
-        skip_counter += 1
-        continue
+        return (TaskResult.SKIPPED, test_id, None)
 
     if test.expected is None:
         test.data["expected"] = [
@@ -633,42 +649,91 @@ for filename in sorted(testsuite):
         with open(filename, "w") as f:
             json.dump(test.data, f, indent=4)
             print(file=f)
-        print(f"{test_id} {color.skipped}saved{color.reset}")
-        skip_counter += 1
-        save_counter += 1
-        continue
+        return (TaskResult.SAVED, test_id, None)
 
     clipped = test.clip(actual)
 
     if isinstance(clipped, str):
-        print(
-            f"{test_id} {color.failed}FAILED (unknown check '{clipped}'){color.reset}"
-        )
-        error_counter += 1
-        continue
+        return (TaskResult.CLIP_FAILED, test_id, clipped)
 
     if actual == test.expected or clipped == test.expected:
-        print(f"{test_id} {color.passed}PASSED{color.reset}")
-        continue
+        return (TaskResult.OK, test_id, None)
 
-    test.report(clipped, tempdir)
-    print(f"{test_id} {color.failed}FAILED{color.reset}")
-    error_counter += 1
+    report = test.report(clipped, tempdir)
+    return (TaskResult.FAILED, test_id, report)
 
+
+@dataclass
+class Counters:
+    error_counter: int = 0
+    skip_counter: int = 0
+    save_counter: int = 0
+
+    def report(self, outcome: int, test_id: str, message: Union[str, None]):
+        if outcome == TaskResult.SKIPPED:
+            print(f"{test_id} {color.skipped}SKIPPED{color.reset}")
+            self.skip_counter += 1
+            return
+
+        if outcome == TaskResult.SAVED:
+            print(f"{test_id} {color.skipped}saved{color.reset}")
+            self.skip_counter += 1
+            self.save_counter += 1
+            return
+
+        if outcome == TaskResult.CLIP_FAILED:
+            print(
+                f"{test_id} {color.failed}FAILED (unknown check '{message}'){color.reset}"
+            )
+            self.error_counter += 1
+            return
+
+        if outcome == TaskResult.OK:
+            print(f"{test_id} {color.passed}PASSED{color.reset}")
+            return
+
+        if message is not None:
+            print(message)
+        print(f"{test_id} {color.failed}FAILED{color.reset}")
+        self.error_counter += 1
+
+    def summary(self, counter: int):
+        print(f"Failed {self.error_counter}/{counter}")
+        if self.skip_counter > 0:
+            skip_test = "test" if self.skip_counter == 1 else "tests"
+            if self.save_counter > 0:
+                print(
+                    f"Skipped {self.skip_counter} {skip_test} (including {self.save_counter} due to saving)"
+                )
+            else:
+                print(f"Skipped {self.skip_counter} {skip_test}")
+
+        return self.error_counter == 0
+
+
+counters = Counters()
+
+with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+    futures = []
+    for filename in sorted(testsuite):
+        counter += 1
+        if counter not in run:
+            continue
+
+        test = Test.load(filename, counter)
+        if not test.ok:
+            continue
+        futures.append(executor.submit(task, test, counter))
+
+    for future in concurrent.futures.as_completed(futures):
+        outcome, test_id, message = future.result()
+        # outcome, test_id, message = task(test, counter)
+        counters.report(outcome, test_id, message)
 
 if args.install is not None:
     shutil.rmtree(args.install)
-shutil.rmtree(TEMP, ignore_errors=True)
+# shutil.rmtree(TEMP, ignore_errors=True)
+shutil.rmtree("build/.testing", ignore_errors=True)
 
-print(f"Failed {error_counter}/{counter}")
-if skip_counter > 0:
-    skip_test = "test" if skip_counter == 1 else "tests"
-    if save_counter > 0:
-        print(
-            f"Skipped {skip_counter} {skip_test} (including {save_counter} due to saving)"
-        )
-    else:
-        print(f"Skipped {skip_counter} {skip_test}")
-
-if error_counter:
+if not counters.summary(counter):
     sys.exit(1)
