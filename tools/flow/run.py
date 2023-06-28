@@ -3,8 +3,8 @@
 # This code is licensed under MIT license (see LICENSE for details)
 
 import argparse
-import matrix
-import runner
+import lib.matrix as matrix
+import lib.runner as runner
 import os
 import sys
 from contextlib import contextmanager
@@ -13,7 +13,7 @@ from typing import List, Set
 DEF_STEPS = {
     "config": ["Conan", "CMake"],
     "build": ["Build"],
-    "verify": ["Build", "Test", "Pack", "Artifacts", "BinInst", "DevInst"],
+    "verify": ["Build", "Test", "Coverage", "Pack", "Artifacts", "BinInst", "DevInst"],
 }
 cmd = os.path.splitext(os.path.basename(sys.argv[0]))[0]
 
@@ -227,7 +227,7 @@ def main():
     runner.runner.DRY_RUN = args.dry_run
     runner.runner.CUTDOWN_OS = args.cutdown_os
     runner.runner.GITHUB_ANNOTATE = args.github
-    path = os.path.join(os.path.dirname(__file__), "config.json")
+    path = os.path.join(os.path.dirname(__file__), "lib", "config.json")
     configs, keys = matrix.load_matrix(path)
 
     usable = [

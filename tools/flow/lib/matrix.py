@@ -3,10 +3,11 @@
 
 import json
 import os
+import shutil
 import sys
 from typing import Dict, List, Tuple, Union
 
-from runner import runner, step_call, copy_file, print_args, step_info
+from .runner import runner, step_call, copy_file, print_args, step_info
 
 platform = {
     "linux": "ubuntu",
@@ -338,12 +339,44 @@ class steps:
         runner.extract("build/artifacts/packages", "build/.user", r"^cov-.*-devel\..*$")
 
     @staticmethod
+    def coverage_exe():
+        exe = f"build/.local/bin/cov"
+        _exe = exe
+        if sys.platform == "win32":
+            _exe += ".exe"
+        if not os.path.exists(_exe):
+            return None
+        return exe
+
+    @staticmethod
+    @step_call(
+        "Coverage",
+        flags=step_info.VERBOSE,
+        visible=lambda config: (
+            config.get("coverage", False) == True and steps.coverage_exe() is not None
+        ),
+    )
+    def coverage(config: dict):
+        reporter = steps.coverage_exe()
+        _exe = reporter
+        if sys.platform == "win32" and not os.path.isfile(_exe):
+            _exe += ".exe"
+        if os.path.isfile(_exe):
+            _exe = os.path.abspath(_exe)
+        _comp = os.path.abspath(shutil.which("cov"))
+        if _exe == _comp:
+            reporter = "cov"
+        report = f"build/{config['preset']}/coveralls.json"
+        runner.call(reporter, "report", "--filter", "coveralls", report)
+
+    @staticmethod
     def build_steps():
         return [
             steps.configure_conan,
             steps.configure_cmake,
             steps.build,
             steps.test,
+            steps.coverage,
             steps.pack,
             steps.store,
             steps.bin_inst,
