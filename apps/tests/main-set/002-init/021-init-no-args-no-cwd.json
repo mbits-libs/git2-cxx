@@ -16,5 +16,6 @@
         "mkdirs '$TMP/subdir'",
         "cd '$TMP/subdir'",
         "rm '$TMP'"
-    ]
+    ],
+    "linear": true
 }
