@@ -25,7 +25,9 @@ namespace cov {
 			if (!--counter_) delete this;
 		}
 
+		// GCOV_EXCL_START
 		long counter() const noexcept override { return counter_; }
+		// GCOV_EXCL_STOP
 
 	private:
 		std::atomic<long> counter_{1};

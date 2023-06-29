@@ -31,7 +31,7 @@ namespace cov::io {
 		if ((hdr.version & VERSION_MAJOR) != v1::VERSION)
 			return error(errc::unsupported_version);
 
-		auto handler = [&] {
+		auto handler = [&] {  // GCOV_EXCL_LINE[GCC]
 			db_handler* result = nullptr;
 			auto it = handlers_.find(hdr.magic);
 			if (it != handlers_.end()) result = it->second.get();
