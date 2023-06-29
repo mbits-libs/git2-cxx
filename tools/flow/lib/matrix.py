@@ -325,17 +325,29 @@ class steps:
 
     @staticmethod
     @step_call("BinInst", flags=step_info.VERBOSE)
-    def bin_inst(_: dict):
+    def bin_inst(config: dict):
         if not runner.DRY_RUN:
             os.makedirs("build/.local", exist_ok=True)
-        runner.extract("build/artifacts/packages", "build/.local", r"^cov-.*-apps\..*$")
+        runner.extract(
+            "build/artifacts/packages",
+            "build/.local",
+            r"^cov-.*-x86_64-dbg-apps\..*$"
+            if config["preset"] == "debug"
+            else r"^cov-.*-x86_64-apps\..*$",
+        )
 
     @staticmethod
     @step_call("DevInst", flags=step_info.VERBOSE)
-    def dev_inst(_: dict):
+    def dev_inst(config: dict):
         if not runner.DRY_RUN:
             os.makedirs("build/.user", exist_ok=True)
-        runner.extract("build/artifacts/packages", "build/.user", r"^cov-.*-devel\..*$")
+        runner.extract(
+            "build/artifacts/packages",
+            "build/.user",
+            r"^cov-.*-x86_64-dbg-devel\..*$"
+            if config["preset"] == "debug"
+            else r"^cov-.*-x86_64-devel\..*$",
+        )
 
     @staticmethod
     @step_call(

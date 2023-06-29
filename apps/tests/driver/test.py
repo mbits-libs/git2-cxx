@@ -9,6 +9,7 @@ import shlex
 import shutil
 import string
 import subprocess
+import sys
 from dataclasses import dataclass
 from difflib import unified_diff
 from typing import Callable, Dict, List, Optional, Tuple, Union
@@ -106,6 +107,12 @@ class Test:
         self.ok = True
         self.post_args = []
         self.linear = data.get("linear", False)
+        self.disabled = data.get("disabled")
+
+        if isinstance(self.disabled, bool):
+            self.ok = not self.disabled
+        elif isinstance(self.disabled, str):
+            self.ok = self.disabled != sys.platform
 
         renovate = False
 

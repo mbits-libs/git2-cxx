@@ -161,9 +161,9 @@ namespace cov::app::builtin::report {
 				    git_oid_equal(&file_list_id, &parent->file_list()) ||
 				    same_coverage(repo, file_list_id, parent->file_list());
 				if (hard_equiv && loose_equiv) {
-					auto HEAD = repo.current_head();
-					result.branch = std::move(HEAD.branch);
-					if (HEAD.tip) result.tip = *HEAD.tip;
+					auto HEAD_2 = repo.current_head();
+					result.branch = std::move(HEAD_2.branch);
+					if (HEAD_2.tip) result.tip = *HEAD_2.tip;
 					result.same_report = true;
 					break;
 				}
