@@ -127,5 +127,5 @@ def task(
     if actual == tested.expected or clipped == tested.expected:
         return (TaskResult.OK, test_id, None, tempdir)
 
-    report = tested.report(clipped, tempdir)
+    report = tested.report(env2, clipped, tempdir)
     return (TaskResult.FAILED, test_id, report, tempdir)

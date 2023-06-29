@@ -23,17 +23,19 @@ def _touch(test: test.Test, args):
 
 
 def _make_RO(test: test.Test, args):
-    mode = os.stat(args[0]).st_mode
-    _file_cache[args[0]] = mode
-    os.chmod(test.path(args[0]), mode & _ro_mask)
+    filename = test.path(args[0])
+    mode = os.stat(filename).st_mode
+    _file_cache[filename] = mode
+    os.chmod(filename, mode & _ro_mask)
 
 
 def _make_RW(test: test.Test, args):
+    filename = test.path(args[0])
     try:
-        mode = _file_cache[args[0]]
+        mode = _file_cache[filename]
     except KeyError:
-        mode = os.stat(args[0]).st_mode | _rw_mask
-    os.chmod(test.path(args[0]), mode)
+        mode = os.stat(filename).st_mode | _rw_mask
+    os.chmod(filename, mode)
 
 
 def _untar(test: test.Test, src, dst):

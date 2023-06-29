@@ -127,7 +127,6 @@ def _make_env(args: argparse.Namespace, counter_total: int):
     _HANDLERS = {
         **HANDLERS,
         "git": (0, _git),
-        "cov": (0, _cov(target)),
         "detach": (1, _detach),
     }
 
@@ -185,6 +184,7 @@ def _install(install: Union[str, None], install_with: List[str], env: Env):
         shutil.copy2(module, os.path.join(install, "libexec", "cov"))
 
     env.target = os.path.join(install, "bin", os.path.basename(env.target))
+    env.handlers["cov"] = (0, _cov(env.target))
 
 
 def _load_tests(testsuite: List[str], run: List[str]):
@@ -260,7 +260,7 @@ def __main__():
         shutil.rmtree(args.install)
     shutil.rmtree("build/.testing", ignore_errors=True)
 
-    if not counters.summary(counter):
+    if not counters.summary(len(independent_tests) + len(linear_tests)):
         sys.exit(1)
 
 
