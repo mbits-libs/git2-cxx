@@ -17,6 +17,7 @@ namespace cov::app::builtin::report {
 	struct new_head {
 		std::string branch;
 		git_oid tip;
+		bool same_report{false};
 	};
 
 	struct parser : base_parser<errlng, replng> {

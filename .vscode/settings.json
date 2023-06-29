@@ -2,11 +2,14 @@
     "files.insertFinalNewline": true,
     "files.trimFinalNewlines": true,
     "cSpell.words": [
+        "arglist",
         "cobertura",
         "covdata",
         "hilite",
+        "lngs",
         "pofile",
         "polib",
+        "replng",
         "workdir"
     ],
     "files.associations": {

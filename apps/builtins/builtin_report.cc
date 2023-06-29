@@ -50,8 +50,13 @@ namespace cov::app::builtin::report {
 			coverage += file.stats;
 		}
 
-		auto const [branch, current_id] = p.update_current_branch(
+		auto const [branch, current_id, same_report] = p.update_current_branch(
 		    repo, file_coverage, report.git, commit, coverage);
+
+		if (same_report) {
+			fmt::print("{}\n", p.tr()(replng::WARNING_NO_CHANGES_IN_REPORT));
+			return 0;
+		}
 
 		auto const resulting = repo.lookup<cov::report>(current_id, ec);
 		if (!resulting || ec) {
