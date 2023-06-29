@@ -31,4 +31,4 @@ if sys.argv[1] not in flows:
     sys.exit(0)
 
 args = [sys.executable, os.path.join(__flow__, f"{sys.argv[1]}.py"), *sys.argv[2:]]
-os.execv(sys.executable, args)
+sys.exit(subprocess.run(args, shell=False).returncode)

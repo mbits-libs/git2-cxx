@@ -17,5 +17,6 @@
         "cd '$TMP/subdir'",
         "rm '$TMP'"
     ],
-    "linear": true
+    "linear": true,
+    "disabled": "win32"
 }

@@ -273,10 +273,16 @@ class runner:
         if regex:
             files = [name for name in files if re.match(regex, name)]
         matching_file = regex if len(files) == 0 else files[0]
-        archive = os.path.join(src_dir, matching_file)
+        archive = f"{src_dir}/{matching_file}"
+
+        reminder, ext = os.path.splitext(archive)
+        _, mid = os.path.splitext(reminder)
+        if mid == ".tar":
+            ext = ".tar"
+        unpack, msg = ARCHIVES[ext]
 
         if runner.DRY_RUN:
-            print_args("tar", "-xf", archive, dst_dir)
+            print_args(*msg, archive, dst_dir)
             return
 
         if len(files) == 0:
@@ -288,11 +294,6 @@ class runner:
                 print(f" - {name}", file=sys.stderr)
             sys.exit(1)
 
-        reminder, ext = os.path.splitext(archive)
-        _, mid = os.path.splitext(reminder)
-        if mid == ".tar":
-            ext = ".tar"
-        unpack, msg = ARCHIVES[ext]
         print_args(*msg, archive, dst_dir)
 
         unpack(archive, dst_dir)
