@@ -339,33 +339,13 @@ class steps:
         runner.extract("build/artifacts/packages", "build/.user", r"^cov-.*-devel\..*$")
 
     @staticmethod
-    def coverage_exe():
-        exe = f"build/.local/bin/cov"
-        _exe = exe
-        if sys.platform == "win32":
-            _exe += ".exe"
-        if not os.path.exists(_exe):
-            return None
-        return exe
-
-    @staticmethod
     @step_call(
         "Coverage",
         flags=step_info.VERBOSE,
-        visible=lambda config: (
-            config.get("coverage", False) == True and steps.coverage_exe() is not None
-        ),
+        visible=lambda config: config.get("coverage", False) == True,
     )
     def coverage(config: dict):
-        reporter = steps.coverage_exe()
-        _exe = reporter
-        if sys.platform == "win32" and not os.path.isfile(_exe):
-            _exe += ".exe"
-        if os.path.isfile(_exe):
-            _exe = os.path.abspath(_exe)
-        _comp = os.path.abspath(shutil.which("cov"))
-        if _exe == _comp:
-            reporter = "cov"
+        reporter = f"build/{config['preset']}/bin/cov"
         report = f"build/{config['preset']}/coveralls.json"
         runner.call(reporter, "report", "--filter", "coveralls", report)
 
