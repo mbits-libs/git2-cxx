@@ -139,3 +139,8 @@ msgstr "<report-file>"
 msgctxt "WARNING_FILE_MODIFIED"
 msgid "{} was modified after the report"
 msgstr "{} was modified after the report"
+
+#. Warning message for adding a coverage with no changes to previous report
+msgctxt "WARNING_NO_CHANGES_IN_REPORT"
+msgid "no changes in reported coverage"
+msgstr "no changes in reported coverage"

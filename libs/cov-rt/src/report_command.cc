@@ -16,6 +16,39 @@ namespace cov::app::builtin::report {
 		std::string quoted(std::string_view item) {
 			return fmt::format("\xE2\x80\x98{}\xE2\x80\x99", item);
 		}
+
+		struct oid_ptr {
+			git_oid const* ref;
+			bool operator==(oid_ptr const& right) const noexcept {
+				if (!ref) return !right.ref;
+				if (!right.ref) return false;
+				return git_oid_equal(ref, right.ref);
+			}
+		};
+
+		bool same_coverage(cov::repository& repo,
+		                   git_oid const& left_id,
+		                   git_oid const& right_id) {
+			std::error_code ec{};
+			auto const left = repo.lookup<cov::report_files>(left_id, ec);
+			if (ec || !left) return false;
+			auto const right = repo.lookup<cov::report_files>(right_id, ec);
+			if (ec || !right) return false;
+
+			std::map<std::string_view,
+			         std::pair<cov::io::v1::coverage_stats, oid_ptr>>
+			    left_data, right_data;
+			for (auto const& entry : left->entries()) {
+				left_data[entry->path()] = {entry->stats(),
+				                            {&entry->contents()}};
+			}
+			for (auto const& entry : right->entries()) {
+				right_data[entry->path()] = {entry->stats(),
+				                             {&entry->contents()}};
+			}
+
+			return left_data == right_data;
+		}
 	}  // namespace
 
 	parser::parser(::args::args_view const& arguments,
@@ -104,11 +137,11 @@ namespace cov::app::builtin::report {
 		    std::chrono::system_clock::now());
 
 		while (true) {
+			std::error_code ec{};
 			auto const HEAD = repo.current_head();
 			git_oid parent_id{};
 			if (HEAD.tip) parent_id = *HEAD.tip;
 			if (amend_) {
-				std::error_code ec{};
 				auto current = HEAD.tip
 				                   ? repo.lookup<cov::report>(parent_id, ec)
 				                   : ref_ptr<cov::report>{};
@@ -117,6 +150,23 @@ namespace cov::app::builtin::report {
 					error({msg.data(), msg.size()});
 				}
 				parent_id = current->parent_report();
+			}
+
+			auto parent = repo.lookup<cov::report>(parent_id, ec);
+			if (parent) {
+				const bool hard_equiv =
+				    git_oid_equal(&commit_id, &parent->commit()) &&
+				    git.branch == parent->branch();
+				const bool loose_equiv =
+				    git_oid_equal(&file_list_id, &parent->file_list()) ||
+				    same_coverage(repo, file_list_id, parent->file_list());
+				if (hard_equiv && loose_equiv) {
+					auto HEAD = repo.current_head();
+					result.branch = std::move(HEAD.branch);
+					if (HEAD.tip) result.tip = *HEAD.tip;
+					result.same_report = true;
+					break;
+				}
 			}
 
 			auto const report_obj = cov::report::create(

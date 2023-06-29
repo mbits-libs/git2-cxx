@@ -50,4 +50,6 @@
     MESSAGE_FIELD_GIT_COMMIT = "based on";
     [help("Description for parent of current report; will become \"parent d4965abfb\""), id(-1)]
     MESSAGE_FIELD_PARENT_REPORT = "parent";
+    [help("Warning message for adding a coverage with no changes to previous report"), id(-1)]
+    WARNING_NO_CHANGES_IN_REPORT = "no changes in reported coverage";
 }

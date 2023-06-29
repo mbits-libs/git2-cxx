@@ -293,7 +293,7 @@ namespace cov::io {
 		            21:1: entries_count (uint) := EC
 		            23:1: entry_size (uint) := ES
 		            26 + SO:SIZE: UTF8Z (like ASCIIZ, but UTF-8)
-		            26 + FO:ES: entry (report_entry x EC)
+		            26 + EO:ES: entry (report_entry x EC)
 
 		        report_entry:
 		            0:31-0: path (str)
