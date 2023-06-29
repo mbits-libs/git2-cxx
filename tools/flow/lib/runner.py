@@ -4,15 +4,15 @@
 import functools
 import os
 import re
-import shutil
 import shlex
+import shutil
 import subprocess
 import sys
 import tarfile
 import zipfile
 from contextlib import contextmanager
 from dataclasses import dataclass
-from typing import Callable, List, Union, ClassVar, Dict, Tuple
+from typing import Callable, ClassVar, Dict, List, Optional, Tuple
 
 
 def _untar(src, dst):
@@ -160,7 +160,7 @@ class step_info:
 
     name: str
     impl: Callable[[dict], None]
-    visible: Union[Callable[[dict], bool], None]
+    visible: Optional[Callable[[dict], bool]]
     flags: int
 
     def only_verbose(self):
@@ -198,7 +198,7 @@ class runner:
     @staticmethod
     def run_step(
         step: step_info,
-        config: Union[dict, None],
+        config: Optional[dict],
         counter: int,
         total: int,
         prefix: str,
@@ -299,12 +299,12 @@ class runner:
 
 
 def step_call(
-    step_name: str, visible: Union[Callable[[dict], bool], None] = None, flags: int = 0
+    step_name: str, visible: Optional[Callable[[dict], bool]] = None, flags: int = 0
 ):
     def decorator(step: Callable[[dict], None]):
         @functools.wraps(step)
         def run_step(
-            config: Union[dict, None],
+            config: Optional[dict],
             counter: int = 0,
             total: int = 0,
             prefix: str = "",

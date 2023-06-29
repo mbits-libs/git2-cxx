@@ -3,11 +3,10 @@
 
 import json
 import os
-import shutil
 import sys
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, Optional, Tuple
 
-from .runner import runner, step_call, copy_file, print_args, step_info
+from .runner import copy_file, print_args, runner, step_call, step_info
 
 platform = {
     "linux": "ubuntu",
@@ -113,7 +112,7 @@ def find_compiler(compiler: str) -> Tuple[str, List[str]]:
     return filename, compilers
 
 
-def _stats(coverage: List[Union[None, int]]):
+def _stats(coverage: List[Optional[int]]):
     total = 0
     relevant = 0
     covered = 0
@@ -131,7 +130,7 @@ def _append_coverage(GITHUB_STEP_SUMMARY: str, coveralls: dict):
     total = 0
     relevant = 0
     covered = 0
-    list_of_shame: List[Tuple[int, float, Union[str, None], int, int, int]] = []
+    list_of_shame: List[Tuple[int, float, Optional[str], int, int, int]] = []
 
     for file in coveralls.get("source_files", []):
         stats_total, stats_relevant, stats_covered = _stats(file.get("coverage", []))
