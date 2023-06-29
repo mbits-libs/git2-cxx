@@ -340,8 +340,8 @@ namespace cov::app::report {
 		if (ec) return {};
 		return {
 		    .author = signature(commit.author()),
-		    .committer = signature(commit.committer()),
-		    .committed = commit.committer().when,
+		    .committer = signature(commit.committer()),  // GCOV_EXCL_LINE[GCC]
+		    .committed = commit.committer().when,        // GCOV_EXCL_LINE[GCC]
 		    .message = stored(rstrip(commit.message_raw())),
 		    .tree = std::move(tree),
 		};

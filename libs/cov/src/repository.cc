@@ -249,7 +249,7 @@ namespace cov {
 	    ref_ptr<report> const& older,
 	    std::error_code& ec,
 	    git_diff_find_options const* opts) const {
-		auto const renames = [&, this, opts] {
+		auto const renames = [&, this, opts] {  // GCOV_EXCL_LINE[GCC]
 			std::error_code ignore{};
 			return this->diff_betwen_commits(newer->commit(), older->commit(),
 			                                 ignore, opts);

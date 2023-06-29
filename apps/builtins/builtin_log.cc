@@ -40,7 +40,8 @@ namespace cov::app::builtin::log {
 	    : base_parser<loglng, errlng>{langs, arguments} {
 		using namespace str;
 
-		parser_.arg(rev)
+		parser_
+		    .arg(rev)  // GCOV_EXCL_LINE[GCC]
 		    .meta(tr_(loglng::REV_RANGE_META))
 		    .help(tr_(loglng::REV_RANGE_DESCRIPTION));
 		parser_.arg(count, "n", "max-count")

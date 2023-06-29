@@ -106,7 +106,7 @@ namespace cov::io {
 
 		memcpy(&out.id, sha_id.data, sizeof(sha_id.data));
 
-		auto const filename = [&] {
+		auto const filename = [&] {  // GCOV_EXCL_LINE[GCC]
 			char buffer[2 * decltype(sha_id)::digest_length + 2];
 			git_oid_pathfmt(buffer, &out);
 			return path_ / std::string_view{buffer, std::size(buffer) - 1};

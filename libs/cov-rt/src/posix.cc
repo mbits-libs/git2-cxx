@@ -88,7 +88,9 @@ namespace cov::app::platform {
 
 			std::thread async_write(std::vector<std::byte> const& src) {
 				return std::thread(
+				    // GCOV_EXCL_START[POSIX]
 				    [](pipe_type* self, std::vector<std::byte> const& bytes) {
+					    // GCOV_EXCL_STOP
 					    auto ptr = bytes.data();
 					    auto size = bytes.size();
 
