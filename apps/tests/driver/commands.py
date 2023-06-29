@@ -6,6 +6,7 @@ import stat
 import sys
 import tarfile
 import zipfile
+from typing import Callable, Dict, List, Tuple
 
 from . import test
 
@@ -14,7 +15,7 @@ _rw_mask = stat.S_IWRITE | stat.S_IWGRP | stat.S_IWOTH
 _ro_mask = 0o777 ^ _rw_mask
 
 
-def _touch(test: test.Test, args):
+def _touch(test: test.Test, args: List[str]):
     filename = test.path(args[0])
     os.makedirs(os.path.dirname(filename), exist_ok=True)
     with open(filename, "wb") as f:
@@ -22,14 +23,14 @@ def _touch(test: test.Test, args):
             f.write(args[1].encode("UTF-8"))
 
 
-def _make_RO(test: test.Test, args):
+def _make_RO(test: test.Test, args: List[str]):
     filename = test.path(args[0])
     mode = os.stat(filename).st_mode
     _file_cache[filename] = mode
     os.chmod(filename, mode & _ro_mask)
 
 
-def _make_RW(test: test.Test, args):
+def _make_RW(test: test.Test, args: List[str]):
     filename = test.path(args[0])
     try:
         mode = _file_cache[filename]
@@ -68,7 +69,7 @@ def _unzip(test: test.Test, src, dst):
 _ARCHIVES = {".tar": _untar, ".zip": _unzip}
 
 
-def _unpack(test: test.Test, args):
+def _unpack(test: test.Test, args: List[str]):
     archive = args[0]
     dst = args[1]
     reminder, ext = os.path.splitext(archive)
@@ -78,13 +79,13 @@ def _unpack(test: test.Test, args):
     _ARCHIVES[ext](test, archive, dst)
 
 
-def _cat(test: test.Test, args):
+def _cat(test: test.Test, args: List[str]):
     filename = args[0]
     with open(test.path(filename)) as f:
         sys.stdout.write(f.read())
 
 
-HANDLERS = {
+HANDLERS: Dict[str, Tuple[int, Callable]] = {
     "mkdirs": (1, lambda test, args: test.makedirs(args[0])),
     "rm": (1, lambda test, args: test.rmtree(args[0])),
     "ro": (1, _make_RO),

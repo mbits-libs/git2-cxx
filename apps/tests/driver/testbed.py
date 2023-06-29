@@ -6,7 +6,7 @@ import os
 import random
 import string
 from dataclasses import dataclass
-from typing import Tuple, Union
+from typing import Optional, Tuple
 
 from . import test
 
@@ -34,7 +34,7 @@ class Counters:
     skip_counter: int = 0
     save_counter: int = 0
 
-    def report(self, outcome: int, test_id: str, message: Union[str, None]):
+    def report(self, outcome: int, test_id: str, message: Optional[str]):
         if outcome == TaskResult.SKIPPED:
             print(f"{test_id} {color.skipped}SKIPPED{color.reset}")
             self.skip_counter += 1
@@ -78,7 +78,7 @@ class Counters:
 
 def task(
     env1: test.Env, tested: test.Test, current_counter: int
-) -> Tuple[int, str, Union[str, None]]:
+) -> Tuple[int, str, Optional[str], str]:
     temp_instance = "".join(random.choice(string.ascii_letters) for _ in range(16))
     tempdir = f"{env1.tempdir}/{temp_instance}"
     tempdir_alt = None
@@ -127,5 +127,5 @@ def task(
     if actual == tested.expected or clipped == tested.expected:
         return (TaskResult.OK, test_id, None, tempdir)
 
-    report = tested.report(env2, clipped, tempdir)
+    report: str = tested.report(env2, clipped, tempdir)
     return (TaskResult.FAILED, test_id, report, tempdir)

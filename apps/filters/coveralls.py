@@ -2,10 +2,10 @@
 
 import json
 import sys
-from typing import Dict, List, Union
+from typing import Dict, List, Optional
 
 
-def lines_from(lines: List[Union[None, int]]) -> Dict[int, int]:
+def lines_from(lines: List[Optional[int]]) -> Dict[int, int]:
     result: Dict[int, int] = {}
     for index in range(len(lines)):
         count = lines[index]

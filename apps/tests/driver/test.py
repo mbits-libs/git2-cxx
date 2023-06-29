@@ -11,7 +11,7 @@ import string
 import subprocess
 from dataclasses import dataclass
 from difflib import unified_diff
-from typing import Any, Callable, Dict, List, Tuple, Union
+from typing import Callable, Dict, List, Optional, Tuple, Union
 
 _flds = ["Return code", "Standard out", "Standard err"]
 _streams = ["stdin", "stderr"]
@@ -62,9 +62,9 @@ class Env:
     version: str
     counter_digits: int
     counter_total: int
-    handlers: Dict[str, Tuple[int, Callable[["Test", List[str]], Any]]]
-    data_dir_alt: Union[str, None] = None
-    tempdir_alt: Union[str, None] = None
+    handlers: Dict[str, Tuple[int, Callable]]
+    data_dir_alt: Optional[str] = None
+    tempdir_alt: Optional[str] = None
 
     def expand(self, input: str, tempdir: str):
         return (
@@ -88,14 +88,14 @@ class Env:
         if not len(patches):
             return input
 
-        input = input.split("\n")
+        lines = input.split("\n")
         for patch in patches:
             patched = patches[patch]
             pattern = re.compile(patch)
-            for lineno in range(len(input)):
-                if pattern.match(input[lineno]):
-                    input[lineno] = patched
-        return "\n".join(input)
+            for lineno in range(len(lines)):
+                if pattern.match(lines[lineno]):
+                    lines[lineno] = patched
+        return "\n".join(lines)
 
 
 class Test:
@@ -271,19 +271,19 @@ class Test:
         for sub_expanded in post_expanded:
             if returncode != 0:
                 break
-            proc: subprocess.CompletedProcess = subprocess.run(
+            proc_post: subprocess.CompletedProcess = subprocess.run(
                 [environment.target, *sub_expanded],
                 capture_output=True,
                 env=_env,
                 cwd=cwd,
             )
-            returncode = proc.returncode
-            if len(test_stdout) and len(proc.stdout):
+            returncode = proc_post.returncode
+            if len(test_stdout) and len(proc_post.stdout):
                 test_stdout += b"\n"
-            if len(test_stderr) and len(proc.stderr):
+            if len(test_stderr) and len(proc_post.stderr):
                 test_stderr += b"\n"
-            test_stdout += proc.stdout
-            test_stderr += proc.stderr
+            test_stdout += proc_post.stdout
+            test_stderr += proc_post.stderr
 
         clean = self.run_cmds(environment, self.cleanup, environment.tempdir)
         if clean is None:

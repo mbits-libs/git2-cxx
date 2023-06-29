@@ -8,7 +8,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
-from typing import List, Tuple, Union
+from typing import List, Optional, Tuple
 
 from driver.commands import HANDLERS
 from driver.test import Env, Test
@@ -49,17 +49,17 @@ parser.add_argument(
 )
 
 
-def _run_with(test: Test, *args):
+def _run_with(test: Test, *args: str):
     cwd = None if test.linear else test.cwd
     subprocess.run(args, shell=False, cwd=cwd)
 
 
-def _git(test: Test, args):
+def _git(test: Test, args: List[str]):
     _run_with(test, "git", *args)
 
 
 def _cov(target: str):
-    def __(test: "Test", aditional):
+    def __(test: "Test", aditional: List[str]):
         _run_with(test, target, *aditional)
 
     return __
@@ -111,7 +111,7 @@ def _make_env(args: argparse.Namespace, counter_total: int):
     if os.name == "nt":
         BUFFER_SIZE = 2048
         buffer = create_unicode_buffer(BUFFER_SIZE)
-        GetLongPathName(TEMP, buffer, BUFFER_SIZE)
+        GetLongPathName(tempdir, buffer, BUFFER_SIZE)
         tempdir = buffer.value
 
     if os.sep != "/":
@@ -143,7 +143,7 @@ def _make_env(args: argparse.Namespace, counter_total: int):
     )
 
 
-def _install(install: Union[str, None], install_with: List[str], env: Env):
+def _install(install: Optional[str], install_with: List[str], env: Env):
     if install is None:
         return
 
