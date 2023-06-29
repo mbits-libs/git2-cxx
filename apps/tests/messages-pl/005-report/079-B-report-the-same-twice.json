@@ -1,0 +1,17 @@
+{
+    "lang": "pl",
+    "args": "report $DATA/build-coverage.json -f create-report",
+    "expected": [
+        0,
+        "brak zmian w raporcie pokrycia\n",
+        "[ADD] src/main.cc\n"
+    ],
+    "prepare": [
+        "unpack $DATA/repo.git.tar $TMP",
+        "cd '$TMP'",
+        "git clone repo.git",
+        "cd '$TMP/repo'",
+        "cov init",
+        "cov report $DATA/build-coverage.json -f create-report"
+    ]
+}
