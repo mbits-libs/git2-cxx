@@ -15,10 +15,6 @@ from driver.test import Env, Test
 from driver.testbed import Counters, task
 
 if os.name == "nt":
-    from ctypes import create_unicode_buffer, windll  # type: ignore
-
-    GetLongPathName = windll.kernel32.GetLongPathNameW
-
     sys.stdout.reconfigure(encoding="utf-8")  # type: ignore
 
 try:
@@ -109,10 +105,7 @@ def _make_env(args: argparse.Namespace, counter_total: int):
     data_dir_alt = None
 
     if os.name == "nt":
-        BUFFER_SIZE = 2048
-        buffer = create_unicode_buffer(BUFFER_SIZE)
-        GetLongPathName(tempdir, buffer, BUFFER_SIZE)
-        tempdir = buffer.value
+        tempdir = os.path.realpath(tempdir).replace("\\", "/")
 
     if os.sep != "/":
         tempdir_alt = tempdir.replace("/", os.sep)
@@ -217,12 +210,19 @@ def __main__():
     _ensure_identity_exists()
     testsuite = _enum_tests(args)
     env = _make_env(args, len(testsuite))
+    print("target: ", env.target, env.version)
+    if env.data_dir_alt is None:
+        print("data:   ", env.data_dir)
+    else:
+        print("data:   ", env.data_dir, env.data_dir_alt)
+    print("tests:  ", args.tests)
+    if env.tempdir_alt is None:
+        print("$TEMP:  ", env.tempdir)
+    else:
+        print("$TEMP:  ", env.tempdir, env.tempdir_alt)
+
     os.makedirs(env.tempdir, exist_ok=True)
     _install(args.install, args.install_with, env)
-    print("target: ", env.target, env.version)
-    print("data:   ", env.data_dir)
-    print("tests:  ", args.tests)
-    print("$TEMP:  ", env.tempdir)
 
     run = args.run
 
