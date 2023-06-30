@@ -1,13 +1,14 @@
 
 set(BUILTINS
-    init
+    branch
+    checkout
     config
+    init
+    log
     module
     report
-    log
-    branch
+    reset
     tag
-    checkout
 )
 
 set(REPORT_FILTERS

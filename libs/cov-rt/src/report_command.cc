@@ -201,7 +201,8 @@ namespace cov::app::builtin::report {
 
 	void parser::print_report(std::string_view local_branch,
 	                          size_t files,
-	                          cov::report const& report) {
+	                          cov::report const& report,
+	                          str::cov_report::Strings const& tr) {
 		static constexpr auto message_chunk1 = "%C(red)["sv;
 		static constexpr auto message_chunk2 = " %hr]%Creset %s%n "sv;
 		static constexpr auto message_chunk3 =
@@ -216,8 +217,8 @@ namespace cov::app::builtin::report {
 
 		std::string change{}, parent{};
 		std::string file_count =
-		    fmt::format(fmt::runtime(tr_(counted::MESSAGE_FILE_COUNT,
-		                                 static_cast<intmax_t>(files))),
+		    fmt::format(fmt::runtime(tr(counted::MESSAGE_FILE_COUNT,
+		                                static_cast<intmax_t>(files))),
 		                files);
 
 		if (stats.covered < stats.relevant) {
@@ -226,19 +227,19 @@ namespace cov::app::builtin::report {
 
 		if (!git_oid_is_zero(&report.parent_report())) {
 			parent = fmt::format(" {} %rp%n"sv,
-			                     tr_(replng::MESSAGE_FIELD_PARENT_REPORT));
+			                     tr(replng::MESSAGE_FIELD_PARENT_REPORT));
 		}
 
 		std::string_view chunks[] = {
 		    message_chunk1,
-		    local_branch.empty() ? tr_(replng::MESSAGE_DETACHED_HEAD)
+		    local_branch.empty() ? tr(replng::MESSAGE_DETACHED_HEAD)
 		                         : local_branch,
 		    message_chunk2,
 		    file_count,
 		    message_chunk3,
 		    change,
 		    message_chunk4,
-		    tr_(replng::MESSAGE_FIELD_GIT_COMMIT),
+		    tr(replng::MESSAGE_FIELD_GIT_COMMIT),
 		    message_chunk5,
 		    parent,
 		};

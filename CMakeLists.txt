@@ -18,13 +18,14 @@ set(STRINGS
   cov
   errors
   log_format
-  cov_init
-  cov_config
-  cov_module
-  cov_report
-  cov_log
-  cov_refs
   cov_checkout
+  cov_config
+  cov_init
+  cov_log
+  cov_module
+  cov_refs
+  cov_report
+  cov_reset
 )
 set(LANGUAGES pl en)
 
