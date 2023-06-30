@@ -1,0 +1,19 @@
+{
+    "args": "reset -h",
+    "expected": [
+        0,
+        [
+            "usage: cov reset [-h] <report>",
+            "",
+            "positional arguments:",
+            " <report>   sets HEAD of current branch to a given report",
+            "",
+            "optional arguments:",
+            " -h, --help shows this help message and exits\n"
+        ],
+        ""
+    ],
+    "prepare": [
+        "cd '$TMP'"
+    ]
+}

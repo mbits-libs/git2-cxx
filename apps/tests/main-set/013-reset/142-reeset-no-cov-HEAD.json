@@ -1,0 +1,17 @@
+{
+    "args": "reset HEAD",
+    "expected": [
+        2,
+        "",
+        [
+            "usage: cov reset [-h] <report>",
+            "cov reset: error: HEAD refers to branch with no reports\n"
+        ]
+    ],
+    "prepare": [
+        "mkdirs '$TMP/reset-empty'",
+        "cd '$TMP/reset-empty'",
+        "git init",
+        "cov init"
+    ]
+}

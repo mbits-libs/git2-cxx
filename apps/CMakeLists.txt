@@ -132,6 +132,7 @@ if (COV_TESTING)
         010-log
         011-refs
         012-checkout
+        013-reset
     )
         add_test(
             NAME cov-exec--${TEST_SET}

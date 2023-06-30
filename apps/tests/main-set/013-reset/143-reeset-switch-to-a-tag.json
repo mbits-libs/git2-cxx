@@ -1,0 +1,18 @@
+{
+    "args": "reset F",
+    "expected": [
+        0,
+        [
+            "Tip of 'main' branch now points to cb6394c0b1199077b0a47ade847161b32ef9feab",
+            "\u001b[31m[main cb6394c0b]\u001b[m Commit F",
+            " 0 files, \u001b[31m  0%\u001b[m (0/0)",
+            " \u001b[2;37mbased on\u001b[m \u001b[2;33mdbe474382@main\u001b[m",
+            " parent 8b9c7b3b7\n"
+        ],
+        ""
+    ],
+    "prepare": [
+        "unpack $DATA/revparse.tar $TMP",
+        "cd $TMP/revparse"
+    ]
+}
