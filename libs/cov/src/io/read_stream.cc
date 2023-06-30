@@ -21,7 +21,7 @@ namespace cov::io {
 
 	size_t bytes_read_stream::read(void* ptr, size_t length) {
 		auto const chunk = std::min(length, in_.size());
-		std::memcpy(ptr, in_.data(), chunk);
+		if (chunk) std::memcpy(ptr, in_.data(), chunk);
 		in_ = in_.subview(chunk);
 		return chunk;
 	}
