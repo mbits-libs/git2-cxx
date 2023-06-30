@@ -1,0 +1,14 @@
+[
+    project("cov"),
+    namespace("cov::app::str::cov_reset"),
+    version("latest"),
+    serial(1)
+] strings {
+	[help("Description for the report reference argument"), id(-1)]
+	REPORT_DESCRIPTION = "sets HEAD of current branch to a given report";
+
+	[help("Message for moving repository tip of a detached HEAD"), id(-1)]
+	DETACHED_TIP_MOVED_TO = "Detached HEAD now points to {}";
+	[help("Message for moving repository tip of current branch"), id(-1)]
+	BRANCH_TIP_MOVED_TO = "Tip of `{}` branch now points to {}";
+}

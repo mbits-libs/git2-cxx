@@ -45,7 +45,14 @@ namespace cov::app::builtin::report {
 
 		void print_report(std::string_view local_branch,
 		                  size_t files,
-		                  cov::report const& report);
+		                  cov::report const& report) {
+			print_report(local_branch, files, report, tr_);
+		}
+
+		static void print_report(std::string_view local_branch,
+		                         size_t files,
+		                         cov::report const& report,
+		                         str::cov_report::Strings const& tr);
 
 		template <typename Enum, typename... Args>
 		[[noreturn]] void data_error(Enum id, Args&&... args) const
