@@ -10,5 +10,5 @@
 	[help("Message for moving repository tip of a detached HEAD"), id(-1)]
 	DETACHED_TIP_MOVED_TO = "Detached HEAD now points to {}";
 	[help("Message for moving repository tip of current branch"), id(-1)]
-	BRANCH_TIP_MOVED_TO = "Tip of `{}` branch now points to {}";
+	BRANCH_TIP_MOVED_TO = "Tip of '{}' branch now points to {}";
 }
