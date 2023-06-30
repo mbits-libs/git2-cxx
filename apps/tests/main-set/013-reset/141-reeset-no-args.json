@@ -1,0 +1,15 @@
+{
+    "args": "reset",
+    "expected": [
+        2,
+        "",
+        [
+            "usage: cov reset [-h] <report>",
+            "cov reset: error: argument <report> is required\n"
+        ]
+    ],
+    "prepare": [
+        "cd '$TMP'",
+        "cov init"
+    ]
+}
