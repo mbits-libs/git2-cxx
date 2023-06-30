@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) and [COMMITS.md](COMMITS.md) for commit guidelines.
 
+## [0.16.0](https://github.com/mzdun/cov/compare/v0.15.2...v0.16.0) (2023-06-30)
+
+### New Features
+
+- add cov reset ([5a0e415](https://github.com/mzdun/cov/commit/5a0e415bb1ac35a2d5574841e5593156b0a8e939))
+- recognize (nearly) repeated reports ([3e314b6](https://github.com/mzdun/cov/commit/3e314b6d5bfb4bd06cbc66c6d568dbd73976fef4))
+
+### Bug Fixes
+
+- patched an undefined behavior ([08fdaa1](https://github.com/mzdun/cov/commit/08fdaa1f9fdc80f98fd51677eddf0300d2197622))
+- no `uz` on MSVC yet ([6c6d9df](https://github.com/mzdun/cov/commit/6c6d9df929f9ecef3274246c810d6aa6a0ce6749))
+
 ## [0.15.2](https://github.com/mzdun/cov/compare/v0.15.1...v0.15.2) (2023-05-28)
 
 ### Bug Fixes
