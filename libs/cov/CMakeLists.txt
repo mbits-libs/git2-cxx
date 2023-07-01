@@ -10,6 +10,7 @@ set(SOURCES
   src/format/defaults.cc
   src/format/formatter.cc
   src/format/parser.cc
+  src/format/tabular.cc
   src/hash/md5.cc
   src/hash/sha1.cc
   src/init.cc
@@ -61,6 +62,7 @@ set(SOURCES
   include/cov/repository.hh
   include/cov/revparse.hh
   include/cov/streams.hh
+  include/cov/tabular.hh
   include/cov/tag.hh
   include/cov/zstream.hh
 )
