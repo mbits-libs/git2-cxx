@@ -19,6 +19,8 @@ namespace cov {
 						return "Generic error";
 					case current_branch:
 						return "Current branch cannot be deleted";
+					case wrong_object_type:
+						return "Object cannot be cast to required type";
 				}
 				return "cov::errc{" + std::to_string(value) + "}";
 			}

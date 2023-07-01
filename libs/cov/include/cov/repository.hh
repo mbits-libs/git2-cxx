@@ -11,6 +11,7 @@
 #include <git2/repository.hh>
 #include <map>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace git {
@@ -140,7 +141,8 @@ namespace cov {
 		                             size_t character_count) const;
 		template <typename Object>
 		ref_ptr<Object> lookup(git_oid const& id, std::error_code& ec) const {
-			return as_a<Object>(lookup_object(id, ec));
+			auto object = lookup_object(id, ec);
+			return as_a<Object>(std::move(object), ec);
 		}
 		bool write(git_oid&, ref_ptr<object> const&);
 		bool write(git_oid& out, git::bytes const& bytes) {

@@ -4,6 +4,7 @@
 #pragma once
 #include <atomic>
 #include <concepts>
+#include <cov/error.hh>
 #include <utility>
 
 namespace cov {
@@ -25,9 +26,7 @@ namespace cov {
 			if (!--counter_) delete this;
 		}
 
-		// GCOV_EXCL_START
 		long counter() const noexcept override { return counter_; }
-		// GCOV_EXCL_STOP
 
 	private:
 		std::atomic<long> counter_{1};
@@ -142,14 +141,40 @@ namespace cov {
 	}
 
 	template <Counted derived, Counted base>
+	inline ref_ptr<derived> as_a(ref_ptr<base> const& var,
+	                             std::error_code& ec) {
+		auto ptr = as_a<derived>(var.get());
+		if (ptr)
+			ptr->acquire();
+		else if (!ec)
+			ec = make_error_code(errc::wrong_object_type);
+		return ref_ptr{ptr};
+	}
+
+	template <Counted derived, Counted base>
 	inline ref_ptr<derived> as_a(ref_ptr<base>& var) {
 		auto ptr = as_a<derived>(var.get());
 		if (ptr) ptr->acquire();
 		return ref_ptr{ptr};
 	}
 
+	template <Counted derived, Counted base>
+	inline ref_ptr<derived> as_a(ref_ptr<base>& var, std::error_code& ec) {
+		auto ptr = as_a<derived>(var.get());
+		if (ptr)
+			ptr->acquire();
+		else if (!ec)
+			ec = make_error_code(errc::wrong_object_type);
+		return ref_ptr{ptr};
+	}
+
 	template <Counted same>
 	inline ref_ptr<same> as_a(ref_ptr<same>&& var) {
+		return var;
+	}
+
+	template <Counted same>
+	inline ref_ptr<same> as_a(ref_ptr<same>&& var, std::error_code&) {
 		return var;
 	}
 
