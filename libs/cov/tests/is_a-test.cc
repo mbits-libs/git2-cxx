@@ -11,8 +11,7 @@ namespace cov::testing {
 		class derived2;
 		class derived3;
 
-		struct base {
-			virtual ~base() = default;
+		struct base : counted_impl<> {
 			template <typename Derived>
 			inline bool is_a() const noexcept;
 			virtual bool is_derived1() const noexcept { return false; }
@@ -108,6 +107,42 @@ namespace cov::testing {
 				ASSERT_EQ(nullptr, result);
 			}
 		}
+
+		template <typename Orig, typename Casted>
+		void smart() {
+			ref_ptr<Orig> orig{new Orig};
+			ref_ptr<classes::base> b{orig};
+
+			std::error_code ec{};
+			auto const result = as_a<Casted>(b, ec);
+			if constexpr (std::same_as<Orig, Casted>) {
+				EXPECT_FALSE(ec);
+				EXPECT_EQ(3, orig.counter());
+				ASSERT_EQ(orig.get(), result.get());
+			} else {
+				EXPECT_TRUE(ec);
+				EXPECT_EQ(2, orig.counter());
+				ASSERT_EQ(nullptr, result.get());
+			}
+		}
+
+		template <typename Orig, typename Casted>
+		void csmart() {
+			ref_ptr<Orig> orig{new Orig};
+			ref_ptr<classes::base> const b{orig};
+
+			std::error_code ec{};
+			auto const result = as_a<Casted>(b, ec);
+			if constexpr (std::same_as<Orig, Casted>) {
+				EXPECT_FALSE(ec);
+				EXPECT_EQ(3, orig.counter());
+				ASSERT_EQ(orig.get(), result.get());
+			} else {
+				EXPECT_TRUE(ec);
+				EXPECT_EQ(2, orig.counter());
+				ASSERT_EQ(nullptr, result.get());
+			}
+		}
 	};
 
 #define IS_A_TEST_(test, type1, type2)          \
@@ -129,4 +164,6 @@ namespace cov::testing {
 	IS_A_TEST(cref);
 	IS_A_TEST(ptr);
 	IS_A_TEST(cptr);
+	IS_A_TEST(smart);
+	IS_A_TEST(csmart);
 }  // namespace cov::testing

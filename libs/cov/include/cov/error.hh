@@ -9,6 +9,7 @@ namespace cov {
 	enum class errc : int {
 		error = -1,
 		current_branch = -2,
+		wrong_object_type = -3,
 	};
 
 	std::error_category const& category();
