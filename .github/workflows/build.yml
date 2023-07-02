@@ -130,6 +130,10 @@ jobs:
           ${{ matrix.os }}-${{ matrix.build_type }}-${{ matrix.latest_conan_hash }}
           ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.build_type }}-${{ matrix.latest_conan_hash }}
 
+    - name: Install OpenCppCoverage
+      uses: KungFuDonkey/Install-OpenCppCoverage@v1
+      if: ${{ matrix.windows && matrix.build_type == 'Debug' }}
+
 #     ########  ########   #######        ## ########  ######  ########
 #     ##     ## ##     ## ##     ##       ## ##       ##    ##    ##   
 #     ##     ## ##     ## ##     ##       ## ##       ##          ##   

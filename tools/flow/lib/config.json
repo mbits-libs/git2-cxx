@@ -13,7 +13,7 @@
     {"build_type": "Release", "sanitizer": true}
   ],
   "include": [
-    {"build_type": "Debug", "preset": "debug"},
+    {"build_type": "Debug", "preset": "debug", "coverage": true},
     {"build_type": "Release", "preset": "release"},
     {
       "os": "ubuntu",
@@ -32,11 +32,6 @@
     {"compiler": "clang", "report_compiler": "Clang"},
     {"compiler": "msvc", "report_compiler": "MSVC"},
     {"os": "ubuntu", "build_type": "Release", "sanitizer": false},
-    {
-      "os": "ubuntu",
-      "build_type": "Debug",
-      "coverage": true
-    },
     {
       "os": "windows",
       "build_type": "Release",
