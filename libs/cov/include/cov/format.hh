@@ -173,6 +173,7 @@ namespace cov::placeholder {
 		static context from(cov::repository const&,
 		                    color_feature clr,
 		                    decorate_feature decorate);
+		static rating rating_from(cov::repository const&);
 	};
 
 	struct git_person {
@@ -282,6 +283,14 @@ namespace cov {
 		std::vector<placeholder::format> const& parsed() const noexcept {
 			return format_;
 		}
+
+		static translatable apply_mark(io::v1::coverage_stats const& stats,
+		                               placeholder::rating const& marks);
+
+		static placeholder::color apply_mark(
+		    placeholder::color color,
+		    io::v1::coverage_stats const& stats,
+		    placeholder::rating const& marks);
 
 	private:
 		static std::string no_translation(long long count,

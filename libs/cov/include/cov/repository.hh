@@ -4,6 +4,7 @@
 #pragma once
 #include <cov/db.hh>
 #include <cov/discover.hh>
+#include <cov/error.hh>
 #include <cov/init.hh>
 #include <cov/reference.hh>
 #include <git2/config.hh>
@@ -56,6 +57,11 @@ namespace cov {
 		file_diff::kind diff_kind{};
 
 		bool operator==(file_stats const&) const noexcept = default;
+
+		void extend(file_stats const& rhs) noexcept {
+			current += rhs.current;
+			previous += rhs.previous;
+		}
 
 		file_diff diff(unsigned char digits = 2) const noexcept {
 			auto const curr = current.calc(digits);

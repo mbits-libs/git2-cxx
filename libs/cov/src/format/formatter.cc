@@ -147,30 +147,10 @@ namespace cov::placeholder {
 			return fmt::format_to(out, "{:>3}%", stats.calc(0).whole);
 		}
 
-		static auto apply_mark(io::v1::coverage_stats const& stats,
-		                       rating const& marks) {
-			if (!stats.relevant || !marks.incomplete.den || !marks.passing.den)
-				return translatable::mark_failing;
-			auto const gcd_1 = std::gcd(stats.relevant, stats.covered);
-			auto const cov = stats.covered / gcd_1;
-			auto const rel = stats.relevant / gcd_1;
-
-			auto const incomplete = marks.incomplete.gcd();
-			auto const lhs = cov * incomplete.den;
-			auto const rhs = incomplete.num * rel;
-			// if ((cov * incomplete.den) < (incomplete.num * rel))
-			if (lhs < rhs) return translatable::mark_failing;
-
-			auto const passing = marks.passing.gcd();
-			if ((cov * passing.den) < (passing.num * rel))
-				return translatable::mark_incomplete;
-			return translatable::mark_passing;
-		}
-
 		iterator format_rating(iterator out,
 		                       io::v1::coverage_stats const& stats,
 		                       internal_context const& ctx) {
-			auto mark = apply_mark(stats, ctx.client->marks);
+			auto mark = formatter::apply_mark(stats, ctx.client->marks);
 			return format_str(out, ctx.translate(mark));
 		}
 
@@ -525,12 +505,6 @@ namespace cov::placeholder {
 		                                                    : pass;
 	}
 
-#define MARK_COLOR(...)                                                        \
-	if (clr == color::__VA_ARGS__##rating)                                     \
-		clr = mark_color(mark, color::__VA_ARGS__##green,                      \
-		                 color::__VA_ARGS__##yellow, color::__VA_ARGS__##red); \
-	else
-
 	iterator report_view::format(iterator out,
 	                             internal_context& ctx,
 	                             color clr) const {
@@ -538,11 +512,7 @@ namespace cov::placeholder {
 		if (ctx.client->colorize) {
 			if (clr == color::rating || clr == color::bold_rating ||
 			    clr == color::faint_rating || clr == color::bg_rating) {
-				auto const mark = apply_mark(*stats, ctx.client->marks);
-				MARK_COLOR()
-				MARK_COLOR(bold_)
-				MARK_COLOR(faint_)
-				MARK_COLOR(bg_) {}
+				clr = formatter::apply_mark(clr, *stats, ctx.client->marks);
 			}
 			out = format_str(
 			    out,
@@ -582,5 +552,51 @@ namespace cov {
 			report.format_with(std::back_inserter(result), int_ctx, fmt);
 
 		return result;
+	}
+
+	translatable formatter::apply_mark(io::v1::coverage_stats const& stats,
+	                                   placeholder::rating const& marks) {
+		if (!stats.relevant || !marks.incomplete.den || !marks.passing.den)
+			return translatable::mark_failing;
+		auto const gcd_1 = std::gcd(stats.relevant, stats.covered);
+		auto const cov = stats.covered / gcd_1;
+		auto const rel = stats.relevant / gcd_1;
+
+		auto const incomplete = marks.incomplete.gcd();
+		auto const lhs = cov * incomplete.den;
+		auto const rhs = incomplete.num * rel;
+		// if ((cov * incomplete.den) < (incomplete.num * rel))
+		if (lhs < rhs) return translatable::mark_failing;
+
+		auto const passing = marks.passing.gcd();
+		if ((cov * passing.den) < (passing.num * rel))
+			return translatable::mark_incomplete;
+		return translatable::mark_passing;
+	}
+
+#define MARK_COLOR(...)                                    \
+	case color::__VA_ARGS__##rating:                       \
+		return mark_color(mark, color::__VA_ARGS__##green, \
+		                  color::__VA_ARGS__##yellow,      \
+		                  color::__VA_ARGS__##red);
+
+	placeholder::color formatter::apply_mark(
+	    placeholder::color clr,
+	    io::v1::coverage_stats const& stats,
+	    placeholder::rating const& marks) {
+		using placeholder::color;
+		if (clr == color::rating || clr == color::bold_rating ||
+		    clr == color::faint_rating || clr == color::bg_rating) {
+			auto const mark = apply_mark(stats, marks);
+			switch (clr) {
+				MARK_COLOR()
+				MARK_COLOR(bold_)
+				MARK_COLOR(faint_)
+				MARK_COLOR(bg_)
+				default:    // GCOV_EXCL_LINE
+					break;  // GCOV_EXCL_LINE
+			}
+		}
+		return clr;
 	}
 }  // namespace cov

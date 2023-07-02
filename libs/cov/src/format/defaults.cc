@@ -138,39 +138,6 @@ namespace cov {
 
 				return ratio{*numerator, *denominator}.gcd();
 			}
-
-			rating rating_from(cov::repository const& repo) {
-				auto const value = repo.config().get_string("core.rating");
-				if (value) {
-					auto const view = std::string_view{*value};
-					auto const pos = view.find(',');
-					if (pos != std::string_view::npos) {
-						auto const one = ratio_from(view.substr(0, pos));
-						auto const other = ratio_from(view.substr(pos + 1));
-						if (one && other) {
-							auto const nums_gcd =
-							    std::gcd(one->num, other->num);
-							auto const dens_gcd =
-							    std::gcd(one->den, other->den);
-							auto const one_gcd =
-							    ratio{one->num / nums_gcd, one->den / dens_gcd};
-							auto const other_gcd = ratio{other->num / nums_gcd,
-							                             other->den / dens_gcd};
-
-							if ((one_gcd.num * other_gcd.den) >
-							    (other_gcd.num * one_gcd.den)) {
-								// one > other
-								return {.incomplete = *other, .passing = *one};
-							}
-							// one <= other
-							return {.incomplete = *one, .passing = *other};
-						}
-					}
-				}
-
-				// default: 75% and 90%
-				return {.incomplete = {3, 4}, .passing = {9, 10}};
-			}
 		}  // namespace
 
 		context context::from(cov::repository const& repo,
@@ -195,6 +162,37 @@ namespace cov {
 			        .marks = rating_from(repo),
 			        .colorize = colorize,
 			        .decorate = decorate == use_feature::yes};
+		}
+
+		rating context::rating_from(cov::repository const& repo) {
+			auto const value = repo.config().get_string("core.rating");
+			if (value) {
+				auto const view = std::string_view{*value};
+				auto const pos = view.find(',');
+				if (pos != std::string_view::npos) {
+					auto const one = ratio_from(view.substr(0, pos));
+					auto const other = ratio_from(view.substr(pos + 1));
+					if (one && other) {
+						auto const nums_gcd = std::gcd(one->num, other->num);
+						auto const dens_gcd = std::gcd(one->den, other->den);
+						auto const one_gcd =
+						    ratio{one->num / nums_gcd, one->den / dens_gcd};
+						auto const other_gcd =
+						    ratio{other->num / nums_gcd, other->den / dens_gcd};
+
+						if ((one_gcd.num * other_gcd.den) >
+						    (other_gcd.num * one_gcd.den)) {
+							// one > other
+							return {.incomplete = *other, .passing = *one};
+						}
+						// one <= other
+						return {.incomplete = *one, .passing = *other};
+					}
+				}
+			}
+
+			// default: 75% and 90%
+			return {.incomplete = {3, 4}, .passing = {9, 10}};
 		}
 	}  // namespace placeholder
 
