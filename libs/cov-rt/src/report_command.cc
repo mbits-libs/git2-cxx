@@ -166,7 +166,7 @@ namespace cov::app::builtin::report {
 					if (HEAD_2.tip) result.tip = *HEAD_2.tip;
 					result.same_report = true;
 					break;
-				}
+				}  // GCOV_EXCL_LINE[WIN32]
 			}
 
 			auto const report_obj = cov::report::create(
@@ -179,8 +179,7 @@ namespace cov::app::builtin::report {
 				// GCOV_EXCL_START
 				[[unlikely]];
 				data_error(replng::ERROR_CANNOT_WRITE_TO_DB);
-				// GCOV_EXCL_STOP
-			}
+			}  // GCOV_EXCL_STOP
 
 			if (repo.update_current_head(result.tip, HEAD)) {
 				size_t size = HEAD.branch.size();
@@ -272,7 +271,7 @@ namespace cov::app::builtin::report {
 		for (auto it = begin; it != end; ++it) {
 			if (first)
 				first = false;
-			else
+			else                        // GCOV_EXCL_LINE
 				result.append(", "sv);  // GCOV_EXCL_LINE
 			result.append(quoted(*it));
 		}
@@ -309,8 +308,7 @@ namespace cov::app::builtin::report {
 			// GCOV_EXCL_START
 			[[unlikely]];
 			p.data_error(replng::ERROR_CANNOT_WRITE_TO_DB);
-			// GCOV_EXCL_STOP
-		}
+		}  // GCOV_EXCL_STOP
 
 		if ((stg.flags & text::in_repo) != text::in_repo ||
 		    (stg.flags & text::mismatched) == text::mismatched) {
@@ -324,8 +322,7 @@ namespace cov::app::builtin::report {
 				// infeasible
 				[[unlikely]];
 				p.data_error(replng::ERROR_BARE_GIT);
-				// GCOV_EXCL_STOP
-			}
+			}  // GCOV_EXCL_STOP
 
 			auto const opened =
 			    io::fopen(make_u8path(*workdir) / make_u8path(info.name), "r");
@@ -334,16 +331,14 @@ namespace cov::app::builtin::report {
 				// same here: we read this file once already...
 				[[unlikely]];
 				p.data_error(replng::ERROR_CANNOT_OPEN_FILE, info.name);
-				// GCOV_EXCL_STOP
-			}
+			}  // GCOV_EXCL_STOP
 
 			auto bytes = opened.read();
 			if (!store_contents(repo, {bytes.data(), bytes.size()})) {
 				// GCOV_EXCL_START
 				[[unlikely]];
 				p.data_error(replng::ERROR_CANNOT_WRITE_TO_DB);
-				// GCOV_EXCL_STOP
-			}
+			}  // GCOV_EXCL_STOP
 		}
 	}
 

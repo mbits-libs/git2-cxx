@@ -251,7 +251,8 @@ class runner:
         print_args(*args)
         if runner.DRY_RUN:
             return
-        args = (shutil.which(args[0]), *args[1:])
+        found = shutil.which(args[0])
+        args = (found if found is not None else args[0], *args[1:])
         proc = subprocess.run(args, check=False)
         if proc.returncode != 0:
             sys.exit(1)

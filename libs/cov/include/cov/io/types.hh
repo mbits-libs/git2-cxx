@@ -57,12 +57,14 @@ namespace cov::io {
 	struct timestamp {
 		uint32_t hi;
 		uint32_t lo;
+		// GCOV_EXCL_START[Clang]
 		[[deprecated("use operator=(sys_seconds)")]] timestamp& operator=(
 		    uint64_t time) noexcept {
 			hi = static_cast<uint32_t>((time >> 32) & 0xFFFF'FFFF);
 			lo = static_cast<uint32_t>((time)&0xFFFF'FFFF);
 			return *this;
 		}
+		// GCOV_EXCL_STOP
 		timestamp& operator=(sys_seconds seconds) noexcept {
 			auto const time =
 			    static_cast<uint64_t>(seconds.time_since_epoch().count());
@@ -70,10 +72,12 @@ namespace cov::io {
 			lo = static_cast<uint32_t>((time)&0xFFFF'FFFF);
 			return *this;
 		}
+		// GCOV_EXCL_START[Clang]
 		[[deprecated("use to_seconds()")]] uint64_t to_time_t() const noexcept {
 			return (static_cast<uint64_t>(hi) << 32) |
 			       static_cast<uint64_t>(lo);
 		}
+		// GCOV_EXCL_STOP
 		sys_seconds to_seconds() const noexcept {
 			return sys_seconds{seconds{(static_cast<uint64_t>(hi) << 32) |
 			                           static_cast<uint64_t>(lo)}};

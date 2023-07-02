@@ -241,8 +241,7 @@ namespace cov {
 			return cmp < 0;
 		// equivalent:
 		return false;
-		// GCOV_EXCL_STOP
-	}
+	}  // GCOV_EXCL_STOP
 
 	std::vector<file_stats> repository::diff_betwen_reports(
 	    ref_ptr<report> const& newer,

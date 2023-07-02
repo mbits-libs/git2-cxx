@@ -498,6 +498,7 @@ namespace hl::cxx::parser {
 	using namespace hl::cxx::parser::callbacks;
 	using namespace cell;
 
+	// GCOV_EXCL_START[Clang] -- ran at compile time, nothing to report
 	static constexpr auto operator""_ident(const char* str, size_t len) {
 		return string_token{std::string_view(str, len)}[on_identifier];
 	}
@@ -509,6 +510,7 @@ namespace hl::cxx::parser {
 	static constexpr auto operator""_kw(const char* str, size_t len) {
 		return string_token{std::string_view(str, len)}[on_keyword];
 	}
+	// GCOV_EXCL_STOP
 
 	// clang-format off
 	// leave the rules in semi-readable state.
@@ -935,10 +937,12 @@ namespace hl::cxx::parser {
 		}
 	};
 
+	// GCOV_EXCL_START[Clang] -- ran at compile time, nothing to report
 	template <typename Wrapped>
 	constexpr wrapped<Wrapped> wrap(const Wrapped& inner) {
 		return inner;
 	}
+	// GCOV_EXL_STOP
 
 	// clang-format off
 	constexpr auto pp_include = wrap([] {

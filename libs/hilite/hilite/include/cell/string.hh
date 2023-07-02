@@ -31,10 +31,12 @@ namespace cell {
 		}
 	};
 
+	// GCOV_EXCL_START[Clang] -- ran at compile time, nothing to report
 	template <size_t Length>
 	constexpr string_token lit(const char (&view)[Length]) {
 		return std::string_view(view, Length - 1);
 	}
+	// GCOV_EXCL_STOP
 
 	namespace ext {
 		template <size_t Length>

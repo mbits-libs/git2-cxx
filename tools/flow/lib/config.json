@@ -35,7 +35,6 @@
     {
       "os": "ubuntu",
       "build_type": "Debug",
-      "compiler": "gcc",
       "coverage": true
     },
     {

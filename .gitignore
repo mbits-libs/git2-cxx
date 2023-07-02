@@ -36,3 +36,4 @@ build/
 *.pyc
 web.log
 super-linter.log
+*.profraw

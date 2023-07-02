@@ -42,8 +42,7 @@ namespace cov::app::builtin::report {
 			// GCOV_EXCL_START
 			[[unlikely]];
 			p.data_error(replng::ERROR_CANNOT_WRITE_TO_DB);
-			// GCOV_EXCL_STOP
-		}
+		}  // GCOV_EXCL_STOP
 
 		auto coverage = io::v1::coverage_stats::init();
 		for (auto const& file : files) {
@@ -63,8 +62,7 @@ namespace cov::app::builtin::report {
 			// GCOV_EXCL_START
 			[[unlikely]];
 			p.data_error(replng::ERROR_CANNOT_READ_FROM_DB);
-			// GCOV_EXCL_STOP
-		}
+		}  // GCOV_EXCL_STOP
 
 		p.print_report(branch, files.size(), *resulting);
 

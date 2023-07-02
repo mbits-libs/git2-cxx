@@ -42,9 +42,6 @@ namespace hl {
 	public:
 		void emit(std::size_t start, std::size_t end, token kind) {
 			switch (kind) {
-				/*case hl::cxx::token::deleted_newline:
-					eol(start + 1, end);
-					return;*/
 				case token::newline:
 					endlines_.push_back({end, end - start});
 					return;

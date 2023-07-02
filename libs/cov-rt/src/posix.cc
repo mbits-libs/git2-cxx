@@ -15,6 +15,10 @@ extern "C" {
 }
 #endif
 
+#ifdef RUNNING_LLVM_COV
+extern "C" int __llvm_profile_write_file(void);
+#endif
+
 namespace cov::app::platform {
 	namespace {
 		[[noreturn]] void spawn(std::filesystem::path const& bin,
@@ -35,9 +39,12 @@ namespace cov::app::platform {
 				argv.push_back(const_cast<char*>(args[i].data()));
 			argv.push_back(nullptr);
 
-#ifdef RUNNING_GCOV
 			// since we plan to go away...
+#ifdef RUNNING_GCOV
 			__gcov_dump();
+#endif
+#ifdef RUNNING_LLVM_COV
+			__llvm_profile_write_file();
 #endif
 			// GCOV_EXCL_START[POSIX]
 			execv(program_path.c_str(), argv.data());
@@ -188,8 +195,7 @@ namespace cov::app::platform {
 				[[unlikely]];
 				result.return_code = 128;
 				return result;
-				// GCOV_EXCL_STOP
-			}
+			}  // GCOV_EXCL_STOP
 
 			pid = fork();
 			if (pid < 0) {
@@ -197,8 +203,7 @@ namespace cov::app::platform {
 				[[unlikely]];
 				result.return_code = -errno;
 				return result;
-				// GCOV_EXCL_STOP
-			}
+			}  // GCOV_EXCL_STOP
 			if (!pid) {
 				if (cwd) {
 					std::error_code ignore{};
