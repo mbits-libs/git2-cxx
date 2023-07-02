@@ -85,7 +85,7 @@ namespace cov::testing {
 		std::fputs(actual.c_str(), stdout);
 		std::fputc('\n', stdout);
 		ASSERT_EQ(expected.nocolor, actual);
-	}  // namespace cov::testing
+	}
 
 	TEST_P(format_color, shell) {
 		auto const& [_, tmplt, expected, tweaks] = GetParam();
@@ -115,7 +115,43 @@ namespace cov::testing {
 		std::fputs(actual.c_str(), stdout);
 		std::fputc('\n', stdout);
 		ASSERT_EQ(expected.shell, actual);
-	}  // namespace cov::testing
+	}
+
+	TEST(format_color, apply_mark) {
+		using placeholder::color;
+		placeholder::rating rating{.incomplete{75, 100}, .passing{9, 10}};
+		struct mark_info {
+			color clr, expected;
+			io::v1::coverage_stats stats;
+		};
+
+		static constexpr mark_info marks[] = {
+		    {
+		        .clr = color::rating,
+		        .expected = color::green,
+		        .stats{.total{}, .relevant{100}, .covered{100}},
+		    },
+		    {
+		        .clr = color::bg_rating,
+		        .expected = color::bg_yellow,
+		        .stats{.total{}, .relevant{100}, .covered{89}},
+		    },
+		    {
+		        .clr = color::faint_rating,
+		        .expected = color::faint_red,
+		        .stats{.total{}, .relevant{100}, .covered{70}},
+		    },
+		    {
+		        .clr = color::blue,
+		        .expected = color::blue,
+		        .stats{.total{}, .relevant{100}, .covered{70}},
+		    }};
+
+		for (auto const [clr, expected, stats] : marks) {
+			auto const actual = formatter::apply_mark(clr, stats, rating);
+			EXPECT_EQ(expected, actual);
+		}
+	}
 
 	using days = std::chrono::duration<
 	    std::chrono::hours::rep,

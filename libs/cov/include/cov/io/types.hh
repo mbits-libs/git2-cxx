@@ -146,13 +146,73 @@ namespace cov::io {
 			inline static coverage_stats stats(
 			    std::vector<coverage> const& lines) noexcept;
 
+			template <typename Int>
+			using Ordering =
+			    decltype(std::declval<Int>() <=> std::declval<Int>());
+			template <typename Int>
+			using IntMax = std::conditional_t<std::is_signed_v<Int>,
+			                                  std::intmax_t,
+			                                  std::uintmax_t>;
+
 			template <typename Int = unsigned>
 			struct ratio {
 				Int whole;
-				unsigned fraction;
+				Int fraction;
 				unsigned digits;
 
-				auto operator<=>(ratio const&) const noexcept = default;
+				auto operator<=>(ratio const& rhs) const noexcept {
+					using intmax = IntMax<Int>;
+					using ordering =
+					    std::common_type_t<Ordering<Int>, Ordering<intmax>>;
+
+					if (auto const cmp =
+					        static_cast<ordering>(whole <=> rhs.whole);
+					    cmp != 0)
+						return cmp;
+
+					if constexpr (std::is_signed_v<Int>) {
+						if ((fraction < 0) != (rhs.fraction < 0))
+							return static_cast<ordering>(fraction <=>
+							                             rhs.fraction);
+					}
+
+					auto lhs_fraction = static_cast<intmax>(fraction);
+					auto rhs_fraction = static_cast<intmax>(rhs.fraction);
+					if (digits < rhs.digits) {
+						auto const level_diff =
+						    static_cast<intmax>(pow10(1, rhs.digits - digits));
+						lhs_fraction *= level_diff;
+					} else if (rhs.digits < digits) {
+						auto const level_diff =  // GCOV_EXCL_LINE[GCC]
+						    static_cast<intmax>(pow10(1, digits - rhs.digits));
+						rhs_fraction *= level_diff;
+					}
+
+					return static_cast<ordering>(lhs_fraction <=> rhs_fraction);
+				}
+
+				bool operator==(ratio const& rhs) const noexcept {
+					using intmax = IntMax<Int>;
+					if (whole != rhs.whole) return false;
+
+					if constexpr (std::is_signed_v<Int>) {
+						if ((fraction < 0) != (rhs.fraction < 0)) return false;
+					}
+
+					auto lhs_fraction = static_cast<intmax>(fraction);
+					auto rhs_fraction = static_cast<intmax>(rhs.fraction);
+					if (digits < rhs.digits) {
+						auto const level_diff =
+						    static_cast<intmax>(pow10(1, rhs.digits - digits));
+						lhs_fraction *= level_diff;
+					} else if (rhs.digits < digits) {
+						auto const level_diff =  // GCOV_EXCL_LINE[GCC]
+						    static_cast<intmax>(pow10(1, digits - rhs.digits));
+						rhs_fraction *= level_diff;
+					}
+
+					return lhs_fraction == rhs_fraction;
+				}
 			};
 
 			static constexpr std::uintmax_t pow10(std::uintmax_t value,
@@ -166,7 +226,7 @@ namespace cov::io {
 			}
 
 			constexpr ratio<> calc(unsigned char digits = 0) const noexcept {
-				if (!relevant) return {0, 0, 1};
+				if (!relevant) return {0, 0, digits};
 
 				auto const divider = pow10(1, digits);
 				auto out = covered * 100 * divider;
@@ -226,7 +286,8 @@ namespace cov::io {
 			    neg ? older_val - newer_val : newer_val - older_val, ceil);
 
 			auto const ret = static_cast<int>(abs / multiplier);
-			return {neg ? -ret : ret, static_cast<unsigned>(abs % multiplier),
+			auto const fraction = static_cast<int>(abs % multiplier);
+			return {neg ? -ret : ret, neg && !ret ? -fraction : fraction,
 			        digits};
 		}
 
@@ -373,3 +434,46 @@ namespace cov::io {
 
 	};  // namespace v1
 }  // namespace cov::io
+
+namespace fmt {
+	template <typename Int>
+	struct formatter<cov::io::v1::coverage_stats::ratio<Int>> {
+		bool with_sign{false};
+
+		FMT_CONSTEXPR auto parse(format_parse_context& ctx)
+		    -> decltype(ctx.begin()) {
+			auto it = ctx.begin(), end = ctx.end();
+			if (it != end && (*it == '+' || *it == '-')) {
+				with_sign = *it++ == '+';
+			}
+
+			while (it != end && *it != '}')
+				++it;
+			return it;
+		}
+
+		template <typename FormatContext>
+		FMT_CONSTEXPR auto format(
+		    cov::io::v1::coverage_stats::ratio<Int> const& ratio,
+		    FormatContext& ctx) const -> decltype(ctx.out()) {
+			if constexpr (std::signed_integral<Int>) {
+				if (!ratio.whole && ratio.fraction < 0)
+					return fmt::format_to(ctx.out(), "-0.{:0{}}",
+					                      -ratio.fraction, ratio.digits);
+				if (with_sign) {
+					return fmt::format_to(
+					    ctx.out(), "{}{}.{:0{}}", ratio.whole < 0 ? '-' : '+',
+					    ratio.whole < 0 ? -ratio.whole : ratio.whole,
+					    ratio.fraction, ratio.digits);
+				}
+			} else {
+				if (with_sign) {
+					return fmt::format_to(ctx.out(), "+{}.{:0{}}", ratio.whole,
+					                      ratio.fraction, ratio.digits);
+				}
+			}
+			return fmt::format_to(ctx.out(), "{}.{:0{}}", ratio.whole,
+			                      ratio.fraction, ratio.digits);
+		}
+	};
+}  // namespace fmt
