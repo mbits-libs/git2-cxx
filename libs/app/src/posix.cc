@@ -7,12 +7,6 @@
 #include <cstdlib>
 #include <filesystem>
 
-#ifdef RUNNING_GCOV
-extern "C" {
-#include <gcov.h>
-}
-#endif
-
 namespace cov::app::platform {
 	std::filesystem::path exec_path() {
 		using namespace std::literals;

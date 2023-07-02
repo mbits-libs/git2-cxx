@@ -42,8 +42,7 @@ namespace cov {
 				// however, this would require messing with covdata directory,
 				// which would be detected by create_directories below
 				return ec;
-				// GCOV_EXCL_STOP
-			}
+			}  // GCOV_EXCL_STOP
 
 			return cfg.set_path(names::core_gitdir,
 			                    rel_path(git_dir, base_dir));
@@ -77,8 +76,7 @@ namespace cov {
 			// GCOV_EXCL_START -- untestable without a create_directories
 			// already reporting an error
 			return result;
-			// GCOV_EXCL_STOP
-		}
+		}  // GCOV_EXCL_STOP
 
 		if (auto const touch = io::fopen(base_dir / names::HEAD, "wb");
 		    !touch) {

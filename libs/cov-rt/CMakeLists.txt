@@ -47,8 +47,12 @@ target_link_libraries(cov-rt PUBLIC app json)
 
 set_target_properties(cov-rt PROPERTIES FOLDER libs)
 
-if (cov_COVERALLS AND NOT MSVC)
-  target_compile_options(cov-rt PRIVATE -DRUNNING_GCOV=1)
+if (cov_COVERALLS)
+  if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    target_compile_options(cov-rt PRIVATE -DRUNNING_GCOV=1)
+  elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    target_compile_options(cov-rt PRIVATE -DRUNNING_LLVM_COV=1)
+  endif()
 endif()
 
 if (COV_TESTING)

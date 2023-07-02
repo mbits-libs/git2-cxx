@@ -83,8 +83,7 @@ namespace cov {
 			// GCOV_EXCL_START
 			buffer.push_back(0);
 			std::fputs(buffer.data(), f);
-			// GCOV_EXCL_STOP
-		}
+		}  // GCOV_EXCL_STOP
 	}
 
 	std::string data_table::format() const {
@@ -125,5 +124,5 @@ namespace cov {
 		}
 
 		return col_widths;
-	}
+	}  // GCOV_EXCL_LINE[GCC]
 }  // namespace cov

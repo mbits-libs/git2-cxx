@@ -192,8 +192,7 @@ namespace cov::app::module {
 				parser_.error(fmt::format(
 				    fmt::runtime(tr_(modcnt::ERROR_OPTS_NEEDS_AT_LEAST, min)),
 				    visitor.visit(name_of(op.cmd)), min));
-				// GCOV_EXCL_STOP
-			}
+			}  // GCOV_EXCL_STOP
 		}
 
 		if (ops.empty()) ops.push_back({command::show});
@@ -205,7 +204,7 @@ namespace cov::app::module {
 		if (ec) {
 			[[unlikely]];    // GCOV_EXCL_LINE
 			error(ec, tr_);  // GCOV_EXCL_LINE
-		}
+		}                    // GCOV_EXCL_LINE
 		auto const covdir = cov::repository::discover(cwd, ec);
 		if (!covdir.empty()) {
 			ec.clear();
@@ -251,7 +250,7 @@ namespace cov::app::module {
 		if (ec || !mods) {
 			[[unlikely]];         // GCOV_EXCL_LINE
 			mods = make_empty();  // GCOV_EXCL_LINE
-		}
+		}                         // GCOV_EXCL_LINE
 		return mods;
 	}
 
@@ -278,7 +277,7 @@ namespace cov::app::module {
 		if (ec || !mods) {
 			[[unlikely]];         // GCOV_EXCL_LINE
 			mods = make_empty();  // GCOV_EXCL_LINE
-		}
+		}                         // GCOV_EXCL_LINE
 		return mods;
 	}
 

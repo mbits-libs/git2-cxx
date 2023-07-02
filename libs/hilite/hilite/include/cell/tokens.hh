@@ -79,6 +79,7 @@ namespace cell {
 		}
 
 	private:
+		// GCOV_EXCL_START[Clang] -- ran at compile-time
 		template <class T>
 		static constexpr void swap(T& l, T& r) {
 			T tmp = std::move(l);
@@ -98,6 +99,7 @@ namespace cell {
 				sort_impl(m + 1, right);
 			}
 		}
+		// GCOV_EXCL_STOP
 	};
 
 	struct set_entry {

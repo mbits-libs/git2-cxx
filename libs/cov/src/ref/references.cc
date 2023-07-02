@@ -233,8 +233,8 @@ namespace cov {
 			if (result) result = out.store({&endl, 1});
 			if (result) result = out.commit() == std::error_code{};
 			if (!result) {
-				out.rollback();  // GCOV_EXCL_LINE[GCC] -- untestable
-			}
+				out.rollback();  // GCOV_EXCL_LINE[GCC, Clang] -- untestable
+			}                    // GCOV_EXCL_LINE[Clang]
 			return result;
 		}
 		std::filesystem::path root_;

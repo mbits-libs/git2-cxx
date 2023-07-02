@@ -43,13 +43,15 @@ namespace lighter {
 			friend constexpr cell::map_entry<Value> operator+(
 			    key_t const& key,
 			    Value const& value) noexcept {
+				// GCOV_EXCL_START[Clang] -- ran at compile-time
 				return cell::map_entry<Value>(key.value, value);
-			}
+			}  // GCOV_EXCL_STOP
 		};
 
 		constexpr key_t operator""_k(const char* key, size_t length) noexcept {
+			// GCOV_EXCL_START[Clang] -- ran at compile-time
 			return key_t{std::string_view{key, length}};
-		}
+		}  // GCOV_EXCL_STOP
 
 		// GCOV_EXCL_START
 		std::string_view none_to_string(unsigned) noexcept { return {}; }

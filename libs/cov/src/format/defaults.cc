@@ -303,7 +303,7 @@ namespace cov {
 			case translatable::mark_passing:
 				return "pass";
 		}
-		// all enums are handled above
+		// all enums are handled above:   GCOV_EXCL_LINE
 		return std::to_string(count);  // GCOV_EXCL_LINE
 	}
 }  // namespace cov
