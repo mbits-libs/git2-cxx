@@ -2,10 +2,12 @@
 // This code is licensed under MIT license (see LICENSE for details)
 
 #include <cov/module.hh>
+#include <cov/repository.hh>
 #include <git2/blob.hh>
 #include <git2/commit.hh>
 #include <map>
 #include <unordered_set>
+#include "path-utils.hh"
 
 #define CHECK(EXPR)                            \
 	do {                                       \
@@ -282,6 +284,44 @@ namespace cov {
 		UNLIKELY(ec);
 
 		return from_config(cfg, ec);
+	}
+
+	static inline bool HEAD_reported(git::repository_handle handle,
+	                                 git_oid const& ref) {
+		std::error_code ec{};
+		CHECK_OBJ(head_ref, handle.head(ec));
+		CHECK_OBJ(resolved, head_ref.resolve(ec));
+		auto oid = git_reference_target(resolved.raw());
+		return oid && git_oid_equal(oid, &ref);
+	}
+
+	static inline ref_ptr<modules> modules_from_workdir(
+	    git::repository_handle handle) {
+		auto const workdir = handle.workdir();
+		if (!workdir) return {};
+
+		auto cfg = git::config::create();
+		auto const ec =
+		    cfg.add_file_ondisk(make_path(*workdir) / ".covmodule"sv);
+		UNLIKELY(ec);
+
+		std::error_code secondary{};
+		auto mods = cov::modules::from_config(cfg, secondary);
+		if (secondary) return {};
+
+		return mods;
+	}
+
+	ref_ptr<modules> modules::from_report(git_oid const& ref,
+	                                      repository const& repo,
+	                                      std::error_code& ec) {
+		auto handle = repo.git();
+		CHECK_OBJ(report, repo.lookup<cov::report>(ref, ec));
+		if (HEAD_reported(handle, report->commit())) {
+			auto result = modules_from_workdir(handle);
+			if (result) return result;
+		}  // GCOV_EXCL_LINE[WIN32]
+		return from_commit(report->commit(), handle, ec);
 	}
 
 #undef UNLIKELY

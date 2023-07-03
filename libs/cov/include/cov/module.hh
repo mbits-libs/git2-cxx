@@ -14,6 +14,8 @@
 #include <vector>
 
 namespace cov {
+	struct repository;
+
 	struct module_info {
 		std::string name;
 		std::vector<std::string> prefixes;
@@ -60,6 +62,9 @@ namespace cov {
 		                                    std::error_code& ec);
 		static ref_ptr<modules> from_commit(git_oid const& commit,
 		                                    git::repository_handle const& repo,
+		                                    std::error_code& ec);
+		static ref_ptr<modules> from_report(git_oid const& report,
+		                                    repository const& repo,
 		                                    std::error_code& ec);
 
 		static void cleanup_config(std::filesystem::path const&);

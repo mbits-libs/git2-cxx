@@ -5,6 +5,7 @@
 #include <git2/signature.h>
 #include <gtest/gtest.h>
 #include <cov/module.hh>
+#include <cov/repository.hh>
 #include <fstream>
 #include <git2/blob.hh>
 #include <git2/commit.hh>
@@ -92,6 +93,19 @@ namespace cov::testing {
 	    {"hilite \xc2\xbb c++"s, {"libs/hilite/hilite-cxx"s}},
 	    {"hilite \xc2\xbb python"s, {"libs/hilite/hilite-py3"s}},
 	    {"hilite \xc2\xbb type script"s, {"libs/hilite/hilite-ts"s}},
+	};
+
+	static constexpr auto modified_project = R"x([module]
+    sep = " :: "
+[module "git2 (c++)"]
+    path = libs/git2-c++
+[module "cov :: API"]
+    path = libs/cov
+)x"sv;
+
+	static std::vector<module_info> const modified_project_modules{
+	    {"git2 (c++)"s, {"libs/git2-c++"s}},
+	    {"cov :: API"s, {"libs/cov"s}},
 	};
 
 	static std::vector<std::string_view> const all_files{
@@ -202,6 +216,47 @@ namespace cov::testing {
 	    "libs/hilite/hilite/src/none.cc"sv,
 	    "libs/hilite/lighter/src/lighter.cc"sv,
 	    "libs/hilite/lighter/src/hilite/lighter.hh"sv};
+
+	std::error_code commit_dot_modules(git_oid& commit_id,
+	                                   git_oid const* parent_id,
+	                                   git::repository_handle const& repo,
+	                                   std::string_view file_text,
+	                                   const char* message) {
+		std::error_code ec;
+
+		git_oid modules_id{};
+		ec = git::as_error(git_blob_create_from_buffer(
+		    &modules_id, repo.get(), file_text.data(), file_text.size()));
+		if (ec) return ec;
+
+		auto builder = git::treebuilder::create(ec, repo);
+		if (ec) return ec;
+
+		ec = builder.insert(".covmodule", modules_id, GIT_FILEMODE_BLOB);
+		if (ec) return ec;
+
+		git_oid tree_id{};
+		ec = builder.write(tree_id);
+		if (ec) return ec;
+
+		auto tree = repo.lookup<git::tree>(tree_id, ec);
+		if (ec) return ec;
+
+		auto johny_appleseed =
+		    git::signature_now("Johnny Appleseed", "johnny@appleseed.com", ec);
+
+		git::commit prev_commit{};
+		if (parent_id) {
+			prev_commit = repo.lookup<git::commit>(*parent_id, ec);
+			if (ec) return ec;
+		}
+		git_commit const* parents[] = {prev_commit.raw()};
+
+		return git::as_error(git_commit_create(
+		    &commit_id, repo.get(), "HEAD", johny_appleseed.raw(),
+		    johny_appleseed.raw(), "UTF-8", message, tree.raw(),
+		    prev_commit ? 1 : 0, parents));
+	}
 
 	struct simple_view {
 		std::string_view name;
@@ -397,37 +452,124 @@ namespace cov::testing {
 		ASSERT_FALSE(ec) << message{ec};
 
 		git_oid commit_id{};
-		{
-			git_oid modules_id{};
-			ec = git::as_error(git_blob_create_from_buffer(
-			    &modules_id, repo.get(), this_project.data(),
-			    this_project.size()));
-			ASSERT_FALSE(ec) << message{ec};
-
-			auto builder = git::treebuilder::create(ec, repo);
-			ASSERT_FALSE(ec) << message{ec};
-
-			ec = builder.insert(".covmodule", modules_id, GIT_FILEMODE_BLOB);
-			ASSERT_FALSE(ec) << message{ec};
-
-			git_oid tree_id{};
-			ec = builder.write(tree_id);
-			ASSERT_FALSE(ec) << message{ec};
-
-			auto tree = repo.lookup<git::tree>(tree_id, ec);
-			ASSERT_FALSE(ec) << message{ec};
-
-			auto johny_appleseed = git::signature_now(
-			    "Johnny Appleseed", "johnny@appleseed.com", ec);
-
-			ec = git::as_error(git_commit_create(
-			    &commit_id, repo.get(), "HEAD", johny_appleseed.raw(),
-			    johny_appleseed.raw(), "UTF-8", "Add the cov modules",
-			    tree.raw(), 0, nullptr));
-			ASSERT_FALSE(ec) << message{ec};
-		}
+		ec = commit_dot_modules(commit_id, nullptr, repo, this_project,
+		                        "Add the cov modules");
 
 		auto const mods = cov::modules::from_commit(commit_id, repo, ec);
+		ASSERT_FALSE(ec) << message{ec};
+		ASSERT_TRUE(mods);
+
+		ASSERT_EQ(project_modules, mods->entries());
+	}
+
+	TEST(module_decl, from_report_at_HEAD) {
+		git::init memory{};
+
+		remove_all(setup::test_dir() / "modules-at-HEAD"sv);
+
+		std::error_code ec{};
+		auto repo = git::repository::init(
+		    setup::test_dir() / "modules-at-HEAD"sv, false, ec);
+		ASSERT_FALSE(ec) << message{ec};
+
+		auto cov_repo = cov::repository::init(
+		    setup::test_dir() / "sysroot"sv,
+		    setup::test_dir() / "modules-at-HEAD/.git/.covdata"sv,
+		    setup::test_dir() / "modules-at-HEAD/.git"sv, ec);
+		ASSERT_FALSE(ec) << message{ec};
+
+		git_oid commit_id{};
+		ec = commit_dot_modules(commit_id, nullptr, repo, this_project,
+		                        "Add the cov modules");
+		ASSERT_FALSE(ec) << message{ec};
+
+		git_oid report_id{};
+		{
+			auto report = cov::report::create({}, {}, commit_id, {}, {}, {}, {},
+			                                  {}, {}, {});
+			ASSERT_TRUE(cov_repo.write(report_id, report));
+		}
+
+		std::ofstream{setup::test_dir() / "modules-at-HEAD/.covmodule"sv}
+		    << modified_project;
+
+		auto const mods = cov::modules::from_report(report_id, cov_repo, ec);
+		ASSERT_FALSE(ec) << message{ec};
+		ASSERT_TRUE(mods);
+
+		ASSERT_EQ(modified_project_modules, mods->entries());
+	}
+
+	TEST(module_decl, from_report_at_HEAD_no_file) {
+		git::init memory{};
+
+		remove_all(setup::test_dir() / "modules-at-HEAD"sv);
+
+		std::error_code ec{};
+		auto repo = git::repository::init(
+		    setup::test_dir() / "modules-at-HEAD"sv, false, ec);
+		ASSERT_FALSE(ec) << message{ec};
+
+		auto cov_repo = cov::repository::init(
+		    setup::test_dir() / "sysroot"sv,
+		    setup::test_dir() / "modules-at-HEAD/.git/.covdata"sv,
+		    setup::test_dir() / "modules-at-HEAD/.git"sv, ec);
+		ASSERT_FALSE(ec) << message{ec};
+
+		git_oid commit_id{};
+		ec = commit_dot_modules(commit_id, nullptr, repo, this_project,
+		                        "Add the cov modules");
+		ASSERT_FALSE(ec) << message{ec};
+
+		git_oid report_id{};
+		{
+			auto report = cov::report::create({}, {}, commit_id, {}, {}, {}, {},
+			                                  {}, {}, {});
+			ASSERT_TRUE(cov_repo.write(report_id, report));
+		}
+
+		auto const mods = cov::modules::from_report(report_id, cov_repo, ec);
+		ASSERT_FALSE(ec) << message{ec};
+		ASSERT_TRUE(mods);
+		ASSERT_TRUE(mods->entries().empty());
+	}
+
+	TEST(module_decl, from_report_in_commit) {
+		git::init memory{};
+
+		remove_all(setup::test_dir() / "modules-in-commit"sv);
+
+		std::error_code ec{};
+		auto repo = git::repository::init(
+		    setup::test_dir() / "modules-in-commit"sv, false, ec);
+		ASSERT_FALSE(ec) << message{ec};
+
+		auto cov_repo = cov::repository::init(
+		    setup::test_dir() / "sysroot"sv,
+		    setup::test_dir() / "modules-in-commit/.git/.covdata"sv,
+		    setup::test_dir() / "modules-in-commit/.git"sv, ec);
+		ASSERT_FALSE(ec) << message{ec};
+
+		git_oid commit_id{};
+		ec = commit_dot_modules(commit_id, nullptr, repo, this_project,
+		                        "Add the cov modules");
+		ASSERT_FALSE(ec) << message{ec};
+
+		git_oid report_id{};
+		{
+			auto report = cov::report::create({}, {}, commit_id, {}, {}, {}, {},
+			                                  {}, {}, {});
+			ASSERT_TRUE(cov_repo.write(report_id, report));
+		}
+
+		std::ofstream{setup::test_dir() / "modules-in-commit/.covmodule"sv}
+		    << modified_project;
+		git_oid current;
+		ec = commit_dot_modules(current, &commit_id, repo, modified_project,
+		                        "Update .covmodule filters");
+		ASSERT_FALSE(ec) << message{ec};
+
+		auto const mods = cov::modules::from_report(report_id, cov_repo, ec);
 		ASSERT_FALSE(ec) << message{ec};
 		ASSERT_TRUE(mods);
 

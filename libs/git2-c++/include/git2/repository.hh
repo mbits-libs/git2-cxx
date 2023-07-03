@@ -15,6 +15,16 @@
 
 namespace git {
 	GIT_PTR_FREE(git_repository);
+	GIT_PTR_FREE(git_reference);
+
+	struct reference : ptr<git_reference> {
+		using ptr<git_reference>::ptr;
+
+		reference resolve(std::error_code& ec) const noexcept {
+			return git::create_handle<reference>(ec, git_reference_resolve,
+			                                     this->get());
+		}
+	};
 
 	template <class Holder>
 	struct basic_repository : Holder {
@@ -59,6 +69,11 @@ namespace git {
 			return git::create_object<ObjectType>(ec, git_object_lookup_prefix,
 			                                      this->get(), &id, prefix,
 			                                      ObjectType::OBJECT_TYPE);
+		}
+
+		reference head(std::error_code& ec) const noexcept {
+			return git::create_handle<reference>(ec, git_repository_head,
+			                                     this->get());
 		}
 
 		auto get() const { return Holder::get(); }

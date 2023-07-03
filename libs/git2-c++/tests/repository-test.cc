@@ -31,6 +31,7 @@ namespace git::testing {
 		struct {
 			std::string_view discovered{};
 			std::string_view workdir{};
+			std::string_view head{};
 		} expected{};
 		repo_kind kind{repo_kind::workspace};
 
@@ -186,15 +187,57 @@ namespace git::testing {
 		ASSERT_EQ(get_path(result), common);
 	}
 
+	TEST_P(repository, head) {
+		auto [start_path, expected, kind] = GetParam();
+		auto const start =
+		    make_absolute(start_path, kind == repo_kind::failing);
+		std::error_code ec{};
+		auto const result = git::repository::discover(start, ec);
+		if (expected.discovered == std::string_view{}) {
+			ASSERT_TRUE(ec);
+			ASSERT_EQ(get_path(result), std::string{});
+		} else {
+			ASSERT_FALSE(ec);
+			ASSERT_EQ(get_path(result),
+			          get_path(make_absolute(expected.discovered,
+			                                 kind == repo_kind::failing)));
+		}
+		if (result.empty()) return;
+
+		auto const repo = git::repository::open(result, ec);
+		ASSERT_FALSE(ec);
+		ASSERT_TRUE(repo);
+		auto const head = repo.head(ec);
+		ASSERT_FALSE(ec);
+		ASSERT_TRUE(head);
+		auto const resolved = head.resolve(ec);
+		ASSERT_FALSE(ec);
+		ASSERT_TRUE(resolved);
+
+		auto const sha = [resolved = resolved.raw()] {
+			char buffer[GIT_OID_HEXSZ];
+			git_oid_fmt(buffer, git_reference_target(resolved));
+			return std::string{buffer, GIT_OID_HEXSZ};
+		}();
+
+		ASSERT_EQ(expected.head, sha);
+	}
+
+	static constexpr auto b3 = "b3f67d63bd1c87427805eba4aa028bfa43587f78"sv;
+	static constexpr auto b7 = "b78559c626ce713277ed5c9bac57e20785091000"sv;
+
 	constexpr repo_param dirs[] = {
 	    {"/"sv, {}, repo_kind::failing},
 	    {"c:/"sv, {}, repo_kind::failing},
-	    {"bare.git/"sv, {"bare.git/"sv}, repo_kind::bare},
-	    {"bare.git"sv, {"bare.git/"sv}, repo_kind::bare},
-	    {"gitdir/subdir/"sv, {"gitdir/.git/"sv, "gitdir/"sv}},
-	    {"gitdir/"sv, {"gitdir/.git/"sv, "gitdir/"sv}},
-	    {"gitdir"sv, {"gitdir/.git/"sv, "gitdir/"sv}},
-	    {"gitdir/bare/"sv, {"gitdir/.git/modules/bare/"sv, "gitdir/bare/"sv}},
+	    {"bare.git/"sv, {"bare.git/"sv, ""sv, b3}, repo_kind::bare},
+	    {"bare.git"sv, {"bare.git/"sv, ""sv, b3}, repo_kind::bare},
+	    {"gitdir/subdir/"sv, {"gitdir/.git/"sv, "gitdir/"sv, b7}},
+	    {"gitdir/"sv, {"gitdir/.git/"sv, "gitdir/"sv, b7}},
+	    {"gitdir"sv, {"gitdir/.git/"sv, "gitdir/"sv, b7}},
+	    {
+	        "gitdir/bare/"sv,
+	        {"gitdir/.git/modules/bare/"sv, "gitdir/bare/"sv, b3},
+	    },
 	};
 
 	INSTANTIATE_TEST_SUITE_P(dirs, repository, ValuesIn(dirs));
