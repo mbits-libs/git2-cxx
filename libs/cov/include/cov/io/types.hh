@@ -119,7 +119,7 @@ namespace cov::io {
 			uint32_t relevant;
 			uint32_t covered;
 
-			static coverage_stats init() { return {0, 0, 0}; }
+			static constexpr coverage_stats init() { return {0, 0, 0}; }
 
 			bool operator==(coverage_stats const&) const noexcept = default;
 
