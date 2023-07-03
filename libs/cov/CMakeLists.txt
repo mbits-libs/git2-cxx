@@ -26,6 +26,7 @@ set(SOURCES
   src/module_config.cc
   src/module.cc
   src/path-utils.hh
+  src/projection.cc
   src/ref/internal.hh
   src/ref/reference_list.cc
   src/ref/reference.cc
@@ -57,6 +58,7 @@ set(SOURCES
   include/cov/io/types.hh
   include/cov/module.hh
   include/cov/object.hh
+  include/cov/projection.hh
   include/cov/reference.hh
   include/cov/report.hh
   include/cov/repository.hh
