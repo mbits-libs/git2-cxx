@@ -62,15 +62,15 @@ namespace cov::testing {
 		void run_lt() {
 			auto const& [lhs, rhs, relation] = this->GetParam();
 			ASSERT_EQ(lhs < rhs, relation == rel::lt);
-		};
+		}
 		void run_eq() {
 			auto const& [lhs, rhs, relation] = this->GetParam();
 			ASSERT_EQ(lhs == rhs, relation == rel::eq);
-		};
+		}
 		void run_gt() {
 			auto const& [lhs, rhs, relation] = this->GetParam();
 			ASSERT_EQ(lhs > rhs, relation == rel::gt);
-		};
+		}
 	};
 
 	template <typename Int>
@@ -81,7 +81,7 @@ namespace cov::testing {
 			auto const& [ratio, format, expected] = this->GetParam();
 			auto const actual = fmt::format(fmt::runtime(format), ratio);
 			ASSERT_EQ(expected, actual);
-		};
+		}
 	};
 
 #define RATE_TEST(FIXTURE, OP) \
