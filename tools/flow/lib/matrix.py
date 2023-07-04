@@ -80,6 +80,10 @@ def load_matrix(json_path: str) -> Tuple[List[dict], List[str]]:
 
     excludes = setup.get("exclude", [])
     matrix = [obj for obj in full if not matches_any(obj, excludes)]
+    if "NO_COVERAGE" in os.environ:
+        for conf in matrix:
+            if "coverage" in conf:
+                del conf["coverage"]
 
     return matrix, keys
 
