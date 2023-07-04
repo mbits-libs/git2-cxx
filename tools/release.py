@@ -8,6 +8,7 @@ import string
 import subprocess
 import sys
 import time
+import shutil
 from pathlib import Path
 from typing import Dict, List, NamedTuple, Tuple
 
@@ -585,6 +586,8 @@ MESSAGE = f"release {NEW_TAG[1:]}"
 GITHUB_TOKEN = load_secret()
 GITHUB_REMOTE = None if GITHUB_TOKEN is None else locate_remote()
 
+COV_TOOL = shutil.which("cov", path="./build/.local/bin")
+
 if dry_run:
     print(f'Would commit "chore: {MESSAGE}"')
     if GITHUB_REMOTE is not None:
@@ -605,6 +608,8 @@ subprocess.check_call(
 )
 subprocess.check_call(["git", "commit", "-m", f"chore: {MESSAGE}"], shell=False)
 subprocess.check_call(["git", "tag", "-am", MESSAGE, NEW_TAG], shell=False)
+if COV_TOOL is not None:
+    subprocess.check_call([COV_TOOL, "tag", "--force", NEW_TAG], shell=False)
 if GITHUB_REMOTE is not None:
     print(f"Creating release in GitHub under {GITHUB_LINK}/releases/tag/{NEW_TAG}")
     subprocess.check_call(

@@ -1,0 +1,35 @@
+{
+    "args": "show",
+    "patches": {
+        "report [0-9a-f]{40}": "report $OID",
+        "Added:     .*": "Added:     $NOW"
+    },
+    "expected": [
+        0,
+        [
+            "report $OID",
+            "commit 3845124429f44888c0152dc1929ec6853bc1c9f0",
+            "GitBranch: main",
+            "Coverage:  [ 67%] 2/3 (fail)",
+            "Author:    Johnny Appleseeed <johnny@appleseed.com>",
+            "Added:     $NOW",
+            "",
+            "      second",
+            "",
+            "+-------+----------+---------+----------+---------+-------+",
+            "| NAME  | COVERAGE | COVERED | RELEVANT | MISSING | TOTAL |",
+            "+-------+----------+---------+----------+---------+-------+",
+            "| D src |   66.67% |       2 |        3 |       1 |     5 |",
+            "+-------+----------+---------+----------+---------+-------+\n"
+        ],
+        ""
+    ],
+    "prepare": [
+        "unpack $DATA/repo.git.tar $TMP",
+        "cd '$TMP'",
+        "git clone repo.git",
+        "cd '$TMP/repo'",
+        "cov init",
+        "cov report $DATA/build-coverage.json -f create-report"
+    ]
+}

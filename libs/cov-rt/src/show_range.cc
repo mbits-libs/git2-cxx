@@ -96,10 +96,14 @@ namespace cov::app {
 	    },
 	};
 
-	void show_range::add_args(::args::parser& p, LogStrings const& tr) {
-		p.custom(oneline(), "oneline")
-		    .help(tr(loglng::ONELINE_DESCRIPTION))
-		    .opt();
+	void show_range::add_args(::args::parser& p,
+	                          LogStrings const& tr,
+	                          bool for_log) {
+		if (for_log) {
+			p.custom(oneline(), "oneline")
+			    .help(tr(loglng::ONELINE_DESCRIPTION))
+			    .opt();
+		}
 		p.custom(select_format(), "format")
 		    .meta(tr(loglng::FORMAT_META))
 		    .help(tr(loglng::FORMAT_DESCRIPTION))

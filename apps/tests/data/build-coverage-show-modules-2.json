@@ -1,0 +1,36 @@
+{
+    "files": {
+        "src/main.cc": {
+            "text": [
+                "import sys;",
+                "import greetings;",
+                "",
+                "int main() {",
+                "  std::cout << \"Hello, \" << name() << \"!\";",
+                "}"
+            ],
+            "lines": {
+                "4": 15,
+                "5": 15,
+                "6": 15
+            }
+        },
+        "lib/greetings.cc": {
+            "text": [
+                "export module greetings;",
+                "import std;",
+                "",
+                "export std::string name() {",
+                "  using namespace std::literals;",
+                "  return \"coverage!\"s;",
+                "}"
+            ],
+            "lines": {
+                "4": 15,
+                "5": 0,
+                "6": 15,
+                "7": 15
+            }
+        }
+    }
+}

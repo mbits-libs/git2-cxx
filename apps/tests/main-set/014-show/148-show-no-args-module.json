@@ -1,0 +1,43 @@
+{
+    "args": "show --color=always",
+    "patches": {
+        "\u001b\\[33mreport [0-9a-f]{40}\u001b\\[m": "\u001b[33mreport $REPORT_HASH\u001b[m",
+        "commit [0-9a-f]{40}": "commit $COMMIT_HASH",
+        "Added:     .*": "Added:     $NOW"
+    },
+    "expected": [
+        0,
+        [
+            "\u001b[33mreport $REPORT_HASH\u001b[m",
+            "commit $COMMIT_HASH",
+            "GitBranch: main",
+            "Coverage:  [ 86%] \u001b[2;37m6/7\u001b[m \u001b[2;33m(incomplete)\u001b[m",
+            "Author:    Johnny Appleseed <johnny@appleseed.com>",
+            "Added:     $NOW",
+            "",
+            "      reported files",
+            "",
+            "+---------+-----------------+---------+----------+---------+-------+",
+            "| NAME    |    COVERAGE     | COVERED | RELEVANT | MISSING | TOTAL |",
+            "+---------+-----------------+---------+----------+---------+-------+",
+            "| M MAIN  | \u001b[1;32m100.00%\u001b[m \u001b[2;32m+33.33%\u001b[m |    3 \u001b[2;32m+1\u001b[m |        3 |    0 \u001b[2;32m-1\u001b[m |     6 |",
+            "| D lib   |  \u001b[1;33m75.00%\u001b[m \u001b[2;31m-25.00%\u001b[m |    3 \u001b[2;31m-1\u001b[m |        4 |    1 \u001b[2;31m+1\u001b[m |     7 |",
+            "+---------+-----------------+---------+----------+---------+-------+",
+            "| > TOTAL |  \u001b[1;33m85.71%\u001b[m         |    6    |        7 |    1    |    13 |",
+            "+---------+-----------------+---------+----------+---------+-------+\n"
+        ],
+        ""
+    ],
+    "prepare": [
+        "unpack $DATA/repo.git.tar $TMP",
+        "cd '$TMP'",
+        "git clone repo.git",
+        "cd '$TMP/repo'",
+        "git config --local user.name 'Johnny Appleseed'",
+        "git config --local user.email 'johnny@appleseed.com'",
+        "cov init",
+        "cov module --add MAIN src",
+        "cov report $DATA/build-coverage-show-modules.json -f create-report",
+        "cov report $DATA/build-coverage-show-modules-2.json -f create-report"
+    ]
+}

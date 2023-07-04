@@ -29,6 +29,15 @@ namespace cov::projection {
 			previous += rhs.previous;
 		}
 
+		file_diff diff(unsigned char digits = 2) const noexcept {
+			auto const curr = current.calc(digits);
+			auto const prev = previous.calc(digits);
+			return {
+			    .coverage = {.current = curr, .diff = io::v1::diff(curr, prev)},
+			    .stats = {.current = current,
+			              .diff = io::v1::diff(current, previous)},
+			};
+		}
 	};
 
 	enum class entry_type { standalone_file, file, directory, module };

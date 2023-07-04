@@ -1,0 +1,41 @@
+{
+    "args": "show then..",
+    "patches": {
+        "report [0-9a-f]{40}": "report $REPORT_HASH",
+        "commit [0-9a-f]{40}": "commit $COMMIT_HASH",
+        "Added:     .*": "Added:     $NOW"
+    },
+    "expected": [
+        0,
+        [
+            "report $REPORT_HASH",
+            "commit $COMMIT_HASH",
+            "GitBranch: main",
+            "Coverage:  [ 86%] 6/7 (incomplete)",
+            "Author:    Marcin Zdun <mzdun@midnightbits.com>",
+            "Added:     $NOW",
+            "",
+            "      reported files",
+            "",
+            "+---------+-----------------+---------+----------+---------+-------+",
+            "| NAME    |    COVERAGE     | COVERED | RELEVANT | MISSING | TOTAL |",
+            "+---------+-----------------+---------+----------+---------+-------+",
+            "| D lib   |  75.00% -25.00% |    3 -1 |        4 |    1 +1 |     7 |",
+            "| D src   | 100.00% +33.33% |    3 +1 |        3 |    0 -1 |     6 |",
+            "+---------+-----------------+---------+----------+---------+-------+",
+            "| > TOTAL |  85.71%         |    6    |        7 |    1    |    13 |",
+            "+---------+-----------------+---------+----------+---------+-------+\n"
+        ],
+        ""
+    ],
+    "prepare": [
+        "unpack $DATA/repo.git.tar $TMP",
+        "cd '$TMP'",
+        "git clone repo.git",
+        "cd '$TMP/repo'",
+        "cov init",
+        "cov report $DATA/build-coverage-show-modules.json -f create-report",
+        "cov tag then",
+        "cov report $DATA/build-coverage-show-modules-2.json -f create-report"
+    ]
+}
