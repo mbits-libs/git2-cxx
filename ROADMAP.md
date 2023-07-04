@@ -54,8 +54,9 @@
   - [x] `cov tag` / `branch` / `checkout` _(0.15.0)_
   - [x] `cov reset` _(0.16.0)_
   - [ ] `cov show`
-    - [ ] Report / component / directory view
+    - [x] Report / component / directory view
     - [ ] File view
+  - [ ] `cov cherry-pick` (?)
   - [ ] Support for `less`
   - [ ] Major release
     - Update schema id and references in filters

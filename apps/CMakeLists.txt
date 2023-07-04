@@ -8,6 +8,7 @@ set(BUILTINS
     module
     report
     reset
+    show
     tag
 )
 
@@ -133,6 +134,7 @@ if (COV_TESTING)
         011-refs
         012-checkout
         013-reset
+        014-show
     )
         add_test(
             NAME cov-exec--${TEST_SET}
@@ -176,6 +178,7 @@ install(TARGETS cov
 install(
     DIRECTORY ${PROJECT_BINARY_DIR}/share/
     DESTINATION share/
+    USE_SOURCE_PERMISSIONS
     COMPONENT main_exec
 )
 

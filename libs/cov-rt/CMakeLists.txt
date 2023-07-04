@@ -8,6 +8,7 @@ set(SOURCES
   src/root_command.cc
   src/rt_path.cc
   src/show_range.cc
+  src/show.cc
   src/split_command.cc
   src/tools.cc
 
@@ -25,7 +26,8 @@ set(SOURCES
   include/cov/app/report.hh
   include/cov/app/root_command.hh
   include/cov/app/rt_path.hh
-  include/cov/app//show_range.hh
+  include/cov/app/show_range.hh
+  include/cov/app/show.hh
   include/cov/app/split_command.hh
   include/cov/app/tools.hh
 )

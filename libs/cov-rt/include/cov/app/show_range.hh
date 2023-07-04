@@ -27,7 +27,9 @@ namespace cov::app {
 		std::string custom_format{};
 		bool abbrev_hash{false};
 
-		void add_args(::args::parser& p, LogStrings const& tr);
+		void add_args(::args::parser& p,
+		              LogStrings const& tr,
+		              bool for_log = true);
 
 		auto select_format() {
 			return [this](std::string_view arg) { select_format(arg); };

@@ -3,6 +3,7 @@
 
 import json
 import os
+import subprocess
 import sys
 from typing import Dict, List, Optional, Tuple
 
@@ -349,11 +350,18 @@ class steps:
     )
     def coverage(config: dict):
         reporter = f"build/{config['preset']}/bin/cov"
+        ver_process = subprocess.run([reporter, "--version"], stdout=subprocess.PIPE)
+        var_list = ver_process.stdout.decode("UTF-8").strip().split()
+        version = var_list[2] if len(var_list) > 2 else var_list[-1]
+        version_tag = f"v{version}"
         legacy_reporter = os.environ.get("LEGACY_COV")
         report = f"build/{config['preset']}/coveralls.json"
         runner.call(reporter, "report", "--filter", "coveralls", report)
         if legacy_reporter is not None:
             runner.call(legacy_reporter, "import", "--in", report, "--amend")
+        runner.call(
+            reporter, "show", "--format=oneline", "--abbrev-hash", f"v{version}.."
+        )
 
     @staticmethod
     def build_steps():

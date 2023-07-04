@@ -92,6 +92,7 @@ HANDLERS: Dict[str, Tuple[int, Callable]] = {
     "rw": (1, _make_RW),
     "touch": (1, _touch),
     "cd": (1, lambda test, args: test.chdir(args[0])),
+    "ls": (1, lambda test, args: test.ls(args[0])),
     "unpack": (2, _unpack),
     "cat": (1, _cat),
 }

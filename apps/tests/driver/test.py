@@ -370,6 +370,19 @@ Diff:
         if self.linear:
             os.chdir(self.cwd)
 
+    def ls(self, sub):
+        name = self.path(sub)
+        for _, dirnames, filenames in os.walk(name):
+            names = sorted(
+                [
+                    *((name.lower(), f"{name}/") for name in dirnames),
+                    *((name.lower(), f"{name}") for name in filenames),
+                ]
+            )
+            dirnames[:] = []
+            for _, name in names:
+                print(name)
+
     def rmtree(self, sub):
         shutil.rmtree(self.path(sub))
 

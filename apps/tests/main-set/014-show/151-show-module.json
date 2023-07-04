@@ -1,0 +1,25 @@
+{
+    "args": "show -m MAIN",
+    "expected": [
+        0,
+        [
+            "module MAIN",
+            "",
+            "+-------+----------+---------+----------+---------+-------+",
+            "| NAME  | COVERAGE | COVERED | RELEVANT | MISSING | TOTAL |",
+            "+-------+----------+---------+----------+---------+-------+",
+            "| D src |   66.67% |       2 |        3 |       1 |     5 |",
+            "+-------+----------+---------+----------+---------+-------+\n"
+        ],
+        ""
+    ],
+    "prepare": [
+        "unpack $DATA/repo.git.tar $TMP",
+        "cd '$TMP'",
+        "git clone repo.git",
+        "cd '$TMP/repo'",
+        "cov init",
+        "cov report $DATA/build-coverage.json -f create-report",
+        "cov module --add MAIN src/"
+    ]
+}
