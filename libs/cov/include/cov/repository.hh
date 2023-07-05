@@ -58,11 +58,6 @@ namespace cov {
 
 		bool operator==(file_stats const&) const noexcept = default;
 
-		void extend(file_stats const& rhs) noexcept {
-			current += rhs.current;
-			previous += rhs.previous;
-		}
-
 		file_diff diff(unsigned char digits = 2) const noexcept {
 			auto const curr = current.calc(digits);
 			auto const prev = previous.calc(digits);
