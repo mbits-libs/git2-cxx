@@ -13,7 +13,7 @@ using namespace std::literals;
 namespace cov::app::line_printer {
 	using namespace lighter;
 
-	enum class mark { good, bad, irrelevant };
+	enum class mark : unsigned { good, bad, irrelevant };
 	using varying_styles = std::array<std::string_view, 3>;
 	struct single_color {
 		std::string_view value;

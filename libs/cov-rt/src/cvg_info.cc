@@ -52,7 +52,7 @@ namespace cov::app {
 		}
 
 		return result;
-	}
+	}  // GCOV_EXCL_LINE[GCC]
 
 	void cvg_info::load_syntax(std::string_view text,
 	                           std::string_view filename) {
@@ -96,14 +96,10 @@ namespace cov::app {
 		return count;
 	}
 
-	bool cvg_info::has_line(size_t line_no) const noexcept {
-		return syntax.lines.size() > line_no;
-	}
-
 	std::string cvg_info::to_string(size_t line_no,
 	                                view_columns const& widths,
 	                                bool use_color) const noexcept {
-		auto const count = count_for(line_no);
+		auto const count = count_for(static_cast<unsigned>(line_no));
 		auto const& line = syntax.lines[line_no];
 		auto const length = length_of(line.contents);
 		auto const line_text = file_text.substr(line.start, length);
