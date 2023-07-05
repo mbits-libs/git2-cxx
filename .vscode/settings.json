@@ -3,13 +3,23 @@
     "files.trimFinalNewlines": true,
     "cSpell.words": [
         "arglist",
+        "cfglng",
         "cobertura",
         "covdata",
+        "covlng",
+        "errlng",
+        "fmtlng",
         "hilite",
+        "initlng",
         "lngs",
+        "loglng",
+        "modcnt",
+        "modlng",
         "pofile",
         "polib",
+        "refslng",
         "replng",
+        "resetlng",
         "workdir"
     ],
     "files.associations": {
@@ -107,6 +117,7 @@
         "xstring": "cpp",
         "xtr1common": "cpp",
         "xtree": "cpp",
-        "xutility": "cpp"
+        "xutility": "cpp",
+        "fstream": "cpp"
     }
 }
