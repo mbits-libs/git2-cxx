@@ -55,7 +55,7 @@
   - [x] `cov reset` _(0.16.0)_
   - [ ] `cov show`
     - [x] Report / component / directory view
-    - [ ] File view
+    - [x] File view
   - [ ] `cov cherry-pick` (?)
   - [ ] Support for `less`
   - [ ] Major release
