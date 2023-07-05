@@ -2,6 +2,8 @@ set(SOURCES
   src/branches.cc
   src/checkout.cc
   src/config.cc
+  src/cvg_info.cc
+  src/line_printer.cc
   src/module.cc
   src/report_command.cc
   src/report.cc
@@ -15,13 +17,15 @@ set(SOURCES
   include/cov/app/branches.hh
   include/cov/app/checkout.hh
   include/cov/app/config.hh
-  include/cov/app/module.hh
   include/cov/app/cov_config_tr.hh
   include/cov/app/cov_init_tr.hh
   include/cov/app/cov_module_tr.hh
   include/cov/app/cov_report_tr.hh
   include/cov/app/cov_tr.hh
+  include/cov/app/cvg_info.hh
   include/cov/app/errors_tr.hh
+  include/cov/app/line_printer.hh
+  include/cov/app/module.hh
   include/cov/app/report_command.hh
   include/cov/app/report.hh
   include/cov/app/root_command.hh
