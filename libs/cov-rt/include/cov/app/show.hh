@@ -5,6 +5,7 @@
 
 #include <cov/app/args.hh>
 #include <cov/app/cov_log_tr.hh>
+#include <cov/app/cov_show_tr.hh>
 #include <cov/app/cov_tr.hh>
 #include <cov/app/errors_tr.hh>
 #include <cov/app/rt_path.hh>
@@ -21,7 +22,7 @@ namespace cov {
 }
 
 namespace cov::app::show {
-	struct parser : base_parser<covlng, loglng, errlng> {
+	struct parser : base_parser<covlng, loglng, errlng, showlng> {
 		parser(::args::args_view const& arguments,
 		       str::translator_open_info const& langs);
 

@@ -1,0 +1,26 @@
+{
+    "lang": "pl",
+    "args": "show -h",
+    "expected": [
+        0,
+        [
+            "u\u017cycie: cov show [-h] [<raport>] [-m <modu\u0142>] [--format <format>] [--abbrev-hash] [--no-abbrev-hash] [--color <kiedy>] [--decorate <jak>]",
+            "",
+            "argumenty pozycyjne:",
+            " <raport>             pokazuje albo zmiany mi\u0119dzy danym raportem a raportem bezpo\u015brednio poprzedzaj\u0105cym (je\u017celi podano tylko jedno odwo\u0142anie), albo mi\u0119dzy dwoma raportami (gdy istniej\u0105 dwa odwo\u0142ania oddzielone za pomoc\u0105 \u201e..\u201d); pokazuje wyniki dla pliku, je\u015bli po nazwie zakresu wyst\u0119puje dwukropek i nazwa pliku, na przyk\u0142ad \u201ecov show HEAD:src/main.cpp\u201d; pokazuje wyniki dla katalogu, je\u015bli po nazwie zakresu wyst\u0119puje dwukropek i nazwa katalogu; na przyk\u0142ad, aby zobaczy\u0107 zmiany w katalogu \u201esrc/\u201d od czasu raportu oznaczonego jako \u201enazwa-taga\u201d, wywo\u0142aj \u201ecov show nazwa-taga..:src\u201d; domy\u015blnie wybiera HEAD, je\u015bli nie zosta\u0142 podany",
+            "",
+            "argumenty opcjonalne:",
+            " -h, --help           pokazuje ten komunikat pomocy i wychodzi",
+            " -m, --module <modu\u0142> pokazuje tylko wyniki w danym prefiksie modu\u0142u",
+            " --format <format>    wy\u015bwietla zawarto\u015b\u0107 dziennik\u00f3w raportu w danym formacie, gdzie <format> mo\u017ce by\u0107 jednym z \u201eoneline\u201d, \u201eshort\u201d, \u201emedium\u201d, \u201efull\u201d, \u201efuller\u201d, \u201ereference\u201d, \u201eraw\u201d i \u201epretty:<string>\u201d; gdy <format> nie jest \u017cadnym z powy\u017cszych i zawiera %symbol zast\u0119pczy, dzia\u0142a tak, jakby zosta\u0142o wywo\u0142ane --format=pretty:<format>",
+            " --abbrev-hash        zamiast wy\u015bwietla\u0107 pe\u0142n\u0105 40-bajtow\u0105 szesnastkow\u0105 nazw\u0119 obiektu raportu, pokazuje prefiks, kt\u00f3ry nazywa obiekty jednoznacznie",
+            " --no-abbrev-hash     pokazuje pe\u0142n\u0105 40-bajtow\u0105 szesnastkow\u0105 nazw\u0119 obiektu raportu",
+            " --color <kiedy>      u\u017cywa koloru na wyj\u015bciu; <kiedy> jest jednym z \u201enever\u201d (nigdy), \u201ealways\u201d (zawsze) lub \u201eauto\u201d",
+            " --decorate <jak>     drukuje referencje wy\u015bwietlanych raport\u00f3w; <jak> jest jednym z \u201eshort\u201d (kr\u00f3tkie), \u201eauto\u201d lub \u201eno\u201d (nie)\n"
+        ],
+        ""
+    ],
+    "prepare": [
+        "cd '$TMP'"
+    ]
+}
