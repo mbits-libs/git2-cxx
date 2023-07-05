@@ -297,7 +297,7 @@ namespace cov::projection::testing {
 
 			auto expected = make_entries(expected_entries);
 			ASSERT_EQ(expected, actual);
-		};
+		}
 	};
 
 	TEST_F(projection, default_projection) {

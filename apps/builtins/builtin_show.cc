@@ -49,7 +49,7 @@ namespace cov::app::builtin::show {
 		if (ec) {
 			if (ec == git::errc::notfound)
 				ec = {};
-			else
+			else                      // GCOV_EXCL_LINE
 				p.error(ec, p.tr());  // GCOV_EXCL_LINE
 		}
 
