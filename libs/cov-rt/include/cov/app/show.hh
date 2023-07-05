@@ -14,6 +14,7 @@
 #include <cov/repository.hh>
 #include <cov/revparse.hh>
 #include <string>
+#include <vector>
 
 namespace cov {
 	struct data_table;
