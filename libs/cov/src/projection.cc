@@ -43,7 +43,7 @@ namespace cov::projection {
 		                std::string_view display) -> decltype(children.begin());
 
 		struct dir_entry {
-			entry result;
+			entry result{};
 			std::vector<dir_entry> children{};
 
 			template <typename Callback>
@@ -179,7 +179,13 @@ namespace cov::projection {
 				}
 				result.name.display.append(
 				    children.front().result.name.display);
-				std::swap(children, children.front().children);
+				swap_with_child();
+			}
+
+			void swap_with_child() {
+				auto tmp = std::move(children);
+				children = std::vector<dir_entry>{};
+				children = std::move(tmp.front().children);
 			}
 		};
 
@@ -234,7 +240,7 @@ namespace cov::projection {
 		auto fname_filter = fname;
 		if (is_standalone) {
 			if (root.children.front().result.type == entry_type::directory) {
-				std::swap(root.children, root.children.front().children);
+				root.swap_with_child();
 			}
 
 			root.children.front().result.type = entry_type::standalone_file;
