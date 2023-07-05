@@ -351,6 +351,10 @@ class steps:
     def coverage(config: dict):
         reporter = f"build/{config['preset']}/bin/cov"
         ver_process = subprocess.run([reporter, "--version"], stdout=subprocess.PIPE)
+        tag_process = subprocess.run([reporter, "tag"], stdout=subprocess.PIPE)
+        tags = (
+            tag_process.stdout.decode("UTF-8").replace("\r\n", "\n").strip().split("\n")
+        )
         var_list = ver_process.stdout.decode("UTF-8").strip().split()
         version = var_list[2] if len(var_list) > 2 else var_list[-1]
         version_tag = f"v{version}"
@@ -359,9 +363,14 @@ class steps:
         runner.call(reporter, "report", "--filter", "coveralls", report)
         if legacy_reporter is not None:
             runner.call(legacy_reporter, "import", "--in", report, "--amend")
-        runner.call(
-            reporter, "show", "--format=oneline", "--abbrev-hash", f"v{version}.."
-        )
+        if version_tag in tags:
+            runner.call(
+                reporter,
+                "show",
+                "--format=oneline",
+                "--abbrev-hash",
+                f"{version_tag}..",
+            )
 
     @staticmethod
     def build_steps():
