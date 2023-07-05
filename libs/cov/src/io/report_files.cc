@@ -4,6 +4,8 @@
 #include <cov/io/report_files.hh>
 #include <cov/io/strings.hh>
 #include <cov/io/types.hh>
+#include <cov/repository.hh>
+#include <git2/blob.hh>
 
 namespace cov::io::handlers {
 	namespace {
@@ -28,6 +30,18 @@ namespace cov::io::handlers {
 			git_oid const& line_coverage() const noexcept override {
 				return line_coverage_;
 			}
+			std::vector<std::byte> get_contents(
+			    repository const& repo,
+			    std::error_code& ec) const noexcept {
+				auto const obj = repo.lookup<cov::blob>(contents_, ec);
+				if (!obj || ec) return {};
+				auto blob = obj->peek().filtered(path_.c_str(), ec);
+				if (ec) return {};
+				auto const data = git::bytes{blob};
+				auto result = std::vector<std::byte>{data.begin(), data.end()};
+				git_buf_dispose(&blob);
+				return result;
+			}
 
 		private:
 			std::string path_{};
@@ -43,6 +57,13 @@ namespace cov::io::handlers {
 			std::vector<std::unique_ptr<report_entry>> const& entries()
 			    const noexcept override {
 				return files_;
+			}
+
+			report_entry const* by_path(std::string_view path) const noexcept {
+				for (auto const& entry : files_) {
+					if (entry->path() == path) return entry.get();
+				}
+				return nullptr;
 			}
 
 		private:

@@ -11,6 +11,8 @@
 #include <vector>
 
 namespace cov {
+	struct repository;
+
 	struct object_with_id : object {
 		virtual git_oid const& oid() const noexcept = 0;
 	};
@@ -70,6 +72,9 @@ namespace cov {
 		virtual io::v1::coverage_stats const& stats() const noexcept = 0;
 		virtual git_oid const& contents() const noexcept = 0;
 		virtual git_oid const& line_coverage() const noexcept = 0;
+		virtual std::vector<std::byte> get_contents(
+		    repository const&,
+		    std::error_code&) const noexcept = 0;
 	};
 
 	struct report_files : object {
@@ -77,6 +82,8 @@ namespace cov {
 		bool is_report_files() const noexcept final { return true; }
 		virtual std::vector<std::unique_ptr<report_entry>> const& entries()
 		    const noexcept = 0;
+		virtual report_entry const* by_path(
+		    std::string_view path) const noexcept = 0;
 
 		static ref_ptr<report_files> create(
 		    std::vector<std::unique_ptr<report_entry>>&&);
