@@ -9,16 +9,16 @@ namespace cov::app::show {
 
 	parser::parser(::args::args_view const& arguments,
 	               str::translator_open_info const& langs)
-	    : base_parser<covlng, loglng, errlng>{langs, arguments} {
+	    : base_parser<covlng, loglng, errlng, showlng>{langs, arguments} {
 		using namespace str;
 
 		parser_
 		    .arg(rev)  // GCOV_EXCL_LINE[GCC]
 		    .meta(tr_(covlng::REPORT_META))
-		    .help(tr_(loglng::REV_RANGE_DESCRIPTION));
+		    .help(tr_(showlng::REPORT_DESCRIPTION));
 		parser_.arg(module, "m", "module")
-		    .meta("<module>")
-		    .help("shows only results within given module prefix");
+		    .meta(tr_(showlng::MODULE_META))
+		    .help(tr_(showlng::MODULE_DESCRIPTION));
 		show.add_args(parser_, tr_, false);
 	}
 

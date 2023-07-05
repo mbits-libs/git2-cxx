@@ -26,6 +26,7 @@ set(STRINGS
   cov_refs
   cov_report
   cov_reset
+  cov_show
 )
 set(LANGUAGES pl en)
 

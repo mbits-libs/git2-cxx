@@ -1,0 +1,48 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2023 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the cov package.
+# marcin.zdun@midnightbits.com, 2023.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: cov latest\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-07-05 23:46+0200\n"
+"PO-Revision-Date: 2023-07-05 23:46+0200\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.4.2\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. Description of module argument
+msgctxt "MODULE_DESCRIPTION"
+msgid "shows only results within given module prefix"
+msgstr "shows only results within given module prefix"
+
+#. Name of module argument
+msgctxt "MODULE_META"
+msgid "<module>"
+msgstr "<module>"
+
+#. Description for the <report> positional argument; do not translate examples and directory name, but do localize the 'tag-name'
+msgctxt "REPORT_DESCRIPTION"
+msgid ""
+"shows either changes between given report and the report directly preceeding "
+"(if only one reference is given), or between two reports (when there are two "
+"refs separated by a '..'); shows results for a file, if proceeded by a colon "
+"and file name, for example, with 'cov show HEAD:src/main.cpp'; shows results "
+"for a directory, if proceeded by a colon and directory name; for example, to "
+"see changes in 'src/' directory since a report marked as 'tag-name', call "
+"with 'cov show tag-name..:src'; defaults to HEAD if missing"
+msgstr ""
+"shows either changes between given report and the report directly preceeding "
+"(if only one reference is given), or between two reports (when there are two "
+"refs separated by a '..'); shows results for a file, if proceeded by a colon "
+"and file name, for example, with 'cov show HEAD:src/main.cpp'; shows results "
+"for a directory, if proceeded by a colon and directory name; for example, to "
+"see changes in 'src/' directory since a report marked as 'tag-name', call "
+"with 'cov show tag-name..:src'; defaults to HEAD if missing"

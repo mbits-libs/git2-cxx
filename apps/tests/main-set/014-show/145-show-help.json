@@ -6,7 +6,7 @@
             "usage: cov show [-h] [<report>] [-m <module>] [--format <format>] [--abbrev-hash] [--no-abbrev-hash] [--color <when>] [--decorate <how>]",
             "",
             "positional arguments:",
-            " <report>              shows only reports in the specified revision range",
+            " <report>              shows either changes between given report and the report directly preceeding (if only one reference is given), or between two reports (when there are two refs separated by a '..'); shows results for a file, if proceeded by a colon and file name, for example, with 'cov show HEAD:src/main.cpp'; shows results for a directory, if proceeded by a colon and directory name; for example, to see changes in 'src/' directory since a report marked as 'tag-name', call with 'cov show tag-name..:src'; defaults to HEAD if missing",
             "",
             "optional arguments:",
             " -h, --help            shows this help message and exits",

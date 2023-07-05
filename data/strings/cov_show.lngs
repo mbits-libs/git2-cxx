@@ -1,0 +1,22 @@
+[
+    project("cov"),
+    namespace("cov::app::str::cov_show"),
+    version("latest"),
+    serial(1)
+] strings {
+    [help("Description for the <report> positional argument; "
+          "do not translate examples and directory name, but do localize the 'tag-name'"), id(-1)]
+    REPORT_DESCRIPTION=
+        "shows either changes between given report and the report directly preceeding "
+        "(if only one reference is given), or between two reports (when there are two refs separated by a '..'); "
+        "shows results for a file, if proceeded by a colon and file name, "
+        "for example, with 'cov show HEAD:src/main.cpp'; "
+        "shows results for a directory, if proceeded by a colon and directory name; "
+        "for example, to see changes in 'src/' directory since a report marked as 'tag-name', "
+        "call with 'cov show tag-name..:src'; "
+        "defaults to HEAD if missing";
+    [help("Name of module argument"), id(-1)]
+    MODULE_META="<module>";
+    [help("Description of module argument"), id(-1)]
+    MODULE_DESCRIPTION="shows only results within given module prefix";
+}
