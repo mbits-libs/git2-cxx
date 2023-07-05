@@ -42,6 +42,14 @@ namespace cov::testing {
 		    const noexcept override {
 			return files;
 		}
+
+		report_entry const* by_path(
+		    std::string_view path) const noexcept override {
+			for (auto const& entry : files) {
+				if (entry->path() == path) return entry.get();
+			}
+			return nullptr;
+		}
 	};
 
 	TEST(report_files, load) {
@@ -121,6 +129,8 @@ namespace cov::testing {
 		ASSERT_EQ(1250u, entry.stats().total);
 		ASSERT_EQ(300u, entry.stats().relevant);
 		ASSERT_EQ(299u, entry.stats().covered);
+		ASSERT_TRUE(lines->by_path("file path"sv));
+		ASSERT_FALSE(lines->by_path("another file"sv));
 	}
 
 	TEST(report_files, load_partial_1_not_enough_entries) {
