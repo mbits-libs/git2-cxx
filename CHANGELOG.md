@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) and [COMMITS.md](COMMITS.md) for commit guidelines.
 
+## [0.17.0](https://github.com/mzdun/cov/compare/v0.16.0...v0.17.0) (2023-07-06)
+
+### New Features
+
+- **api**: locate file contents by path ([5850d90](https://github.com/mzdun/cov/commit/5850d901866ab7afae5b0c007df0c3f4d4093df7))
+- **api**: calculate module and/or directory projection ([2e12983](https://github.com/mzdun/cov/commit/2e129833e3403452c49247fd46327a9b7dfec25c))
+- **api**: take workdir modules if commit is also HEAD ([c837521](https://github.com/mzdun/cov/commit/c837521013ec6e68b27ff99e6bd4cd2ee28f15ae))
+- **api**: expose apply_mark to wider audience ([10729b6](https://github.com/mzdun/cov/commit/10729b6d8d2d4d00d0a25619152cba617d79194f))
+- **api**: report error code on bad cast ([aea68b6](https://github.com/mzdun/cov/commit/aea68b6138e589a70c7b215acd71435ac4544c48))
+- **api**: format tabular data ([fc3a87d](https://github.com/mzdun/cov/commit/fc3a87d8eb9fb98e3011ab265e7fa2f816a7c75a))
+- **core**: added translations to cov show ([ffc9e18](https://github.com/mzdun/cov/commit/ffc9e181d801de137caeaf72e1de89d63f937acd))
+- **core**: show file coverage ([edd4e95](https://github.com/mzdun/cov/commit/edd4e954b4e1c623bdd8ffc5965ff3b0284b7f69))
+- **core, rt**: add cov show command ([2475041](https://github.com/mzdun/cov/commit/24750415fc6b6d072a4c0702745a24936e8f76be))
+- **rt**: format file contents for xterm ([b8471f4](https://github.com/mzdun/cov/commit/b8471f4da8f5bec8c320c4e7b241538a1077495d))
+
+### Bug Fixes
+
+- apply linter' note ([1ec1b27](https://github.com/mzdun/cov/commit/1ec1b2791580d09c83c71acc7073fcb8a0eaad99))
+- remove compilation issues ([6d823e9](https://github.com/mzdun/cov/commit/6d823e987bb90a01c637615db5bc91cfe3ead1ef))
+- stabilize show test, apply linter findings ([3ff576f](https://github.com/mzdun/cov/commit/3ff576fa6253072b8cd710ac1654316e63e1f2f0))
+- **api**: removed another instance of an UB ([ba7fd88](https://github.com/mzdun/cov/commit/ba7fd88921067f9565253a7aa0f52fe3d05bf369))
+
 ## [0.16.0](https://github.com/mzdun/cov/compare/v0.15.2...v0.16.0) (2023-06-30)
 
 ### New Features

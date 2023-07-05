@@ -55,12 +55,16 @@ If a command allows a range, either `..<rev>`, `<rev>..` or `<rev>..<rev>` (but 
 
     will create Cov repository inside `coverage/project`, pointing back to `git/project/.git`.
 
-- **Basic Snapshotting**: report, remove _(soon)_, ~~reset~~ \
+- **Basic Snapshotting**: report, reset \
   `cov report [-h] <report-file> [-f <filter>] [--amend]`
 
   This command adds a new report to the report list. It it like **git add** and **git commit** rolled into one and just like **commit**, it normally adds the report on top of exiting history, unless there is an **--amend** parameter. In this case, it tries to replace current tip of the history with updated report.
 
   The _report file_ format is a JSON described by the [report-schema.json](apps/report-schema.json), but it can be filtered from other formats by **-f \<filter\>** argument. Currently, the **cov report** has filters for Cobertura and Coveralls.
+
+  `cov reset [-h] <report>`
+
+  The **cov reset** commands moves the `HEAD` of current branch to some other revision.
 
 - **Branches and Tags**: branch, tag, checkout \
   `cov branch [-h] [--color <when>]`
@@ -78,7 +82,29 @@ If a command allows a range, either `..<rev>`, `<rev>..` or `<rev>..<rev>` (but 
 
   Again, **cov branch**, **cov tag** and **cov checkout** are simplified versions of **git branch**, **git tag** and **git checkout**, respectively, but instead of Git data, they work on Cov data.
 
-- **Inspection and Comparison**: log, show  _(soon)_, serve  _(soon)_\
+- **Inspection and Comparison**: log, show, serve  _(soon)_\
   `cov log [-h] [<options>] [<revision-range>|<revision>]`
 
   Lists all reports reachable from **\<revision>**. Alternatively, lists all reports reachable from right side to **\<revision-range>**, but not reachable from left side.
+
+  `cov show [-h] [<options>] [<revision-range>|<revision>[:<path>]] [-m <module>]`
+
+  Shows changes reported in **\<revision>**. Alternatively, shows difference in coverage since left side of **\<revision-range>** until report on right side of the range. When the revision (or revision range) has a path attached to it, the report is either limited to a given directory, or coverage of a file is presented (depending on what the path points to).
+
+  For instance, to show changes between cov tags **v0.16.0** and **v0.17.0**:
+
+  ```sh
+  cov show v0.16.0..v0.17.0
+  ```
+
+  To limit the report to only files under **lib/** and also only those grouped inside module **SUPPORT**:
+
+  ```sh
+  cov show v0.16.0..v0.17.0:lib/ --module SUPPORT
+  ```
+
+  To show coverage of **src/main.cpp** from latest report:
+
+  ```sh
+  cov show HEAD:src/main.cpp
+  ```
