@@ -96,18 +96,7 @@ namespace cov::app::show {
 		    row == row_type::data);
 	}
 
-	void context::print(std::vector<entry> const& entries) const {
-		auto const is_standalone =
-		    entries.size() == 1 &&
-		    entries.front().type == entry_type::standalone_file;
-
-		print_table(entries, !is_standalone);
-
-		if (is_standalone) print_file();
-	}
-
-	void context::print_table(std::vector<entry> const& entries,
-	                          bool with_total) const {
+	void context::print_table(std::vector<entry> const& entries) const {
 		entry_stats total{};
 		data_table table{.header = {
 		                     {"NAME"s, '<'},  // GCOV_EXCL_LINE[GCC]
@@ -136,11 +125,9 @@ namespace cov::app::show {
 			total.extend(entry.stats);
 		}
 
-		if (with_total && entries.size() > 1)
+		if (entries.size() > 1)
 			add(table, '>', total, "TOTAL"sv, row_type::footer);
 
 		table.print();
 	}
-
-	void context::print_file() const {}
 }  // namespace cov::app::show

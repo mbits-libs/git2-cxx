@@ -1,0 +1,44 @@
+{
+    "files": {
+        "src/main.cc": {
+            "text": [
+                "void foo() {",
+                "\tstd::cout << \"Hello, \" << name() << \"!\";",
+                "}",
+                "",
+                "void bar() {",
+                "\tfoo();",
+                "\tfoo();",
+                "\tfoo();",
+                "\tfoo();",
+                "\tfoo();",
+                "\tfoo();",
+                "\tfoo();",
+                "\tfoo();",
+                "\tfoo();",
+                "\tfoo();",
+                "\tfoo();",
+                "}"
+            ],
+            "lines": {
+                "0": 0,
+                "1": 0,
+                "4": 15,
+                "6": 10,
+                "7": 8,
+                "8": 6,
+                "9": 4,
+                "10": 2,
+                "11": 0
+            }
+        }
+    },
+    "commits": [
+        {
+            "message": "multiple chunks and tab stops",
+            "files": [
+                "src/main.cc"
+            ]
+        }
+    ]
+}

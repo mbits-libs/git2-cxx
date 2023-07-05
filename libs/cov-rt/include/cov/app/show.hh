@@ -96,11 +96,6 @@ namespace cov::app::show {
 		         projection::entry_stats const& stats,
 		         std::string_view label,
 		         row_type row = row_type::data) const;
-		void print(std::vector<projection::entry> const& entries) const;
-
-	private:
-		void print_table(std::vector<projection::entry> const& entries,
-		                 bool with_total) const;
-		void print_file() const;
+		void print_table(std::vector<projection::entry> const& entries) const;
 	};
 }  // namespace cov::app::show

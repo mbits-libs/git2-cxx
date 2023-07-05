@@ -1,0 +1,31 @@
+{
+    "args": "show HEAD:src/main.cc --color always",
+    "expected": [
+        0,
+        [
+            "\u001b[33mfile src/main.cc\u001b[m",
+            "",
+            "+-----------+----------+---------+----------+---------+-------+",
+            "| NAME      | COVERAGE | COVERED | RELEVANT | MISSING | TOTAL |",
+            "+-----------+----------+---------+----------+---------+-------+",
+            "|   main.cc |   \u001b[1;31m66.67%\u001b[m |       2 |        3 |       1 |     5 |",
+            "+-----------+----------+---------+----------+---------+-------+",
+            "",
+            " 1 |     |  \u001b[0;49;90m#include \u001b[2;49;91m<iostream>\u001b[m",
+            " 2 |     |  ",
+            " 3 |  0x | \u001b[0;49;31m-\u001b[1;31mint\u001b[0;49;31m main() {\u001b[m",
+            " 4 | 15x | \u001b[0;49;32m+  std::cout << \u001b[0;49;92m\"\u001b[2;49;92mHello, coverage!\u001b[0;49;92m\"\u001b[0;49;32m;\u001b[m",
+            " 5 | 15x | \u001b[0;49;32m+}\u001b[m",
+            "\n"
+        ],
+        ""
+    ],
+    "prepare": [
+        "unpack $DATA/repo.git.tar $TMP",
+        "cd '$TMP'",
+        "git clone repo.git",
+        "cd '$TMP/repo'",
+        "cov init",
+        "cov report $DATA/build-coverage.json -f create-report"
+    ]
+}

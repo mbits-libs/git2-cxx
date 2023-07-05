@@ -25,9 +25,9 @@ def _last_enter(value: str):
 
 
 def _diff(expected, actual):
-    expected = _last_enter(expected).splitlines(keepends=True)
-    actual = _last_enter(actual).splitlines(keepends=True)
-    return "".join(list(unified_diff(expected, actual))[2:])
+    expected = _last_enter(expected).splitlines(keepends=False)
+    actual = _last_enter(actual).splitlines(keepends=False)
+    return "\n".join(list(unified_diff(expected, actual, lineterm=""))[2:])
 
 
 def _alt_sep(input, value, var):

@@ -5,10 +5,17 @@
 
 #include <fmt/format.h>
 #include <args/actions.hpp>
+#include <cov/app/cvg_info.hh>
+#include <cov/app/line_printer.hh>
 #include <cov/app/path.hh>
 #include <cov/app/show.hh>
+#include <cov/format.hh>
 #include <cov/module.hh>
+#include <git2/blob.hh>
 #include <git2/repository.hh>
+#include <hilite/hilite.hh>
+#include <hilite/lighter.hh>
+#include <hilite/none.hh>
 #include <map>
 #include <optional>
 #include <set>
@@ -88,8 +95,65 @@ namespace cov::app::builtin::show {
 				fmt::print("\n");
 		}
 
-		ctx.print(entries);
+		ctx.print_table(entries);
 
+		if (!is_standalone) return 0;
+
+		auto const report = info.repo.lookup<cov::report>(info.range.to, ec);
+
+		if (git_oid_is_zero(&report->file_list())) return 1;
+		auto const files =
+		    info.repo.lookup<cov::report_files>(report->file_list(), ec);
+		if (ec) p.error(ec, p.tr());
+
+		auto const* file_entry = files->by_path(entries.front().name.expanded);
+		if (!file_entry || git_oid_is_zero(&file_entry->contents())) return 1;
+
+		cvg_info cvg{};
+
+		if (!git_oid_is_zero(&file_entry->line_coverage())) {
+			auto const file_cvg = info.repo.lookup<cov::line_coverage>(
+			    file_entry->line_coverage(), ec);
+			if (file_cvg && !ec)
+				cvg = cvg_info::from_coverage(file_cvg->coverage());
+		}
+
+		auto const data = file_entry->get_contents(info.repo, ec);
+		if (ec) p.error(ec, p.tr());
+		cvg.load_syntax(
+		    std::string_view{reinterpret_cast<char const*>(data.data()),
+		                     data.size()},
+		    entries.front().name.display);
+
+		auto clr = p.show.color_type;
+		if (clr == use_feature::automatic) {
+			clr = cov::platform::is_terminal(stdout) ? use_feature::yes
+			                                         : use_feature::no;
+		}
+
+		auto const widths = cvg.column_widths();
+
+		bool first = true;
+		for (auto const& [start, stop] : cvg.chunks) {
+			if (first)
+				first = false;
+			else
+				fmt::print("\n");
+			fmt::print("\n");
+
+			bool ran_out_of_lines{false};
+			for (auto line_no = start; line_no <= stop; ++line_no) {
+				if (!cvg.has_line(line_no)) {
+					ran_out_of_lines = true;
+					break;
+				}
+				fmt::print("{}\n", cvg.to_string(line_no, widths,
+				                                 clr == use_feature::yes));
+			}
+			if (ran_out_of_lines) break;
+		}
+
+		fmt::print("\n");
 		return 0;
 	}
 }  // namespace cov::app::builtin::show

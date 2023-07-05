@@ -1,0 +1,40 @@
+{
+    "args": "show HEAD:src/main.cc --color always",
+    "expected": [
+        0,
+        [
+            "\u001b[33mfile src/main.cc\u001b[m",
+            "",
+            "+-----------+----------+---------+----------+---------+-------+",
+            "| NAME      | COVERAGE | COVERED | RELEVANT | MISSING | TOTAL |",
+            "+-----------+----------+---------+----------+---------+-------+",
+            "|   main.cc |   \u001b[1;31m66.67%\u001b[m |       6 |        9 |       3 |    17 |",
+            "+-----------+----------+---------+----------+---------+-------+",
+            "",
+            "  1 |  0x | \u001b[0;49;31m-\u001b[1;31mvoid\u001b[0;49;31m foo() {\u001b[m",
+            "  2 |  0x | \u001b[0;49;31m-    std::cout << \u001b[0;49;91m\"\u001b[2;49;91mHello, \u001b[0;49;91m\"\u001b[0;49;31m << name() << \u001b[0;49;91m\"\u001b[2;49;91m!\u001b[0;49;91m\"\u001b[0;49;31m;\u001b[m",
+            "  3 |     |  }",
+            "  4 |     |  ",
+            "  5 | 15x | \u001b[0;49;32m+\u001b[1;32mvoid\u001b[0;49;32m bar() {\u001b[m",
+            "",
+            "",
+            "  9 |  6x | \u001b[0;49;32m+    foo();\u001b[m",
+            " 10 |  4x | \u001b[0;49;32m+    foo();\u001b[m",
+            " 11 |  2x | \u001b[0;49;32m+    foo();\u001b[m",
+            " 12 |  0x | \u001b[0;49;31m-    foo();\u001b[m",
+            " 13 |     |      foo();",
+            " 14 |     |      foo();",
+            " 15 |     |      foo();",
+            "\n"
+        ],
+        ""
+    ],
+    "prepare": [
+        "unpack $DATA/repo.git.tar $TMP",
+        "cd '$TMP'",
+        "git clone repo.git",
+        "cd '$TMP/repo'",
+        "cov init",
+        "cov report $DATA/build-coverage-show-multiple-chunks.json -f create-report"
+    ]
+}
