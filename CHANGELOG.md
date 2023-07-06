@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) and [COMMITS.md](COMMITS.md) for commit guidelines.
 
+## [0.17.1](https://github.com/mzdun/cov/compare/v0.17.0...v0.17.1) (2023-07-06)
+
+### Bug Fixes
+
+- show summary for HEAD..HEAD ([fa981b2](https://github.com/mzdun/cov/commit/fa981b2a8b0dcd0a3f0f2fba6fe1275fad5dba08))
+
 ## [0.17.0](https://github.com/mzdun/cov/compare/v0.16.0...v0.17.0) (2023-07-06)
 
 ### New Features
