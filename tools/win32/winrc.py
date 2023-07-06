@@ -43,7 +43,7 @@ class Translation(NamedTuple):
 
 
 APP = {
-    "fileName": Translation("cov.DESCRIPTION", "Cov for Windows"),
+    "fileName": Translation("DESCRIPTION", "Cov for Windows"),
 }
 
 
@@ -58,7 +58,7 @@ class Language(NamedTuple):
 
 
 root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-translations_dir = os.path.join(root, "data", "translations")
+translations_dir = os.path.join(root, "data", "translations", "cov")
 dest = os.path.join(sys.argv[1] if len(sys.argv) > 1 else ".", "versioninfo.rc")
 
 # pl_PL -> 0x415, but LANGUAGE uses SUBLANG_DEFAULT
@@ -256,7 +256,7 @@ with open(dest, "w") as output:
                 sublang=spec.sublang,
                 fileModule=fileModule,
                 fileExt=fileExt,
-                **strings
+                **strings,
             ),
             file=output,
         )
