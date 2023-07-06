@@ -50,7 +50,7 @@ list(APPEND SOURCES ${CMAKE_CURRENT_BINARY_DIR}/gen/cov/builtins.hh)
 
 if (WIN32)
     foreach(LANG ${LANGUAGES})
-        list(APPEND PO_FILES "${CMAKE_SOURCE_DIR}/data/translations/${LANG}.po")
+        list(APPEND PO_FILES "${CMAKE_SOURCE_DIR}/data/translations/cov/${LANG}.po")
     endforeach()
 
     add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/gen/cov/versioninfo.rc"
