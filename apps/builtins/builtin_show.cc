@@ -49,7 +49,7 @@ namespace cov::app::builtin::show {
 
 		app::show::parser p{{tool, args},
 		                    {platform::locale_dir(), ::lngs::system_locales()}};
-		auto const info = p.parse();
+		auto info = p.parse();
 		std::error_code ec{};
 
 		auto mods = cov::modules::from_report(info.range.to, info.repo, ec);
@@ -77,6 +77,12 @@ namespace cov::app::builtin::show {
 		                     view.fname.prefix.empty();
 
 		if (is_root) {
+			if (!info.range.single &&
+			    git_oid_equal(&info.range.from, &info.range.to)) {
+				info.range.single = true;
+				info.range.from = {};
+			}
+
 			p.show.print(info.repo, info.range, 1);
 		} else if (is_standalone) {
 			fmt::print("{}file {}{}\n\n", ctx.color_for(color::yellow),
