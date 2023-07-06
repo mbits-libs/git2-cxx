@@ -269,12 +269,8 @@ class runner:
             copy_file(os.path.join(src_dir, name), os.path.join(dst_dir, name))
 
     @staticmethod
-    def extract(src_dir: str, dst_dir: str, regex: str):
-        files = _ls(src_dir)
-        if regex:
-            files = [name for name in files if re.match(regex, name)]
-        matching_file = regex if len(files) == 0 else files[0]
-        archive = f"{src_dir}/{matching_file}"
+    def extract(src_dir: str, dst_dir: str, package: str):
+        archive = f"{src_dir}/{package}"
 
         reminder, ext = os.path.splitext(archive)
         _, mid = os.path.splitext(reminder)
@@ -282,22 +278,9 @@ class runner:
             ext = ".tar"
         unpack, msg = ARCHIVES[ext]
 
-        if runner.DRY_RUN:
-            print_args(*msg, archive, dst_dir)
-            return
-
-        if len(files) == 0:
-            print(f"No files matching {regex}", file=sys.stderr)
-            sys.exit(1)
-        if len(files) > 1:
-            print(f"Multiple file matching {regex}:", file=sys.stderr)
-            for name in files:
-                print(f" - {name}", file=sys.stderr)
-            sys.exit(1)
-
         print_args(*msg, archive, dst_dir)
-
-        unpack(archive, dst_dir)
+        if not runner.DRY_RUN:
+            unpack(archive, dst_dir)
 
 
 def step_call(

@@ -8,17 +8,63 @@ import sys
 from typing import Dict, List, Optional, Tuple
 
 from .runner import copy_file, print_args, runner, step_call, step_info
+from .uname import uname
 
-platform = {
-    "linux": "ubuntu",
-    "win32": "windows",
-}[sys.platform]
+_platform_name, _platform_version, _platform_arch = uname()
+
+
+platform = _platform_name
 
 _names = {
     "clang": ["clang", "clang++"],
     "stdclang": ["clang", "stdclang"],
     "gcc": ["gcc", "g++"],
 }
+
+_cpack_generators = {
+    "ZIP": ".zip",
+    "TGZ": ".tar.gz",
+    "WIZ": ".msi",
+}
+
+
+def arch_ext(config: dict):
+    cpack_generator = config.get("cpack_generator", [])
+    if len(cpack_generator):
+        try:
+            return _cpack_generators[cpack_generator[0]]
+        except KeyError:
+            pass
+    return None
+
+
+def get_version():
+    root = os.path.dirname(
+        os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    )
+    with open(os.path.join(root, "CMakeLists.txt"), "r") as f:
+        attr, rest = f.read().split("project (cov", 1)[1].split(")", 1)
+
+    for attr, value in [
+        line.strip().split(" ", 1) for line in attr.strip().split("\n")
+    ]:
+        if attr == "VERSION":
+            version = value
+            break
+    rest = rest.split('set(PROJECT_VERSION_STABILITY "', 1)[1].split('"')[0]
+    return (version, rest)
+
+
+def package_name(config: dict, group: str):
+    debug = "-dbg" if config.get("build_type", "").lower() == "debug" else ""
+    ver = "".join(get_version())
+    ext = arch_ext(config)
+    if ext is None:
+        ext = ".zip"
+    platform_with_version = (
+        platform if platform == "windows" else f"{platform}-{_platform_version}"
+    )
+    return f"cov-{ver}-{platform_with_version}-{_platform_arch}{debug}-{group}{ext}"
 
 
 def matches(tested: dict, test: dict):
@@ -329,18 +375,30 @@ class steps:
                 pass
 
     @staticmethod
-    @step_call("BinInst", flags=step_info.VERBOSE)
-    def bin_inst(_: dict):
+    @step_call(
+        "BinInst",
+        flags=step_info.VERBOSE,
+        visible=lambda cfg: arch_ext(cfg) is not None,
+    )
+    def bin_inst(config: dict):
         if not runner.DRY_RUN:
             os.makedirs("build/.local", exist_ok=True)
-        runner.extract("build/artifacts/packages", "build/.local", r"^cov-.*-apps\..*$")
+        runner.extract(
+            "build/artifacts/packages", "build/.local", package_name(config, "apps")
+        )
 
     @staticmethod
-    @step_call("DevInst", flags=step_info.VERBOSE)
-    def dev_inst(_: dict):
+    @step_call(
+        "DevInst",
+        flags=step_info.VERBOSE,
+        visible=lambda cfg: arch_ext(cfg) is not None,
+    )
+    def dev_inst(config: dict):
         if not runner.DRY_RUN:
             os.makedirs("build/.user", exist_ok=True)
-        runner.extract("build/artifacts/packages", "build/.user", r"^cov-.*-devel\..*$")
+        runner.extract(
+            "build/artifacts/packages", "build/.user", package_name(config, "devel")
+        )
 
     @staticmethod
     @step_call(
@@ -350,13 +408,11 @@ class steps:
     )
     def coverage(config: dict):
         reporter = f"build/{config['preset']}/bin/cov"
-        ver_process = subprocess.run([reporter, "--version"], stdout=subprocess.PIPE)
         tag_process = subprocess.run([reporter, "tag"], stdout=subprocess.PIPE)
         tags = (
             tag_process.stdout.decode("UTF-8").replace("\r\n", "\n").strip().split("\n")
         )
-        var_list = ver_process.stdout.decode("UTF-8").strip().split()
-        version = var_list[2] if len(var_list) > 2 else var_list[-1]
+        version = "".join(get_version())
         version_tag = f"v{version}"
         legacy_reporter = os.environ.get("LEGACY_COV")
         report = f"build/{config['preset']}/coveralls.json"
