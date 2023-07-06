@@ -1,0 +1,43 @@
+{
+    "args": "show same..sies",
+    "patches": {
+        "report [0-9a-f]{40}": "report $REPORT_HASH",
+        "commit [0-9a-f]{40}": "commit $COMMIT_HASH",
+        "Added:     .*": "Added:     $NOW"
+    },
+    "expected": [
+        0,
+        [
+            "report $REPORT_HASH",
+            "commit $COMMIT_HASH",
+            "GitBranch: main",
+            "Coverage:  [ 86%] 6/7 (incomplete)",
+            "Author:    Johnny Appleseed <johnny@appleseed.com>",
+            "Added:     $NOW",
+            "",
+            "      reported files",
+            "",
+            "+---------+----------+---------+----------+---------+-------+",
+            "| NAME    | COVERAGE | COVERED | RELEVANT | MISSING | TOTAL |",
+            "+---------+----------+---------+----------+---------+-------+",
+            "| D lib   |  100.00% |       4 |        4 |       0 |     7 |",
+            "| D src   |   66.67% |       2 |        3 |       1 |     6 |",
+            "+---------+----------+---------+----------+---------+-------+",
+            "| > TOTAL |   85.71% |       6 |        7 |       1 |    13 |",
+            "+---------+----------+---------+----------+---------+-------+\n"
+        ],
+        ""
+    ],
+    "prepare": [
+        "unpack $DATA/repo.git.tar $TMP",
+        "cd '$TMP'",
+        "git clone repo.git",
+        "cd '$TMP/repo'",
+        "git config --local user.name 'Johnny Appleseed'",
+        "git config --local user.email 'johnny@appleseed.com'",
+        "cov init",
+        "cov report $DATA/build-coverage-show-modules.json -f create-report",
+        "cov tag same",
+        "cov tag sies"
+    ]
+}
