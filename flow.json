@@ -25,7 +25,7 @@
       "os": "windows",
       "build_generator": "msbuild",
       "report_os": "Windows",
-      "cpack_generator": ["ZIP"]
+      "cpack_generator": ["ZIP", "WIX"]
     },
     {"os": "ubuntu", "report_os": "Linux"},
     {"compiler": "gcc", "report_compiler": "GNU"},
