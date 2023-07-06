@@ -19,7 +19,7 @@
       "os": "ubuntu",
       "conan_settings": ["compiler.libcxx=libstdc++11"],
       "build_generator": "ninja",
-      "cpack_generator": ["TGZ"]
+      "cpack_generator": ["TGZ", "DEB"]
     },
     {
       "os": "windows",
