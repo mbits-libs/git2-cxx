@@ -311,7 +311,7 @@ class steps:
         runner.copy(
             f"build/{preset}/packages",
             "build/artifacts/packages",
-            r"^cov-.*-(devel|apps)\..*$",
+            r"^cov-.*$",
         )
         runner.copy(f"build/{preset}/test-results", "build/artifacts/test-results")
         if config.get("coverage", False):

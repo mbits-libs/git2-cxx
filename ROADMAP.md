@@ -6,6 +6,10 @@
   - [x] `report`
   - [x] `report_file`
   - [x] `line_coverage`
+  - [ ] `branch_coverage`
+  - [ ] `function_coverage`
+  - [ ] `report_set` **\[breaking, must be done pre-release]**
+  - [ ] `propset`
 - [x] Wrap I/O in Z streams _(0.2.0-alpha)_
 - [x] Idea of references, tags and "branches" _(0.3.0-alpha)_
 - [x] Report format for `log` _(0.4.1-alpha)_
@@ -33,6 +37,7 @@
     _name=..._\
     _dir=..._\
     _dir=..._
+    - [ ] rename `.covmodule` to `.covmodules` **\[breaking, must be done pre-release]**
   - [x] Patch-worth:
     - [x] add win32 RC file _(0.12.1-beta)_
     - [x] merge/split .po files _(0.12.2-beta)_
@@ -53,7 +58,7 @@
   - [x] `cov log` _(0.14.0)_
   - [x] `cov tag` / `branch` / `checkout` _(0.15.0)_
   - [x] `cov reset` _(0.16.0)_
-  - [ ] `cov show`
+  - [ ] `cov show` _(0.17.0)_
     - [x] Report / component / directory view
     - [x] File view
   - [ ] `cov cherry-pick` (?)

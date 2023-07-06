@@ -227,7 +227,7 @@ def main():
     runner.runner.DRY_RUN = args.dry_run
     runner.runner.CUTDOWN_OS = args.cutdown_os
     runner.runner.GITHUB_ANNOTATE = args.github
-    path = os.path.join(os.path.dirname(__file__), "lib", "config.json")
+    path = os.path.join(os.path.dirname(__file__), "..", "..", "flow.json")
     configs, keys = matrix.load_matrix(path)
 
     usable = [
