@@ -9,4 +9,4 @@
 	url = https://github.com/mbits-libs/json.git
 [submodule "external/date"]
 	path = external/date
-	url = https://github.com/HowardHinnant/date.git
+	url = https://github.com/mzdun/date.git
