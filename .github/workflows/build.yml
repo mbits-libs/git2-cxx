@@ -43,13 +43,13 @@ jobs:
             ubuntu: true
             home: /home/runner
             run_os: ubuntu
-            latest_conan_hash: 111b1001009e07646d901bc7f4c1f6288c65deb6757bc615c38b2dfc8174207f
+            latest_conan_hash: e903f3ceb636ec2e496810737eb6033a1a8c39c227b437a0693d31086d8aa9df
             # Windows ANY
           - os: windows-latest
             windows: true
             home: C:/Users/runneradmin
             run_os: windows
-            latest_conan_hash: 701d0a420b7f8c0168f6d14ed46ca0520792087cccf5d2254afd92583d58c1f8
+            latest_conan_hash: 1f8eec6aa067e5a60fc4f0ab2668dae66a983ae5902b1eda006f134b009f84eb
 
     env:
       BUILD_TYPE: ${{ matrix.build_type }}

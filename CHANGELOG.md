@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) and [COMMITS.md](COMMITS.md) for commit guidelines.
 
+## [0.17.2](https://github.com/mzdun/cov/compare/v0.17.1...v0.17.2) (2023-07-08)
+
+### Bug Fixes
+
+- create WiX installer ([6bfe24d](https://github.com/mzdun/cov/commit/6bfe24d4a5f9e46832e47e9346cdf0db77231684))
+
 ## [0.17.1](https://github.com/mzdun/cov/compare/v0.17.0...v0.17.1) (2023-07-06)
 
 ### Bug Fixes
