@@ -164,7 +164,8 @@ if (COV_SANITIZE)
   message(STATUS "This build is prepared for sanitization")
 endif()
 
-include(prepare_pack)
+include(${PROJECT_SOURCE_DIR}/packages/config.cmake)
+include(CPack)
 
 set(BINARY_DIR bin)
 set(ROOT_DIR "..")
