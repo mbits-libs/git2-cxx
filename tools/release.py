@@ -482,7 +482,7 @@ def update_changelog(cur_tag: str, prev_tag: str) -> dict:
         "tag_name": cur_tag,
         "name": cur_tag,
         "body": "\n".join(github),
-        "draft": False,
+        "draft": True,
         "prerelease": False,  # updated by the caller
     }
 
@@ -592,7 +592,7 @@ if dry_run:
     print(f'Would commit "chore: {MESSAGE}"')
     if GITHUB_REMOTE is not None:
         print(
-            f"Would create release in GitHub under {GITHUB_LINK}/releases/tag/{NEW_TAG}"
+            f"Would create release draft in GitHub under {GITHUB_LINK}/releases/tag/{NEW_TAG}"
         )
     sys.exit(0)
 
@@ -611,7 +611,9 @@ subprocess.check_call(["git", "tag", "-am", MESSAGE, NEW_TAG], shell=False)
 if COV_TOOL is not None:
     subprocess.check_call([COV_TOOL, "tag", "--force", NEW_TAG], shell=False)
 if GITHUB_REMOTE is not None:
-    print(f"Creating release in GitHub under {GITHUB_LINK}/releases/tag/{NEW_TAG}")
+    print(
+        f"Creating release draft in GitHub under {GITHUB_LINK}/releases/tag/{NEW_TAG}"
+    )
     subprocess.check_call(
         ["git", "push", GITHUB_REMOTE, "main", "--follow-tags"], shell=False
     )
