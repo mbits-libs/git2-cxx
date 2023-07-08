@@ -66,16 +66,21 @@ def get_version():
     return (version, rest)
 
 
-def package_name(config: dict, group: str):
+def package_name_(config: dict, group: str, ext: str):
     debug = "-dbg" if config.get("build_type", "").lower() == "debug" else ""
     ver = "".join(get_version())
-    ext = arch_ext(config)
     if ext is None:
         ext = ".zip"
     platform_with_version = (
         platform if platform == "windows" else f"{platform}-{_platform_version}"
     )
-    return f"cov-{ver}-{platform_with_version}-{_platform_arch}{debug}-{group}{ext}"
+    if group != "":
+        group = f"-{group}"
+    return f"cov-{ver}-{platform_with_version}-{_platform_arch}{debug}{group}{ext}"
+
+
+def package_name(config: dict, group: str):
+    return package_name_(config, group, arch_ext(config))
 
 
 def matches(tested: dict, test: dict):
@@ -341,17 +346,44 @@ class steps:
     @staticmethod
     @step_call("Pack", lambda config: len(config.get("cpack_generator", [])) > 0)
     def pack(config: dict):
-        for generator in config.get("cpack_generator", []):
-            runner.call("cpack", "--preset", config["preset"], "-G", generator)
+        runner.call(
+            "cpack",
+            "--preset",
+            config["preset"],
+            "-G",
+            ";".join(config.get("cpack_generator", [])),
+        )
 
     @staticmethod
     @step_call("Artifacts")
     def store(config: dict):
+        preset = config["preset"]
+        packages_dir = f"build/{preset}/packages"
         if not runner.DRY_RUN:
             os.makedirs("build/artifacts", exist_ok=True)
-        preset = config["preset"]
+        print_args(
+            "mv", package_name_(config, "apps", ".*"), package_name_(config, "", ".*")
+        )
+        if not runner.DRY_RUN:
+            comp_filename = package_name_(config, "apps", "")
+            main_filename = package_name_(config, "", "")
+            for _, dirnames, filenames in os.walk(packages_dir):
+                dirnames[:] = []
+                extensions = [
+                    filename[len(comp_filename) :]
+                    for filename in filenames
+                    if len(filename) > len(comp_filename)
+                    and filename[: len(comp_filename)] == comp_filename
+                    and filename[len(comp_filename)] == "."
+                ]
+            for extension in extensions:
+                shutil.move(
+                    f"{packages_dir}/{comp_filename}{extension}",
+                    f"{packages_dir}/{main_filename}{extension}",
+                )
+
         runner.copy(
-            f"build/{preset}/packages",
+            packages_dir,
             "build/artifacts/packages",
             r"^cov-.*$",
         )
@@ -380,7 +412,7 @@ class steps:
         if not runner.DRY_RUN:
             os.makedirs("build/.local", exist_ok=True)
         runner.extract(
-            "build/artifacts/packages", "build/.local", package_name(config, "apps")
+            "build/artifacts/packages", "build/.local", package_name(config, "")
         )
 
     @staticmethod
