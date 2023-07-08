@@ -1,6 +1,7 @@
 # Copyright (c) 2023 Marcin Zdun
 # This code is licensed under MIT license (see LICENSE for details)
 
+import abc
 import functools
 import os
 import re
@@ -152,6 +153,128 @@ def _ls(dirname):
             for filename in filenames
         )
     return result
+
+
+class conan(abc.ABC):
+    def __init__(self, version: int = 1):
+        self.version = version
+
+    def settings(self, cfg: dict):
+        result: List[str] = []
+        for threshold, name in enumerate(
+            ["conan_settings", "conan2_settings"],
+        ):
+            if self.version <= threshold:
+                break
+            result = cfg.get(name, result)
+        return result
+
+    @abc.abstractmethod
+    def config(
+        self,
+        conan_output_dir: str,
+        compiler_profile_name: str,
+        build_type_profile_name: str,
+    ):
+        ...
+
+
+def _conan_version():
+    found = shutil.which("conan")
+    if found is None:
+        return 1
+
+    p = subprocess.run([found, "--version"], check=False, stdout=subprocess.PIPE)
+    if p.returncode != 0:
+        return 1
+    conan_ver = p.stdout.decode("UTF-8").strip().split(" ")
+    if len(conan_ver) <= 2:
+        return 1
+
+    conan_ver = conan_ver[2].split(".")
+    try:
+        return int(conan_ver[0])
+    except ValueError:
+        pass
+
+    return 1
+
+
+class conan_1(conan):
+    def __init__(self):
+        super().__init__(1)
+
+    def config(
+        self,
+        conan_output_dir: str,
+        compiler_profile_name: str,
+        build_type_profile_name: str,
+    ):
+        runner.call(
+            "conan",
+            "profile",
+            "new",
+            "--detect",
+            "--force",
+            compiler_profile_name,
+        )
+
+        runner.call(
+            "conan",
+            "install",
+            "-if",
+            conan_output_dir,
+            "-of",
+            conan_output_dir,
+            "--build",
+            "missing",
+            "-pr:b",
+            build_type_profile_name,
+            "-pr:h",
+            build_type_profile_name,
+            ".",
+        )
+
+
+class conan_2(conan):
+    def __init__(self):
+        super().__init__(2)
+
+    def config(
+        self,
+        conan_output_dir: str,
+        compiler_profile_name: str,
+        build_type_profile_name: str,
+    ):
+        runner.call(
+            "conan",
+            "profile",
+            "detect",
+            "--force",
+            "--name",
+            compiler_profile_name,
+        )
+
+        runner.call(
+            "conan",
+            "install",
+            "-of",
+            conan_output_dir,
+            "--build",
+            "missing",
+            "-pr:b",
+            build_type_profile_name,
+            "-pr:h",
+            build_type_profile_name,
+            ".",
+        )
+
+
+def conan_api() -> conan:
+    version = _conan_version()
+    if version == 2:
+        return conan_2()
+    return conan_1()
 
 
 @dataclass

@@ -4,12 +4,23 @@
 import json
 import os
 import subprocess
+import shutil
 import sys
+import textwrap
 from typing import Dict, List, Optional, Tuple
 
-from .runner import copy_file, print_args, runner, step_call, step_info
+from .runner import (
+    copy_file,
+    print_args,
+    runner,
+    step_call,
+    step_info,
+    conan,
+    conan_api,
+)
 from .uname import uname
 
+_conan: Optional[conan] = None
 _platform_name, _platform_version, _platform_arch = uname()
 
 
@@ -246,6 +257,8 @@ class steps:
     @staticmethod
     @step_call("Conan")
     def configure_conan(config: dict):
+        global _conan
+
         CONAN_DIR = "build/conan"
         CONAN_PROFILE = "_profile-compiler"
         CONAN_PROFILE_GEN = "_profile-build_type"
@@ -254,45 +267,28 @@ class steps:
         if config.get("--first-build", False):
             runner.refresh_build_dir("conan")
 
+        if _conan is None:
+            _conan = conan_api()
+
         if not runner.DRY_RUN:
             with open(profile_gen, "w", encoding="UTF-8") as profile:
                 print(
-                    f"""include({CONAN_PROFILE})
+                    textwrap.dedent(
+                        f"""\
+                        include({CONAN_PROFILE})
 
-[settings]""",
+                        [settings]"""
+                    ),
                     file=profile,
                 )
+
                 for setting in [
-                    *config.get("conan_settings", []),
+                    *_conan.settings(config),
                     f"build_type={config['build_type']}",
                 ]:
                     print(setting, file=profile)
 
-        runner.call(
-            "conan",
-            "profile",
-            "new",
-            "--detect",
-            "--force",
-            f"./{CONAN_DIR}/{CONAN_PROFILE}",
-        )
-
-        runner.call(
-            "conan",
-            "install",
-            "-if",
-            CONAN_DIR,
-            "-of",
-            CONAN_DIR,
-            "--build",
-            "missing",
-            "-pr:b",
-            profile_gen,
-            "-pr:h",
-            profile_gen,
-            ".",
-        )
-
+        _conan.config(CONAN_DIR, f"./{CONAN_DIR}/{CONAN_PROFILE}", profile_gen)
         if not runner.DRY_RUN:
             os.remove("CMakeUserPresets.json")
 
