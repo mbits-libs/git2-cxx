@@ -4,7 +4,7 @@
 import os
 import secrets
 import string
-from typing import Dict, List, NamedTuple, Tuple
+from typing import Dict, List, Tuple
 from .runner import capture, checked
 
 from .changelog import (

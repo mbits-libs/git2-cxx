@@ -3,17 +3,18 @@
 # This code is licensed under MIT license (see LICENSE for details)
 
 import argparse
+import hashlib
+import io
 import os
-import sys
-from pprint import pprint
-from typing import Optional
+import re
+import zipfile
+from typing import List, Optional
 
-from github.api import format_release, locate_remote
-from github.api import release as github_release
+from github.api import API, format_release
 from github.changelog import FORCED_LEVEL, update_changelog
 from github.cmake import get_version, set_version
 from github.git import add_files, annotated_tag, bump_version, commit, get_log, get_tags
-from github.runner import Environment
+from github.runner import Environment, print_args
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 GITHUB_ORG = "mzdun"
@@ -45,16 +46,73 @@ def release(take_all: bool, forced_level: Optional[int]):
     commit(f"chore: {commit_message}")
     annotated_tag(next_tag, commit_message)
 
-    github_remote = locate_remote(GITHUB_ORG, project.name.value)
+    api = API(GITHUB_ORG, project.name.value)
 
-    if github_remote is not None:
+    if api.remote is not None:
         gh_release = format_release(log, next_tag, project.tag(), github_link)
-        response = github_release(
-            GITHUB_ORG, project.name.value, github_remote, gh_release
-        )
-        html_url = response.get("html_url")
+        html_url = api.release(gh_release).get("html_url")
         if html_url is not None:
             print(f"Visit draft at {html_url}")
+
+
+def _hash(filename: str) -> str:
+    sha = hashlib.sha256()
+    with open(filename, "rb") as data:
+        for block in iter(lambda: data.read(io.DEFAULT_BUFFER_SIZE), b""):
+            sha.update(block)
+    return sha.hexdigest()
+
+
+def _checksums(archive: str, names: List[str], out_name: str):
+    print_args(["sha256sum", "-b"])
+    if True or not Environment.DRY_RUN:
+        with open(os.path.join(archive, out_name), "w") as output:
+            for name in names:
+                digest = _hash(os.path.join(archive, name))
+                print(f"{digest} *{name}", file=output)
+    names.append(out_name)
+
+
+def upload(archive: str):
+    project = get_version()
+    api = API(GITHUB_ORG, project.name.value)
+    regex = f"^{project.pkg()}-.*-x86_64\..*$"
+    matcher = re.compile(regex)
+
+    if os.path.isdir(archive):
+        for _, dirnames, filenames in os.walk(archive):
+            dirnames[:] = []
+            names = [name for name in filenames if matcher.match(name)]
+    else:
+        next_archive = f"{archive}-dir"
+        os.makedirs(next_archive, exist_ok=True)
+        with zipfile.ZipFile(archive) as zip:
+            names = [name for name in zip.namelist() if matcher.match(name)]
+            for name in names:
+                zip.extract(name, path=next_archive)
+        archive = next_archive
+    if not len(names):
+        print(f"no artifact matches {regex}")
+        return None
+
+    _checksums(archive, names, "file_list.sha256")
+
+    releases = api.unpublished_releases(project.tag())
+    release_id = releases[0].get("id") if len(releases) else None
+
+    if release_id is not None:
+        for name in names:
+            path = os.path.abspath(os.path.join(archive, name))
+            api.upload_asset(release_id, path)
+
+        html_url = api.publish_release(release_id)
+        if html_url is not None:
+            print(">>>", html_url)
+    elif Environment.DRY_RUN:
+        if len(names):
+            print(f"would upload:")
+        for name in names:
+            print(f"- {name}")
 
 
 parser = argparse.ArgumentParser(usage="Creates a release draft in GitHub")
@@ -76,12 +134,21 @@ parser.add_argument(
     help="ignore the version change from changelog and instead use this settings' change",
     choices=FORCED_LEVEL.keys(),
 )
+parser.add_argument(
+    "--upload",
+    metavar="ZIP-or-dir",
+    required=False,
+    help="instead of creating a new release, upload to and publish an existing one",
+)
 
 
 def __main__():
     args = parser.parse_args()
     Environment.DRY_RUN = args.dry_run
-    release(args.all, FORCED_LEVEL.get(args.force))
+    if args.upload is not None:
+        upload(args.upload)
+    else:
+        release(args.all, FORCED_LEVEL.get(args.force))
 
 
 if __name__ == "__main__":
