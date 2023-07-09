@@ -20,6 +20,10 @@ from .runner import (
 )
 from .uname import uname
 
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+
+from github.cmake import get_version
+
 _conan: Optional[conan] = None
 _platform_name, _platform_version, _platform_arch = uname()
 
@@ -49,26 +53,9 @@ def arch_ext(config: dict):
     return None
 
 
-def get_version():
-    root = os.path.dirname(
-        os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    )
-    with open(os.path.join(root, "CMakeLists.txt"), "r") as f:
-        attr, rest = f.read().split("project (cov", 1)[1].split(")", 1)
-
-    for attr, value in [
-        line.strip().split(" ", 1) for line in attr.strip().split("\n")
-    ]:
-        if attr == "VERSION":
-            version = value
-            break
-    rest = rest.split('set(PROJECT_VERSION_STABILITY "', 1)[1].split('"')[0]
-    return (version, rest)
-
-
 def package_name_(config: dict, group: str, ext: str):
     debug = "-dbg" if config.get("build_type", "").lower() == "debug" else ""
-    ver = "".join(get_version())
+    pkg = get_version().pkg()
     if ext is None:
         ext = ".zip"
     platform_with_version = (
@@ -76,7 +63,7 @@ def package_name_(config: dict, group: str, ext: str):
     )
     if group != "":
         group = f"-{group}"
-    return f"cov-{ver}-{platform_with_version}-{_platform_arch}{debug}{group}{ext}"
+    return f"{pkg}-{platform_with_version}-{_platform_arch}{debug}{group}{ext}"
 
 
 def package_name(config: dict, group: str):
@@ -440,20 +427,19 @@ class steps:
         tags = (
             tag_process.stdout.decode("UTF-8").replace("\r\n", "\n").strip().split("\n")
         )
-        version = "".join(get_version())
-        version_tag = f"v{version}"
+        version = get_version()
         legacy_reporter = os.environ.get("LEGACY_COV")
         report = f"build/{config['preset']}/coveralls.json"
         runner.call(reporter, "report", "--filter", "coveralls", report)
         if legacy_reporter is not None:
             runner.call(legacy_reporter, "import", "--in", report, "--amend")
-        if version_tag in tags:
+        if version.tag() in tags:
             runner.call(
                 reporter,
                 "show",
                 "--format=oneline",
                 "--abbrev-hash",
-                f"{version_tag}..",
+                f"{version.tag()}..",
             )
 
     @staticmethod
