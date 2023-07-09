@@ -33,8 +33,6 @@ def release(take_all: bool, forced_level: Optional[int]):
         level = forced_level
 
     next_stability = project.stability.value
-    if next_stability == "":
-        next_stability = "-test"
     next_tag = f"v{bump_version(project.ver(), level)}{next_stability}"
     if not Environment.DRY_RUN:
         update_changelog(log, next_tag, project.tag(), github_link)
