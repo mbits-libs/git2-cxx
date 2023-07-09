@@ -3,6 +3,7 @@
 
 import json
 import os
+import sys
 import urllib.parse
 from pathlib import Path
 from typing import Any, Optional
@@ -29,6 +30,13 @@ def _load_secret(owner: str, project: str) -> Optional[str]:
                 continue
     except FileNotFoundError:
         pass
+    GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN")  # fall back to bot, if available
+    if GITHUB_TOKEN:
+        print(
+            f"falling back to GITHUB_TOKEN (len: {len(GITHUB_TOKEN)})", file=sys.stderr
+        )
+        return GITHUB_TOKEN
+    print("no secrets to be used...", file=sys.stderr)
     return None
 
 
@@ -105,87 +113,10 @@ def json_from(url: str, *args: str, method: Optional[str] = None, default: Any =
     proc = curl(url, *args, method=method)
     if proc is None:
         return default
-    return json.loads(proc.stdout.decode("UTF-8"))
-
-
-def release(owner: str, project: str, github_remote: str, gh_release: dict) -> dict:
-    checked("git", "push", github_remote, "main", "--follow-tags")
-    result = curl(
-        f"https://api.github.com/repos/{owner}/{project}/releases",
-        "-d",
-        json.dumps(gh_release),
-        method="POST",
-    )
-
-    if result is None:
-        return {}
-    return json.loads(result.stdout.decode("UTF-8"))
-
-
-def runs_for_commit(owner: str, project: str, ref: str):
-    ref_hash = (
-        capture("git", "rev-list", "--no-walk", ref).stdout.decode("UTF-8").strip()
-    )
-    runs = json_from(
-        f"https://api.github.com/repos/{owner}/{project}/actions/runs",
-        "-L",
-    ).get("workflow_runs", [])
-
-    return [
-        item
-        for item in runs
-        if item.get("head_sha") == ref_hash and item.get("head_sha") == ref_hash
-    ]
-
-
-def list_artifacts(url: str, name: str):
-    return [
-        art
-        for art in json_from(
-            url,
-            "-L",
-        ).get("artifacts", [])
-        if art.get("name") == name
-    ]
-
-
-def download_archive_from_url(url: str, filename: str):
-    os.makedirs(os.path.dirname(filename), exist_ok=True)
-    curl(url, "-L", "--output", filename, capture_output=False)
-
-
-def download_archive(owner: str, project: str, ref: str, archive_name: str):
-    runs = runs_for_commit(owner, project, ref)
-    if len(runs) > 1:
-        with open("dump.json", "w", encoding="UTF-8") as dump:
-            json.dump(runs, dump)
-    name: str = runs[0].get("name", "<unnamed>")
-    run_number: int = runs[0].get("run_number", 0)
-    display_title: str = runs[0].get("display_title", 0)
-    status: str = runs[0].get("status", "")
-
-    print(f"{name} #{run_number} {display_title} -- {status}")
-    if status != "completed":
-        return None
-
-    artifacts_url: Optional[str] = runs[0].get("artifacts_url") if len(runs) else None
-    if artifacts_url is None:
-        return None
-
-    artifacts = list_artifacts(artifacts_url, archive_name)
-    archive_download_url: Optional[str] = (
-        artifacts[0].get("archive_download_url") if len(artifacts) else None
-    )
-
-    if archive_download_url is None:
-        return None
-
-    filename = (
-        f"build/downloads/{runs[0].get('run_number', 'unknown')}/{archive_name}.zip"
-    )
-    download_archive_from_url(archive_download_url, filename)
-
-    return filename
+    stdout = proc.stdout.decode("UTF-8")
+    if Environment.DBG:
+        print(stdout)
+    return json.loads(stdout)
 
 
 class API:
@@ -199,20 +130,86 @@ class API:
         self.remote = locate_remote(owner, repo)
 
     def release(self, gh_release: dict) -> dict:
-        return release(self.owner, self.repo, self.remote, gh_release)
+        checked(
+            "git", "push", self.remote, "main", "--follow-tags", "--force-with-lease"
+        )
+
+        return json_from(
+            f"https://api.github.com/repos/{self.owner}/{self.repo}/releases",
+            "-d",
+            json.dumps(gh_release),
+            method="POST",
+            default={},
+        )
 
     def download_archive(self, ref: str, archive_name: str):
-        return download_archive(self.owner, self.repo, ref, archive_name)
+        ref_hash = (
+            capture("git", "rev-list", "--no-walk", ref).stdout.decode("UTF-8").strip()
+        )
+        if Environment.DBG:
+            print(ref_hash)
 
-    def unpublished_releases(self, tag_name: str):
-        return [
-            release
-            for release in json_from(
-                f"https://api.github.com/repos/{self.owner}/{self.repo}/releases",
-                default=[],
-            )
-            if release.get("tag_name") == tag_name
+        workflow_runs = json_from(
+            f"https://api.github.com/repos/{self.owner}/{self.repo}/actions/runs",
+            "-L",
+        ).get("workflow_runs", [])
+
+        runs = [
+            run
+            for run in workflow_runs
+            if run.get("head_sha") == ref_hash and run.get("head_sha") == ref_hash
         ]
+
+        if len(runs) > 1:
+            with open("dump.json", "w", encoding="UTF-8") as dump:
+                json.dump(runs, dump)
+        name: str = runs[0].get("name", "<unnamed>")
+        run_number: int = runs[0].get("run_number", 0)
+        display_title: str = runs[0].get("display_title", 0)
+        status: str = runs[0].get("status", "")
+
+        print(f"{name} #{run_number} {display_title} -- {status}")
+        if status != "completed":
+            return None
+
+        artifacts_url: Optional[str] = (
+            runs[0].get("artifacts_url") if len(runs) else None
+        )
+        if artifacts_url is None:
+            return None
+
+        artifacts = [
+            art
+            for art in json_from(
+                artifacts_url,
+                "-L",
+            ).get("artifacts", [])
+            if art.get("name") == name
+        ]
+        archive_download_url: Optional[str] = (
+            artifacts[0].get("archive_download_url") if len(artifacts) else None
+        )
+
+        if archive_download_url is None:
+            return None
+
+        filename = (
+            f"build/downloads/{runs[0].get('run_number', 'unknown')}/{archive_name}.zip"
+        )
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
+        curl(archive_download_url, "-L", "--output", filename, capture_output=False)
+
+        return filename
+
+    def get_unpublished_release_id(self, tag_name: str):
+        releases = json_from(
+            f"https://api.github.com/repos/{self.owner}/{self.repo}/releases",
+            default=[],
+        )
+        limited = [
+            release for release in releases if release.get("tag_name") == tag_name
+        ]
+        return limited[0].get("id") if len(limited) else None
 
     def upload_asset(self, release_id: int, path: str):
         quoted = urllib.parse.quote_plus(os.path.basename(path))

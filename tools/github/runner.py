@@ -9,13 +9,20 @@ from typing import List, Optional, Tuple
 
 class Environment:
     DRY_RUN: bool = False
+    USE_COLOR: bool = True
+    DBG: bool = True
     SECRETS: List[str] = []
+
+
+def _hide(arg: str):
+    for secret in Environment.SECRETS:
+        arg = arg.replace(secret, "?" * len(secret))
+    return arg
 
 
 def _print_arg(arg: str):
     color = ""
-    for secret in Environment.SECRETS:
-        arg = arg.replace(secret, "*****")
+    arg = _hide(arg)
     if arg[:1] == "-":
         color = "\033[2;37m"
     arg = shlex.join([arg])
@@ -27,6 +34,10 @@ def _print_arg(arg: str):
 
 
 def print_args(args: Tuple[str]):
+    if not Environment.USE_COLOR:
+        print(shlex.join(_hide(arg) for arg in args))
+        return
+
     cmd = shlex.join([args[0]])
     args = " ".join([_print_arg(arg) for arg in args[1:]])
     print(f"\033[33m{cmd}\033[m {args}", file=sys.stderr)

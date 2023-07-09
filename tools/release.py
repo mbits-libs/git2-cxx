@@ -7,6 +7,7 @@ import hashlib
 import io
 import os
 import re
+import sys
 import zipfile
 from typing import List, Optional
 
@@ -90,13 +91,12 @@ def upload(archive: str):
                 zip.extract(name, path=next_archive)
         archive = next_archive
     if not len(names):
-        print(f"no artifact matches {regex}")
+        print(f"no artifact matches {regex}", file=sys.stderr)
         return None
 
     _checksums(archive, names, "file_list.sha256")
 
-    releases = api.unpublished_releases(project.tag())
-    release_id = releases[0].get("id") if len(releases) else None
+    release_id = api.get_unpublished_release_id(project.tag())
 
     if release_id is not None:
         for name in names:
@@ -105,12 +105,12 @@ def upload(archive: str):
 
         html_url = api.publish_release(release_id)
         if html_url is not None:
-            print(">>>", html_url)
+            print(">>>", html_url, file=sys.stderr)
     elif Environment.DRY_RUN:
         if len(names):
-            print(f"would upload:")
+            print(f"would upload:", file=sys.stderr)
         for name in names:
-            print(f"- {name}")
+            print(f"- {name}", file=sys.stderr)
 
 
 parser = argparse.ArgumentParser(usage="Creates a release draft in GitHub")
@@ -138,11 +138,27 @@ parser.add_argument(
     required=False,
     help="instead of creating a new release, upload to and publish an existing one",
 )
+parser.add_argument(
+    "--color",
+    required=False,
+    help="should we colorize the output",
+    choices=["always", "never"],
+    default="always",
+)
+parser.add_argument(
+    "--debug",
+    required=False,
+    action="store_true",
+)
 
 
 def __main__():
     args = parser.parse_args()
     Environment.DRY_RUN = args.dry_run
+    Environment.USE_COLOR = args.color == "always"
+    Environment.DBG = args.debug
+    print(args)
+    print("Environment.USE_COLOR", Environment.USE_COLOR)
     if args.upload is not None:
         upload(args.upload)
     else:
