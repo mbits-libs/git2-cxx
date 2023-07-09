@@ -3,8 +3,7 @@
 
 import os
 import re
-from pprint import pprint
-from typing import Dict, Iterator, List, NamedTuple, Optional
+from typing import Iterator, List, NamedTuple, Optional
 
 PROJECT_SOURCE_DIRECTORY = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

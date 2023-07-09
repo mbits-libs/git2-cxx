@@ -32,7 +32,7 @@ def print_args(args: Tuple[str]):
     print(f"\033[33m{cmd}\033[m {args}", file=sys.stderr)
 
 
-def run(args: Tuple[str], **kwargs) -> subprocess.CompletedProcess[bytes]:
+def run(*args: str, **kwargs) -> subprocess.CompletedProcess[bytes]:
     print_args(args)
     return subprocess.run(args, shell=False, **kwargs)
 
@@ -54,4 +54,4 @@ def checked_capture(
 
 
 def capture(*args: List[str], **kwargs):
-    return run(args, capture_output=True, **kwargs)
+    return run(*args, capture_output=True, **kwargs)
