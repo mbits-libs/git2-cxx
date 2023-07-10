@@ -10,7 +10,7 @@ from typing import List, Optional, Tuple
 class Environment:
     DRY_RUN: bool = False
     USE_COLOR: bool = True
-    DBG: bool = True
+    DBG: bool = False
     SECRETS: List[str] = []
 
 

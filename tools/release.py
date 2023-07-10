@@ -9,6 +9,7 @@ import os
 import re
 import sys
 import zipfile
+import subprocess
 from typing import List, Optional
 
 from github.api import API, format_release
@@ -96,11 +97,14 @@ def upload(archive: str):
 
     _checksums(archive, names, "file_list.sha256")
 
-    release_id = api.get_unpublished_release_id(project.tag())
+    release_id = api.get_unpublished_release(project.tag()).get("id")
 
     if release_id is not None:
+        preexisting = api.asset_list(release_id)
         for name in names:
             path = os.path.abspath(os.path.join(archive, name))
+            if name in preexisting:
+                api.delete_asset(preexisting[name])
             api.upload_asset(release_id, path)
 
         html_url = api.publish_release(release_id)
@@ -157,12 +161,15 @@ def __main__():
     Environment.DRY_RUN = args.dry_run
     Environment.USE_COLOR = args.color == "always"
     Environment.DBG = args.debug
-    print(args)
-    print("Environment.USE_COLOR", Environment.USE_COLOR)
-    if args.upload is not None:
-        upload(args.upload)
-    else:
-        release(args.all, FORCED_LEVEL.get(args.force))
+    try:
+        if args.upload is not None:
+            upload(args.upload)
+        else:
+            release(args.all, FORCED_LEVEL.get(args.force))
+    except subprocess.CalledProcessError as e:
+        print(e.stdout.decode("utf-8"), file=sys.stdout)
+        print(e.stderr.decode("utf-8"), file=sys.stderr)
+        sys.exit(1)
 
 
 if __name__ == "__main__":
