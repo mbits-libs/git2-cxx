@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) and [COMMITS.md](COMMITS.md) for commit guidelines.
 
+## [0.17.3](https://github.com/mzdun/cov/compare/v0.17.2...v0.17.3) (2023-07-10)
+
+### Continuos Integration
+
+- **github**: clean workflow ([3448083](https://github.com/mzdun/cov/commit/344808315693efd15482ba111f85d7ac961dfbb1))
+- **github**: fix asset upload ([94e631f](https://github.com/mzdun/cov/commit/94e631fd106f0355a5538d193f3e15036207697e))
+- **github**: switch from `curl` to `gh api` ([2fabad3](https://github.com/mzdun/cov/commit/2fabad3d1bb036054eb31be7c80250918b29b0a4))
+- **github**: hook upload to github actions ([3880a42](https://github.com/mzdun/cov/commit/3880a42ee454069083c3f6bc8772490ee163e2c0))
+- **github**: do not force -test on main branch ([b7c7015](https://github.com/mzdun/cov/commit/b7c7015eb2fa72c165249f11ece27bba1c20b4e6))
+- **github**: upload artifacts to release ([9ec6d60](https://github.com/mzdun/cov/commit/9ec6d604ed21725b10acaaa5bdd0e46b7a0b1e46))
+- **github**: clean up the release script ([eefc2ff](https://github.com/mzdun/cov/commit/eefc2ff4981681ebfa4d27e60fc53bee7cd65c8f))
+
 ## [0.17.2](https://github.com/mzdun/cov/compare/v0.17.1...v0.17.2) (2023-07-08)
 
 ### Bug Fixes
