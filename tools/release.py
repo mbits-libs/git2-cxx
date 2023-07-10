@@ -100,11 +100,8 @@ def upload(archive: str):
     release_id = api.get_unpublished_release(project.tag()).get("id")
 
     if release_id is not None:
-        api.upload_assets(
-            project.tag(),
-            list(os.path.abspath(os.path.join(archive, name)) for name in names),
-        )
-
+        os.chdir(archive)
+        api.upload_assets(project.tag(), names)
         html_url = api.publish_release(release_id)
         if html_url is not None:
             print(">>>", html_url, file=sys.stderr)
