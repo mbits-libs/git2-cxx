@@ -100,12 +100,10 @@ def upload(archive: str):
     release_id = api.get_unpublished_release(project.tag()).get("id")
 
     if release_id is not None:
-        preexisting = api.asset_list(release_id)
-        for name in names:
-            path = os.path.abspath(os.path.join(archive, name))
-            if name in preexisting:
-                api.delete_asset(preexisting[name])
-            api.upload_asset(release_id, path)
+        api.upload_assets(
+            project.tag(),
+            list(os.path.abspath(os.path.join(archive, name)) for name in names),
+        )
 
         html_url = api.publish_release(release_id)
         if html_url is not None:
@@ -167,8 +165,10 @@ def __main__():
         else:
             release(args.all, FORCED_LEVEL.get(args.force))
     except subprocess.CalledProcessError as e:
-        print(e.stdout.decode("utf-8"), file=sys.stdout)
-        print(e.stderr.decode("utf-8"), file=sys.stderr)
+        if e.stdout:
+            print(e.stdout.decode("utf-8"), file=sys.stdout)
+        if e.stderr:
+            print(e.stderr.decode("utf-8"), file=sys.stderr)
         sys.exit(1)
 
 

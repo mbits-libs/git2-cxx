@@ -3,10 +3,9 @@
 
 import json
 import os
-import urllib.parse
-from typing import Any, Optional, Dict, Union
-from pprint import pprint
 import subprocess
+import urllib.parse
+from typing import Any, List, Optional, Union
 
 from .changelog import ChangeLog, format_changelog, read_tag_date
 from .runner import Environment, capture, checked, checked_capture, print_args
@@ -142,11 +141,11 @@ class API:
         )
 
         flags = []
-        for flag, name, value in [
-            ("-f" if isinstance(value, str) else "-F", key, json.dumps(value))
-            for key, value in gh_release.items()
-        ]:
-            flags.append(flag)
+        for name, value in gh_release.items():
+            is_str = isinstance(value, str)
+            if not is_str:
+                value = json.dumps(value)
+            flags.append("-f" if is_str else "-F")
             flags.append(f"{name}={value}")
 
         return self.json_from("/releases", *flags, method="POST", default={})
@@ -240,6 +239,9 @@ class API:
         errors = response.get("errors")
         if errors is not None:
             raise RuntimeError(json.dumps(errors))
+
+    def upload_assets(self, tag_name: int, paths: List[str]):
+        checked("gh", "release", "upload", tag_name, *paths, "--clobber")
 
     def publish_release(self, release_id: int) -> Optional[str]:
         return self.json_from(
