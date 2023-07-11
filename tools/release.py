@@ -25,7 +25,7 @@ SCOPE_FIX = {"ws": "webapi", "rest": "webapi", "lngs": "lang"}
 #####################################################################
 
 
-def release(take_all: bool, forced_level: Optional[int]):
+def release(take_all: bool, forced_level: Optional[int], stability: Optional[str]):
     project = get_version()
     github_link = f"https://github.com/{GITHUB_ORG}/{project.name.value}"
     tags = get_tags(project)
@@ -35,6 +35,11 @@ def release(take_all: bool, forced_level: Optional[int]):
         level = forced_level
 
     next_stability = project.stability.value
+    if stability is not None:
+        stability.strip("-")
+        if len(stability):
+            stability = f"-{stability}"
+        next_stability = stability
     next_tag = f"v{bump_version(project.ver(), level)}{next_stability}"
     if not Environment.DRY_RUN:
         update_changelog(log, next_tag, project.tag(), github_link)
@@ -132,6 +137,11 @@ parser.add_argument(
     choices=FORCED_LEVEL.keys(),
 )
 parser.add_argument(
+    "--stability",
+    required=False,
+    help="change the stability of the version",
+)
+parser.add_argument(
     "--upload",
     metavar="ZIP-or-dir",
     required=False,
@@ -160,7 +170,7 @@ def __main__():
         if args.upload is not None:
             upload(args.upload)
         else:
-            release(args.all, FORCED_LEVEL.get(args.force))
+            release(args.all, FORCED_LEVEL.get(args.force), args.stability)
     except subprocess.CalledProcessError as e:
         if e.stdout:
             print(e.stdout.decode("utf-8"), file=sys.stdout)

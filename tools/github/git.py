@@ -166,6 +166,8 @@ def get_log(
         # Hide even from --all
         if commit.type == "chore" and commit.summary[:8] == "release ":
             continue
+        if "(no-log)" in commit.summary:
+            continue
         current_level = _level_from_commit(commit)
         if current_level > level:
             level = current_level
