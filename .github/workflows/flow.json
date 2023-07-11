@@ -19,19 +19,25 @@
       "os": "ubuntu",
       "conan_settings": ["compiler.libcxx=libstdc++11"],
       "build_generator": "ninja",
-      "cpack_generator": ["TGZ", "DEB"]
+      "cpack_generator": ["TGZ", "DEB"],
+      "ubuntu": true,
+      "home": "/home/runner",
+      "latest_conan_hash": "e903f3ceb636ec2e496810737eb6033a1a8c39c227b437a0693d31086d8aa9df"
     },
     {
       "os": "windows",
       "conan2_settings": ["compiler.cppstd=23", "compiler.runtime=dynamic"],
       "build_generator": "msbuild",
       "report_os": "Windows",
-      "cpack_generator": ["ZIP", "WIX"]
+      "cpack_generator": ["ZIP", "WIX"],
+      "windows": true,
+      "home": "C:/Users/runneradmin",
+      "latest_conan_hash": "1f8eec6aa067e5a60fc4f0ab2668dae66a983ae5902b1eda006f134b009f84eb"
     },
     {"os": "ubuntu", "report_os": "Linux"},
-    {"compiler": "gcc", "report_compiler": "GNU"},
-    {"compiler": "clang", "report_compiler": "Clang"},
-    {"compiler": "msvc", "report_compiler": "MSVC"},
+    {"compiler": "gcc", "report_compiler": "GNU", "gcc": true},
+    {"compiler": "clang", "report_compiler": "Clang", "clang": true},
+    {"compiler": "msvc", "report_compiler": "MSVC", "msvc": true},
     {"os": "ubuntu", "build_type": "Release", "sanitizer": false},
     {
       "os": "windows",

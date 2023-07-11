@@ -112,9 +112,28 @@ def cartesian(input: Dict[str, list]) -> List[dict]:
     return product
 
 
-def load_matrix(json_path: str) -> Tuple[List[dict], List[str]]:
-    with open(json_path, encoding="UTF-8") as f:
-        setup: dict = json.load(f)
+def load_matrix(*json_paths: str) -> Tuple[List[dict], List[str]]:
+    setups: List[dict] = []
+    for json_path in json_paths:
+        with open(json_path, encoding="UTF-8") as f:
+            setups.append(json.load(f))
+
+    setup = setups[0]
+    for additional in setups[1:]:
+        src_matrix = setup.get("matrix", {})
+        src_exclude = setup.get("exclude", [])
+        src_include = setup.get("include", [])
+
+        for key, value in additional.get("matrix", {}).items():
+            old = src_matrix.get(key)
+            if isinstance(old, list) and isinstance(value, list):
+                old.extend(value)
+            elif isinstance(old, list):
+                old.append(value)
+            else:
+                src_matrix[key] = value
+        src_exclude.extend(additional.get("exclude", []))
+        src_include.extend(additional.get("include", []))
 
     raw = setup.get("matrix", {})
     keys = list(raw.keys())

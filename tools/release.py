@@ -100,7 +100,7 @@ def upload(archive: str):
         print(f"no artifact matches {regex}", file=sys.stderr)
         return None
 
-    _checksums(archive, names, "file_list.sha256")
+    _checksums(archive, names, "sha256sum.txt")
 
     release_id = api.get_unpublished_release(project.tag()).get("id")
 
