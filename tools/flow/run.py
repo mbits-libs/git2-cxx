@@ -3,12 +3,14 @@
 # This code is licensed under MIT license (see LICENSE for details)
 
 import argparse
-import lib.matrix as matrix
-import lib.runner as runner
+import json
 import os
 import sys
 from contextlib import contextmanager
 from typing import List, Set
+
+import lib.matrix as matrix
+import lib.runner as runner
 
 DEF_STEPS = {
     "config": ["Conan", "CMake"],
@@ -52,7 +54,7 @@ def _flatten(array: List[list]) -> list:
     return [item for sublist in array for item in sublist]
 
 
-def _config(config: List[str]):
+def _config(config: List[str], only_host: bool):
     args = {}
     for arg in config:
         if arg[:1] == "-":
@@ -68,7 +70,7 @@ def _config(config: List[str]):
         if name in args:
             values.update(args[name])
         args[name] = list(values)
-    if "os" not in args:
+    if only_host and "os" not in args:
         args["os"] = [matrix.platform]
     return matrix.cartesian(args)
 
@@ -199,10 +201,30 @@ parser.add_argument(
     "each filter is a name of a matrix axis followed by comma-separated values to take; "
     f'if "os" is missing, it will default to additional "-c os={matrix.platform}"',
 )
+parser.add_argument(
+    "--matrix",
+    action="store_true",
+    required=False,
+    help="print matrix json",
+)
+parser.add_argument(
+    "--official",
+    action="store_true",
+    required=False,
+    help="cut matrix to minimal set of builds",
+)
+
+
+def _turn(config: dict):
+    config["github_os"] = f"{config['os']}-latest"
+    config["github_sanitizer"] = f"{'with' if config['sanitizer'] else 'no'}-sanitizer"
+    return config
 
 
 def main():
     args = parser.parse_args()
+    if "RELEASE" in os.environ and "GITHUB_ACTIONS" in os.environ:
+        args.official = not not json.loads(os.environ["RELEASE"])
     if cmd != "run":
         args.steps = [step.lower() for step in DEF_STEPS[cmd]]
     else:
@@ -223,18 +245,29 @@ def main():
                 "sanitizer=OFF",
             ]
         )
-    args.configs = _config(_flatten(args.configs))
+    args.configs = _config(_flatten(args.configs), not (args.official or args.github))
     runner.runner.DRY_RUN = args.dry_run
     runner.runner.CUTDOWN_OS = args.cutdown_os
     runner.runner.GITHUB_ANNOTATE = args.github
-    path = os.path.join(os.path.dirname(__file__), "..", "..", "flow.json")
-    configs, keys = matrix.load_matrix(path)
+    root = os.path.join(os.path.dirname(__file__), "..", "..", ".github", "workflows")
+    paths = [os.path.join(root, "flow.json")]
+    if args.official:
+        paths.append(os.path.join(root, "flow.official.json"))
+    configs, keys = matrix.load_matrix(*paths)
 
     usable = [
-        config
+        _turn(config)
         for config in configs
         if len(args.configs) == 0 or matrix.matches_any(config, args.configs)
     ]
+
+    if args.matrix:
+        if "GITHUB_ACTIONS" in os.environ:
+            var = json.dumps({"include": usable})
+            print(f"matrix={var}")
+        else:
+            json.dump(usable, sys.stdout)
+        return
 
     first_build = True
     for conf in usable:
