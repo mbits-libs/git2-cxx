@@ -43,7 +43,7 @@ ALL_TYPES = {
     "assets": "Assets",
     "build": "Build System",
     "chore": "Chores",
-    "ci": "Continuos Integration",
+    "ci": "Continuous Integration",
     "perf": "Performance Improvements",
     "refactor": "Code Refactoring",
     "revert": "Reverts",

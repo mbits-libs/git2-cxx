@@ -245,5 +245,10 @@ class API:
 
     def publish_release(self, release_id: int) -> Optional[str]:
         return self.json_from(
-            f"/releases/{release_id}", "-f", "draft=false", method="PATCH"
+            f"/releases/{release_id}",
+            "-f",
+            "draft=false",
+            "-F",
+            "latest=legacy",
+            method="PATCH",
         ).get("html_url")
