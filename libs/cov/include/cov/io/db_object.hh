@@ -49,22 +49,46 @@ namespace cov::io {
 		}
 	};
 
+	struct OBJECT_or_uint {
+		uint32_t value{};
+		constexpr OBJECT_or_uint() = default;
+		constexpr OBJECT_or_uint(OBJECT value)
+		    : value{static_cast<uint32_t>(value)} {}
+		constexpr OBJECT_or_uint(uint32_t value) : value{value} {}
+	};
+
+	template <OBJECT_or_uint>
+	struct version_from_t : std::integral_constant<uint32_t, v1::VERSION> {};
+
+	template <OBJECT_or_uint TAG>
+	constexpr auto version_from = version_from_t<TAG>::value;
+
+	template <>
+	struct version_from_t<OBJECT::FILES>
+	    : std::integral_constant<uint32_t, io::VERSION_v1_1> {};
+
 	class db_object {
 	public:
 		db_object() = default;
 
 		template <uint32_t magic, std::derived_from<db_handler> Handler>
 		void add_handler() {
-			return add_handler(magic, std::make_unique<Handler>());
+			return add_handler(magic, std::make_unique<Handler>(),
+			                   version_from<magic>);
 		}
 		template <OBJECT magic, std::derived_from<db_handler> Handler>
 		void add_handler() {
-			return add_handler(magic, std::make_unique<Handler>());
+			return add_handler(magic, std::make_unique<Handler>(),
+			                   version_from<magic>);
 		}
-		void add_handler(uint32_t magic, std::unique_ptr<db_handler>&& handler);
-		void add_handler(OBJECT magic, std::unique_ptr<db_handler>&& handler) {
-			return add_handler(static_cast<uint32_t>(magic),
-			                   std::move(handler));
+		void add_handler(uint32_t magic,
+		                 std::unique_ptr<db_handler>&& handler,
+		                 uint32_t version = v1::VERSION);
+		void add_handler(OBJECT magic,
+		                 std::unique_ptr<db_handler>&& handler,
+		                 uint32_t version = v1::VERSION) {
+			return add_handler(static_cast<uint32_t>(magic), std::move(handler),
+			                   version);
 		}
 		void remove_handler(uint32_t magic);
 		void remove_handler(OBJECT magic) {
@@ -77,7 +101,9 @@ namespace cov::io {
 		bool store(ref_ptr<counted> const& value, write_stream& in) const;
 
 	private:
-		std::unordered_map<uint32_t, std::unique_ptr<db_handler>> handlers_{};
+		std::unordered_map<uint32_t,
+		                   std::pair<uint32_t, std::unique_ptr<db_handler>>>
+		    handlers_{};
 	};
 }  // namespace cov::io
 
