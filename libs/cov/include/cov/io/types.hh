@@ -32,7 +32,7 @@ namespace cov {
 		       ((static_cast<uint32_t>(c3) & 0xFF) << 16) |
 		       ((static_cast<uint32_t>(c4) & 0xFF) << 24);
 	}
-	constexpr inline uint32_t operator""_tag(const char* s, size_t len) {
+	consteval inline uint32_t operator""_tag(const char* s, size_t len) {
 		return MK_TAG(len > 0 ? s[0] : ' ', len > 1 ? s[1] : ' ',
 		              len > 2 ? s[2] : ' ', len > 3 ? s[3] : ' ');
 	}
@@ -43,11 +43,18 @@ namespace cov::io {
 		REPORT = "rprt"_tag,
 		FILES = "list"_tag,
 		COVERAGE = "lnes"_tag,
+		FUNCTIONS = "fnct"_tag,
+		BRANCHES = "bran"_tag,
 		HILITES = "stxs"_tag,  // highlights list file
 		HILITE_TAG = "sntx"_tag,
 	};
 
-	enum : uint32_t { VERSION_MAJOR = 0xFFFF'0000 };
+	enum : uint32_t {
+		VERSION_MAJOR = 0xFFFF'0000,
+		VERSION_MINOR = 0x0000'FFFF,
+		VERSION_v1_0 = 0x0001'0000,
+		VERSION_v1_1 = 0x0001'0001
+	};
 
 	struct file_header {
 		uint32_t magic;
@@ -102,7 +109,9 @@ namespace cov::io {
 	}
 
 	namespace v1 {
-		enum : uint32_t { VERSION = 0x0001'0000 };
+		enum : uint32_t {
+			VERSION = VERSION_v1_0,
+		};
 
 		struct coverage;
 
@@ -350,24 +359,28 @@ namespace cov::io {
 		    REPORT FILES:
 		        file_header:
 		            0:1: "list" (tag)
-		            1:1: 1.0 (version)
+		            1:1: 1.x (version)
 		        report_files:
-		            24:1: strings_offset (uint) := SO
-		            25:1: strings_size (uint) := SIZE
-		            22:1: entries_offset (uint) := EO
-		            21:1: entries_count (uint) := EC
-		            23:1: entry_size (uint) := ES
+		            21:1: strings_offset (uint) := SO
+		            22:1: strings_size (uint) := SIZE
+		            23:1: entries_offset (uint) := EO
+		            24:1: entries_count (uint) := EC
+		            25:1: entry_size (uint) := ES
 		            26 + SO:SIZE: UTF8Z (like ASCIIZ, but UTF-8)
 		            26 + EO:ES: entry (report_entry x EC)
 
 		        report_entry:
-		            0:31-0: path (str)
-		            coverage_stats:
-		                1:1: total (uint)
-		                2:1: relevant (uint)
-		                3:1: covered (uint)
-		            4:5: contents (oid)
-		            9:5: line_coverage (oid)
+		            v1.0:
+		                0:31-0: path (str)
+		                coverage_stats:
+		                    1:1: total (uint)
+		                    2:1: relevant (uint)
+		                    3:1: covered (uint)
+		                4:5: contents (oid)
+		                9:5: line_coverage (oid)
+		            v1.1:
+		                14:5: function_coverage (oid)
+		                19:5: branch_coverage (oid)
 		*/
 
 		struct report_files {
@@ -382,14 +395,26 @@ namespace cov::io {
 		static_assert(sizeof(report_files) == sizeof(uint32_t[5]),
 		              "report_files does not pack well here");
 
-		struct report_entry {
+		struct report_entry_base {
 			uint32_t path;
 			coverage_stats stats;
 			git_oid contents;
 			git_oid line_coverage;
 		};
 
-		static_assert(sizeof(report_entry) == sizeof(uint32_t[14]),
+		static_assert(sizeof(report_entry_base) == sizeof(uint32_t[14]),
+		              "git_oid does not pack well here");
+
+		struct report_entry_ext {
+			uint32_t path;
+			coverage_stats stats;
+			git_oid contents;
+			git_oid line_coverage;
+			git_oid function_coverage;
+			git_oid branch_coverage;
+		};
+
+		static_assert(sizeof(report_entry_ext) == sizeof(uint32_t[24]),
 		              "git_oid does not pack well here");
 
 		/*

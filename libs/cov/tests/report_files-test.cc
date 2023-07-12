@@ -311,6 +311,57 @@ namespace cov::testing {
 		ASSERT_EQ(expected, stream.view());
 	}
 
+	git_oid operator""_oid(const char* str, size_t len) {
+		git_oid result{};
+		if (len == GIT_OID_HEXSZ) git_oid_fromstr(&result, str);
+		return result;
+	}
+
+	TEST(report_files, store_with_newer_data) {
+		static constexpr auto expected =
+		    "list\x00\x00\x01\x00"
+
+		    "\x00\x00\x00\x00"
+		    "\x03\x00\x00\x00"
+		    "\x03\x00\x00\x00"
+		    "\x01\x00\x00\x00"
+		    "\x18\x00\x00\x00"
+
+		    "file path\0\0\0"
+
+		    "\x00\x00\x00\x00"
+		    "\xE2\x04\x00\x00"
+		    "\x2C\x01\x00\x00"
+		    "\x2B\x01\x00\x00"
+
+		    "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+		    "\x00\x00\x00\x00"
+
+		    "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+		    "\x00\x00\x00\x00"
+
+		    "\x12\x34\x56\x78\x90\x12\x34\x56\x78\x90\x12\x34\x56\x78\x90\x12"
+		    "\x34\x56\x78\x90"
+
+		    "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+		    "\x00\x00\x00\x00"sv;
+		test_stream stream{};
+
+		io::db_object dbo{};
+		dbo.add_handler<io::OBJECT::FILES, io::handlers::report_files>();
+
+		auto const obj = make_ref<report_files_impl>();
+		report_files_builder builder{};
+		builder.add_nfo({.path = "file path"sv,
+		                 .stats = {1250, 300, 299},
+		                 .function_coverage =
+		                     "1234567890123456789012345678901234567890"_oid});
+		obj->files = builder.release();
+		auto const result = dbo.store(obj, stream);
+		ASSERT_TRUE(result);
+		ASSERT_EQ(expected, stream.view());
+	}
+
 	TEST(report_files, remove) {
 		report_files_builder builder{};
 		builder.add_nfo({.path = "Alpha"})

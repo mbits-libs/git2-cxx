@@ -63,10 +63,6 @@ namespace cov::io {
 	template <OBJECT_or_uint TAG>
 	constexpr auto version_from = version_from_t<TAG>::value;
 
-	template <>
-	struct version_from_t<OBJECT::FILES>
-	    : std::integral_constant<uint32_t, io::VERSION_v1_1> {};
-
 	class db_object {
 	public:
 		db_object() = default;

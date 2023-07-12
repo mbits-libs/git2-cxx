@@ -101,7 +101,7 @@ namespace cov::io::handlers {
 		v1::report_files header{};
 		if (!in.load(header)) return {};
 		auto const entry_size = header.entry_size * sizeof(uint32_t);
-		if (entry_size < sizeof(v1::report_entry) ||
+		if (entry_size < sizeof(v1::report_entry_base) ||
 		    header.entries_offset < header.strings_offset)
 			return {};
 
@@ -123,13 +123,22 @@ namespace cov::io::handlers {
 
 		for (uint32_t index = 0; index < header.entries_count; ++index) {
 			if (!in.load(buffer, entry_size)) return {};
-			auto const& entry =
-			    *reinterpret_cast<v1::report_entry const*>(buffer.data());
+			auto const& entry_v0 =
+			    *reinterpret_cast<v1::report_entry_base const*>(buffer.data());
+			auto const& entry_v1 =
+			    *reinterpret_cast<v1::report_entry_ext const*>(buffer.data());
 
-			if (!strings.is_valid(entry.path)) return {};
+			if (!strings.is_valid(entry_v0.path)) return {};
 
-			builder.add(strings.at(entry.path), entry.stats, entry.contents,
-			            entry.line_coverage, zero_id, zero_id);
+			if (entry_size < sizeof(v1::report_entry_ext) / sizeof(uint32_t))
+				builder.add(strings.at(entry_v0.path), entry_v0.stats,
+				            entry_v0.contents, entry_v0.line_coverage, zero_id,
+				            zero_id);
+			else
+				builder.add(strings.at(entry_v1.path), entry_v1.stats,
+				            entry_v1.contents, entry_v1.line_coverage,
+				            entry_v1.function_coverage,
+				            entry_v1.branch_coverage);
 		}
 
 		ec.clear();
@@ -143,11 +152,58 @@ namespace cov::io::handlers {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wnull-dereference"
 #endif
+	template <typename EntryType>
+	struct init_entry;
+	template <>
+	struct init_entry<v1::report_entry_base> {
+		static v1::report_entry_base get(cov::report_entry const& in,
+		                                 uint32_t path32) {
+			return {
+			    .path = path32,
+			    .stats = in.stats(),
+			    .contents = in.contents(),
+			    .line_coverage = in.line_coverage(),
+			};
+		}
+	};
+	template <>
+	struct init_entry<v1::report_entry_ext> {
+		static v1::report_entry_ext get(cov::report_entry const& in,
+		                                uint32_t path32) {
+			return {
+			    .path = path32,
+			    .stats = in.stats(),
+			    .contents = in.contents(),
+			    .line_coverage = in.line_coverage(),
+			    .function_coverage = in.function_coverage(),
+			    .branch_coverage = in.branch_coverage(),
+			};
+		}
+	};
+
+	template <typename EntryType>
+	bool store_entry(cov::report_entry const& in,
+	                 uint32_t path32,
+	                 write_stream& out) {
+		auto const entry = init_entry<EntryType>::get(in, path32);
+		return out.store(entry);
+	}
+
 	bool report_files::store(ref_ptr<counted> const& value,
 	                         write_stream& out) const {
 		auto const obj =
 		    as_a<cov::report_files>(static_cast<object const*>(value.get()));
 		auto const& entries = obj->entries();
+
+		auto only_lines = true;
+		for (auto const& entry_ptr : entries) {
+			auto& entry = *entry_ptr;
+			if (!git_oid_is_zero(&entry.function_coverage()) ||
+			    !git_oid_is_zero(&entry.branch_coverage())) {
+				only_lines = false;
+				break;
+			}
+		}
 
 		auto stg = [&] {
 			strings_builder strings{};
@@ -159,6 +215,8 @@ namespace cov::io::handlers {
 			return strings.build();
 		}();
 
+		auto const entry_byte_size = only_lines ? sizeof(v1::report_entry_base)
+		                                        : sizeof(v1::report_entry_ext);
 		v1::report_files hdr{
 		    .strings_offset = 0u,
 		    .strings_size =
@@ -166,7 +224,8 @@ namespace cov::io::handlers {
 		    .entries_offset =
 		        static_cast<uint32_t>(stg.size() / sizeof(uint32_t)),
 		    .entries_count = static_cast<uint32_t>(entries.size()),
-		    .entry_size = sizeof(v1::report_entry) / sizeof(uint32_t),
+		    .entry_size =
+		        static_cast<uint32_t>(entry_byte_size / sizeof(uint32_t)),
 		};
 
 		if (!out.store(hdr)) return false;
@@ -179,14 +238,13 @@ namespace cov::io::handlers {
 			auto const path32 = uint_32(path);
 			if (path != path32 || path32 > stg.size()) return false;
 
-			v1::report_entry entry = {
-			    .path = path32,
-			    .stats = in.stats(),
-			    .contents = in.contents(),
-			    .line_coverage = in.line_coverage(),
-			};
-
-			if (!out.store(entry)) return false;
+			if (only_lines) {
+				if (!store_entry<v1::report_entry_base>(in, path32, out))
+					return false;
+			} else {
+				if (!store_entry<v1::report_entry_ext>(in, path32, out))
+					return false;
+			}
 		}
 
 		return true;
