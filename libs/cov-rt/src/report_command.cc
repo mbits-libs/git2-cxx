@@ -220,8 +220,9 @@ namespace cov::app::builtin::report {
 		                                static_cast<intmax_t>(files))),
 		                files);
 
-		if (stats.covered < stats.relevant) {
-			change = fmt::format(", -{}"sv, stats.relevant - stats.covered);
+		if (stats.lines.visited < stats.lines.relevant) {
+			change = fmt::format(", -{}"sv,
+			                     stats.lines.relevant - stats.lines.visited);
 		}
 
 		if (!git_oid_is_zero(&report.parent_report())) {

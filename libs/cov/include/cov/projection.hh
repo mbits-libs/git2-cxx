@@ -30,8 +30,8 @@ namespace cov::projection {
 		}
 
 		file_diff diff(unsigned char digits = 2) const noexcept {
-			auto const curr = current.calc(digits);
-			auto const prev = previous.calc(digits);
+			auto const curr = current.lines.calc(digits);
+			auto const prev = previous.lines.calc(digits);
 			return {
 			    .coverage = {.current = curr, .diff = io::v1::diff(curr, prev)},
 			    .stats = {.current = current,

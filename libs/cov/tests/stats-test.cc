@@ -10,8 +10,7 @@
 
 namespace cov::io::v1 {
 	template <typename Unsigned>
-	void PrintTo(coverage_stats::ratio<Unsigned> const& ratio,
-	             std::ostream* out) {
+	void PrintTo(stats::ratio<Unsigned> const& ratio, std::ostream* out) {
 		if (ratio.digits < 2) {
 			*out << fmt::format("{}%", ratio.whole);
 			return;
@@ -20,12 +19,12 @@ namespace cov::io::v1 {
 		                    ratio.digits - 1);
 	}
 	void PrintTo(coverage_stats const& stats, std::ostream* out) {
-		*out << fmt::format("[{}/{} {}]", stats.covered, stats.relevant,
-		                    stats.total);
+		*out << fmt::format("[{}/{} {}]", stats.lines.visited,
+		                    stats.lines.relevant, stats.lines_total);
 	}
 	void PrintTo(coverage_diff const& diff, std::ostream* out) {
-		*out << fmt::format("[{}/{} {}]", diff.covered, diff.relevant,
-		                    diff.total);
+		*out << fmt::format("[{}/{} {}]", diff.lines.visited,
+		                    diff.lines.relevant, diff.lines_total);
 	}
 }  // namespace cov::io::v1
 
@@ -38,9 +37,8 @@ namespace cov::testing::setup {
 	};
 
 	template <typename Unsigned>
-	struct add_sign<io::v1::coverage_stats::ratio<Unsigned>> {
-		using type =
-		    io::v1::coverage_stats::ratio<typename add_sign<Unsigned>::type>;
+	struct add_sign<io::v1::stats::ratio<Unsigned>> {
+		using type = io::v1::stats::ratio<typename add_sign<Unsigned>::type>;
 	};
 
 	template <>
@@ -73,8 +71,7 @@ namespace cov::testing::setup {
 		void run_test() {
 			auto const& [older, newer, expected] = this->GetParam();
 			auto const actual = io::v1::diff(newer, older);
-			if constexpr (std::same_as<Unsigned,
-			                           io::v1::coverage_stats::ratio<>>) {
+			if constexpr (std::same_as<Unsigned, io::v1::stats::ratio<>>) {
 				ASSERT_EQ(expected, actual)
 				    << "Value: {" << actual.whole << ", " << actual.fraction
 				    << "u, " << actual.digits << "u}";
@@ -87,24 +84,24 @@ namespace cov::testing::setup {
 	struct diff_stats : diff_base<io::v1::coverage_stats> {};
 	TEST_P(diff_stats, diff) { run_test(); }
 
-	struct diff_ratio : diff_base<io::v1::coverage_stats::ratio<>> {};
+	struct diff_ratio : diff_base<io::v1::stats::ratio<>> {};
 	TEST_P(diff_ratio, diff) { run_test(); }
 
 	static constexpr diff_test<io::v1::coverage_stats> stats[] = {
-	    {{1000, 300, 299}, {1001, 300, 300}, {+1, 0, +1}},
-	    {{9876, 5432, 4321}, {1234, 2345, 6789}, {-8642, -3087, +2468}},
+	    {{1000, {300, 299}}, {1001, {300, 300}}, {+1, {0, +1}}},
+	    {{9876, {5432, 4321}}, {1234, {2345, 6789}}, {-8642, {-3087, +2468}}},
 	};
 
-	using stats_t = io::v1::coverage_stats;
+	using stats_t = io::v1::stats;
 	static constexpr diff_test<stats_t::ratio<>> ratios[] = {
 	    {
-	        stats_t{1000, 300, 299}.calc(4),
-	        stats_t{1001, 300, 300}.calc(2),
+	        stats_t{300, 299}.calc(4),
+	        stats_t{300, 300}.calc(2),
 	        {0, 3333u, 4u},
 	    },
 	    {
-	        stats_t{9876, 5432, 4321}.calc(2),
-	        stats_t{1234, 5432, 3321}.calc(2),
+	        stats_t{5432, 4321}.calc(2),
+	        stats_t{5432, 3321}.calc(2),
 	        {-18, 41u, 2u},
 	    },
 	};

@@ -40,8 +40,8 @@ namespace cov {
 		enum kind { normal, renamed, copied, added, deleted };
 		enum initial { initial_add_all, initial_with_self };
 		struct {
-			io::v1::coverage_stats::ratio<> current{};
-			io::v1::coverage_stats::ratio<int> diff{};
+			io::v1::stats::ratio<> current{};
+			io::v1::stats::ratio<int> diff{};
 		} coverage;
 		struct {
 			io::v1::coverage_stats current{};
@@ -59,8 +59,8 @@ namespace cov {
 		bool operator==(file_stats const&) const noexcept = default;
 
 		file_diff diff(unsigned char digits = 2) const noexcept {
-			auto const curr = current.calc(digits);
-			auto const prev = previous.calc(digits);
+			auto const curr = current.lines.calc(digits);
+			auto const prev = previous.lines.calc(digits);
 			return {
 			    .coverage = {.current = curr, .diff = io::v1::diff(curr, prev)},
 			    .stats = {.current = current,

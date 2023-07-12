@@ -160,9 +160,9 @@ namespace cov::testing {
 		ASSERT_EQ("Initial commit"sv, rprt->message());
 		ASSERT_EQ(sys_seconds{0x11223344556677s}, rprt->commit_time_utc());
 		ASSERT_EQ(sys_seconds{0x11223344556677s}, rprt->add_time_utc());
-		ASSERT_EQ(1250u, rprt->stats().total);
-		ASSERT_EQ(300u, rprt->stats().relevant);
-		ASSERT_EQ(299u, rprt->stats().covered);
+		ASSERT_EQ(1250u, rprt->stats().lines_total);
+		ASSERT_EQ(300u, rprt->stats().lines.relevant);
+		ASSERT_EQ(299u, rprt->stats().lines.visited);
 		ASSERT_TRUE(git_oid_is_zero(&rprt->parent_report()));
 		ASSERT_TRUE(git_oid_is_zero(&rprt->file_list()));
 		ASSERT_TRUE(git_oid_is_zero(&rprt->commit()));
@@ -249,9 +249,8 @@ namespace cov::testing {
 		    .add_time_utc = sys_seconds{0x11223344556677s},
 		    .stats =
 		        {
-		            .total = 1250,
-		            .relevant = 300,
-		            .covered = 299,
+		            .lines_total = 1250,
+		            .lines = {.relevant = 300, .visited = 299},
 		        },
 		};
 		auto const result = dbo.store(obj, stream);
@@ -261,13 +260,11 @@ namespace cov::testing {
 
 	TEST(report, stats_calc) {
 		static constexpr io::v1::coverage_stats stats{
-		    .total = 1'000'000,
-		    .relevant = 1'000'000,
-		    .covered = 657'823,
+		    .lines_total = 1'000'000,
+		    .lines = {.relevant = 1'000'000, .visited = 657'823},
 		};
 
-		static constexpr std::tuple<unsigned char,
-		                            io::v1::coverage_stats::ratio<>>
+		static constexpr std::tuple<unsigned char, io::v1::stats::ratio<>>
 		    tests[] = {
 		        {0u, {66u, 0u, 0u}},        {1u, {65u, 8u, 1u}},
 		        {2u, {65u, 78u, 2u}},       {3u, {65u, 782u, 3u}},
@@ -277,7 +274,7 @@ namespace cov::testing {
 		    };
 
 		for (auto const& [digits, expected] : tests) {
-			auto const actual = stats.calc(digits);
+			auto const actual = stats.lines.calc(digits);
 			EXPECT_EQ(expected, actual)
 			    << "Digits: " << static_cast<unsigned>(digits);
 		}

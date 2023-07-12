@@ -149,8 +149,9 @@ namespace cov::io::v1 {
 		     << "u}";
 	}
 	void PrintTo(coverage_stats const& stats, std::ostream* out) {
-		*out << "{.total=" << stats.total << "u, .relevant=" << stats.relevant
-		     << "u, .covered=" << stats.covered << "u}";
+		*out << "{.total=" << stats.lines_total
+		     << "u, .relevant=" << stats.lines.relevant
+		     << "u, .covered=" << stats.lines.visited << "u}";
 	}
 }  // namespace cov::io::v1
 
@@ -199,7 +200,8 @@ namespace cov::app::testing {
 		    {.value = 0x7fffffffu, .is_null = 1u},
 		    {.value = 0x7ffffff3u, .is_null = 1u}};
 		io::v1::coverage_stats expected_status{
-		    .total = 4294967295u, .relevant = 4u, .covered = 3u};
+		    .lines_total = 4294967295u,
+		    .lines = {.relevant = 4u, .visited = 3u}};
 		ASSERT_EQ(expected_coverage, actual_coverage);
 		ASSERT_EQ(expected_status, actual_status);
 	}

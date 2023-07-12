@@ -47,7 +47,7 @@ namespace cov::testing {
 			git_oid_fromstr(&commit_id,
 			                "36109a1c35e0d5cf3e5e68d896c8b1b4be565525");
 
-			io::v1::coverage_stats const default_stats{1250, 300, 299};
+			io::v1::coverage_stats const default_stats{1250, {300, 299}};
 			return report::create(
 			    id, parent_id, zero, commit_id, "develop"sv,
 			    {"Johnny Appleseed"sv, "johnny@appleseed.com"sv},
@@ -129,22 +129,22 @@ namespace cov::testing {
 		    {
 		        .clr = color::rating,
 		        .expected = color::green,
-		        .stats{.total{}, .relevant{100}, .covered{100}},
+		        .stats{.lines_total{}, .lines{.relevant{100}, .visited{100}}},
 		    },
 		    {
 		        .clr = color::bg_rating,
 		        .expected = color::bg_yellow,
-		        .stats{.total{}, .relevant{100}, .covered{89}},
+		        .stats{.lines_total{}, .lines{.relevant{100}, .visited{89}}},
 		    },
 		    {
 		        .clr = color::faint_rating,
 		        .expected = color::faint_red,
-		        .stats{.total{}, .relevant{100}, .covered{70}},
+		        .stats{.lines_total{}, .lines{.relevant{100}, .visited{70}}},
 		    },
 		    {
 		        .clr = color::blue,
 		        .expected = color::blue,
-		        .stats{.total{}, .relevant{100}, .covered{70}},
+		        .stats{.lines_total{}, .lines{.relevant{100}, .visited{70}}},
 		    }};
 
 		for (auto const [clr, expected, stats] : marks) {
@@ -196,7 +196,7 @@ namespace cov::testing {
 	            "\x1B[34m<Johnny Appleseed>\x1B[m \x1B[32m(committed 4 months "
 	            "ago, added 4 months ago)\x1B[m"sv,
 	        },
-	        {.stats = io::v1::coverage_stats{1250, 1000, 790}},
+	        {.stats = io::v1::coverage_stats{1250, {1000, 790}}},
 	    },
 	    {
 	        "Rating: bad"sv,
@@ -211,7 +211,7 @@ namespace cov::testing {
 	            "\x1B[34m<Johnny Appleseed>\x1B[m \x1B[32m(committed 4 months "
 	            "ago, added 4 months ago)\x1B[m"sv,
 	        },
-	        {.stats = io::v1::coverage_stats{1250, 600, 300}},
+	        {.stats = io::v1::coverage_stats{1250, {600, 300}}},
 	    },
 	};
 

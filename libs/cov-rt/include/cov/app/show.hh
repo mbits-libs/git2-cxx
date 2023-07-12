@@ -57,7 +57,7 @@ namespace cov::app::show {
 		}
 
 		template <typename Int>
-		static bool is_zero(io::v1::coverage_stats::ratio<Int> const& val) {
+		static bool is_zero(io::v1::stats::ratio<Int> const& val) {
 			return val.whole == 0 && val.fraction == 0;
 		}
 

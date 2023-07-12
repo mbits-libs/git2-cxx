@@ -30,9 +30,9 @@ namespace cov::projection {
 				*os << '{' << std::to_underlying(entry.type) << '}';
 		}
 		*os << ",\"" << entry.name.display << "\"sv,\"" << entry.name.expanded
-		    << "\"sv,stats(" << entry.stats.current.total << ','
-		    << entry.stats.current.relevant << ','
-		    << entry.stats.current.covered << ")}";
+		    << "\"sv,stats(" << entry.stats.current.lines_total << ','
+		    << entry.stats.current.lines.relevant << ','
+		    << entry.stats.current.lines.visited << ")}";
 	}
 }  // namespace cov::projection
 namespace cov::projection::testing {
@@ -79,7 +79,7 @@ namespace cov::projection::testing {
 	consteval coverage_stats stats(uint32_t total,
 	                               uint32_t relevant,
 	                               uint32_t covered) {
-		return {total, relevant, covered};
+		return {total, {relevant, covered}};
 	}
 
 	static constexpr file_info all_files[] = {
@@ -290,7 +290,7 @@ namespace cov::projection::testing {
 						break;
 				}
 				auto const ratio =
-				    fmt::format("{}", entry.stats.current.calc(2));
+				    fmt::format("{}", entry.stats.current.lines.calc(2));
 				fmt::print("{:>6}% {} {} : {}\n", ratio, entry_flag,
 				           entry.name.display, entry.name.expanded);
 			}

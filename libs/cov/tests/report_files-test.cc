@@ -126,9 +126,9 @@ namespace cov::testing {
 		ASSERT_TRUE(front);
 		auto const& entry = *front;
 		ASSERT_EQ("file path"sv, entry.path());
-		ASSERT_EQ(1250u, entry.stats().total);
-		ASSERT_EQ(300u, entry.stats().relevant);
-		ASSERT_EQ(299u, entry.stats().covered);
+		ASSERT_EQ(1250u, entry.stats().lines_total);
+		ASSERT_EQ(300u, entry.stats().lines.relevant);
+		ASSERT_EQ(299u, entry.stats().lines.visited);
 		ASSERT_TRUE(lines->by_path("file path"sv));
 		ASSERT_FALSE(lines->by_path("another file"sv));
 	}
@@ -304,7 +304,7 @@ namespace cov::testing {
 
 		auto const obj = make_ref<report_files_impl>();
 		report_files_builder builder{};
-		builder.add_nfo({.path = "file path"sv, .stats = {1250, 300, 299}});
+		builder.add_nfo({.path = "file path"sv, .stats = {1250, {300, 299}}});
 		obj->files = builder.release();
 		auto const result = dbo.store(obj, stream);
 		ASSERT_TRUE(result);
@@ -353,7 +353,7 @@ namespace cov::testing {
 		auto const obj = make_ref<report_files_impl>();
 		report_files_builder builder{};
 		builder.add_nfo({.path = "file path"sv,
-		                 .stats = {1250, 300, 299},
+		                 .stats = {1250, {300, 299}},
 		                 .function_coverage =
 		                     "1234567890123456789012345678901234567890"_oid});
 		obj->files = builder.release();

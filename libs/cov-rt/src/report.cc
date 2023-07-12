@@ -246,8 +246,8 @@ namespace cov::app::report {
 		auto& [coverage, stats] = result;
 
 		size_t size{};
-		stats.total = visit_lines(line_coverage, line_count,
-		                          [&](unsigned, bool) { ++size; });
+		stats.lines_total = visit_lines(line_coverage, line_count,
+		                                [&](unsigned, bool) { ++size; });
 		coverage.reserve(size);
 		visit_lines(line_coverage, line_count,
 		            [&coverage = coverage, &stats = stats](unsigned count,
@@ -256,8 +256,8 @@ namespace cov::app::report {
 			                io::v1::coverage{.value = count & ((1u << 31) - 1),
 			                                 .is_null = is_null ? 1u : 0u});
 			            if (!is_null) {
-				            ++stats.relevant;
-				            if (count) ++stats.covered;
+				            ++stats.lines.relevant;
+				            if (count) ++stats.lines.visited;
 			            }
 		            });
 		return result;
