@@ -13,11 +13,15 @@ namespace cov::io::handlers {
 			report_entry_impl(std::string_view path,
 			                  io::v1::coverage_stats const& stats,
 			                  git_oid const& contents,
-			                  git_oid const& line_coverage)
+			                  git_oid const& line_coverage,
+			                  git_oid const& function_coverage,
+			                  git_oid const& branch_coverage)
 			    : path_{path.data(), path.size()}
 			    , stats_{stats}
 			    , contents_{contents}
-			    , line_coverage_{line_coverage} {}
+			    , line_coverage_{line_coverage}
+			    , function_coverage_{function_coverage}
+			    , branch_coverage_{branch_coverage} {}
 
 			~report_entry_impl() = default;
 			std::string_view path() const noexcept override { return path_; }
@@ -29,6 +33,12 @@ namespace cov::io::handlers {
 			}
 			git_oid const& line_coverage() const noexcept override {
 				return line_coverage_;
+			}
+			git_oid const& function_coverage() const noexcept override {
+				return function_coverage_;
+			}
+			git_oid const& branch_coverage() const noexcept override {
+				return branch_coverage_;
 			}
 			std::vector<std::byte> get_contents(
 			    repository const& repo,
@@ -48,6 +58,8 @@ namespace cov::io::handlers {
 			io::v1::coverage_stats stats_{};
 			git_oid contents_{};
 			git_oid line_coverage_{};
+			git_oid function_coverage_{};
+			git_oid branch_coverage_{};
 		};
 
 		struct impl : counted_impl<cov::report_files> {
@@ -107,6 +119,8 @@ namespace cov::io::handlers {
 		report_files_builder builder{};
 		std::vector<std::byte> buffer{};
 
+		static const git_oid zero_id{};
+
 		for (uint32_t index = 0; index < header.entries_count; ++index) {
 			if (!in.load(buffer, entry_size)) return {};
 			auto const& entry =
@@ -115,7 +129,7 @@ namespace cov::io::handlers {
 			if (!strings.is_valid(entry.path)) return {};
 
 			builder.add(strings.at(entry.path), entry.stats, entry.contents,
-			            entry.line_coverage);
+			            entry.line_coverage, zero_id, zero_id);
 		}
 
 		ec.clear();
@@ -201,9 +215,12 @@ namespace cov {
 	    std::string_view path,
 	    io::v1::coverage_stats const& stats,
 	    git_oid const& contents,
-	    git_oid const& line_coverage) {
+	    git_oid const& line_coverage,
+	    git_oid const& function_coverage,
+	    git_oid const& branch_coverage) {
 		return add(std::make_unique<io::handlers::report_entry_impl>(
-		    path, stats, contents, line_coverage));
+		    path, stats, contents, line_coverage, function_coverage,
+		    branch_coverage));
 	}
 
 	bool report_files_builder::remove(std::string_view path) {

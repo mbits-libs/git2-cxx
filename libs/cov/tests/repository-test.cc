@@ -15,7 +15,8 @@
 
 namespace cov::testing {
 	using namespace std::literals;
-	// using namespace std::filesystem;
+
+	static constexpr git_oid zero_id{};
 
 	class repository : public ::testing::Test {
 	public:
@@ -457,7 +458,7 @@ namespace cov::testing {
 				auto file_stats = stats(cvg_object->coverage());
 				total += file_stats;
 
-				file.add_to(builder, file_stats, line_cvg_id);
+				file.add_to(builder, file_stats, line_cvg_id, zero_id, zero_id);
 			}
 
 			auto cvg_files = builder.extract();
@@ -576,7 +577,7 @@ namespace cov::testing {
 				auto file_stats = stats(cvg_object->coverage());
 				total += file_stats;
 
-				file.add_to(builder, file_stats, line_cvg_id);
+				file.add_to(builder, file_stats, line_cvg_id, zero_id, zero_id);
 			}
 
 			auto cvg_files = builder.extract();

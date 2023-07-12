@@ -347,7 +347,7 @@ namespace cov::app::builtin::report {
 		std::vector<io::v1::coverage> cvg{};
 		std::tie(cvg, stats) = info.expand_coverage(stg.lines);
 		auto const obj = cov::line_coverage::create(std::move(cvg));
-		return repo.write(cvg_id, obj);
+		return repo.write(lines_id, obj);
 	}
 
 	bool stored_file::store_contents(cov::repository& repo,
@@ -364,7 +364,8 @@ namespace cov::app::builtin::report {
 		for (auto const& file : report_files) {
 			auto& compiled = *it++;
 			builder.add(file.name, compiled.stats, compiled.stg.existing,
-			            compiled.cvg_id);
+			            compiled.lines_id, compiled.functions_id,
+			            compiled.branches_id);
 		}
 
 		auto const obj = builder.extract();

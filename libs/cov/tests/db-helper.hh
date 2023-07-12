@@ -22,8 +22,10 @@ namespace cov::testing {
 
 		void add_to(report_files_builder& builder,
 		            io::v1::coverage_stats const& stats,
-		            git_oid const& lines_id) const {
-			builder.add(name, stats, {}, lines_id);
+		            git_oid const& lines_id,
+		            git_oid const& functions_id,
+		            git_oid const& branch_id) const {
+			builder.add(name, stats, {}, lines_id, functions_id, branch_id);
 		}
 	};
 
