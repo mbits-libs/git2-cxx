@@ -62,6 +62,8 @@ namespace cov::testing {
 
 		// write
 		{
+			static const git_oid zero_id{};
+
 			auto total = io::v1::coverage_stats::init();
 			report_files_builder builder{};
 			for (auto const& file : rprt.files) {
@@ -73,7 +75,7 @@ namespace cov::testing {
 				auto file_stats = stats(cvg_object->coverage());
 				total += file_stats;
 
-				file.add_to(builder, file_stats, line_cvg_id);
+				file.add_to(builder, file_stats, line_cvg_id, zero_id, zero_id);
 			}
 
 			auto cvg_files = builder.extract();

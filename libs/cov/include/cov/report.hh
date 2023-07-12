@@ -72,6 +72,8 @@ namespace cov {
 		virtual io::v1::coverage_stats const& stats() const noexcept = 0;
 		virtual git_oid const& contents() const noexcept = 0;
 		virtual git_oid const& line_coverage() const noexcept = 0;
+		virtual git_oid const& function_coverage() const noexcept = 0;
+		virtual git_oid const& branch_coverage() const noexcept = 0;
 		virtual std::vector<std::byte> get_contents(
 		    repository const&,
 		    std::error_code&) const noexcept = 0;
@@ -96,14 +98,19 @@ namespace cov {
 			io::v1::coverage_stats stats{};
 			git_oid contents{};
 			git_oid line_coverage{};
+			git_oid function_coverage{};
+			git_oid branch_coverage{};
 		};
 		report_files_builder& add(std::unique_ptr<report_entry>&&);
 		report_files_builder& add(std::string_view path,
 		                          io::v1::coverage_stats const& stats,
 		                          git_oid const& contents,
-		                          git_oid const& line_coverage);
+		                          git_oid const& line_coverage,
+		                          git_oid const& function_coverage,
+		                          git_oid const& branch_coverage);
 		report_files_builder& add_nfo(info const& nfo) {
-			return add(nfo.path, nfo.stats, nfo.contents, nfo.line_coverage);
+			return add(nfo.path, nfo.stats, nfo.contents, nfo.line_coverage,
+			           nfo.function_coverage, nfo.branch_coverage);
 		}
 		bool remove(std::string_view path);
 		ref_ptr<report_files> extract();

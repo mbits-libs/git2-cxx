@@ -106,7 +106,9 @@ namespace cov::app::builtin::report {
 	struct stored_file {
 		blob_info stg{};
 		io::v1::coverage_stats stats{};
-		git_oid cvg_id{};
+		git_oid lines_id{};
+		git_oid functions_id{};
+		git_oid branches_id{};
 
 		static stored_file from(git_commit const& commit,
 		                        file_info const& info) {
