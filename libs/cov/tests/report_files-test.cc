@@ -304,7 +304,8 @@ namespace cov::testing {
 
 		auto const obj = make_ref<report_files_impl>();
 		report_files_builder builder{};
-		builder.add_nfo({.path = "file path"sv, .stats = {1250, {300, 299}}});
+		builder.add_nfo({.path = "file path"sv,
+		                 .stats = {1250, {300, 299}, {0, 0}, {0, 0}}});
 		obj->files = builder.release();
 		auto const result = dbo.store(obj, stream);
 		ASSERT_TRUE(result);
@@ -353,7 +354,7 @@ namespace cov::testing {
 		auto const obj = make_ref<report_files_impl>();
 		report_files_builder builder{};
 		builder.add_nfo({.path = "file path"sv,
-		                 .stats = {1250, {300, 299}},
+		                 .stats = {1250, {300, 299}, {0, 0}, {0, 0}},
 		                 .function_coverage =
 		                     "1234567890123456789012345678901234567890"_oid});
 		obj->files = builder.release();

@@ -128,12 +128,12 @@ namespace cov::io::handlers {
 		     message = at(header.commit.message);
 
 		ec.clear();
-		return cov::report::create(id, header.parent_report, header.file_list,
-		                           header.commit.commit_id, branch,
-		                           {author_name, author_email},
-		                           {committer_name, committer_email}, message,
-		                           header.commit.committed.to_seconds(),
-		                           header.added.to_seconds(), header.stats);
+		return cov::report::create(
+		    id, header.parent_report, header.file_list, header.commit.commit_id,
+		    branch, {author_name, author_email},
+		    {committer_name, committer_email}, message,
+		    header.commit.committed.to_seconds(), header.added.to_seconds(),
+		    v1::coverage_stats::from(header.stats));
 	}
 
 #if defined(__GNUC__)
@@ -174,7 +174,7 @@ namespace cov::io::handlers {
 		    .parent_report = obj->parent_report(),
 		    .file_list = obj->file_list(),
 		    .added = time_stamp(obj->add_time_utc()),
-		    .stats = obj->stats(),
+		    .stats = obj->stats().to_short(),
 		    .commit =
 		        {
 		            .branch = locate(obj->branch()),

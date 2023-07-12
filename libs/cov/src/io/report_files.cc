@@ -131,11 +131,13 @@ namespace cov::io::handlers {
 			if (!strings.is_valid(entry_v0.path)) return {};
 
 			if (entry_size < sizeof(v1::report_entry_ext) / sizeof(uint32_t))
-				builder.add(strings.at(entry_v0.path), entry_v0.stats,
+				builder.add(strings.at(entry_v0.path),
+				            v1::coverage_stats::from(entry_v0.stats),
 				            entry_v0.contents, entry_v0.line_coverage, zero_id,
 				            zero_id);
 			else
-				builder.add(strings.at(entry_v1.path), entry_v1.stats,
+				builder.add(strings.at(entry_v1.path),
+				            v1::coverage_stats::from(entry_v1.stats),
 				            entry_v1.contents, entry_v1.line_coverage,
 				            entry_v1.function_coverage,
 				            entry_v1.branch_coverage);
@@ -160,7 +162,7 @@ namespace cov::io::handlers {
 		                                 uint32_t path32) {
 			return {
 			    .path = path32,
-			    .stats = in.stats(),
+			    .stats = in.stats().to_short(),
 			    .contents = in.contents(),
 			    .line_coverage = in.line_coverage(),
 			};
@@ -172,7 +174,7 @@ namespace cov::io::handlers {
 		                                uint32_t path32) {
 			return {
 			    .path = path32,
-			    .stats = in.stats(),
+			    .stats = in.stats().to_short(),
 			    .contents = in.contents(),
 			    .line_coverage = in.line_coverage(),
 			    .function_coverage = in.function_coverage(),
