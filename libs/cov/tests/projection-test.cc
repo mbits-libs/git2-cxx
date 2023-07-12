@@ -79,7 +79,7 @@ namespace cov::projection::testing {
 	consteval coverage_stats stats(uint32_t total,
 	                               uint32_t relevant,
 	                               uint32_t covered) {
-		return {total, {relevant, covered}};
+		return {total, {relevant, covered}, {0, 0}, {0, 0}};
 	}
 
 	static constexpr file_info all_files[] = {

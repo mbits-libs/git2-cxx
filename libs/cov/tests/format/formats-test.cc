@@ -86,7 +86,8 @@ namespace cov::testing {
 			git_oid_fromstr(&files_id,
 			                "7698a173c0f8b9c38bd853ba767c71df40b9f669");
 
-			io::v1::coverage_stats const default_stats{1250, {300, 299}};
+			io::v1::coverage_stats const default_stats{
+			    1250, {300, 299}, {0, 0}, {0, 0}};
 			return report::create(
 			    id, parent_id, files_id, commit_id, "develop"sv,
 			    {"Johnny Appleseed"sv, "johnny@appleseed.com"sv},
@@ -194,7 +195,7 @@ namespace cov::testing {
 	        "221144335 (main) 226/300  75% (incomplete) - from [36109a1c3] "
 	        "Subject, isn't it? <Johnny Appleseed>"sv,
 	        {.report = "221144335566778899aabbccddeeff0012345678"sv,
-	         .stats = io::v1::coverage_stats{1250, {300, 226}}},
+	         .stats = io::v1::coverage_stats{1250, {300, 226}, {0, 0}, {0, 0}}},
 	    },
 	    {
 	        "v1.0.0"sv,
@@ -202,7 +203,7 @@ namespace cov::testing {
 	        "221133445 (tag: v1.0.0) 270/300  90% (pass) - from [36109a1c3] "
 	        "Subject, isn't it? <Johnny Appleseed>"sv,
 	        {.report = "221133445566778899aabbccddeeff0012345678"sv,
-	         .stats = io::v1::coverage_stats{1250, {300, 270}}},
+	         .stats = io::v1::coverage_stats{1250, {300, 270}, {0, 0}, {0, 0}}},
 	    },
 	    {
 	        "no refs"sv,
@@ -210,7 +211,7 @@ namespace cov::testing {
 	        "442211335 100/300  33% (fail) - from [36109a1c3] Subject, isn't "
 	        "it? <Johnny Appleseed>"sv,
 	        {.report = "442211335566778899aabbccddeeff0012345678"sv,
-	         .stats = io::v1::coverage_stats{1250, {300, 100}}},
+	         .stats = io::v1::coverage_stats{1250, {300, 100}, {0, 0}, {0, 0}}},
 	    },
 	    {
 	        "nothing to judge"sv,
@@ -218,7 +219,7 @@ namespace cov::testing {
 	        "442211335 0/0   0% (fail) - from [36109a1c3] Subject, isn't it? "
 	        "<Johnny Appleseed>"sv,
 	        {.report = "442211335566778899aabbccddeeff0012345678"sv,
-	         .stats = io::v1::coverage_stats{1250, {0, 0}}},
+	         .stats = io::v1::coverage_stats{1250, {0, 0}, {0, 0}, {0, 0}}},
 	    },
 	    {
 	        "broken rating (bad passing)"sv,
@@ -226,7 +227,7 @@ namespace cov::testing {
 	        "442211335 300/300 100% (fail) - from [36109a1c3] Subject, isn't "
 	        "it? <Johnny Appleseed>"sv,
 	        {.report = "442211335566778899aabbccddeeff0012345678"sv,
-	         .stats = io::v1::coverage_stats{1250, {300, 300}},
+	         .stats = io::v1::coverage_stats{1250, {300, 300}, {0, 0}, {0, 0}},
 	         .marks{ph::rating{.incomplete{75, 100}, .passing{90, 0}}}},
 	    },
 	    {
@@ -235,7 +236,7 @@ namespace cov::testing {
 	        "442211335 300/300 100% (fail) - from [36109a1c3] Subject, isn't "
 	        "it? <Johnny Appleseed>"sv,
 	        {.report = "442211335566778899aabbccddeeff0012345678"sv,
-	         .stats = io::v1::coverage_stats{1250, {300, 300}},
+	         .stats = io::v1::coverage_stats{1250, {300, 300}, {0, 0}, {0, 0}},
 	         .marks{ph::rating{.incomplete{75, 0}, .passing{9, 10}}}},
 	    },
 	    {
@@ -259,7 +260,7 @@ namespace cov::testing {
 	        "221144335 [main] 226/300  75% (incomplete) - from [36109a1c3] "
 	        "Subject, isn't it? <Johnny Appleseed>"sv,
 	        {.report = "221144335566778899aabbccddeeff0012345678"sv,
-	         .stats = io::v1::coverage_stats{1250, {300, 226}}},
+	         .stats = io::v1::coverage_stats{1250, {300, 226}, {0, 0}, {0, 0}}},
 	    },
 	    {
 	        "no refs (unwrapped)"sv,
@@ -268,7 +269,7 @@ namespace cov::testing {
 	        "isn't "
 	        "it? <Johnny Appleseed>"sv,
 	        {.report = "442211335566778899aabbccddeeff0012345678"sv,
-	         .stats = io::v1::coverage_stats{1250, {300, 100}}},
+	         .stats = io::v1::coverage_stats{1250, {300, 100}, {0, 0}, {0, 0}}},
 	    },
 	    {
 	        "file list (long and short)"sv,

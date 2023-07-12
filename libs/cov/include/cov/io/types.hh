@@ -126,7 +126,7 @@ namespace cov::io {
 			uint32_t relevant;
 			uint32_t visited;
 
-			static constexpr stats init() { return {0, 0}; }
+			static constexpr stats init() noexcept { return {0, 0}; }
 			constexpr bool operator==(stats const&) const noexcept = default;
 
 			constexpr stats& operator+=(stats const& rhs) noexcept {
@@ -238,23 +238,58 @@ namespace cov::io {
 		struct coverage_diff {
 			int32_t lines_total;
 			stats_diff lines;
+			stats_diff functions;
+			stats_diff branches;
 
 			bool operator==(coverage_diff const&) const noexcept = default;
+		};
+
+		struct coverage_stats_short {
+			uint32_t lines_total;
+			stats lines;
 		};
 
 		struct coverage_stats {
 			uint32_t lines_total;
 			stats lines;
+			stats functions;
+			stats branches;
 
-			static constexpr coverage_stats init() {
-				return {0, stats::init()};
+			static constexpr coverage_stats init() noexcept {
+				return {0, stats::init(), stats::init(), stats::init()};
+			}
+
+			static constexpr coverage_stats from(
+			    coverage_stats_short const& shorter) noexcept {
+				return {shorter.lines_total, shorter.lines, stats::init(),
+				        stats::init()};
+			}
+
+			constexpr coverage_stats_short to_short() const noexcept {
+				return {lines_total, lines};
 			}
 
 			bool operator==(coverage_stats const&) const noexcept = default;
 
+			coverage_stats& operator+=(
+			    coverage_stats_short const& rhs) noexcept {
+				lines_total = add_u32(lines_total, rhs.lines_total);
+				lines += rhs.lines;
+				return *this;
+			}
+
+			coverage_stats operator+(
+			    coverage_stats_short const& rhs) const noexcept {
+				auto tmp = coverage_stats{*this};
+				tmp += rhs;
+				return tmp;
+			}
+
 			coverage_stats& operator+=(coverage_stats const& rhs) noexcept {
 				lines_total = add_u32(lines_total, rhs.lines_total);
 				lines += rhs.lines;
+				functions += rhs.functions;
+				branches += rhs.branches;
 				return *this;
 			}
 
@@ -300,6 +335,8 @@ namespace cov::io {
 			return {
 			    .lines_total = diff(newer.lines_total, older.lines_total),
 			    .lines = diff(newer.lines, older.lines),
+			    .functions = diff(newer.functions, older.functions),
+			    .branches = diff(newer.branches, older.branches),
 			};
 		}
 
@@ -375,7 +412,7 @@ namespace cov::io {
 			git_oid parent_report;
 			git_oid file_list;
 			timestamp added;
-			coverage_stats stats;
+			coverage_stats_short stats;
 			report_commit commit;
 			uint32_t strings_offset;
 			uint32_t strings_size;
@@ -426,7 +463,7 @@ namespace cov::io {
 
 		struct report_entry_base {
 			uint32_t path;
-			coverage_stats stats;
+			coverage_stats_short stats;
 			git_oid contents;
 			git_oid line_coverage;
 		};
@@ -436,7 +473,7 @@ namespace cov::io {
 
 		struct report_entry_ext {
 			uint32_t path;
-			coverage_stats stats;
+			coverage_stats_short stats;
 			git_oid contents;
 			git_oid line_coverage;
 			git_oid function_coverage;

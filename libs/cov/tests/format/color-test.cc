@@ -47,7 +47,8 @@ namespace cov::testing {
 			git_oid_fromstr(&commit_id,
 			                "36109a1c35e0d5cf3e5e68d896c8b1b4be565525");
 
-			io::v1::coverage_stats const default_stats{1250, {300, 299}};
+			io::v1::coverage_stats const default_stats{
+			    1250, {300, 299}, io::v1::stats::init(), io::v1::stats::init()};
 			return report::create(
 			    id, parent_id, zero, commit_id, "develop"sv,
 			    {"Johnny Appleseed"sv, "johnny@appleseed.com"sv},
@@ -196,7 +197,10 @@ namespace cov::testing {
 	            "\x1B[34m<Johnny Appleseed>\x1B[m \x1B[32m(committed 4 months "
 	            "ago, added 4 months ago)\x1B[m"sv,
 	        },
-	        {.stats = io::v1::coverage_stats{1250, {1000, 790}}},
+	        {.stats = io::v1::coverage_stats{1250,
+	                                         {1000, 790},
+	                                         io::v1::stats::init(),
+	                                         io::v1::stats::init()}},
 	    },
 	    {
 	        "Rating: bad"sv,
@@ -211,7 +215,10 @@ namespace cov::testing {
 	            "\x1B[34m<Johnny Appleseed>\x1B[m \x1B[32m(committed 4 months "
 	            "ago, added 4 months ago)\x1B[m"sv,
 	        },
-	        {.stats = io::v1::coverage_stats{1250, {600, 300}}},
+	        {.stats = io::v1::coverage_stats{1250,
+	                                         {600, 300},
+	                                         io::v1::stats::init(),
+	                                         io::v1::stats::init()}},
 	    },
 	};
 

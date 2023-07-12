@@ -34,7 +34,8 @@ namespace cov::testing {
 		git_oid_fromstr(&parent_id, "8765432100ffeeddccbbaa998877665544332211");
 		git_oid_fromstr(&commit_id, "36109a1c35e0d5cf3e5e68d896c8b1b4be565525");
 
-		io::v1::coverage_stats const default_stats{1250, 300, 299};
+		io::v1::coverage_stats const default_stats{
+		    1250, {300, 299}, {0, 0}, {0, 0}};
 		return report::create(
 		    id, parent_id, zero, commit_id, "develop"sv,
 		    {"Johnny Appleseed"sv, "johnny@appleseed.com"sv},
