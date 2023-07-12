@@ -8,23 +8,24 @@
 using namespace std::literals;
 
 namespace cov::testing {
-	using io::v1::coverage_stats;
+	using io::v1::stats;
 	enum class rel { lt, eq, gt };
 
 	template <typename Int>
-	static constexpr coverage_stats::ratio<Int>
-	ratio(Int whole, Int fraction, unsigned char digits) noexcept {
+	static constexpr stats::ratio<Int> ratio(Int whole,
+	                                         Int fraction,
+	                                         unsigned char digits) noexcept {
 		return {whole, fraction, digits};
 	}
 
 	template <typename Int>
-	static constexpr coverage_stats::ratio<Int> ratio(Int whole) noexcept {
+	static constexpr stats::ratio<Int> ratio(Int whole) noexcept {
 		return {whole, 0, 0};
 	}
 
 	template <typename Int>
 	struct ratio_test {
-		coverage_stats::ratio<Int> lhs, rhs;
+		stats::ratio<Int> lhs, rhs;
 		rel relation;
 
 		friend inline std::ostream& operator<<(std::ostream& out,
@@ -44,7 +45,7 @@ namespace cov::testing {
 
 	template <typename Int>
 	struct ratio_fmt_test {
-		coverage_stats::ratio<Int> ratio;
+		stats::ratio<Int> ratio;
 		std::string_view fmt;
 		std::string_view expected;
 

@@ -80,18 +80,19 @@ namespace cov::app::show {
 		        apply_mark(val(change.coverage.current, "%"sv),
 		                   change.stats.current),
 		        val_sign(change.coverage.diff, color::faint_green, "%"sv),
-		        val(change.stats.current.covered),
-		        val_sign(change.stats.diff.covered),
-		        val(change.stats.current.relevant),
-		        val_sign(change.stats.diff.relevant, color::faint_normal),
+		        val(change.stats.current.lines.visited),
+		        val_sign(change.stats.diff.lines.visited),
+		        val(change.stats.current.lines.relevant),
+		        val_sign(change.stats.diff.lines.relevant, color::faint_normal),
 		        // GCOV_EXCL_START[GCC]
-		        val(change.stats.current.relevant -
-		            change.stats.current.covered),
-		        val_sign(change.stats.diff.relevant - change.stats.diff.covered,
+		        val(change.stats.current.lines.relevant -
+		            change.stats.current.lines.visited),
+		        val_sign(change.stats.diff.lines.relevant -
+		                     change.stats.diff.lines.visited,
 		                 color::faint_red),
 		        // GCOV_EXCL_STOP
-		        val(change.stats.current.total),
-		        val_sign(change.stats.diff.total, color::faint_normal),
+		        val(change.stats.current.lines_total),
+		        val_sign(change.stats.diff.lines_total, color::faint_normal),
 		    },
 		    row == row_type::data);
 	}

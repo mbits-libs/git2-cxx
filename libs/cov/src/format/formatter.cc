@@ -144,7 +144,7 @@ namespace cov::placeholder {
 
 		iterator format_percentage(iterator out,
 		                           io::v1::coverage_stats const& stats) {
-			return fmt::format_to(out, "{:>3}%", stats.calc(0).whole);
+			return fmt::format_to(out, "{:>3}%", stats.lines.calc(0).whole);
 		}
 
 		iterator format_rating(iterator out,
@@ -485,11 +485,11 @@ namespace cov::placeholder {
 			case report::lines_percent:
 				return !stats ? out : format_percentage(out, *stats);
 			case report::lines_total:
-				return !stats ? out : format_num(out, stats->total);
+				return !stats ? out : format_num(out, stats->lines_total);
 			case report::lines_relevant:
-				return !stats ? out : format_num(out, stats->relevant);
+				return !stats ? out : format_num(out, stats->lines.relevant);
 			case report::lines_covered:
-				return !stats ? out : format_num(out, stats->covered);
+				return !stats ? out : format_num(out, stats->lines.visited);
 			case report::lines_rating:
 				return !stats ? out : format_rating(out, *stats, ctx);
 		}
@@ -556,11 +556,12 @@ namespace cov {
 
 	translatable formatter::apply_mark(io::v1::coverage_stats const& stats,
 	                                   placeholder::rating const& marks) {
-		if (!stats.relevant || !marks.incomplete.den || !marks.passing.den)
+		if (!stats.lines.relevant || !marks.incomplete.den ||
+		    !marks.passing.den)
 			return translatable::mark_failing;
-		auto const gcd_1 = std::gcd(stats.relevant, stats.covered);
-		auto const cov = stats.covered / gcd_1;
-		auto const rel = stats.relevant / gcd_1;
+		auto const gcd_1 = std::gcd(stats.lines.relevant, stats.lines.visited);
+		auto const cov = stats.lines.visited / gcd_1;
+		auto const rel = stats.lines.relevant / gcd_1;
 
 		auto const incomplete = marks.incomplete.gcd();
 		auto const lhs = cov * incomplete.den;

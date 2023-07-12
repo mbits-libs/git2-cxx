@@ -91,19 +91,19 @@ namespace cov::io {
 		}
 	};
 
-	inline uint32_t clip_u32(size_t raw) {
+	inline constexpr uint32_t clip_u32(size_t raw) {
 		constexpr size_t max_u32 = std::numeric_limits<uint32_t>::max();
 		return static_cast<uint32_t>(std::min(raw, max_u32));
 	}
 
-	inline uint32_t add_u32(uint32_t lhs, uint32_t rhs) {
+	inline constexpr uint32_t add_u32(uint32_t lhs, uint32_t rhs) {
 		constexpr auto max_u32 = std::numeric_limits<uint32_t>::max();
 		auto const rest = max_u32 - lhs;
 		if (rest < rhs) return max_u32;
 		return lhs + rhs;
 	}
 
-	inline void inc_u32(uint32_t& rhs) {
+	inline constexpr void inc_u32(uint32_t& rhs) {
 		constexpr auto max_u32 = std::numeric_limits<uint32_t>::max();
 		if (rhs < max_u32) ++rhs;
 	}
@@ -115,45 +115,31 @@ namespace cov::io {
 
 		struct coverage;
 
-		struct coverage_diff {
-			int32_t total;
+		struct stats_diff {
 			int32_t relevant;
-			int32_t covered;
+			int32_t visited;
 
-			bool operator==(coverage_diff const&) const noexcept = default;
+			bool operator==(stats_diff const&) const noexcept = default;
 		};
 
-		struct coverage_stats {
-			uint32_t total;
+		struct stats {
 			uint32_t relevant;
-			uint32_t covered;
+			uint32_t visited;
 
-			static constexpr coverage_stats init() { return {0, 0, 0}; }
+			static constexpr stats init() { return {0, 0}; }
+			constexpr bool operator==(stats const&) const noexcept = default;
 
-			bool operator==(coverage_stats const&) const noexcept = default;
-
-			coverage_stats& operator+=(coverage_stats const& rhs) noexcept {
-				total = add_u32(total, rhs.total);
+			constexpr stats& operator+=(stats const& rhs) noexcept {
 				relevant = add_u32(relevant, rhs.relevant);
-				covered = add_u32(covered, rhs.covered);
+				visited = add_u32(visited, rhs.visited);
 				return *this;
 			}
 
-			coverage_stats operator+(coverage_stats const& rhs) const noexcept {
-				auto tmp = coverage_stats{*this};
+			constexpr stats operator+(stats const& rhs) const noexcept {
+				auto tmp = stats{*this};
 				tmp += rhs;
 				return tmp;
 			}
-
-			inline coverage_stats& operator+=(coverage const& rhs) noexcept;
-			coverage_stats operator+(coverage const& rhs) const noexcept {
-				auto tmp = coverage_stats{*this};
-				tmp += rhs;
-				return tmp;
-			}
-
-			inline static coverage_stats stats(
-			    std::vector<coverage> const& lines) noexcept;
 
 			template <typename Int>
 			using Ordering =
@@ -238,7 +224,7 @@ namespace cov::io {
 				if (!relevant) return {0, 0, digits};
 
 				auto const divider = pow10(1, digits);
-				auto out = covered * 100 * divider;
+				auto out = visited * 100 * divider;
 
 				// round towards the nearest whole
 				out += relevant / 2;
@@ -247,6 +233,46 @@ namespace cov::io {
 				return {static_cast<unsigned>(out / divider),
 				        static_cast<unsigned>(out % divider), digits};
 			}
+		};
+
+		struct coverage_diff {
+			int32_t lines_total;
+			stats_diff lines;
+
+			bool operator==(coverage_diff const&) const noexcept = default;
+		};
+
+		struct coverage_stats {
+			uint32_t lines_total;
+			stats lines;
+
+			static constexpr coverage_stats init() {
+				return {0, stats::init()};
+			}
+
+			bool operator==(coverage_stats const&) const noexcept = default;
+
+			coverage_stats& operator+=(coverage_stats const& rhs) noexcept {
+				lines_total = add_u32(lines_total, rhs.lines_total);
+				lines += rhs.lines;
+				return *this;
+			}
+
+			coverage_stats operator+(coverage_stats const& rhs) const noexcept {
+				auto tmp = coverage_stats{*this};
+				tmp += rhs;
+				return tmp;
+			}
+
+			inline coverage_stats& operator+=(coverage const& rhs) noexcept;
+			coverage_stats operator+(coverage const& rhs) const noexcept {
+				auto tmp = coverage_stats{*this};
+				tmp += rhs;
+				return tmp;
+			}
+
+			inline static coverage_stats from(
+			    std::vector<coverage> const& lines) noexcept;
 		};
 
 		inline auto diff(std::unsigned_integral auto newer,
@@ -262,31 +288,34 @@ namespace cov::io {
 			return neg ? -abs : abs;
 		}
 
-		inline coverage_diff diff(coverage_stats const& newer,
-		                          coverage_stats const& older) {
+		inline stats_diff diff(stats const& newer, stats const& older) {
 			return {
-			    .total = diff(newer.total, older.total),
 			    .relevant = diff(newer.relevant, older.relevant),
-			    .covered = diff(newer.covered, older.covered),
+			    .visited = diff(newer.visited, older.visited),
 			};
 		}
 
-		inline coverage_stats::ratio<int> diff(
-		    coverage_stats::ratio<> const& newer,
-		    coverage_stats::ratio<> const& older) {
+		inline coverage_diff diff(coverage_stats const& newer,
+		                          coverage_stats const& older) {
+			return {
+			    .lines_total = diff(newer.lines_total, older.lines_total),
+			    .lines = diff(newer.lines, older.lines),
+			};
+		}
+
+		inline stats::ratio<int> diff(stats::ratio<> const& newer,
+		                              stats::ratio<> const& older) {
 			auto const digits = std::max(newer.digits, older.digits);
-			auto const multiplier = coverage_stats::pow10(1, digits);
+			auto const multiplier = stats::pow10(1, digits);
 
 			auto const newer_back =
-			    coverage_stats::pow10(newer.whole, newer.digits) +
-			    newer.fraction;
+			    stats::pow10(newer.whole, newer.digits) + newer.fraction;
 			auto const newer_val =
-			    coverage_stats::pow10(newer_back, digits - newer.digits);
+			    stats::pow10(newer_back, digits - newer.digits);
 			auto const older_back =
-			    coverage_stats::pow10(older.whole, older.digits) +
-			    older.fraction;
+			    stats::pow10(older.whole, older.digits) + older.fraction;
 			auto const older_val =
-			    coverage_stats::pow10(older_back, digits - older.digits);
+			    stats::pow10(older_back, digits - older.digits);
 
 			static constexpr auto ceil = static_cast<std::uintmax_t>(
 			    std::numeric_limits<std::intmax_t>::max());
@@ -442,19 +471,19 @@ namespace cov::io {
 		inline coverage_stats& coverage_stats::operator+=(
 		    coverage const& rhs) noexcept {
 			if (rhs.is_null) {
-				total = add_u32(total, rhs.value);
+				lines_total = add_u32(lines_total, rhs.value);
 				return *this;
 			}
-			inc_u32(total);
-			inc_u32(relevant);
-			if (rhs.value) inc_u32(covered);
+			inc_u32(lines_total);
+			inc_u32(lines.relevant);
+			if (rhs.value) inc_u32(lines.visited);
 			return *this;
 		}
 
-		inline coverage_stats coverage_stats::stats(
+		inline coverage_stats coverage_stats::from(
 		    std::vector<coverage> const& lines) noexcept {
 			return std::accumulate(lines.begin(), lines.end(),
-			                       coverage_stats{});
+			                       coverage_stats::init());
 		}
 
 	};  // namespace v1
@@ -462,7 +491,7 @@ namespace cov::io {
 
 namespace fmt {
 	template <typename Int>
-	struct formatter<cov::io::v1::coverage_stats::ratio<Int>> {
+	struct formatter<cov::io::v1::stats::ratio<Int>> {
 		bool with_sign{false};
 
 		FMT_CONSTEXPR auto parse(format_parse_context& ctx)
@@ -478,9 +507,9 @@ namespace fmt {
 		}
 
 		template <typename FormatContext>
-		FMT_CONSTEXPR auto format(
-		    cov::io::v1::coverage_stats::ratio<Int> const& ratio,
-		    FormatContext& ctx) const -> decltype(ctx.out()) {
+		FMT_CONSTEXPR auto format(cov::io::v1::stats::ratio<Int> const& ratio,
+		                          FormatContext& ctx) const
+		    -> decltype(ctx.out()) {
 			if constexpr (std::signed_integral<Int>) {
 				if (!ratio.whole && ratio.fraction < 0)
 					return fmt::format_to(ctx.out(), "-0.{:0{}}",

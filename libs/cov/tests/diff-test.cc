@@ -32,10 +32,12 @@ namespace cov {
 	}
 
 	void PrintTo(file_stats const& file, std::ostream* out) {
-		*out << "{\"" << file.filename << "\"s, {" << file.current.total << ", "
-		     << file.current.relevant << ", " << file.current.covered << "}, {"
-		     << file.previous.total << ", " << file.previous.relevant << ", "
-		     << file.previous.covered << "},";
+		*out << "{\"" << file.filename << "\"s, {" << file.current.lines_total
+		     << ", " << file.current.lines.relevant << ", "
+		     << file.current.lines.visited << "}, {"
+		     << file.previous.lines_total << ", "
+		     << file.previous.lines.relevant << ", "
+		     << file.previous.lines.visited << "},";
 		if (file.previous_name.empty())
 			*out << "{}";
 		else
@@ -190,8 +192,8 @@ namespace cov::testing {
 		return fmt::format("{}", value);
 	}
 
-	std::string format(io::v1::coverage_stats::ratio<> value,
-	                   io::v1::coverage_stats::ratio<int> diff) {
+	std::string format(io::v1::stats::ratio<> value,
+	                   io::v1::stats::ratio<int> diff) {
 		if (diff.whole || diff.fraction)
 			return fmt::format("{}.{:0{}}% [{:+}.{:0{}}%]", value.whole,
 			                   value.fraction, value.digits, diff.whole,
@@ -227,12 +229,12 @@ namespace cov::testing {
 			std::vector<std::string> row(row_size + 2);
 			row[id_letter] = fmt::format("{}", letter_for(file.diff_kind));
 			row[id_percent] = format(diff.coverage.current, diff.coverage.diff);
-			row[id_covered] =
-			    format(diff.stats.current.covered, diff.stats.diff.covered);
-			row[id_relevant] =
-			    format(diff.stats.current.relevant, diff.stats.diff.relevant);
-			row[id_total] =
-			    format(diff.stats.current.total, diff.stats.diff.total);
+			row[id_covered] = format(diff.stats.current.lines.visited,
+			                         diff.stats.diff.lines.visited);
+			row[id_relevant] = format(diff.stats.current.lines.relevant,
+			                          diff.stats.diff.lines.relevant);
+			row[id_total] = format(diff.stats.current.lines_total,
+			                       diff.stats.diff.lines_total);
 			row[id_total + 1] = file.filename;
 
 			if (file.diff_kind == file_diff::renamed ||
@@ -351,11 +353,15 @@ namespace cov::testing {
 	        0,
 	        {
 	            {"src/greetings.cc",
-	             {8, 3, 3},
-	             {6, 1, 0},
+	             {8, {3, 3}},
+	             {6, {1, 0}},
 	             "src/old-name.cc",
 	             file_diff::renamed},
-	            {"src/main.cc", {5, 1, 1}, {5, 1, 0}, {}, file_diff::normal},
+	            {"src/main.cc",
+	             {5, {1, 1}},
+	             {5, {1, 0}},
+	             {},
+	             file_diff::normal},
 	        },
 	    },
 	    {
@@ -363,14 +369,18 @@ namespace cov::testing {
 	        0,
 	        {
 	            {"src/greetings.cc",
-	             {8, 3, 3},
-	             {0, 0, 0},
+	             {8, {3, 3}},
+	             {0, {0, 0}},
 	             {},
 	             file_diff::added},
-	            {"src/main.cc", {5, 1, 1}, {5, 1, 0}, {}, file_diff::normal},
+	            {"src/main.cc",
+	             {5, {1, 1}},
+	             {5, {1, 0}},
+	             {},
+	             file_diff::normal},
 	            {"src/old-name.cc",
-	             {0, 0, 0},
-	             {6, 1, 0},
+	             {0, {0, 0}},
+	             {6, {1, 0}},
 	             {},
 	             file_diff::deleted},
 	        },
@@ -380,10 +390,10 @@ namespace cov::testing {
 	        "middle"sv,
 	        1,
 	        {
-	            {"src/main.cc", {5, 1, 0}, {0, 0, 0}, {}, file_diff::added},
+	            {"src/main.cc", {5, {1, 0}}, {0, {0, 0}}, {}, file_diff::added},
 	            {"src/old-name.cc",
-	             {6, 1, 0},
-	             {5, 1, 0},
+	             {6, {1, 0}},
+	             {5, {1, 0}},
 	             "main.cc",
 	             file_diff::renamed},
 	        },
@@ -392,14 +402,14 @@ namespace cov::testing {
 	        "bottom_to_self"sv,
 	        2,
 	        {
-	            {"main.cc", {5, 1, 0}, {5, 1, 0}, {}, file_diff::normal},
+	            {"main.cc", {5, {1, 0}}, {5, {1, 0}}, {}, file_diff::normal},
 	        },
 	    },
 	    {
 	        "bottom_to_empty"sv,
 	        2,
 	        {
-	            {"main.cc", {5, 1, 0}, {0, 0, 0}, {}, file_diff::added},
+	            {"main.cc", {5, {1, 0}}, {0, {0, 0}}, {}, file_diff::added},
 	        },
 	        {.initial = file_diff::initial_add_all},
 	    },
