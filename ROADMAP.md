@@ -50,6 +50,8 @@
     - [x] coveralls
     - [x] cobertura
     - [x] `cov report --amend`
+      - [ ] `cov report --flag`
+      - [ ] `$COV_FILTER_PATH`
     - [x] extract `make_u8path`/`get_u8path` to cov-rt
   - [x] code cleanup
     - [x] add documentation

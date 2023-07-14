@@ -1,7 +1,9 @@
-[module "git2 (c++)"]
-    path = libs/git2-c++
+[module "cov/git2 (c++)"]
+    path = libs/cov-api/include/cov/git2
+    path = libs/cov-api/src/git2-c++
 [module "cov/API"]
-    path = libs/cov
+    path = libs/cov-api/include/cov
+    path = libs/cov-api/src/cov
 [module "cov/runtime"]
     path = libs/cov-rt
 [module "app/library"]
