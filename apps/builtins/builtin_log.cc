@@ -10,9 +10,9 @@
 #include <cov/app/rt_path.hh>
 #include <cov/app/show_range.hh>
 #include <cov/format.hh>
+#include <cov/git2/repository.hh>
 #include <cov/repository.hh>
 #include <cov/revparse.hh>
-#include <git2/repository.hh>
 
 namespace cov::app::builtin::log {
 	struct parser : base_parser<loglng, errlng> {

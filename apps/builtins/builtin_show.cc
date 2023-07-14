@@ -10,9 +10,9 @@
 #include <cov/app/path.hh>
 #include <cov/app/show.hh>
 #include <cov/format.hh>
+#include <cov/git2/blob.hh>
+#include <cov/git2/repository.hh>
 #include <cov/module.hh>
-#include <git2/blob.hh>
-#include <git2/repository.hh>
 #include <hilite/hilite.hh>
 #include <hilite/lighter.hh>
 #include <hilite/none.hh>

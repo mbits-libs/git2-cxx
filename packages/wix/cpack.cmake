@@ -4,7 +4,6 @@ list(REMOVE_ITEM CPACK_COMPONENTS_ALL
     libcov
     librt
     libapp
-    git2_cxx
     hilite
     hilite_cxx
     lighter

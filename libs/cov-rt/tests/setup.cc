@@ -2,10 +2,10 @@
 // This code is licensed under MIT license (see LICENSE for details)
 
 #include "setup.hh"
+#include <cov/git2/global.hh>
 #include <cov/io/file.hh>
 #include <cstdio>
 #include <filesystem>
-#include <git2/global.hh>
 #include <string>
 #include <tar.hh>
 

@@ -7,7 +7,7 @@
 #include <cov/app/tools.hh>
 #include <cov/app/tr.hh>
 #include <cov/discover.hh>
-#include "../../cov/src/path-utils.hh"
+#include "../../cov-api/src/cov/path-utils.hh"
 
 namespace cov::app {
 	namespace {

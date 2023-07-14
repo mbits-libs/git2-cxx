@@ -22,7 +22,7 @@ This project will use [Conventional Commits v1.0.0](https://www.conventionalcomm
 |Scope|Usage|
 |-|-|
 |`lang`|either .lang or .po files|
-|`api`|`git2-c++` or `cov-api` libraries|
+|`api`|`cov-api` library|
 |`lighter`|any of the `hilite` libraries|
 |`app`|`app` library|
 |`rt`|`cov-rt` library|

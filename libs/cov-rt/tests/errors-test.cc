@@ -8,8 +8,8 @@
 #include <cov/app/log_format_tr.hh>
 #include <cov/app/rt_path.hh>
 #include <cov/app/tools.hh>
-#include <git2/error.hh>
-#include <git2/global.hh>
+#include <cov/git2/error.hh>
+#include <cov/git2/global.hh>
 
 namespace cov::app::testing {
 	using namespace ::std::literals;

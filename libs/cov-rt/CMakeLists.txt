@@ -76,7 +76,7 @@ if (COV_TESTING)
   )
 
   add_executable(cov-rt-test ${TEST_SRCS_CC} ${TEST_SRCS_CPP} ${TEST_SRCS_CXX})
-  add_executable(cov-rt-stress-test ${STRESS_TEST_SRCS_CC} tests/setup.cc ../git2-c++/tests/stress/new.cc)
+  add_executable(cov-rt-stress-test ${STRESS_TEST_SRCS_CC} tests/setup.cc ../cov-api/tests/git2-c++/stress/new.cc)
 
   set_target_properties(cov-rt-test cov-rt-stress-test PROPERTIES FOLDER tests)
 
@@ -94,7 +94,7 @@ if (COV_TESTING)
   target_include_directories(cov-rt-stress-test
     PRIVATE
       ${CMAKE_CURRENT_SOURCE_DIR}/tests
-      ${CMAKE_CURRENT_SOURCE_DIR}/../git2-c++/tests/stress
+      ${CMAKE_CURRENT_SOURCE_DIR}/../cov-api/tests/git2-c++/stress
       ${CMAKE_CURRENT_BINARY_DIR})
 
   add_test(NAME cov-rt COMMAND cov-rt-test "--gtest_output=xml:${TEST_REPORT_DIR}/libcov-rt/${TEST_REPORT_FILE}")

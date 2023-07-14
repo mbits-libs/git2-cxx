@@ -11,7 +11,7 @@
 #include <cov/app/strings/errors.hh>
 #include <cov/app/tr.hh>
 #include <cov/error.hh>
-#include <git2/error.hh>
+#include <cov/git2/error.hh>
 #include <string>
 #include <utility>
 #include <variant>

@@ -6,8 +6,8 @@
 #include <cov/app/args.hh>
 #include <cov/app/cov_config_tr.hh>
 #include <cov/app/errors_tr.hh>
+#include <cov/git2/config.hh>
 #include <filesystem>
-#include <git2/config.hh>
 #include <string>
 #include <type_traits>
 #include <vector>

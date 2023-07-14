@@ -7,8 +7,8 @@
 #include <cov/app/errors_tr.hh>
 #include <cov/app/path.hh>
 #include <cov/app/rt_path.hh>
+#include <cov/git2/repository.hh>
 #include <cov/repository.hh>
-#include <git2/repository.hh>
 
 namespace cov::app::builtin::init {
 	namespace {

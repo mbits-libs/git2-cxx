@@ -3,11 +3,11 @@
 
 #pragma once
 
+#include <cov/git2/repository.hh>
+#include <cov/git2/tree.hh>
 #include <cov/io/report.hh>
 #include <cov/io/types.hh>
 #include <filesystem>
-#include <git2/repository.hh>
-#include <git2/tree.hh>
 #include <map>
 #include <string>
 #include <string_view>

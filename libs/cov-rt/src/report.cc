@@ -5,10 +5,10 @@
 #include <chrono>
 #include <cov/app/path.hh>
 #include <cov/app/report.hh>
+#include <cov/git2/commit.hh>
 #include <cov/hash/md5.hh>
 #include <cov/hash/sha1.hh>
 #include <cov/io/file.hh>
-#include <git2/commit.hh>
 #include <json/json.hpp>
 
 namespace cov::app::report {
