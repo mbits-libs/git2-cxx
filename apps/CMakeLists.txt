@@ -139,13 +139,10 @@ if (COV_TESTING)
         add_test(
             NAME cov-exec--${TEST_SET}
             COMMAND "${Python3_EXECUTABLE}"
-                "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_driver.py"
-                --target "$<TARGET_FILE:cov>"
-                --tests "${CMAKE_CURRENT_SOURCE_DIR}/tests/main-set/${TEST_SET}"
-                --data-dir "${CMAKE_CURRENT_SOURCE_DIR}/tests/data"
+                "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_runner.py"
+                --bin "${PROJECT_BINARY_DIR}"
+                --tests "main-set/${TEST_SET}"
                 --version "${PROJECT_VERSION}${PROJECT_VERSION_STABILITY}${PROJECT_VERSION_BUILD_META}"
-                --install "${CMAKE_CURRENT_SOURCE_DIR}/tests/copy"
-                --install-with "$<TARGET_FILE:cov-echo>"
                 )
     endforeach()
 
@@ -153,13 +150,10 @@ if (COV_TESTING)
         add_test(
             NAME cov-exec-pl
             COMMAND "${Python3_EXECUTABLE}"
-                "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_driver.py"
-                --target "$<TARGET_FILE:cov>"
-                --tests "${CMAKE_CURRENT_SOURCE_DIR}/tests/messages-pl"
-                --data-dir "${CMAKE_CURRENT_SOURCE_DIR}/tests/data"
+                "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_runner.py"
+                --bin "${PROJECT_BINARY_DIR}"
+                --tests "messages-pl"
                 --version "${PROJECT_VERSION}${PROJECT_VERSION_STABILITY}${PROJECT_VERSION_BUILD_META}"
-                --install "${CMAKE_CURRENT_SOURCE_DIR}/tests/copy"
-                --install-with "$<TARGET_FILE:cov-echo>"
                 )
     endif()
 
