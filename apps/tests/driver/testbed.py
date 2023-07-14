@@ -5,8 +5,8 @@ import json
 import os
 import random
 import string
-from dataclasses import dataclass
-from typing import Optional, Tuple
+from dataclasses import dataclass, field
+from typing import List, Optional, Tuple
 
 from . import test
 
@@ -33,6 +33,7 @@ class Counters:
     error_counter: int = 0
     skip_counter: int = 0
     save_counter: int = 0
+    echo: List[str] = field(default_factory=list)
 
     def report(self, outcome: int, test_id: str, message: Optional[str]):
         if outcome == TaskResult.SKIPPED:
@@ -47,9 +48,9 @@ class Counters:
             return
 
         if outcome == TaskResult.CLIP_FAILED:
-            print(
-                f"{test_id} {color.failed}FAILED (unknown check '{message}'){color.reset}"
-            )
+            msg = f"{test_id} {color.failed}FAILED (unknown check '{message}'){color.reset}"
+            print(msg)
+            self.echo.append(msg)
             self.error_counter += 1
             return
 
@@ -59,7 +60,9 @@ class Counters:
 
         if message is not None:
             print(message)
-        print(f"{test_id} {color.failed}FAILED{color.reset}")
+        msg = f"{test_id} {color.failed}FAILED{color.reset}"
+        print(msg)
+        self.echo.append(msg)
         self.error_counter += 1
 
     def summary(self, counter: int):
@@ -72,6 +75,11 @@ class Counters:
                 )
             else:
                 print(f"Skipped {self.skip_counter} {skip_test}")
+
+        if len(self.echo):
+            print()
+        for echo in self.echo:
+            print(echo)
 
         return self.error_counter == 0
 

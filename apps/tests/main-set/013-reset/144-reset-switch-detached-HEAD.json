@@ -3,11 +3,11 @@
     "expected": [
         0,
         [
-            "Detached HEAD now points to cb6394c0b1199077b0a47ade847161b32ef9feab",
-            "\u001b[31m[detached HEAD cb6394c0b]\u001b[m Commit F",
+            "Detached HEAD now points to a92306133d70bd92972c8b9ed3e16b394effa80f",
+            "\u001b[31m[detached HEAD a92306133]\u001b[m Commit F",
             " 0 files, \u001b[31m  0%\u001b[m (0/0)",
-            " \u001b[2;37mbased on\u001b[m \u001b[2;33mdbe474382@main\u001b[m",
-            " parent 8b9c7b3b7\n"
+            " \u001b[2;37mbased on\u001b[m \u001b[2;33mfef5de748@main\u001b[m",
+            " parent 7115c0526\n"
         ],
         ""
     ],
