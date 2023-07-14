@@ -5,7 +5,7 @@
 #include <cov/app/dirs.hh>
 #include <cov/app/root_command.hh>
 #include <cov/app/tools.hh>
-#include <git2/global.hh>
+#include <cov/git2/global.hh>
 #include "../path-utils.hh"
 #include "new.hh"
 

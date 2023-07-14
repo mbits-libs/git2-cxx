@@ -4,8 +4,8 @@
 #pragma once
 
 #include <git2/oid.h>
+#include <cov/git2/repository.hh>
 #include <filesystem>
-#include <git2/repository.hh>
 #include <string>
 #include "path.hh"
 

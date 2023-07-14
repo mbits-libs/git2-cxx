@@ -7,7 +7,7 @@
 #endif
 
 #include <args/parser.hpp>
-#include <git2/global.hh>
+#include <cov/git2/global.hh>
 
 extern int tool(::args::args_view const&);
 

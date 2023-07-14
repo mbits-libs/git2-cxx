@@ -3,7 +3,7 @@
 
 #include <cov/app/config.hh>
 #include <cov/app/rt_path.hh>
-#include <git2/repository.hh>
+#include <cov/git2/repository.hh>
 
 namespace cov::app::builtin::config {
 	using namespace app::config;

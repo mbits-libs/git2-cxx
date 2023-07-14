@@ -5,8 +5,8 @@
 
 #include <args/parser.hpp>
 #include <cov/app/cov_tr.hh>
+#include <cov/git2/config.hh>
 #include <filesystem>
-#include <git2/config.hh>
 #include <set>
 #include <span>
 #include <string>

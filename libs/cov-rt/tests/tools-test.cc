@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 #include <cov/app/dirs.hh>
 #include <cov/app/tools.hh>
-#include <git2/global.hh>
+#include <cov/git2/global.hh>
 
 namespace cov::app::testing {
 	using namespace ::std::literals;

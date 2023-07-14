@@ -40,7 +40,7 @@ if (COV_TESTING)
 
   add_executable(lighter-test ${TEST_SRCS_CC} ${TEST_SRCS_CPP} ${TEST_SRCS_CXX})
   add_executable(lighter-stress-test ${STRESS_TEST_SRCS_CC}
-    ../../git2-c++/tests/stress/new.cc)
+    ../../cov-api/tests/git2-c++/stress/new.cc)
 
   set_target_properties(lighter-test lighter-stress-test PROPERTIES FOLDER tests)
 
@@ -58,7 +58,7 @@ if (COV_TESTING)
   target_include_directories(lighter-stress-test
     PRIVATE
       ${CMAKE_CURRENT_SOURCE_DIR}/tests
-      ${CMAKE_CURRENT_SOURCE_DIR}/../../git2-c++/tests/stress
+      ${CMAKE_CURRENT_SOURCE_DIR}/../../cov-api/tests/git2-c++/stress
       ${CMAKE_CURRENT_BINARY_DIR})
 
   add_test(NAME lighter COMMAND lighter-test "--gtest_output=xml:${TEST_REPORT_DIR}/liblighter/${TEST_REPORT_FILE}")

@@ -11,9 +11,9 @@
 #include <cov/app/path.hh>
 #include <cov/app/rt_path.hh>
 #include <cov/app/show_range.hh>
+#include <cov/git2/repository.hh>
 #include <cov/repository.hh>
 #include <cov/revparse.hh>
-#include <git2/repository.hh>
 
 namespace cov::app::builtin::tag {
 	using base_parser = app::branches_base_parser;

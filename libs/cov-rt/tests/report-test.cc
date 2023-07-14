@@ -3,7 +3,7 @@
 
 #include <gtest/gtest.h>
 #include <cov/app/report.hh>
-#include <git2/global.hh>
+#include <cov/git2/global.hh>
 #include <json/json.hpp>
 #include "setup.hh"
 

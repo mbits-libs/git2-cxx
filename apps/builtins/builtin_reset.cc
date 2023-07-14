@@ -11,9 +11,9 @@
 #include <cov/app/report_command.hh>
 #include <cov/app/rt_path.hh>
 #include <cov/app/show_range.hh>
+#include <cov/git2/repository.hh>
 #include <cov/repository.hh>
 #include <cov/revparse.hh>
-#include <git2/repository.hh>
 
 namespace cov::app::builtin::reset {
 	struct parser : base_parser<errlng, covlng, replng, resetlng> {
