@@ -606,7 +606,6 @@ namespace cov::testing::setup {
 		printf("Tearing down test environment\n");
 		using namespace std::filesystem;
 		std::error_code ignore{};
-		// remove_all(test_dir(), ignore);
-		puts(get_path(test_dir()).c_str());
+		remove_all(test_dir(), ignore);
 	}
 }  // namespace cov::testing::setup
