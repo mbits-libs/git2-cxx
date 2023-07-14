@@ -27,12 +27,12 @@ namespace cov::app::builtin::report {
 		};
 
 		bool same_coverage(cov::repository& repo,
-		                   git_oid const& left_id,
-		                   git_oid const& right_id) {
+		                   git::oid_view left_id,
+		                   git::oid_view right_id) {
 			std::error_code ec{};
-			auto const left = repo.lookup<cov::report_files>(left_id, ec);
+			auto const left = repo.lookup<cov::files>(left_id, ec);
 			if (ec || !left) return false;
-			auto const right = repo.lookup<cov::report_files>(right_id, ec);
+			auto const right = repo.lookup<cov::files>(right_id, ec);
 			if (ec || !right) return false;
 
 			std::map<std::string_view,
@@ -40,11 +40,11 @@ namespace cov::app::builtin::report {
 			    left_data, right_data;
 			for (auto const& entry : left->entries()) {
 				left_data[entry->path()] = {entry->stats(),
-				                            {&entry->contents()}};
+				                            {&entry->contents().id}};
 			}
 			for (auto const& entry : right->entries()) {
 				right_data[entry->path()] = {entry->stats(),
-				                             {&entry->contents()}};
+				                             {&entry->contents().id}};
 			}
 
 			return left_data == right_data;
@@ -123,18 +123,28 @@ namespace cov::app::builtin::report {
 		return std::move(output.output);
 	}
 
+	bool parser::store_build(git::oid& out,
+	                         cov::repository& repo,
+	                         git::oid_view file_list_id,
+	                         date::sys_seconds add_time_utc,
+	                         io::v1::coverage_stats const& stats) {
+		auto const build =
+		    cov::build::create(file_list_id, add_time_utc, {}, stats);
+		return repo.write(out, build);
+	}
+
 	new_head parser::update_current_branch(
 	    cov::repository& repo,
-	    git_oid const& file_list_id,
+	    git::oid_view file_list_id,
 	    git_info const& git,
 	    git_commit const& commit,
-	    io::v1::coverage_stats const& stats) {
+	    date::sys_seconds add_time_utc,
+	    io::v1::coverage_stats const& stats,
+	    std::vector<std::unique_ptr<cov::report::build>>&& builds) {
 		new_head result{};
 
 		git_oid commit_id;
 		git_oid_fromstrn(&commit_id, git.head.data(), git.head.length());
-		auto const now = std::chrono::floor<std::chrono::seconds>(
-		    std::chrono::system_clock::now());
 
 		while (true) {
 			std::error_code ec{};
@@ -149,21 +159,20 @@ namespace cov::app::builtin::report {
 					auto const msg = tr_(replng::ERROR_AMEND_IN_FRESH_REPO);
 					error({msg.data(), msg.size()});
 				}
-				parent_id = current->parent_report();
+				parent_id = current->parent_id().id;
 			}
 
 			auto parent = repo.lookup<cov::report>(parent_id, ec);
 			if (parent) {
-				const bool hard_equiv =
-				    git_oid_equal(&commit_id, &parent->commit()) &&
-				    git.branch == parent->branch();
+				const bool hard_equiv = commit_id == parent->commit_id() &&
+				                        git.branch == parent->branch();
 				const bool loose_equiv =
-				    git_oid_equal(&file_list_id, &parent->file_list()) ||
-				    same_coverage(repo, file_list_id, parent->file_list());
+				    file_list_id == parent->file_list_id() ||
+				    same_coverage(repo, file_list_id, parent->file_list_id());
 				if (hard_equiv && loose_equiv) {
 					auto HEAD_2 = repo.current_head();
 					result.branch = std::move(HEAD_2.branch);
-					if (HEAD_2.tip) result.tip = *HEAD_2.tip;
+					if (HEAD_2.tip) result.tip.assign(*HEAD_2.tip);
 					result.same_report = true;
 					break;
 				}  // GCOV_EXCL_LINE[WIN32]
@@ -173,7 +182,8 @@ namespace cov::app::builtin::report {
 			    parent_id, file_list_id, commit_id, git.branch,
 			    {commit.author.name, commit.author.mail},
 			    {commit.committer.name, commit.committer.mail}, commit.message,
-			    sys_seconds{commit.committed}, now, stats);
+			    sys_seconds{commit.committed}, add_time_utc, stats,
+			    std::move(builds));
 
 			if (!repo.write(result.tip, report_obj)) {
 				// GCOV_EXCL_START
@@ -225,7 +235,7 @@ namespace cov::app::builtin::report {
 			                     stats.lines.relevant - stats.lines.visited);
 		}
 
-		if (!git_oid_is_zero(&report.parent_report())) {
+		if (!report.parent_id().is_zero()) {
 			parent = fmt::format(" {} %rp%n"sv,
 			                     tr(replng::MESSAGE_FIELD_PARENT_REPORT));
 		}
@@ -358,11 +368,11 @@ namespace cov::app::builtin::report {
 
 	bool stored_file::store_tree(git_oid& id,
 	                             cov::repository& repo,
-	                             std::vector<file_info> const& report_files,
+	                             std::vector<file_info> const& file_infos,
 	                             std::vector<stored_file> const& files) {
-		cov::report_files_builder builder{};
+		cov::files::builder builder{};
 		auto it = files.begin();
-		for (auto const& file : report_files) {
+		for (auto const& file : file_infos) {
 			auto& compiled = *it++;
 			builder.add(file.name, compiled.stats, compiled.stg.existing,
 			            compiled.lines_id, compiled.functions_id,

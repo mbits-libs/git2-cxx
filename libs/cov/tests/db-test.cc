@@ -59,40 +59,51 @@ namespace cov::testing {
 		                         {103, 5},
 		                         {104, 15}},
 		               .finish = 20}}};
+		auto const props = "{ \"os\": \"qnx\",  \"build_type\": \"Debug\" }"sv;
 
 		// write
 		{
-			static const git_oid zero_id{};
+			static const git::oid zero_id{};
 
 			auto total = io::v1::coverage_stats::init();
-			report_files_builder builder{};
+			files::builder files{};
 			for (auto const& file : rprt.files) {
 				auto cvg_object = from_lines(file.lines, file.finish);
 				ASSERT_TRUE(cvg_object);
-				git_oid line_cvg_id{};
+				git::oid line_cvg_id{};
 				ASSERT_TRUE(backend->write(line_cvg_id, cvg_object));
 
 				auto file_stats = stats(cvg_object->coverage());
 				total += file_stats;
 
-				file.add_to(builder, file_stats, line_cvg_id, zero_id, zero_id);
+				file.add_to(files, file_stats, line_cvg_id, zero_id, zero_id);
 			}
 
-			auto cvg_files = builder.extract();
+			auto cvg_files = files.extract();
 			ASSERT_TRUE(cvg_files);
-			git_oid files_id{};
+			git::oid files_id{};
 			ASSERT_TRUE(backend->write(files_id, cvg_files));
+
+			cov::report::builder builds{};
+
+			auto cvg_build =
+			    cov::build::create(files_id, rprt.add_time_utc, props, total);
+			ASSERT_TRUE(cvg_build);
+			git::oid build_id{};
+			ASSERT_TRUE(backend->write(build_id, cvg_build));
+			builds.add_nfo(
+			    {.build_id = build_id, .props = props, .stats = total});
 
 			auto cvg_report = cov::report::create(
 			    rprt.parent, files_id, rprt.head.commit, rprt.head.branch,
 			    {rprt.head.author_name, rprt.head.author_email},
 			    {rprt.head.committer_name, rprt.head.committer_email},
 			    rprt.head.message, rprt.head.commit_time_utc, rprt.add_time_utc,
-			    total);
+			    total, builds.release());
 			ASSERT_TRUE(cvg_report);
 			ASSERT_TRUE(backend->write(report_id, cvg_report));
 		}
-		ASSERT_EQ("6ae885c09be27020a24aacbd9dd96d11c8305692"sv,
+		ASSERT_EQ("9894b1593157fc0613f3fc1d32482125284b9be9"sv,
 		          setup::get_oid(report_id));
 
 		// read
@@ -107,10 +118,21 @@ namespace cov::testing {
 			ASSERT_EQ(rprt.head.message, cvg_report->message());
 			ASSERT_EQ(rprt.head.commit_time_utc, cvg_report->commit_time_utc());
 			ASSERT_EQ(rprt.add_time_utc, cvg_report->add_time_utc());
+
+			auto builds = cvg_report->entries();
+			ASSERT_EQ(1, builds.size());
+			ASSERT_EQ(props, builds[0]->props_json());
+
+			auto cvg_build = backend->lookup<cov::build>(builds[0]->build_id());
+			ASSERT_TRUE(cvg_build);
+			ASSERT_EQ(rprt.add_time_utc, cvg_build->add_time_utc());
+			ASSERT_EQ(props, cvg_build->props_json());
+			ASSERT_EQ(cvg_report->file_list_id(), cvg_build->file_list_id());
+
 			auto cvg_files =
-			    backend->lookup<cov::report_files>(cvg_report->file_list());
+			    backend->lookup<cov::files>(cvg_report->file_list_id());
 			ASSERT_TRUE(cvg_files);
-			auto& entries = cvg_files->entries();
+			auto entries = cvg_files->entries();
 			ASSERT_EQ(rprt.files.size(), entries.size());
 
 			auto const count = entries.size();
@@ -131,7 +153,7 @@ namespace cov::testing {
 	}
 
 	TEST(db, read_nonexisting) {
-		git_oid report_id{};
+		git::oid report_id{};
 
 		{
 			std::error_code ec{};
@@ -142,8 +164,8 @@ namespace cov::testing {
 			                 << ec.category().name() << ')';
 
 			ASSERT_EQ(
-			    0, git_oid_fromstr(&report_id,
-			                       "6ae885c09be27020a24aacbd9dd96d11c8305692"));
+			    0, git_oid_fromstr(&report_id.id,
+			                       "2b875786ee42e4141e8004ff9a91fc212b00f1f5"));
 		}
 
 		auto backend =
@@ -184,7 +206,7 @@ namespace cov {
 
 namespace cov::testing {
 	TEST(db, read_unknown) {
-		git_oid report_id{};
+		git::oid report_id{};
 
 		{
 			std::error_code ec{};
@@ -200,8 +222,9 @@ namespace cov::testing {
 		ASSERT_TRUE(backend);
 
 		{
+			git::oid z{};
 			auto cvg_report =
-			    cov::report::create({}, {}, {}, {}, {}, {}, {}, {}, {}, {});
+			    cov::report::create(z, z, z, {}, {}, {}, {}, {}, {}, {}, {});
 			ASSERT_TRUE(cvg_report);
 			ASSERT_TRUE(backend->write(report_id, cvg_report));
 		}
@@ -211,7 +234,7 @@ namespace cov::testing {
 	}
 
 	TEST(db, write_unknown) {
-		git_oid report_id{};
+		git::oid report_id{};
 
 		{
 			std::error_code ec{};
@@ -232,12 +255,12 @@ namespace cov::testing {
 	}
 
 	TEST(db, failed_z_stream) {
-		git_oid oid{};
+		git::oid oid{};
 
 		static constexpr auto text = "not a z-stream"sv;
 
 		auto sha = hash::sha1::once({text.data(), text.size()}).str();
-		git_oid_fromstr(&oid, sha.c_str());
+		git_oid_fromstr(&oid.id, sha.c_str());
 		sha.insert(2, 1, '/');
 
 		{

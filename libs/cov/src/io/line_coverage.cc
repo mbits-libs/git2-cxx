@@ -10,7 +10,7 @@ namespace cov::io::handlers {
 			explicit impl(std::vector<v1::coverage>&& lines)
 			    : lines_{std::move(lines)} {}
 
-			std::vector<v1::coverage> const& coverage()
+			std::span<io::v1::coverage const> coverage()
 			    const noexcept override {
 				return lines_;
 			}
@@ -22,7 +22,7 @@ namespace cov::io::handlers {
 
 	ref_ptr<counted> line_coverage::load(uint32_t,
 	                                     uint32_t,
-	                                     git_oid const&,
+	                                     git::oid_view,
 	                                     read_stream& in,
 	                                     std::error_code& ec) const {
 		ec = make_error_code(errc::bad_syntax);

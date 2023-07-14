@@ -7,6 +7,7 @@
 #include <cov/report.hh>
 #include <filesystem>
 #include <git2/config.hh>
+#include <git2/oid.hh>
 #include <git2/repository.hh>
 #include <memory>
 #include <span>
@@ -24,7 +25,7 @@ namespace cov {
 
 	struct module_view {
 		std::string_view name;
-		std::vector<report_entry const*> items;
+		std::vector<files::entry const*> items;
 		auto operator<=>(module_view const&) const noexcept = default;
 	};
 
@@ -41,10 +42,10 @@ namespace cov {
 		virtual std::string_view separator() const noexcept = 0;
 		virtual std::vector<module_info> const& entries() const noexcept = 0;
 		virtual std::vector<module_view> filter(
-		    std::vector<std::unique_ptr<report_entry>> const&) const = 0;
+		    std::span<std::unique_ptr<files::entry> const> const&) const = 0;
 		virtual std::vector<module_view> filter(
-		    std::span<report_entry const*> const&) const = 0;
-		std::vector<module_view> filter(report_files const& report) const {
+		    std::span<files::entry const*> const&) const = 0;
+		std::vector<module_view> filter(files const& report) const {
 			return filter(report.entries());
 		}
 		virtual mod_errc set_separator(std::string const& sep) = 0;
@@ -60,10 +61,10 @@ namespace cov {
 		    std::vector<module_info> const& mods);
 		static ref_ptr<modules> from_config(git::config const& cfg,
 		                                    std::error_code& ec);
-		static ref_ptr<modules> from_commit(git_oid const& commit,
+		static ref_ptr<modules> from_commit(git::oid_view commit,
 		                                    git::repository_handle const& repo,
 		                                    std::error_code& ec);
-		static ref_ptr<modules> from_report(git_oid const& report,
+		static ref_ptr<modules> from_report(git::oid_view report,
 		                                    repository const& repo,
 		                                    std::error_code& ec);
 

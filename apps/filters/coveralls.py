@@ -27,7 +27,7 @@ git = data["git"]
 git_head = git["head"]
 json.dump(
     {
-        "$schema": "https://raw.githubusercontent.com/mzdun/cov/v0.12.4-beta/apps/report-schema.json",
+        "$schema": "https://raw.githubusercontent.com/mzdun/cov/v0.18.0/apps/report-schema.json",
         "git": {"branch": git["branch"], "head": git_head["id"]},
         "files": [cov_from(source_file) for source_file in data["source_files"]],
     },

@@ -8,6 +8,7 @@
 #include <cov/io/read_stream.hh>
 #include <cov/io/report.hh>
 #include <git2/bytes.hh>
+#include <ranges>
 #include "setup.hh"
 
 namespace cov::testing {
@@ -16,18 +17,24 @@ namespace cov::testing {
 		static constexpr auto tested_text =
 		    "rprt\x00\x00\x01\x00"
 
+		    // strings
+		    "\x25\x00\x00\x00"
+		    "\x18\x00\x00\x00"
+
 		    // parent report
 		    "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
 		    "\x00\x00\x00\x00"
 		    // file list
 		    "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
 		    "\x00\x00\x00\x00"
+
+		    // builds ref
+		    "\x3D\x00\x00\x00"
+		    "\x0D\x00\x00\x00"
+		    "\x02\x00\x00\x00"
+
 		    // added
 		    "\x33\x22\x11\x00\x77\x66\x55\x44"
-		    // stats
-		    "\xE2\x04\x00\x00"
-		    "\x2C\x01\x00\x00"
-		    "\x2B\x01\x00\x00"
 		    // - branch (str)
 		    "\x20\x00\x00\x00"
 		    // - author (report_email)
@@ -43,17 +50,57 @@ namespace cov::testing {
 		    "\x00\x00\x00\x00"
 		    // - committed (timestamp)
 		    "\x33\x22\x11\x00\x77\x66\x55\x44"
-		    // string offset/size
+
+		    // stats
+		    "\xE2\x04\x00\x00"
+		    "\x2C\x01\x00\x00"
+		    "\x2B\x01\x00\x00"
 		    "\x00\x00\x00\x00"
-		    "\x10\x00\x00\x00"
+		    "\x00\x00\x00\x00"
+		    "\x00\x00\x00\x00"
+		    "\x00\x00\x00\x00"
 
 		    // strings
 		    // 3456789'123456789'123456789
 		    "Initial commit\x00"        //  0, 15 :: 0x00
 		    "Johnny Appleseed\x00"      // 15, 17 :: 0x0F
 		    "develop\x00"               // 32,  8 :: 0x20
-		    "johnny@appleseed.com\x00"  // 40,  - :: 0x28
-		    "\x00\x00\x00"sv;
+		    "johnny@appleseed.com\x00"  // 40, 21 :: 0x28
+		    "{\"prop\":\"set#1\"}\x00"  // 61, 17 :: 0x3D
+		    "{\"prop\":\"set#2\"}\x00"  // 78, 17 :: 0x4E
+		    "\x00"
+
+		    // prop=set#1
+		    // - build_id (oid)
+		    "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+		    "\x00\x00\x00\x00"
+		    // - propset
+		    "\x3D\x00\x00\x00"
+		    // - stats
+		    "\xE2\x04\x00\x00"
+		    "\x2C\x01\x00\x00"
+		    "\x2B\x01\x00\x00"
+		    "\x00\x00\x00\x00"
+		    "\x00\x00\x00\x00"
+		    "\x00\x00\x00\x00"
+		    "\x00\x00\x00\x00"
+
+		    // prop=set#2
+		    // - build_id (oid)
+		    "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+		    "\x00\x00\x00\x00"
+		    // - propset
+		    "\x4E\x00\x00\x00"
+		    // - stats
+		    "\xE2\x04\x00\x00"
+		    "\x2C\x01\x00\x00"
+		    "\x2B\x01\x00\x00"
+		    "\x00\x00\x00\x00"
+		    "\x00\x00\x00\x00"
+		    "\x00\x00\x00\x00"
+		    "\x00\x00\x00\x00"
+
+		    ""sv;
 	}  // namespace
 
 	class test_stream final : public write_stream {
@@ -81,14 +128,16 @@ namespace cov::testing {
 	};
 
 	struct report_impl : counted_impl<cov::report> {
-		git_oid const& oid() const noexcept override { return state.oid; }
-		git_oid const& parent_report() const noexcept override {
-			return state.parent_report;
+		git::oid const& oid() const noexcept override { return state.oid; }
+		git::oid const& parent_id() const noexcept override {
+			return state.parent_id;
 		}
-		git_oid const& file_list() const noexcept override {
+		git::oid const& file_list_id() const noexcept override {
 			return state.file_list;
 		}
-		git_oid const& commit() const noexcept override { return state.commit; }
+		git::oid const& commit_id() const noexcept override {
+			return state.commit;
+		}
 		std::string_view branch() const noexcept override {
 			return state.branch;
 		}
@@ -116,12 +165,16 @@ namespace cov::testing {
 		io::v1::coverage_stats const& stats() const noexcept override {
 			return state.stats;
 		}
+		std::span<std::unique_ptr<cov::report::build> const> entries()
+		    const noexcept override {
+			return state.entries;
+		}
 
 		struct state_type {
-			git_oid oid;
-			git_oid parent_report;
-			git_oid file_list;
-			git_oid commit;
+			git::oid oid;
+			git::oid parent_id;
+			git::oid file_list;
+			git::oid commit;
 			std::string branch;
 			std::string author_name;
 			std::string author_email;
@@ -131,6 +184,7 @@ namespace cov::testing {
 			sys_seconds commit_time_utc;
 			sys_seconds add_time_utc;
 			io::v1::coverage_stats stats;
+			std::vector<std::unique_ptr<cov::report::build>> entries;
 		} state;
 	};
 
@@ -142,7 +196,7 @@ namespace cov::testing {
 		dbo.add_handler<io::OBJECT::REPORT, io::handlers::report>();
 
 		std::error_code ec{};
-		auto const result = dbo.load({}, stream, ec);
+		auto const result = dbo.load(git::oid{}, stream, ec);
 		ASSERT_FALSE(ec) << "   Error: " << ec.message() << " ("
 		                 << ec.category().name() << ')';
 		ASSERT_TRUE(result);
@@ -163,9 +217,27 @@ namespace cov::testing {
 		ASSERT_EQ(1250u, rprt->stats().lines_total);
 		ASSERT_EQ(300u, rprt->stats().lines.relevant);
 		ASSERT_EQ(299u, rprt->stats().lines.visited);
-		ASSERT_TRUE(git_oid_is_zero(&rprt->parent_report()));
-		ASSERT_TRUE(git_oid_is_zero(&rprt->file_list()));
-		ASSERT_TRUE(git_oid_is_zero(&rprt->commit()));
+		ASSERT_TRUE(rprt->parent_id().is_zero());
+		ASSERT_TRUE(rprt->file_list_id().is_zero());
+		ASSERT_TRUE(rprt->commit_id().is_zero());
+
+		ASSERT_EQ(2, rprt->entries().size());
+
+		static constexpr std::string_view props[] = {
+		    "{\"prop\":\"set#1\"}"sv,
+		    "{\"prop\":\"set#2\"}"sv,
+		};
+
+		auto prop = props;
+
+		for (auto const& entry : rprt->entries()) {
+			auto copy = *prop++;
+			ASSERT_TRUE(entry->build_id().is_zero());
+			ASSERT_EQ(copy, entry->props_json());
+			ASSERT_EQ(1250u, entry->stats().lines_total);
+			ASSERT_EQ(300u, entry->stats().lines.relevant);
+			ASSERT_EQ(299u, entry->stats().lines.visited);
+		}
 	}
 
 	TEST(report, load_partial) {
@@ -177,7 +249,7 @@ namespace cov::testing {
 		dbo.add_handler<io::OBJECT::REPORT, io::handlers::report>();
 
 		std::error_code ec{};
-		auto const result = dbo.load({}, stream, ec);
+		auto const result = dbo.load(git::oid{}, stream, ec);
 		ASSERT_TRUE(ec);
 		ASSERT_FALSE(result);
 	}
@@ -186,18 +258,24 @@ namespace cov::testing {
 		auto const data =
 		    "rprt\x00\x00\x01\x00"
 
+		    // strings
+		    "\x25\x00\x00\x00"
+		    "\x10\x00\x00\x00"
+
 		    // parent report
 		    "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
 		    "\x00\x00\x00\x00"
 		    // file list
 		    "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
 		    "\x00\x00\x00\x00"
+
+		    // builds ref
+		    "\x35\x00\x00\x00"
+		    "\x0D\x00\x00\x00"
+		    "\x00\x00\x00\x00"
+
 		    // added
 		    "\x33\x22\x11\x00\x77\x66\x55\x44"
-		    // stats
-		    "\xE2\x04\x00\x00"
-		    "\x2C\x01\x00\x00"
-		    "\x2B\x01\x00\x00"
 		    // - branch (str)
 		    "\x20\x00\x00\x00"
 		    // - author (report_email)
@@ -213,16 +291,91 @@ namespace cov::testing {
 		    "\x00\x00\x00\x00"
 		    // - committed (timestamp)
 		    "\x33\x22\x11\x00\x77\x66\x55\x44"
-		    // string offset/size
+
+		    // stats
+		    "\xE2\x04\x00\x00"
+		    "\x2C\x01\x00\x00"
+		    "\x2B\x01\x00\x00"
 		    "\x00\x00\x00\x00"
-		    "\x00\x00\x00\x00"sv;
+		    "\x00\x00\x00\x00"
+		    "\x00\x00\x00\x00"
+		    "\x00\x00\x00\x00"
+		    ""sv;
 		io::bytes_read_stream stream{git::bytes{data.data(), data.size()}};
 
 		io::db_object dbo{};
 		dbo.add_handler<io::OBJECT::REPORT, io::handlers::report>();
 
 		std::error_code ec{};
-		auto const result = dbo.load({}, stream, ec);
+		auto const result = dbo.load(git::oid{}, stream, ec);
+		ASSERT_TRUE(ec);
+		ASSERT_FALSE(result);
+	}
+
+	TEST(report, load_partial_no_builds) {
+		auto const data =
+		    "rprt\x00\x00\x01\x00"
+
+		    // strings
+		    "\x25\x00\x00\x00"
+		    "\x18\x00\x00\x00"
+
+		    // parent report
+		    "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+		    "\x00\x00\x00\x00"
+		    // file list
+		    "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+		    "\x00\x00\x00\x00"
+
+		    // builds ref
+		    "\x3D\x00\x00\x00"
+		    "\x0D\x00\x00\x00"
+		    "\x02\x00\x00\x00"
+
+		    // added
+		    "\x33\x22\x11\x00\x77\x66\x55\x44"
+		    // - branch (str)
+		    "\x20\x00\x00\x00"
+		    // - author (report_email)
+		    "\x0F\x00\x00\x00"
+		    "\x28\x00\x00\x00"
+		    // - committer (report_email)
+		    "\x0F\x00\x00\x00"
+		    "\x28\x00\x00\x00"
+		    // - message (str)
+		    "\x00\x00\x00\x00"
+		    // - commit_id (oid)
+		    "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+		    "\x00\x00\x00\x00"
+		    // - committed (timestamp)
+		    "\x33\x22\x11\x00\x77\x66\x55\x44"
+
+		    // stats
+		    "\xE2\x04\x00\x00"
+		    "\x2C\x01\x00\x00"
+		    "\x2B\x01\x00\x00"
+		    "\x00\x00\x00\x00"
+		    "\x00\x00\x00\x00"
+		    "\x00\x00\x00\x00"
+		    "\x00\x00\x00\x00"
+
+		    // strings
+		    // 3456789'123456789'123456789
+		    "Initial commit\x00"        //  0, 15 :: 0x00
+		    "Johnny Appleseed\x00"      // 15, 17 :: 0x0F
+		    "develop\x00"               // 32,  8 :: 0x20
+		    "johnny@appleseed.com\x00"  // 40, 21 :: 0x28
+		    "{\"prop\":\"set#1\"}\x00"  // 61, 17 :: 0x3D
+		    "{\"prop\":\"set#2\"}\x00"  // 78, 17 :: 0x4E
+		    "\x00"
+		    ""sv;
+		io::bytes_read_stream stream{git::bytes{data.data(), data.size()}};
+
+		io::db_object dbo{};
+		dbo.add_handler<io::OBJECT::REPORT, io::handlers::report>();
+
+		std::error_code ec{};
+		auto const result = dbo.load(git::oid{}, stream, ec);
 		ASSERT_TRUE(ec);
 		ASSERT_FALSE(result);
 	}
@@ -236,7 +389,7 @@ namespace cov::testing {
 		auto const obj = make_ref<report_impl>();
 		obj->state = {
 		    .oid = {},
-		    .parent_report = {},
+		    .parent_id = {},
 		    .file_list = {},
 		    .commit = {},
 		    .branch = "develop"s,
@@ -252,7 +405,27 @@ namespace cov::testing {
 		            .lines_total = 1250,
 		            .lines = {.relevant = 300, .visited = 299},
 		        },
-		};
+		    .entries =
+		        cov::report::builder{}
+		            .add_nfo({
+		                .build_id{},
+		                .props = "{\"prop\":\"set#1\"}",
+		                .stats =
+		                    {
+		                        .lines_total = 1250,
+		                        .lines = {.relevant = 300, .visited = 299},
+		                    },
+		            })
+		            .add_nfo({
+		                .build_id{},
+		                .props = "{\"prop\":\"set#2\"}",
+		                .stats =
+		                    {
+		                        .lines_total = 1250,
+		                        .lines = {.relevant = 300, .visited = 299},
+		                    },
+		            })
+		            .release()};
 		auto const result = dbo.store(obj, stream);
 		ASSERT_TRUE(result);
 		ASSERT_EQ(tested_text, stream.view());

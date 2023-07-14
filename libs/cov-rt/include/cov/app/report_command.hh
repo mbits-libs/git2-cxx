@@ -16,7 +16,7 @@ namespace cov::app::builtin::report {
 
 	struct new_head {
 		std::string branch;
-		git_oid tip;
+		git::oid tip;
 		bool same_report{false};
 	};
 
@@ -37,11 +37,20 @@ namespace cov::app::builtin::report {
 			return filter_ ? *filter_ : std::string_view{};
 		}
 
-		new_head update_current_branch(cov::repository& repo,
-		                               git_oid const& file_list_id,
-		                               git_info const& git,
-		                               git_commit const& commit,
-		                               io::v1::coverage_stats const& stats);
+		bool store_build(git::oid& out,
+		                 cov::repository& repo,
+		                 git::oid_view file_list_id,
+		                 date::sys_seconds add_time_utc,
+		                 io::v1::coverage_stats const& stats);
+
+		new_head update_current_branch(
+		    cov::repository& repo,
+		    git::oid_view file_list_id,
+		    git_info const& git,
+		    git_commit const& commit,
+		    date::sys_seconds add_time_utc,
+		    io::v1::coverage_stats const& stats,
+		    std::vector<std::unique_ptr<cov::report::build>>&& builds);
 
 		void print_report(std::string_view local_branch,
 		                  size_t files,
@@ -106,9 +115,9 @@ namespace cov::app::builtin::report {
 	struct stored_file {
 		blob_info stg{};
 		io::v1::coverage_stats stats{};
-		git_oid lines_id{};
-		git_oid functions_id{};
-		git_oid branches_id{};
+		git::oid lines_id{};
+		git::oid functions_id{};
+		git::oid branches_id{};
 
 		static stored_file from(git_commit const& commit,
 		                        file_info const& info) {
@@ -128,7 +137,7 @@ namespace cov::app::builtin::report {
 
 		static bool store_tree(git_oid& id,
 		                       cov::repository& repo,
-		                       std::vector<file_info> const& report_files,
+		                       std::vector<file_info> const& file_infos,
 		                       std::vector<stored_file> const& files);
 
 	private:

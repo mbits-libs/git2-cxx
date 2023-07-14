@@ -49,7 +49,7 @@ namespace cov::testing {
 		            load,
 		            (uint32_t magic,
 		             uint32_t version,
-		             git_oid const&,
+		             git::oid_view,
 		             read_stream& in,
 		             std::error_code& ec),
 		            (const, override));
@@ -68,7 +68,7 @@ namespace cov::testing {
 
 		io::db_object dbo{};
 		std::error_code ec{};
-		auto const result = dbo.load({}, stream, ec);
+		auto const result = dbo.load(git::oid{}, stream, ec);
 		ASSERT_FALSE(result);
 		ASSERT_EQ(ec, io::errc::bad_syntax);
 	}
@@ -79,7 +79,7 @@ namespace cov::testing {
 
 		io::db_object dbo{};
 		std::error_code ec{};
-		auto const result = dbo.load({}, stream, ec);
+		auto const result = dbo.load(git::oid{}, stream, ec);
 		ASSERT_FALSE(result);
 		ASSERT_EQ(ec, io::errc::unsupported_version);
 	}
@@ -90,7 +90,7 @@ namespace cov::testing {
 
 		io::db_object dbo{};
 		std::error_code ec{};
-		auto const result = dbo.load({}, stream, ec);
+		auto const result = dbo.load(git::oid{}, stream, ec);
 		ASSERT_FALSE(result);
 		ASSERT_EQ(ec, io::errc::unknown_magic);
 	}
@@ -101,7 +101,7 @@ namespace cov::testing {
 
 		io::db_object dbo{};
 		std::error_code ec{};
-		auto const result = dbo.load({}, stream, ec);
+		auto const result = dbo.load(git::oid{}, stream, ec);
 		ASSERT_FALSE(result);
 		ASSERT_EQ(ec, io::errc::unknown_magic);
 	}
@@ -117,7 +117,7 @@ namespace cov::testing {
 		dbo.add_handler("abcd"_tag, std::move(handler));
 
 		std::error_code ec{};
-		auto const result = dbo.load({}, stream, ec);
+		auto const result = dbo.load(git::oid{}, stream, ec);
 		dbo.remove_handler("abcd"_tag);
 		ASSERT_FALSE(result);
 		ASSERT_FALSE(ec) << "   Error: " << ec.message() << " ("
@@ -132,7 +132,7 @@ namespace cov::testing {
 		dbo.add_handler("abcd"_tag, {});
 
 		std::error_code ec{};
-		auto const result = dbo.load({}, stream, ec);
+		auto const result = dbo.load(git::oid{}, stream, ec);
 		ASSERT_FALSE(result);
 		ASSERT_EQ(ec, io::errc::unknown_magic);
 	}
@@ -153,7 +153,7 @@ namespace cov::testing {
 		dbo.add_handler("abcd"_tag, std::move(handler));
 
 		std::error_code ec{};
-		auto const result = dbo.load({}, stream, ec);
+		auto const result = dbo.load(git::oid{}, stream, ec);
 		ASSERT_FALSE(ec) << "   Error: " << ec.message() << " ("
 		                 << ec.category().name() << ')';
 		ASSERT_EQ(raw, result.get());
@@ -162,7 +162,7 @@ namespace cov::testing {
 	}
 
 	TEST(dbo, pass_created_object_OBJECT) {
-		static constexpr auto s = "stxs\x00\x00\x01\x00"sv;
+		static constexpr auto s = "bld \x01\x00\x01\x00"sv;
 		io::bytes_read_stream stream{git::bytes{s.data(), s.size()}};
 
 		io::db_object dbo{};
@@ -171,13 +171,13 @@ namespace cov::testing {
 		auto raw = obj.get();
 
 		auto handler = std::make_unique<mock_handler>();
-		EXPECT_CALL(*handler, load("stxs"_tag, io::v1::VERSION, _, _, _))
-		    .WillRepeatedly(Return(ByMove(std::move(obj))));
+		EXPECT_CALL(*handler, load("bld "_tag, io::VERSION_v1_1, _, _, _))
+		    .WillRepeatedly(Return(obj));
 
-		dbo.add_handler(io::OBJECT::HILITES, std::move(handler));
+		dbo.add_handler(io::OBJECT::BUILD, std::move(handler));
 
 		std::error_code ec{};
-		auto const result = dbo.load({}, stream, ec);
+		auto const result = dbo.load(git::oid{}, stream, ec);
 		ASSERT_FALSE(ec) << "   Error: " << ec.message() << " ("
 		                 << ec.category().name() << ')';
 		ASSERT_EQ(raw, result.get());

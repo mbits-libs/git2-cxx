@@ -149,7 +149,7 @@ namespace cov::projection::testing {
 	    {"libs/cov/src/io/line_coverage.cc"sv, stats(173, 138, 138)},
 	    {"libs/cov/src/io/read_stream.cc"sv, stats(686, 405, 405)},
 	    {"libs/cov/src/io/report.cc"sv, stats(255, 233, 233)},
-	    {"libs/cov/src/io/report_files.cc"sv, stats(561, 506, 98)},
+	    {"libs/cov/src/io/files.cc"sv, stats(561, 506, 98)},
 	    {"libs/cov/src/io/safe_stream.cc"sv, stats(272, 208, 0)},
 	    {"libs/cov/src/io/strings.cc"sv, stats(666, 491, 0)},
 	    {"libs/cov/src/ref/reference.cc"sv, stats(161, 91, 91)},

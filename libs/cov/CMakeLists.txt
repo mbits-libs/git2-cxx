@@ -14,12 +14,13 @@ set(SOURCES
   src/hash/md5.cc
   src/hash/sha1.cc
   src/init.cc
+  src/io/build.cc
   src/io/db_object-error.cc
   src/io/db_object.cc
   src/io/file.cc
+  src/io/files.cc
   src/io/line_coverage.cc
   src/io/read_stream.cc
-  src/io/report_files.cc
   src/io/report.cc
   src/io/safe_stream.cc
   src/io/strings.cc
@@ -47,11 +48,12 @@ set(SOURCES
   include/cov/hash/md5.hh
   include/cov/hash/sha1.hh
   include/cov/init.hh
+  include/cov/io/build.hh
   include/cov/io/db_object.hh
   include/cov/io/file.hh
+  include/cov/io/files.hh
   include/cov/io/line_coverage.hh
   include/cov/io/read_stream.hh
-  include/cov/io/report_files.hh
   include/cov/io/report.hh
   include/cov/io/safe_stream.hh
   include/cov/io/strings.hh

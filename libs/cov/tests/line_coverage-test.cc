@@ -11,9 +11,9 @@
 
 namespace cov::testing {
 	using namespace std::literals;
-	class test_stream final : public write_stream {
+	class memory final : public write_stream {
 	public:
-		std::vector<std::byte> data;
+		std::vector<std::byte> data{};
 
 		bool opened() const noexcept final { return true; }
 		size_t write(git::bytes block) final {
@@ -30,8 +30,7 @@ namespace cov::testing {
 	struct line_coverage_impl : counted_impl<cov::line_coverage> {
 		std::vector<io::v1::coverage> lines{};
 
-		std::vector<io::v1::coverage> const& coverage()
-		    const noexcept override {
+		std::span<io::v1::coverage const> coverage() const noexcept override {
 			return lines;
 		}
 	};
@@ -46,7 +45,7 @@ namespace cov::testing {
 		dbo.add_handler<io::OBJECT::COVERAGE, io::handlers::line_coverage>();
 
 		std::error_code ec{};
-		auto const result = dbo.load({}, stream, ec);
+		auto const result = dbo.load(git::oid{}, stream, ec);
 		ASSERT_FALSE(ec) << "   Error: " << ec.message() << " ("
 		                 << ec.category().name() << ')';
 		ASSERT_TRUE(result);
@@ -69,7 +68,7 @@ namespace cov::testing {
 		dbo.add_handler<io::OBJECT::COVERAGE, io::handlers::line_coverage>();
 
 		std::error_code ec{};
-		auto const result = dbo.load({}, stream, ec);
+		auto const result = dbo.load(git::oid{}, stream, ec);
 		ASSERT_FALSE(ec) << "   Error: " << ec.message() << " ("
 		                 << ec.category().name() << ')';
 
@@ -98,7 +97,7 @@ namespace cov::testing {
 		dbo.add_handler<io::OBJECT::COVERAGE, io::handlers::line_coverage>();
 
 		std::error_code ec{};
-		auto const result = dbo.load({}, stream, ec);
+		auto const result = dbo.load(git::oid{}, stream, ec);
 		ASSERT_FALSE(result);
 		ASSERT_EQ(ec, io::errc::bad_syntax);
 	}
@@ -107,7 +106,7 @@ namespace cov::testing {
 		static constexpr auto expected =
 		    "lnes\x00\x00\x01\x00"
 		    "\x00\x00\x00\x00"sv;
-		test_stream stream{};
+		memory stream{};
 
 		io::db_object dbo{};
 		dbo.add_handler<io::OBJECT::COVERAGE, io::handlers::line_coverage>();
@@ -123,7 +122,7 @@ namespace cov::testing {
 		    "lnes\x00\x00\x01\x00"
 		    "\x01\x00\x00\x00"
 		    "\x20\x00\x00\x80"sv;
-		test_stream stream{};
+		memory stream{};
 
 		io::db_object dbo{};
 		dbo.add_handler<io::OBJECT::COVERAGE, io::handlers::line_coverage>();

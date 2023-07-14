@@ -48,9 +48,18 @@ namespace cov::app::builtin::report {
 		for (auto const& file : files) {
 			coverage += file.stats;
 		}
+		auto const now = std::chrono::floor<std::chrono::seconds>(
+		    std::chrono::system_clock::now());
 
-		auto const [branch, current_id, same_report] = p.update_current_branch(
-		    repo, file_coverage, report.git, commit, coverage);
+		git::oid build_id{};
+		p.store_build(build_id, repo, file_coverage, now, coverage);
+
+		cov::report::builder builds{};
+		builds.add(build_id, {}, coverage);
+
+		auto const [branch, current_id, same_report] =
+		    p.update_current_branch(repo, file_coverage, report.git, commit,
+		                            now, coverage, builds.release());
 
 		if (same_report) {
 			fmt::print("{}\n", p.tr()(replng::WARNING_NO_CHANGES_IN_REPORT));

@@ -80,7 +80,7 @@
                                 "pattern": "sha1:[0-9a-fA-F]{40}"
                             }
                         ],
-                        "title": "the content digest at the time of taking the report; contains a digest algorithm and hash, joined by a colon; known algorithms are: md5 and sha1",
+                        "title": "the content digest at the time of taking the report; contains a digest algorithm and hash, separated by a colon; known algorithms are: md5 and sha1",
                         "examples": [
                             "md5:192cc23d05c33a7b423da3e3e4653eff",
                             "sha1:d76762b8592ac4958463b65506cdef0779a2c8ef"
@@ -120,6 +120,57 @@
                                 "23": 1
                             }
                         ]
+                    },
+                    "functions": {
+                        "type": "array",
+                        "default": [],
+                        "title": "function list",
+                        "items": {
+                            "type": "object",
+                            "title": "function coverage",
+                            "required": [
+                                "name",
+                                "count",
+                                "start_line"
+                            ],
+                            "properties": {
+                                "name": {
+                                    "type": "string",
+                                    "pattern": "^.+$"
+                                },
+                                "demangled": {
+                                    "type": "string",
+                                    "pattern": "^.+$"
+                                },
+                                "count": {
+                                    "type": "integer"
+                                },
+                                "start_line": {
+                                    "type": "integer",
+                                    "minimum": 1
+                                },
+                                "start_column": {
+                                    "type": "integer",
+                                    "minimum": 1
+                                },
+                                "end_line": {
+                                    "type": "integer",
+                                    "minimum": 1
+                                },
+                                "end_column": {
+                                    "type": "integer",
+                                    "minimum": 1
+                                }
+                            },
+                            "examples": [
+                                {
+                                    "name": "_Z3fooi",
+                                    "demangled": "foo(int)",
+                                    "count": 0,
+                                    "start_line": 3
+                                }
+                            ]
+                        }
                     }
                 },
                 "examples": [
@@ -130,7 +181,15 @@
                             "5": 0,
                             "6": 15,
                             "23": 1
-                        }
+                        },
+                        "functions": [
+                            {
+                                "name": "_Z3barRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE",
+                                "demangled": "bar(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)",
+                                "count": 0,
+                                "start_line": 3
+                            }
+                        ]
                     }
                 ]
             },
@@ -143,7 +202,15 @@
                             "5": 0,
                             "6": 15,
                             "23": 1
-                        }
+                        },
+                        "functions": [
+                            {
+                                "name": "_Z3barRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE",
+                                "demangled": "bar(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)",
+                                "count": 0,
+                                "start_line": 3
+                            }
+                        ]
                     }
                 ]
             ]
@@ -164,7 +231,15 @@
                             "5": 0,
                             "6": 15,
                             "23": 1
-                        }
+                        },
+                        "functions": [
+                            {
+                                "name": "_Z3barRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE",
+                                "demangled": "bar(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)",
+                                "count": 0,
+                                "start_line": 3
+                            }
+                        ]
                     }
                 ]
             ]

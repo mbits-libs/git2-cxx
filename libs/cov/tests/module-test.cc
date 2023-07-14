@@ -175,7 +175,7 @@ namespace cov::testing {
 	    "libs/cov/src/io/line_coverage.cc"sv,
 	    "libs/cov/src/io/read_stream.cc"sv,
 	    "libs/cov/src/io/report.cc"sv,
-	    "libs/cov/src/io/report_files.cc"sv,
+	    "libs/cov/src/io/files.cc"sv,
 	    "libs/cov/src/io/safe_stream.cc"sv,
 	    "libs/cov/src/io/strings.cc"sv,
 	    "libs/cov/src/ref/reference.cc"sv,
@@ -285,7 +285,7 @@ namespace cov::testing {
 	};
 
 	struct list_ptr {
-		std::vector<report_entry const*> const& items;
+		std::vector<cov::files::entry const*> const& items;
 
 		friend std::ostream& operator<<(std::ostream& out, list_ptr const& L) {
 			for (auto const& ptr : L.items) {
@@ -314,6 +314,30 @@ namespace cov::testing {
 	struct filter_test {
 		std::string_view prefix{};
 		std::vector<simple_view> expected{};
+
+		friend std::ostream& operator<<(std::ostream& out,
+		                                filter_test const& test) {
+			testing::print_view(out << "(prefix: ", test.prefix) << ", view: (";
+			bool first = true;
+			for (auto const& view : test.expected) {
+				if (first)
+					first = false;
+				else
+					out << ", ";
+				testing::print_view(out, view.name);
+			}
+			return out << ')';
+		}
+	};
+
+	struct print_to {
+		std::vector<cov::testing::simple_view> const& ref;
+
+		friend std::ostream& operator<<(std::ostream& out,
+		                                print_to const& print) {
+			::testing::internal::PrintTo(print.ref, &out);
+			return out;
+		}
 	};
 
 	struct modify_op {
@@ -331,9 +355,9 @@ namespace cov::testing {
 	class module_decl : public TestWithParam<filter_test> {
 	protected:
 		void setup_files(std::vector<std::string_view> const& files,
-		                 ref_ptr<report_files>& file_list,
+		                 ref_ptr<cov::files>& file_list,
 		                 ref_ptr<modules>& mods) {
-			report_files_builder builder{};
+			files::builder builder{};
 			for (auto const& file : files) {
 				builder.add_nfo({.path = file});
 			}
@@ -360,7 +384,7 @@ namespace cov::testing {
 				               std::transform(
 				                   view.items.begin(), view.items.end(),
 				                   std::back_inserter(group.items),
-				                   [](report_entry const* entry) {
+				                   [](cov::files::entry const* entry) {
 					                   return entry ? entry->path()
 					                                : std::string_view{};
 				                   });
@@ -384,14 +408,14 @@ namespace cov::testing {
 			});
 		}
 
-		ref_ptr<report_files> file_list;
+		ref_ptr<files> file_list;
 		ref_ptr<modules> mods;
 		setup_files(copy, file_list, mods);
 		if (::testing::Test::HasFatalFailure()) return;
 
 		auto const actual = map(mods->filter(*file_list));
 		ASSERT_EQ(expected, actual)
-		    << "    prefix: " << prefix << "\n    files: " << list{copy};
+		    << "    prefix: " << prefix << "\n    files: " << print_to{actual};
 	}
 
 	TEST_P(module_decl, filter_pointer) {
@@ -399,12 +423,12 @@ namespace cov::testing {
 
 		git::init memory{};
 
-		ref_ptr<report_files> file_list;
+		ref_ptr<files> file_list;
 		ref_ptr<modules> mods;
 		setup_files(all_files, file_list, mods);
 		if (::testing::Test::HasFatalFailure()) return;
 
-		std::vector<report_entry const*> copy{};
+		std::vector<cov::files::entry const*> copy{};
 		copy.reserve(file_list->entries().size());
 		std::transform(file_list->entries().begin(), file_list->entries().end(),
 		               std::back_inserter(copy),
@@ -485,8 +509,8 @@ namespace cov::testing {
 
 		git_oid report_id{};
 		{
-			auto report = cov::report::create({}, {}, commit_id, {}, {}, {}, {},
-			                                  {}, {}, {});
+			auto report = cov::report::create(git::oid{}, git::oid{}, commit_id,
+			                                  {}, {}, {}, {}, {}, {}, {}, {});
 			ASSERT_TRUE(cov_repo.write(report_id, report));
 		}
 
@@ -523,8 +547,8 @@ namespace cov::testing {
 
 		git_oid report_id{};
 		{
-			auto report = cov::report::create({}, {}, commit_id, {}, {}, {}, {},
-			                                  {}, {}, {});
+			auto report = cov::report::create(git::oid{}, git::oid{}, commit_id,
+			                                  {}, {}, {}, {}, {}, {}, {}, {});
 			ASSERT_TRUE(cov_repo.write(report_id, report));
 		}
 
@@ -557,8 +581,8 @@ namespace cov::testing {
 
 		git_oid report_id{};
 		{
-			auto report = cov::report::create({}, {}, commit_id, {}, {}, {}, {},
-			                                  {}, {}, {});
+			auto report = cov::report::create(git::oid{}, git::oid{}, commit_id,
+			                                  {}, {}, {}, {}, {}, {}, {}, {});
 			ASSERT_TRUE(cov_repo.write(report_id, report));
 		}
 
@@ -796,10 +820,10 @@ namespace cov::testing {
 	              "libs/cov/src/io/db_object-error.cc"sv,
 	              "libs/cov/src/io/db_object.cc"sv,
 	              "libs/cov/src/io/file.cc"sv,
+	              "libs/cov/src/io/files.cc"sv,
 	              "libs/cov/src/io/line_coverage.cc"sv,
 	              "libs/cov/src/io/read_stream.cc"sv,
 	              "libs/cov/src/io/report.cc"sv,
-	              "libs/cov/src/io/report_files.cc"sv,
 	              "libs/cov/src/io/safe_stream.cc"sv,
 	              "libs/cov/src/io/strings.cc"sv,
 	              "libs/cov/src/path-utils.hh"sv,
@@ -906,10 +930,10 @@ namespace cov::testing {
 	              "libs/cov/src/io/db_object-error.cc"sv,
 	              "libs/cov/src/io/db_object.cc"sv,
 	              "libs/cov/src/io/file.cc"sv,
+	              "libs/cov/src/io/files.cc"sv,
 	              "libs/cov/src/io/line_coverage.cc"sv,
 	              "libs/cov/src/io/read_stream.cc"sv,
 	              "libs/cov/src/io/report.cc"sv,
-	              "libs/cov/src/io/report_files.cc"sv,
 	              "libs/cov/src/io/safe_stream.cc"sv,
 	              "libs/cov/src/io/strings.cc"sv,
 	              "libs/cov/src/path-utils.hh"sv,

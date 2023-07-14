@@ -7,6 +7,7 @@
 #include <hilite/lighter.hh>
 #include <map>
 #include <optional>
+#include <span>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -25,7 +26,7 @@ namespace cov::app {
 		lighter::highlights syntax{};
 
 		static cvg_info from_coverage(
-		    std::vector<io::v1::coverage> const& lines);
+		    std::span<io::v1::coverage const> const& lines);
 		void load_syntax(std::string_view text, std::string_view filename);
 		view_columns column_widths() const noexcept;
 

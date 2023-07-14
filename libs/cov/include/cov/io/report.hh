@@ -1,4 +1,4 @@
-// Copyright (c) 2022 Marcin Zdun
+// Copyright (c) 2023 Marcin Zdun
 // This code is licensed under MIT license (see LICENSE for details)
 
 #pragma once
@@ -10,7 +10,7 @@ namespace cov::io::handlers {
 	struct report : db_handler_for<cov::report> {
 		ref_ptr<counted> load(uint32_t magic,
 		                      uint32_t version,
-		                      git_oid const& id,
+		                      git::oid_view id,
 		                      read_stream& in,
 		                      std::error_code& ec) const override;
 		bool store(ref_ptr<counted> const& obj,

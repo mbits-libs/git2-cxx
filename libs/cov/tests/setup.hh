@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include <git2/oid.h>
 #include <filesystem>
+#include <git2/oid.hh>
 #include <string>
 #include "path.hh"
 
@@ -20,5 +20,5 @@ namespace cov::testing::setup {
 	static test_initializer initializer{};
 
 	std::filesystem::path test_dir();
-	std::string get_oid(git_oid const& id);
+	std::string get_oid(git::oid_view id);
 }  // namespace cov::testing::setup

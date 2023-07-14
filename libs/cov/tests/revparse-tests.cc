@@ -23,8 +23,8 @@ namespace cov::testing {
 		    .name = "Johnny Appleseed"sv,
 		    .email = "johnny.applessed@example.com"sv};
 		auto const now = floor<seconds>(system_clock::now());
-		auto obj = cov::report::create(parent, {}, {}, "main"sv, johnny, johnny,
-		                               tag, now, now, {});
+		auto obj = cov::report::create(parent, git::oid{}, git::oid{}, "main"sv,
+		                               johnny, johnny, tag, now, now, {}, {});
 		if (!repo.write(object_id, obj)) return false;
 
 		repo.refs()->create(fmt::format("refs/tags/{}"sv, tag), object_id);

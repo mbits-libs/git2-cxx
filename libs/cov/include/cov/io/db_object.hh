@@ -6,6 +6,7 @@
 #include <cov/io/types.hh>
 #include <cov/object.hh>
 #include <cov/streams.hh>
+#include <git2/oid.hh>
 #include <memory>
 #include <unordered_map>
 #include <utility>
@@ -33,7 +34,7 @@ namespace cov::io {
 
 		virtual ref_ptr<counted> load(uint32_t magic,
 		                              uint32_t version,
-		                              git_oid const& id,
+		                              git::oid_view id,
 		                              read_stream& in,
 		                              std::error_code& ec) const = 0;
 		virtual bool recognized(ref_ptr<counted> const& obj) const = 0;
@@ -91,7 +92,7 @@ namespace cov::io {
 			return remove_handler(static_cast<uint32_t>(magic));
 		}
 
-		ref_ptr<counted> load(git_oid const& id,
+		ref_ptr<counted> load(git::oid_view id,
 		                      read_stream& in,
 		                      std::error_code& ec) const;
 		bool store(ref_ptr<counted> const& value, write_stream& in) const;

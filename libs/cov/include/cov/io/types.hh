@@ -41,12 +41,11 @@ namespace cov {
 namespace cov::io {
 	enum class OBJECT : uint32_t {
 		REPORT = "rprt"_tag,
+		BUILD = "bld"_tag,
 		FILES = "list"_tag,
 		COVERAGE = "lnes"_tag,
 		FUNCTIONS = "fnct"_tag,
 		BRANCHES = "bran"_tag,
-		HILITES = "stxs"_tag,  // highlights list file
-		HILITE_TAG = "sntx"_tag,
 	};
 
 	enum : uint32_t {
@@ -107,6 +106,29 @@ namespace cov::io {
 		constexpr auto max_u32 = std::numeric_limits<uint32_t>::max();
 		if (rhs < max_u32) ++rhs;
 	}
+
+	enum class str : uint32_t;
+
+	struct block {
+		uint32_t offset;
+		uint32_t size;
+	};
+
+	struct array_ref {
+		uint32_t offset;
+		uint32_t size;
+		uint32_t count;
+
+		template <typename Entry>
+		static array_ref from(size_t byte_offset, size_t count) noexcept {
+			static const auto u32s = [](size_t bytes) {
+				return static_cast<uint32_t>(bytes / sizeof(uint32_t));
+			};
+			return {.offset = u32s(byte_offset),
+			        .size = u32s(sizeof(Entry)),
+			        .count = clip_u32(count)};
+		}
+	};
 
 	namespace v1 {
 		enum : uint32_t {
@@ -366,134 +388,85 @@ namespace cov::io {
 			        digits};
 		}
 
-		/*
-		    REPORT:
-		        file_header:
-		            0:1: "rprt" (tag)
-		            1:1: 1.0 (version)
-		        report:
-		            2:5: parent report (oid)
-		            7:5: file list (oid)
-		            12:2: added (timestamp)
-		            coverage_stats:
-		                14:1: total (uint)
-		                15:1: relevant (uint)
-		                16:1: covered (uint)
-		            report_commit:
-		                17:1: branch (str)
-		                18:2: author (report_email)
-		                20:2: committer (report_email)
-		                22:1: message (str)
-		                23:5: commit_id (oid)
-		                28:2: committed (timestamp)
-		            30:1: strings_offset (uint) := SO
-		            31:1: strings_size (uint) := SIZE
-		            32 + SO:SIZE: UTF8Z (like ASCIIZ, but UTF-8)
-		*/
-
-		struct report_email {
-			uint32_t name;
-			uint32_t email;
+		struct email_ref {
+			str name;
+			str email;
 		};
-
-		struct report_commit {
-			uint32_t branch;
-			report_email author;
-			report_email committer;
-			uint32_t message;
-			git_oid commit_id;
-			timestamp committed;
-		};
-
-		static_assert(sizeof(report_commit) == sizeof(uint32_t[13]),
-		              "git_oid and/or header email does not pack well here");
 
 		struct report {
-			git_oid parent_report;
+			struct commit {
+				str branch;
+				email_ref author;
+				email_ref committer;
+				str message;
+				git_oid commit_id;
+				timestamp committed;
+			};
+
+			struct entry {
+				git_oid build;
+				str propset;
+				coverage_stats stats;
+			};
+
+			block strings;
+			git_oid parent;
+			git_oid file_list;
+			array_ref builds;
+			timestamp added;
+			commit git;
+			coverage_stats stats;
+		};
+
+		static_assert(sizeof(report) == sizeof(uint32_t[37]),
+		              "report does not pack well here");
+
+		static_assert(sizeof(report::commit) == sizeof(uint32_t[13]),
+		              "report::commit does not pack well here");
+
+		static_assert(sizeof(report::entry) == sizeof(uint32_t[13]),
+		              "report::entry does not pack well here");
+
+		struct build {
+			block strings;
 			git_oid file_list;
 			timestamp added;
-			coverage_stats_short stats;
-			report_commit commit;
-			uint32_t strings_offset;
-			uint32_t strings_size;
+			str propset;
+			coverage_stats stats;
 		};
 
-		static_assert(sizeof(report) == sizeof(uint32_t[30]),
-		              "report_header does not pack well here");
+		static_assert(sizeof(build) == sizeof(uint32_t[17]),
+		              "build does not pack well here");
 
-		/*
-		    REPORT FILES:
-		        file_header:
-		            0:1: "list" (tag)
-		            1:1: 1.x (version)
-		        report_files:
-		            21:1: strings_offset (uint) := SO
-		            22:1: strings_size (uint) := SIZE
-		            23:1: entries_offset (uint) := EO
-		            24:1: entries_count (uint) := EC
-		            25:1: entry_size (uint) := ES
-		            26 + SO:SIZE: UTF8Z (like ASCIIZ, but UTF-8)
-		            26 + EO:ES: entry (report_entry x EC)
+#define FILES_ENTRY_BASIC       \
+	str path;                   \
+	coverage_stats_short stats; \
+	git_oid contents;           \
+	git_oid line_coverage
 
-		        report_entry:
-		            v1.0:
-		                0:31-0: path (str)
-		                coverage_stats:
-		                    1:1: total (uint)
-		                    2:1: relevant (uint)
-		                    3:1: covered (uint)
-		                4:5: contents (oid)
-		                9:5: line_coverage (oid)
-		            v1.1:
-		                14:5: function_coverage (oid)
-		                19:5: branch_coverage (oid)
-		*/
+		struct files {
+			struct basic {
+				FILES_ENTRY_BASIC;
+			};
 
-		struct report_files {
-			uint32_t strings_offset;  // all offsets in u32s, from the end of
-			                          // header
-			uint32_t strings_size;
-			uint32_t entries_offset;
-			uint32_t entries_count;
-			uint32_t entry_size;
+			struct ext {
+				FILES_ENTRY_BASIC;
+				git_oid function_coverage;
+				git_oid branch_coverage;
+			};
+
+			block strings;
+			array_ref entries;
 		};
 
-		static_assert(sizeof(report_files) == sizeof(uint32_t[5]),
-		              "report_files does not pack well here");
+		static_assert(sizeof(files) == sizeof(uint32_t[5]),
+		              "files does not pack well here");
 
-		struct report_entry_base {
-			uint32_t path;
-			coverage_stats_short stats;
-			git_oid contents;
-			git_oid line_coverage;
-		};
+		static_assert(sizeof(files::basic) == sizeof(uint32_t[14]),
+		              "files::basic does not pack well here");
 
-		static_assert(sizeof(report_entry_base) == sizeof(uint32_t[14]),
-		              "git_oid does not pack well here");
-
-		struct report_entry_ext {
-			uint32_t path;
-			coverage_stats_short stats;
-			git_oid contents;
-			git_oid line_coverage;
-			git_oid function_coverage;
-			git_oid branch_coverage;
-		};
-
-		static_assert(sizeof(report_entry_ext) == sizeof(uint32_t[24]),
-		              "git_oid does not pack well here");
-
-		/*
-		    LINE COVERAGE:
-		        file_header:
-		            0:1: "lnes" (tag)
-		            1:1: 1.0 (version)
-		        line_coverage:
-		            2:1: line_count (uint) := LC
-		            3:LC*1: coverage
-		                31-31: is_null (flag)
-		                30-0: value (uint)
-		*/
+		static_assert(sizeof(files::ext) == sizeof(uint32_t[24]),
+		              "files::ext does not pack well here");
 
 		struct line_coverage {
 			uint32_t line_count;
@@ -523,6 +496,23 @@ namespace cov::io {
 			                       coverage_stats::init());
 		}
 
+		struct function_files {
+			block strings;
+			array_ref entries;
+		};
+
+		struct text_pos {
+			uint32_t line;
+			uint32_t column;
+		};
+
+		struct function_entry {
+			str name;
+			str demangled_name;
+			uint32_t count;
+			text_pos start;
+			text_pos end;
+		};
 	};  // namespace v1
 }  // namespace cov::io
 

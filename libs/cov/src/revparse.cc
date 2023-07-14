@@ -14,7 +14,7 @@ namespace cov {
 		using namespace std::literals;
 
 		struct ref {
-			git_oid sha{};
+			git::oid sha{};
 			bool flag{};
 
 			explicit operator bool() const noexcept { return flag; }
@@ -22,12 +22,13 @@ namespace cov {
 			bool operator==(ref const& other) const noexcept {
 				if (flag != other.flag) return false;
 				if (!flag) return true;
-				return git_oid_cmp(&sha, &other.sha) == 0;
+				return sha == other.sha;
 			}
 
 			size_t hash() const noexcept {
-				auto const view = std::string_view{
-				    reinterpret_cast<char const*>(sha.id), sizeof(sha.id)};
+				auto const view =
+				    std::string_view{reinterpret_cast<char const*>(sha.id.id),
+				                     sizeof(sha.id.id)};
 				return std::hash<std::string_view>{}(view);
 			}
 
@@ -38,8 +39,8 @@ namespace cov {
 					// object-already-looked-up
 					auto me = repo.lookup<cov::report>(sha, ec);
 					if (!ec && me) {
-						auto const& parent = me->parent_report();
-						if (!git_oid_is_zero(&parent)) {
+						auto const& parent = me->parent_id();
+						if (!parent.is_zero()) {
 							return {parent, true};
 						}
 					}
@@ -109,13 +110,13 @@ namespace cov {
 		// from is inaccessible start
 		// to is accessible start
 
-		ref top{to, true};
-		ref bottom{from, true};
+		ref top{git::oid{to}, true};
+		ref bottom{git::oid{from}, true};
 
 		while (top || bottom) {
 			if (top) {
 				if (unallowed.contains(top)) {
-					from = top.sha;
+					from = top.sha.id;
 					return;
 				}
 				allowed.insert(top);
@@ -123,7 +124,7 @@ namespace cov {
 			}
 			if (bottom) {
 				if (allowed.contains(bottom)) {
-					from = bottom.sha;
+					from = bottom.sha.id;
 					return;
 				}
 				unallowed.insert(bottom);
@@ -131,7 +132,7 @@ namespace cov {
 			}
 		}
 		// by now, top.id is zero -- so everything will be included
-		from = top.sha;
+		from = top.sha.id;
 	}
 
 	std::error_code revs::parse(cov::repository const& repo,
@@ -247,16 +248,16 @@ namespace cov {
 				return git::make_error_code(git::errc::notfound);
 			}
 
-			out = report->oid();
+			out = report->oid().id;
 		}
 
 		if (parent_count) {
-			auto node = cov::ref{out, true};
+			auto node = cov::ref{git::oid{out}, true};
 			while (node && parent_count) {
 				--parent_count;
 				node = node.next(repo);
 			}
-			out = node.sha;
+			out = node.sha.id;
 		}
 
 		return {};

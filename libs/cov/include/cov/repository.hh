@@ -9,6 +9,7 @@
 #include <cov/reference.hh>
 #include <git2/config.hh>
 #include <git2/odb.hh>
+#include <git2/oid.hh>
 #include <git2/repository.hh>
 #include <map>
 #include <string>
@@ -134,14 +135,14 @@ namespace cov {
 		git::config const& config() const noexcept { return cfg_; }
 		ref_ptr<references> const& refs() const noexcept { return refs_; }
 		current_head_type current_head() const;
-		bool update_current_head(git_oid const& ref,
+		bool update_current_head(git::oid_view ref,
 		                         current_head_type const& known) const;
 		ref_ptr<object> dwim(std::string_view) const;
 		ref_ptr<object> find_partial(std::string_view partial) const;
-		ref_ptr<object> find_partial(git_oid const& in,
+		ref_ptr<object> find_partial(git::oid_view in,
 		                             size_t character_count) const;
 		template <typename Object>
-		ref_ptr<Object> lookup(git_oid const& id, std::error_code& ec) const {
+		ref_ptr<Object> lookup(git::oid_view id, std::error_code& ec) const {
 			auto object = lookup_object(id, ec);
 			return as_a<Object>(std::move(object), ec);
 		}
@@ -149,10 +150,16 @@ namespace cov {
 		bool write(git_oid& out, git::bytes const& bytes) {
 			return git_.write(out, bytes);
 		}
+		bool write(git::oid& out, ref_ptr<object> const& obj) {
+			return write(out.id, obj);
+		}
+		bool write(git::oid& out, git::bytes const& bytes) {
+			return write(out.id, bytes);
+		}
 
 		std::map<std::string, commit_file_diff> diff_betwen_commits(
-		    git_oid const& newer,
-		    git_oid const& older,
+		    git::oid_view newer,
+		    git::oid_view older,
 		    std::error_code& ec,
 		    git_diff_find_options const* opts = nullptr) const;
 
@@ -174,8 +181,7 @@ namespace cov {
 		                    std::filesystem::path const& common,
 		                    std::error_code&);
 
-		ref_ptr<object> lookup_object(git_oid const& id,
-		                              std::error_code&) const;
+		ref_ptr<object> lookup_object(git::oid_view id, std::error_code&) const;
 
 	private:
 		struct git_repo {
@@ -183,7 +189,7 @@ namespace cov {
 			void open(std::filesystem::path const& common,
 			          git::config const& cfg,
 			          std::error_code&);
-			ref_ptr<blob> lookup(git_oid const& id, std::error_code&) const;
+			ref_ptr<blob> lookup(git::oid_view id, std::error_code&) const;
 			bool write(git_oid&, git::bytes const&);
 
 			git::repository_handle repo() const noexcept { return git_; }

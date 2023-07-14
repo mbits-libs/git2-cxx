@@ -7,7 +7,8 @@
 namespace cov {
 #define KNOWN_OBJECTS(X) \
 	X(report)            \
-	X(report_files)      \
+	X(build)             \
+	X(files)             \
 	X(line_coverage)     \
 	X(blob)              \
 	X(reference)         \

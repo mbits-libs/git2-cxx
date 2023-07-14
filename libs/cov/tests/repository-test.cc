@@ -448,7 +448,7 @@ namespace cov::testing {
 			ASSERT_TRUE(backend);
 
 			auto total = io::v1::coverage_stats::init();
-			report_files_builder builder{};
+			files::builder builder{};
 			for (auto const& file : rprt.files) {
 				auto cvg_object = from_lines(file.lines, file.finish);
 				ASSERT_TRUE(cvg_object);
@@ -471,11 +471,11 @@ namespace cov::testing {
 			    {rprt.head.author_name, rprt.head.author_email},
 			    {rprt.head.committer_name, rprt.head.committer_email},
 			    rprt.head.message, rprt.head.commit_time_utc, rprt.add_time_utc,
-			    total);
+			    total, {});
 			ASSERT_TRUE(cvg_report);
 			ASSERT_TRUE(backend->write(report_id, cvg_report));
 		}
-		ASSERT_EQ("6ae885c09be27020a24aacbd9dd96d11c8305692"sv,
+		ASSERT_EQ("b0538c84a865b950eb71435c358b0487e7bc3d63"sv,
 		          setup::get_oid(report_id));
 
 		// read
@@ -499,9 +499,9 @@ namespace cov::testing {
 		ASSERT_EQ(rprt.add_time_utc, cvg_report->add_time_utc());
 
 		auto cvg_files =
-		    repo.lookup<cov::report_files>(cvg_report->file_list(), ec);
+		    repo.lookup<cov::files>(cvg_report->file_list_id(), ec);
 		ASSERT_TRUE(cvg_files);
-		auto& entries = cvg_files->entries();
+		auto const entries = cvg_files->entries();
 		ASSERT_EQ(rprt.files.size(), entries.size());
 
 		auto const count = entries.size();
@@ -567,7 +567,7 @@ namespace cov::testing {
 		// write
 		{
 			auto total = io::v1::coverage_stats::init();
-			report_files_builder builder{};
+			files::builder builder{};
 			for (auto const& file : rprt.files) {
 				auto cvg_object = from_lines(file.lines, file.finish);
 				ASSERT_TRUE(cvg_object);
@@ -590,11 +590,11 @@ namespace cov::testing {
 			    {rprt.head.author_name, rprt.head.author_email},
 			    {rprt.head.committer_name, rprt.head.committer_email},
 			    rprt.head.message, rprt.head.commit_time_utc, rprt.add_time_utc,
-			    total);
+			    total, {});
 			ASSERT_TRUE(cvg_report);
 			ASSERT_TRUE(repo.write(report_id, cvg_report));
 		}
-		ASSERT_EQ("6ae885c09be27020a24aacbd9dd96d11c8305692"sv,
+		ASSERT_EQ("b0538c84a865b950eb71435c358b0487e7bc3d63"sv,
 		          setup::get_oid(report_id));
 
 		// read
@@ -612,9 +612,9 @@ namespace cov::testing {
 		ASSERT_EQ(rprt.add_time_utc, cvg_report->add_time_utc());
 
 		auto cvg_files =
-		    repo.lookup<cov::report_files>(cvg_report->file_list(), ec);
+		    repo.lookup<cov::files>(cvg_report->file_list_id(), ec);
 		ASSERT_TRUE(cvg_files);
-		auto& entries = cvg_files->entries();
+		auto const entries = cvg_files->entries();
 		ASSERT_EQ(rprt.files.size(), entries.size());
 
 		auto const count = entries.size();
