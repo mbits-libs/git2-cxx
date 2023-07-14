@@ -19,6 +19,7 @@ set(SOURCES
   include/git2/error.hh
   include/git2/global.hh
   include/git2/object.hh
+  include/git2/oid.hh
   include/git2/odb.hh
   include/git2/ptr.hh
   include/git2/repository.hh

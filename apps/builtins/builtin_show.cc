@@ -107,17 +107,17 @@ namespace cov::app::builtin::show {
 
 		auto const report = info.repo.lookup<cov::report>(info.range.to, ec);
 
-		if (git_oid_is_zero(&report->file_list())) return 1;
+		if (report->file_list_id().is_zero()) return 1;
 		auto const files =
-		    info.repo.lookup<cov::report_files>(report->file_list(), ec);
+		    info.repo.lookup<cov::files>(report->file_list_id(), ec);
 		if (ec) p.error(ec, p.tr());
 
 		auto const* file_entry = files->by_path(entries.front().name.expanded);
-		if (!file_entry || git_oid_is_zero(&file_entry->contents())) return 1;
+		if (!file_entry || file_entry->contents().is_zero()) return 1;
 
 		cvg_info cvg{};
 
-		if (!git_oid_is_zero(&file_entry->line_coverage())) {
+		if (!file_entry->line_coverage().is_zero()) {
 			auto const file_cvg = info.repo.lookup<cov::line_coverage>(
 			    file_entry->line_coverage(), ec);
 			if (file_cvg && !ec)

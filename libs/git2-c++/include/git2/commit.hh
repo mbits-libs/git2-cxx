@@ -5,6 +5,7 @@
 #include <git2/commit.h>
 #include <chrono>
 #include <git2/object.hh>
+#include <git2/oid.hh>
 #include <git2/tree.hh>
 
 #include <string>
@@ -31,7 +32,7 @@ namespace git {
 		                     std::string_view id,
 		                     std::error_code& ec) noexcept;
 		static commit lookup(repository_handle repo,
-		                     git_oid const& id,
+		                     oid_view id,
 		                     std::error_code& ec) noexcept;
 		git::tree tree(std::error_code& ec) const noexcept;
 		sys_seconds commit_time_utc() const noexcept;

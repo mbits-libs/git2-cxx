@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <git2/oid.h>
+#include <git2/oid.hh>
 
 namespace cov {
 	struct repository;

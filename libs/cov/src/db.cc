@@ -4,11 +4,12 @@
 #include <fmt/format.h>
 #include <git2/oid.h>
 #include <cov/db.hh>
+#include <cov/io/build.hh>
 #include <cov/io/file.hh>
+#include <cov/io/files.hh>
 #include <cov/io/line_coverage.hh>
 #include <cov/io/read_stream.hh>
 #include <cov/io/report.hh>
-#include <cov/io/report_files.hh>
 #include <cov/io/safe_stream.hh>
 #include <cov/zstream.hh>
 #include "path-utils.hh"
@@ -34,8 +35,8 @@ namespace cov {
 	class loose_backend : public counted_impl<backend> {
 	public:
 		loose_backend(std::filesystem::path const&);
-		ref_ptr<object> lookup_object(git_oid const& id) const override;
-		ref_ptr<object> lookup_object(git_oid const& id,
+		ref_ptr<object> lookup_object(git::oid_view id) const override;
+		ref_ptr<object> lookup_object(git::oid_view id,
 		                              size_t character_count) const override;
 		bool write(git_oid& id, ref_ptr<object> const& obj) override;
 
@@ -47,17 +48,14 @@ namespace cov {
 	loose_backend::loose_backend(std::filesystem::path const& root)
 	    : root_{root} {
 		io_.add_handler<io::OBJECT::REPORT, io::handlers::report>();
-		io_.add_handler<io::OBJECT::FILES, io::handlers::report_files>();
+		io_.add_handler<io::OBJECT::BUILD, io::handlers::build>();
+		io_.add_handler<io::OBJECT::FILES, io::handlers::files>();
 		io_.add_handler<io::OBJECT::COVERAGE, io::handlers::line_coverage>();
 	}
 
-	ref_ptr<object> loose_backend::lookup_object(git_oid const& id) const {
-		char buffer[GIT_OID_HEXSZ + 1];
-		if (git_oid_pathfmt(buffer, &id)) return {};
+	ref_ptr<object> loose_backend::lookup_object(git::oid_view id) const {
 		std::vector<std::byte> bytes;
-		if (!load_zstream(root_ / std::string_view{buffer, sizeof(buffer)},
-		                  bytes))
-			return {};
+		if (!load_zstream(root_ / id.path(), bytes)) return {};
 
 		io::bytes_read_stream stream{{bytes.data(), bytes.size()}};
 		std::error_code ec{};
@@ -67,7 +65,7 @@ namespace cov {
 		return ref_ptr{static_cast<cov::object*>(result.unlink())};
 	}
 
-	ref_ptr<object> loose_backend::lookup_object(git_oid const& id_,
+	ref_ptr<object> loose_backend::lookup_object(git::oid_view id_,
 	                                             size_t character_count) const {
 		if (character_count >= GIT_OID_HEXSZ) return lookup_object(id_);
 
@@ -75,7 +73,7 @@ namespace cov {
 		static_assert(GIT_OID_MINPREFIXLEN > 2);
 
 		char buffer[GIT_OID_HEXSZ];
-		if (git_oid_fmt(buffer, &id_)) return {};
+		if (git_oid_fmt(buffer, id_.ref)) return {};
 		auto view = std::string_view{buffer, character_count};
 		auto dir = view.substr(0, 2);
 		auto match = view.substr(2);
@@ -85,7 +83,7 @@ namespace cov {
 		if (ec) return {};
 
 		std::vector<std::filesystem::path> paths{};
-		git_oid id{id_};
+		git_oid id{*id_.ref};
 		for (auto const& entry : it) {
 			auto filename = get_path(entry.path().filename());
 			if (!filename.starts_with(match)) continue;

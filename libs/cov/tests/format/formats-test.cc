@@ -92,7 +92,7 @@ namespace cov::testing {
 			    id, parent_id, files_id, commit_id, "develop"sv,
 			    {"Johnny Appleseed"sv, "johnny@appleseed.com"sv},
 			    {"Johnny Committer"sv, "committer@appleseed.com"sv}, message,
-			    commit, add, stats.value_or(default_stats));
+			    commit, add, stats.value_or(default_stats), {});
 		}
 	};
 

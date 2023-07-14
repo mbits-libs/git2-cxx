@@ -68,7 +68,7 @@ namespace cov {
 		}
 	}
 
-	ref_ptr<blob> repository::git_repo::lookup(git_oid const& id,
+	ref_ptr<blob> repository::git_repo::lookup(git::oid_view id,
 	                                           std::error_code& ec) const {
 		if (auto blob = git_.lookup<git::blob>(id, ec))
 			return cov::blob::wrap(std::move(blob), origin::git);
@@ -123,7 +123,7 @@ namespace cov {
 		return {.ref = peeled};
 	}  // GCOV_EXCL_LINE[WIN32]
 
-	bool repository::update_current_head(git_oid const& ref,
+	bool repository::update_current_head(git::oid_view ref,
 	                                     current_head_type const& known) const {
 		if (known != current_head()) return false;
 		std::string name{};
@@ -134,7 +134,7 @@ namespace cov {
 			name.append(names::heads_dir_prefix);
 			name.append(known.branch);
 		}
-		refs_->create(name, ref);
+		refs_->create(name, *ref.ref);
 		return true;
 	}
 
@@ -154,12 +154,12 @@ namespace cov {
 		return find_partial(oid, length);
 	}
 
-	ref_ptr<object> repository::find_partial(git_oid const& in,
+	ref_ptr<object> repository::find_partial(git::oid_view in,
 	                                         size_t character_count) const {
 		return db_->lookup<object>(in, character_count);
 	}
 
-	ref_ptr<object> repository::lookup_object(git_oid const& id,
+	ref_ptr<object> repository::lookup_object(git::oid_view id,
 	                                          std::error_code& ec) const {
 		if (auto report = db_->lookup_object(id)) return report;
 		if (auto blob = git_.lookup(id, ec)) return blob;
@@ -173,8 +173,8 @@ namespace cov {
 	}
 
 	std::map<std::string, commit_file_diff> repository::diff_betwen_commits(
-	    git_oid const& new_commit,
-	    git_oid const& old_commit,
+	    git::oid_view new_commit,
+	    git::oid_view old_commit,
 	    std::error_code& ec,
 	    git_diff_find_options const* opts) const {
 		auto const newer = git::commit::lookup(git_.repo(), new_commit, ec);
@@ -250,15 +250,13 @@ namespace cov {
 	    git_diff_find_options const* opts) const {
 		auto const renames = [&, this, opts] {  // GCOV_EXCL_LINE[GCC]
 			std::error_code ignore{};
-			return this->diff_betwen_commits(newer->commit(), older->commit(),
-			                                 ignore, opts);
+			return this->diff_betwen_commits(newer->commit_id(),
+			                                 older->commit_id(), ignore, opts);
 		}();
 
-		auto const new_files =
-		    lookup<cov::report_files>(newer->file_list(), ec);
+		auto const new_files = lookup<cov::files>(newer->file_list_id(), ec);
 		if (ec) return {};
-		auto const old_files =
-		    lookup<cov::report_files>(older->file_list(), ec);
+		auto const old_files = lookup<cov::files>(older->file_list_id(), ec);
 		if (ec) return {};
 
 		std::map<std::string, std::pair<io::v1::coverage_stats, bool>> pool{};
@@ -307,9 +305,9 @@ namespace cov {
 	    std::error_code& ec,
 	    git_diff_find_options const* opts,
 	    file_diff::initial initial_policy) const {
-		auto const& parent_oid = current->parent_report();
+		auto const& parent_oid = current->parent_id();
 		ref_ptr<report> parent{};
-		if (!git_oid_is_zero(&parent_oid)) {
+		if (!parent_oid.is_zero()) {
 			std::error_code ignore{};
 			parent = lookup<report>(parent_oid, ignore);
 		}
@@ -319,7 +317,7 @@ namespace cov {
 		if (initial_policy == file_diff::initial_with_self)
 			return diff_betwen_reports(current, current, ec);
 
-		auto const files = lookup<cov::report_files>(current->file_list(), ec);
+		auto const files = lookup<cov::files>(current->file_list_id(), ec);
 		if (ec) return {};
 
 		std::vector<file_stats> result{};

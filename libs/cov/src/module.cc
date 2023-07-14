@@ -84,16 +84,16 @@ namespace cov {
 			}  // GCOV_EXCL_LINE[GCC]
 
 			std::vector<module_view> filter(
-			    std::span<report_entry const*> const& files) const override {
+			    std::span<files::entry const*> const& files) const override {
 				return filter_impl(files,
-				                   [](report_entry const* ptr) { return ptr; });
+				                   [](files::entry const* ptr) { return ptr; });
 			}
 
 			std::vector<module_view> filter(
-			    std::vector<std::unique_ptr<report_entry>> const& files)
+			    std::span<std::unique_ptr<files::entry> const> const& files)
 			    const override {
 				return filter_impl(
-				    files, [](std::unique_ptr<report_entry> const& ptr) {
+				    files, [](std::unique_ptr<files::entry> const& ptr) {
 					    return ptr.get();
 				    });
 			}
@@ -266,7 +266,7 @@ namespace cov {
 		return make_modules(sep, result);
 	}
 
-	ref_ptr<modules> modules::from_commit(git_oid const& ref,
+	ref_ptr<modules> modules::from_commit(git::oid_view ref,
 	                                      git::repository_handle const& repo,
 	                                      std::error_code& ec) {
 		CHECK_OBJ(commit, repo.lookup<git::commit>(ref, ec));
@@ -287,12 +287,12 @@ namespace cov {
 	}
 
 	static inline bool HEAD_reported(git::repository_handle handle,
-	                                 git_oid const& ref) {
+	                                 git::oid_view ref) {
 		std::error_code ec{};
 		CHECK_OBJ(head_ref, handle.head(ec));
 		CHECK_OBJ(resolved, head_ref.resolve(ec));
 		auto oid = git_reference_target(resolved.raw());
-		return oid && git_oid_equal(oid, &ref);
+		return oid && oid == ref;
 	}
 
 	static inline ref_ptr<modules> modules_from_workdir(
@@ -312,16 +312,16 @@ namespace cov {
 		return mods;
 	}
 
-	ref_ptr<modules> modules::from_report(git_oid const& ref,
+	ref_ptr<modules> modules::from_report(git::oid_view ref,
 	                                      repository const& repo,
 	                                      std::error_code& ec) {
 		auto handle = repo.git();
 		CHECK_OBJ(report, repo.lookup<cov::report>(ref, ec));
-		if (HEAD_reported(handle, report->commit())) {
+		if (HEAD_reported(handle, report->commit_id())) {
 			auto result = modules_from_workdir(handle);
 			if (result) return result;
 		}  // GCOV_EXCL_LINE[WIN32]
-		return from_commit(report->commit(), handle, ec);
+		return from_commit(report->commit_id(), handle, ec);
 	}
 
 #undef UNLIKELY

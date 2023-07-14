@@ -20,12 +20,13 @@ namespace cov::testing {
 		line_cvg lines{};
 		unsigned finish{};
 
-		void add_to(report_files_builder& builder,
+		void add_to(files::builder& builder,
 		            io::v1::coverage_stats const& stats,
-		            git_oid const& lines_id,
-		            git_oid const& functions_id,
-		            git_oid const& branch_id) const {
-			builder.add(name, stats, {}, lines_id, functions_id, branch_id);
+		            git::oid_view lines_id,
+		            git::oid_view functions_id,
+		            git::oid_view branch_id) const {
+			builder.add(name, stats, git::oid{}, lines_id, functions_id,
+			            branch_id);
 		}
 	};
 
@@ -79,8 +80,9 @@ namespace cov::testing {
 		return line_coverage::create(std::move(result));
 	}
 
-	inline line_cvg from_coverage(std::vector<io::v1::coverage> const& lines,
-	                              unsigned& finish) {
+	inline line_cvg from_coverage(
+	    std::span<io::v1::coverage const> const& lines,
+	    unsigned& finish) {
 		line_cvg result{};
 		unsigned line = 0;
 		for (auto&& cvg : lines) {
@@ -99,7 +101,7 @@ namespace cov::testing {
 	}
 
 	inline io::v1::coverage_stats stats(
-	    std::vector<io::v1::coverage> const& lines) {
+	    std::span<io::v1::coverage const> const& lines) {
 		auto result = io::v1::coverage_stats::init();
 		for (auto&& cvg : lines) {
 			result += cvg;

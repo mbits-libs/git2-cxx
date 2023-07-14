@@ -187,8 +187,7 @@ namespace cov::app {
 				auto report = repo.lookup<cov::report>(id, ec);
 				if (!report || ec) return;
 
-				auto const has_parent =
-				    git_oid_is_zero(&report->parent_report()) == 0;
+				auto const has_parent = !report->parent_id().is_zero();
 				if (has_parent != with_parent) {
 					with_parent = has_parent;
 					format =
@@ -197,7 +196,7 @@ namespace cov::app {
 
 				auto const view = placeholder::report_view::from(*report);
 				std::puts(format.format(view, ctx).c_str());
-				id = report->parent_report();
+				id = report->parent_id().id;
 			}
 			return;
 #undef RAW_PARENT
@@ -215,7 +214,7 @@ namespace cov::app {
 
 			auto const view = placeholder::report_view::from(*report);
 			std::puts(format.format(view, ctx).c_str());
-			id = report->parent_report();
+			id = report->parent_id().id;
 		}
 	}
 }  // namespace cov::app

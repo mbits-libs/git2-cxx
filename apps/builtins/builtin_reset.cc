@@ -68,7 +68,7 @@ namespace cov::app::builtin::reset {
 			auto const report = repo.lookup<cov::report>(new_tip, ec);
 			if (!ec && report) {
 				auto const files =
-				    repo.lookup<cov::report_files>(report->file_list(), ec);
+				    repo.lookup<cov::files>(report->file_list_id(), ec);
 				auto const file_count =
 				    files && !ec ? files->entries().size() : 0u;
 				builtin::report::parser::print_report(head.branch, file_count,

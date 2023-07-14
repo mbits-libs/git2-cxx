@@ -7,6 +7,7 @@
 #include <concepts>
 #include <filesystem>
 #include <git2/bytes.hh>
+#include <span>
 #include <system_error>
 #include <type_traits>
 #include <vector>
@@ -31,6 +32,12 @@ namespace cov {
 
 		template <Simple T>
 		bool store(std::vector<T> const& data) {
+			return write(data.data(), sizeof(T) * data.size()) ==
+			       sizeof(T) * data.size();
+		}
+
+		template <Simple T>
+		bool store(std::span<T> const& data) {
 			return write(data.data(), sizeof(T) * data.size()) ==
 			       sizeof(T) * data.size();
 		}

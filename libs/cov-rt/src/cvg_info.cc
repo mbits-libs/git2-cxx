@@ -27,7 +27,7 @@ namespace cov::app {
 	}
 
 	cvg_info cvg_info::from_coverage(
-	    std::vector<io::v1::coverage> const& lines) {
+	    std::span<io::v1::coverage const> const& lines) {
 		cvg_info result{};
 		unsigned line = 0;
 		for (auto&& cvg : lines) {

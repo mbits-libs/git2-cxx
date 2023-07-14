@@ -54,7 +54,7 @@ namespace cov::testing {
 			    {"Johnny Appleseed"sv, "johnny@appleseed.com"sv},
 			    {"Johnny Committer"sv, "committer@appleseed.com"sv},
 			    "Subject, isn't it?\n\nBody para 1\n\nBody para 2\n"sv, feb29,
-			    feb29, stats.value_or(default_stats));
+			    feb29, stats.value_or(default_stats), {});
 		}
 	};
 

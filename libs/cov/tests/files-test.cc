@@ -4,8 +4,8 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <cov/io/db_object.hh>
+#include <cov/io/files.hh>
 #include <cov/io/read_stream.hh>
-#include <cov/io/report_files.hh>
 #include <git2/bytes.hh>
 #include "setup.hh"
 
@@ -35,15 +35,15 @@ namespace cov::testing {
 		}
 	};
 
-	struct report_files_impl : counted_impl<cov::report_files> {
-		std::vector<std::unique_ptr<report_entry>> files{};
+	struct files_impl : counted_impl<cov::files> {
+		std::vector<std::unique_ptr<cov::files::entry>> files{};
 
-		std::vector<std::unique_ptr<report_entry>> const& entries()
+		std::span<std::unique_ptr<cov::files::entry> const> entries()
 		    const noexcept override {
 			return files;
 		}
 
-		report_entry const* by_path(
+		cov::files::entry const* by_path(
 		    std::string_view path) const noexcept override {
 			for (auto const& entry : files) {
 				if (entry->path() == path) return entry.get();
@@ -52,43 +52,43 @@ namespace cov::testing {
 		}
 	};
 
-	TEST(report_files, load) {
+	TEST(files, load) {
 		static constexpr auto s =
 		    "list\x00\x00\x01\x00"
 
-		    "\x00\x00\x00\x00"
+		    "\x05\x00\x00\x00"
 		    "\x00\x00\x00\x00"
 
-		    "\x00\x00\x00\x00"
-		    "\x00\x00\x00\x00"
-		    "\x0E\x00\x00\x00"sv;
+		    "\x05\x00\x00\x00"
+		    "\x0E\x00\x00\x00"
+		    "\x00\x00\x00\x00"sv;
 		io::bytes_read_stream stream{git::bytes{s.data(), s.size()}};
 
 		io::db_object dbo{};
-		dbo.add_handler<io::OBJECT::FILES, io::handlers::report_files>();
+		dbo.add_handler<io::OBJECT::FILES, io::handlers::files>();
 
 		std::error_code ec{};
-		auto const result = dbo.load({}, stream, ec);
+		auto const result = dbo.load(git::oid{}, stream, ec);
 		ASSERT_FALSE(ec) << "   Error: " << ec.message() << " ("
 		                 << ec.category().name() << ')';
 		ASSERT_TRUE(result);
 		ASSERT_TRUE(result->is_object());
 		auto const obj = static_cast<object const*>(result.get());
-		ASSERT_EQ(obj_report_files, obj->type());
-		auto const lines = as_a<cov::report_files>(obj);
+		ASSERT_EQ(obj_files, obj->type());
+		auto const lines = as_a<cov::files>(obj);
 		ASSERT_TRUE(lines);
 		ASSERT_TRUE(lines->entries().empty());
 	}
 
-	TEST(report_files, load_1) {
+	TEST(files, load_1) {
 		static constexpr auto s =
 		    "list\x00\x00\x01\x00"
 
-		    "\x00\x00\x00\x00"
+		    "\x05\x00\x00\x00"
 		    "\x03\x00\x00\x00"
-		    "\x03\x00\x00\x00"
-		    "\x01\x00\x00\x00"
+		    "\x08\x00\x00\x00"
 		    "\x0E\x00\x00\x00"
+		    "\x01\x00\x00\x00"
 
 		    "file path\0\0\0"
 
@@ -106,10 +106,10 @@ namespace cov::testing {
 
 		io::db_object dbo{};
 
-		dbo.add_handler<io::OBJECT::FILES, io::handlers::report_files>();
+		dbo.add_handler<io::OBJECT::FILES, io::handlers::files>();
 
 		std::error_code ec{};
-		auto const result = dbo.load({}, stream, ec);
+		auto const result = dbo.load(git::oid{}, stream, ec);
 		ASSERT_FALSE(ec) << "   Error: " << ec.message() << " ("
 		                 << ec.category().name() << ')';
 
@@ -117,8 +117,8 @@ namespace cov::testing {
 		ASSERT_TRUE(result->is_object());
 		auto const obj = static_cast<object const*>(result.get());
 
-		ASSERT_EQ(obj_report_files, obj->type());
-		auto const lines = as_a<cov::report_files>(obj);
+		ASSERT_EQ(obj_files, obj->type());
+		auto const lines = as_a<cov::files>(obj);
 		ASSERT_TRUE(lines);
 		ASSERT_EQ(1u, lines->entries().size());
 
@@ -133,15 +133,15 @@ namespace cov::testing {
 		ASSERT_FALSE(lines->by_path("another file"sv));
 	}
 
-	TEST(report_files, load_partial_1_not_enough_entries) {
+	TEST(files, load_partial_1_not_enough_entries) {
 		static constexpr auto s =
 		    "list\x00\x00\x01\x00"
 
-		    "\x00\x00\x00\x00"
+		    "\x05\x00\x00\x00"
 		    "\x03\x00\x00\x00"
-		    "\x03\x00\x00\x00"
-		    "\x02\x00\x00\x00"
+		    "\x08\x00\x00\x00"
 		    "\x0E\x00\x00\x00"
+		    "\x02\x00\x00\x00"
 
 		    "file path\0\0\0"
 
@@ -158,23 +158,23 @@ namespace cov::testing {
 		io::bytes_read_stream stream{git::bytes{s.data(), s.size()}};
 
 		io::db_object dbo{};
-		dbo.add_handler<io::OBJECT::FILES, io::handlers::report_files>();
+		dbo.add_handler<io::OBJECT::FILES, io::handlers::files>();
 
 		std::error_code ec{};
-		auto const result = dbo.load({}, stream, ec);
+		auto const result = dbo.load(git::oid{}, stream, ec);
 		ASSERT_FALSE(result);
 		ASSERT_EQ(ec, io::errc::bad_syntax);
 	}
 
-	TEST(report_files, load_partial_2_bad_strings) {
+	TEST(files, load_partial_2_bad_strings) {
 		static constexpr auto s =
 		    "list\x00\x00\x01\x00"
 
-		    "\x00\x00\x00\x00"
+		    "\x05\x00\x00\x00"
 		    "\xFF\x00\x00\x00"
-		    "\xFF\x00\x00\x00"
-		    "\x02\x00\x00\x00"
+		    "\x04\x01\x00\x00"
 		    "\x0E\x00\x00\x00"
+		    "\x02\x00\x00\x00"
 
 		    "file path\0\0\0"
 
@@ -191,23 +191,23 @@ namespace cov::testing {
 		io::bytes_read_stream stream{git::bytes{s.data(), s.size()}};
 
 		io::db_object dbo{};
-		dbo.add_handler<io::OBJECT::FILES, io::handlers::report_files>();
+		dbo.add_handler<io::OBJECT::FILES, io::handlers::files>();
 
 		std::error_code ec{};
-		auto const result = dbo.load({}, stream, ec);
+		auto const result = dbo.load(git::oid{}, stream, ec);
 		ASSERT_FALSE(result);
 		ASSERT_EQ(ec, io::errc::bad_syntax);
 	}
 
-	TEST(report_files, load_partial_3_entry_too_small) {
+	TEST(files, load_partial_3_entry_too_small) {
 		static constexpr auto s =
 		    "list\x00\x00\x01\x00"
 
-		    "\x00\x00\x00\x00"
+		    "\x05\x00\x00\x00"
 		    "\x03\x00\x00\x00"
-		    "\x03\x00\x00\x00"
-		    "\x01\x00\x00\x00"
+		    "\x08\x00\x00\x00"
 		    "\x0D\x00\x00\x00"
+		    "\x01\x00\x00\x00"
 
 		    "file path\0\0\0"
 
@@ -224,19 +224,19 @@ namespace cov::testing {
 		io::bytes_read_stream stream{git::bytes{s.data(), s.size()}};
 
 		io::db_object dbo{};
-		dbo.add_handler<io::OBJECT::FILES, io::handlers::report_files>();
+		dbo.add_handler<io::OBJECT::FILES, io::handlers::files>();
 
 		std::error_code ec{};
-		auto const result = dbo.load({}, stream, ec);
+		auto const result = dbo.load(git::oid{}, stream, ec);
 		ASSERT_FALSE(result);
 		ASSERT_EQ(ec, io::errc::bad_syntax);
 	}
 
-	TEST(report_files, load_partial_4_entries_beyond_stream) {
+	TEST(files, load_partial_4_entries_beyond_stream) {
 		static constexpr auto s =
 		    "list\x00\x00\x01\x00"
 
-		    "\x00\x00\x00\x00"
+		    "\x05\x00\x00\x00"
 		    "\x03\x00\x00\x00"
 		    "\xFF\x00\x00\x00"
 		    "\x01\x00\x00\x00"
@@ -246,44 +246,44 @@ namespace cov::testing {
 		io::bytes_read_stream stream{git::bytes{s.data(), s.size()}};
 
 		io::db_object dbo{};
-		dbo.add_handler<io::OBJECT::FILES, io::handlers::report_files>();
+		dbo.add_handler<io::OBJECT::FILES, io::handlers::files>();
 
 		std::error_code ec{};
-		auto const result = dbo.load({}, stream, ec);
+		auto const result = dbo.load(git::oid{}, stream, ec);
 		ASSERT_FALSE(result);
 		ASSERT_EQ(ec, io::errc::bad_syntax);
 	}
 
-	TEST(report_files, store) {
+	TEST(files, store) {
 		static constexpr auto expected =
 		    "list\x00\x00\x01\x00"
 
-		    "\x00\x00\x00\x00"
+		    "\x05\x00\x00\x00"
 		    "\x00\x00\x00\x00"
 
-		    "\x00\x00\x00\x00"
-		    "\x00\x00\x00\x00"
-		    "\x0E\x00\x00\x00"sv;
+		    "\x05\x00\x00\x00"
+		    "\x0E\x00\x00\x00"
+		    "\x00\x00\x00\x00"sv;
 		test_stream stream{};
 
 		io::db_object dbo{};
-		dbo.add_handler<io::OBJECT::FILES, io::handlers::report_files>();
+		dbo.add_handler<io::OBJECT::FILES, io::handlers::files>();
 
-		auto const obj = make_ref<report_files_impl>();
+		auto const obj = make_ref<files_impl>();
 		auto const result = dbo.store(obj, stream);
 		ASSERT_TRUE(result);
 		ASSERT_EQ(expected, stream.view());
 	}
 
-	TEST(report_files, store_1) {
+	TEST(files, store_1) {
 		static constexpr auto expected =
 		    "list\x00\x00\x01\x00"
 
-		    "\x00\x00\x00\x00"
+		    "\x05\x00\x00\x00"
 		    "\x03\x00\x00\x00"
-		    "\x03\x00\x00\x00"
-		    "\x01\x00\x00\x00"
+		    "\x08\x00\x00\x00"
 		    "\x0E\x00\x00\x00"
+		    "\x01\x00\x00\x00"
 
 		    "file path\0\0\0"
 
@@ -300,10 +300,10 @@ namespace cov::testing {
 		test_stream stream{};
 
 		io::db_object dbo{};
-		dbo.add_handler<io::OBJECT::FILES, io::handlers::report_files>();
+		dbo.add_handler<io::OBJECT::FILES, io::handlers::files>();
 
-		auto const obj = make_ref<report_files_impl>();
-		report_files_builder builder{};
+		auto const obj = make_ref<files_impl>();
+		files::builder builder{};
 		builder.add_nfo({.path = "file path"sv,
 		                 .stats = {1250, {300, 299}, {0, 0}, {0, 0}}});
 		obj->files = builder.release();
@@ -312,21 +312,21 @@ namespace cov::testing {
 		ASSERT_EQ(expected, stream.view());
 	}
 
-	git_oid operator""_oid(const char* str, size_t len) {
+	git::oid operator""_oid(const char* str, size_t len) {
 		git_oid result{};
 		if (len == GIT_OID_HEXSZ) git_oid_fromstr(&result, str);
-		return result;
+		return git::oid{result};
 	}
 
-	TEST(report_files, store_with_newer_data) {
+	TEST(files, store_with_newer_data) {
 		static constexpr auto expected =
 		    "list\x00\x00\x01\x00"
 
-		    "\x00\x00\x00\x00"
+		    "\x05\x00\x00\x00"
 		    "\x03\x00\x00\x00"
-		    "\x03\x00\x00\x00"
-		    "\x01\x00\x00\x00"
+		    "\x08\x00\x00\x00"
 		    "\x18\x00\x00\x00"
+		    "\x01\x00\x00\x00"
 
 		    "file path\0\0\0"
 
@@ -349,10 +349,10 @@ namespace cov::testing {
 		test_stream stream{};
 
 		io::db_object dbo{};
-		dbo.add_handler<io::OBJECT::FILES, io::handlers::report_files>();
+		dbo.add_handler<io::OBJECT::FILES, io::handlers::files>();
 
-		auto const obj = make_ref<report_files_impl>();
-		report_files_builder builder{};
+		auto const obj = make_ref<files_impl>();
+		files::builder builder{};
 		builder.add_nfo({.path = "file path"sv,
 		                 .stats = {1250, {300, 299}, {0, 0}, {0, 0}},
 		                 .function_coverage =
@@ -363,8 +363,8 @@ namespace cov::testing {
 		ASSERT_EQ(expected, stream.view());
 	}
 
-	TEST(report_files, remove) {
-		report_files_builder builder{};
+	TEST(files, remove) {
+		files::builder builder{};
 		builder.add_nfo({.path = "Alpha"})
 		    .add_nfo({.path = "Beta"})
 		    .add_nfo({.path = "Gamma"})

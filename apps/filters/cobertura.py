@@ -116,7 +116,7 @@ def cov_from(info: ClassInfo) -> dict:
 
 json.dump(
     {
-        "$schema": "https://raw.githubusercontent.com/mzdun/cov/v0.12.4-beta/apps/report-schema.json",
+        "$schema": "https://raw.githubusercontent.com/mzdun/cov/v0.18.0/apps/report-schema.json",
         "git": {"branch": GIT_BRANCH, "head": GIT_HEAD},
         "files": [cov_from(collected[name]) for name in sorted(collected.keys())],
     },

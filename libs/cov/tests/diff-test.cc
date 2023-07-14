@@ -53,29 +53,33 @@ namespace cov::testing {
 		std::string_view path;
 		io::v1::coverage_stats stats{};
 
-		std::unique_ptr<cov::report_entry> with(git::tree const& tree) const {
-			auto builder = report_entry_builder{};
-
-			builder.set_path(path).set_stats(stats);
+		std::unique_ptr<cov::files::entry> with(git::tree const& tree) const {
+			files::builder::info nfo{
+			    .path = path,
+			    .stats = stats,
+			};
 
 			std::error_code ignore;
 			auto entry = tree.entry_bypath(path.data(), ignore);
-			if (!ignore && entry) builder.set_contents(entry.oid());
-			entry = nullptr;
-			return std::move(builder).create();
+			if (!ignore && entry) nfo.contents.assign(entry.oid());
+
+			auto list_of_one = files::builder{}.add_nfo(nfo).release();
+			return std::move(list_of_one.front());
 		}
 	};
 
 	std::error_code add_report(repository& repo,
 	                           git::repository const& git_repo,
-	                           git_oid& report,
+	                           git::oid& report,
 	                           std::string_view commit_id,
 	                           std::span<quick_stat const> files,
-	                           git_oid const* parent = nullptr) {
+	                           git::oid const* parent = nullptr) {
 		std::error_code ec{};
+		auto const now = std::chrono::floor<std::chrono::seconds>(
+		    std::chrono::system_clock::now());
 
 		std::cout << "commit " << commit_id << '\n';
-		if (parent) std::cout << "parent " << setup::get_oid(*parent) << '\n';
+		if (parent) std::cout << "parent " << *parent << '\n';
 		auto commit = git_repo.lookup<git::commit>(commit_id, ec);
 		if (ec) return ec;
 
@@ -83,7 +87,7 @@ namespace cov::testing {
 		if (ec) return ec;
 
 		auto stats = io::v1::coverage_stats::init();
-		std::vector<std::unique_ptr<cov::report_entry>> entries{};
+		std::vector<std::unique_ptr<cov::files::entry>> entries{};
 		entries.reserve(files.size());
 		for (auto const& file : files) {
 			stats += file.stats;
@@ -91,29 +95,39 @@ namespace cov::testing {
 		}
 
 		git_oid peeled_id{};
-		auto peeled = report_files::create(std::move(entries));
+		auto peeled = files::create(std::move(entries));
 		if (!repo.write(peeled_id, peeled)) {
 			return git::make_error_code(git::errc::error);
 		}
 		std::cout << "files " << setup::get_oid(peeled_id) << '\n';
+
+		cov::report::builder builds{};
+		{
+			git::oid build_id{};
+			auto const build = cov::build::create(peeled_id, now, {}, stats);
+			if (!repo.write(build_id, build)) {
+				return git::make_error_code(git::errc::error);
+			}
+			builds.add_nfo({.build_id = build_id, .props = {}, .stats = stats});
+			std::cout << "build " << build_id << '\n';
+		}
 
 		auto author = commit.author();
 		auto committer = commit.committer();
 		auto const as_s = [](std::string_view view) -> std::string {
 			return {view.data(), view.size()};
 		};
-		auto result = report::create(
+
+		git::oid zero{};
+		auto result = cov::report::create(
 		    parent ? *parent : zero, peeled_id, commit.oid(), "main"sv,
-		    {author.name, author.email}, {committer.name,
-		    committer.email}, commit.message_raw(), committer.when,
-		    std::chrono::floor<std::chrono::seconds>(
-		        std::chrono::system_clock::now()),
-		    stats);
+		    {author.name, author.email}, {committer.name, committer.email},
+		    commit.message_raw(), committer.when, now, stats, builds.release());
 
 		if (!repo.write(report, result)) {
 			return git::make_error_code(git::errc::error);
 		}
-		std::cout << "report " << setup::get_oid(report) << '\n';
+		std::cout << "report " << report << '\n';
 		return {};
 	}
 
@@ -121,9 +135,9 @@ namespace cov::testing {
 		git::init app{};
 		std::error_code ec{};
 		remove_all(setup::test_dir() / "diffs/.git/.covdata"sv, ec);
-		auto repo =
-		    cov::repository::init(setup::test_dir() / "diffs/.git/.covdata"sv,
-		                          setup::test_dir() / "diffs/.git"sv, ec);
+		auto repo = cov::repository::init(
+		    setup::test_dir(), setup::test_dir() / "diffs/.git/.covdata"sv,
+		    setup::test_dir() / "diffs/.git"sv, ec);
 		ASSERT_FALSE(ec) << ec.message();
 
 		auto git_repo =
@@ -144,7 +158,7 @@ namespace cov::testing {
 		    {"src/greetings.cc"sv, {8, 3, 3}},
 		};
 
-		git_oid initial{}, middle{}, current{};
+		git::oid initial{}, middle{}, current{};
 		ec = add_report(repo, git_repo, initial,
 		                "c86a87d7b7ac836d4686f4f2a4e251ac4c6e1366"sv,
 		                initial_files);
@@ -160,14 +174,9 @@ namespace cov::testing {
 		                current_files, &middle);
 		ASSERT_FALSE(ec) << ec.message();
 
-		char buffer[42];
-		buffer[40] = '\n';
-		buffer[41] = 0;
-
-		git_oid_fmt(buffer, &current);
 		auto main = io::fopen(
 		    setup::test_dir() / "diffs/.git/.covdata/refs/heads/main"sv, "wb");
-		main.store(buffer, 41);
+		main.store(fmt::format("{}\n", current).c_str(), 41);
 	}
 #endif
 
@@ -213,11 +222,14 @@ namespace cov::testing {
 
 	void print(ref_ptr<cov::report> report,
 	           std::vector<file_stats> const& files) {
-		std::cout << "report " << setup::get_oid(report->oid()) << '\n';
-		if (!git_oid_is_zero(&report->parent_report()))
-			std::cout << "parent " << setup::get_oid(report->parent_report())
-			          << '\n';
-		std::cout << "commit " << setup::get_oid(report->commit()) << '\n';
+		std::cout << "report " << report->oid() << '\n';
+		if (!report->parent_id().is_zero())
+			std::cout << "parent " << report->parent_id() << '\n';
+		std::cout << "commit " << report->commit_id() << '\n';
+		for (auto const& build : report->entries()) {
+			std::cout << "build  " << build->build_id() << " '"
+			          << build->props_json() << "'\n";
+		}
 
 		if (!files.empty()) std::cout << '\n';
 
@@ -279,7 +291,7 @@ namespace cov::testing {
 	ref_ptr<cov::report> from_parent(repository& repo,
 	                                 ref_ptr<cov::report> const& report,
 	                                 std::error_code& ec) {
-		return repo.lookup<cov::report>(report->parent_report(), ec);
+		return repo.lookup<cov::report>(report->parent_id(), ec);
 	}
 
 	ref_ptr<cov::report> from_head(repository& repo,

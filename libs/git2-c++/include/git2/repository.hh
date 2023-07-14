@@ -5,6 +5,7 @@
 #include <git2/object.h>
 #include <git2/repository.h>
 #include <git2/odb.hh>
+#include <git2/oid.hh>
 #include <git2/ptr.hh>
 #include <git2/submodule.hh>
 
@@ -58,16 +59,16 @@ namespace git {
 		}
 
 		template <typename ObjectType>
-		ObjectType lookup(git_oid const& id,
+		ObjectType lookup(git::oid_view id,
 		                  std::error_code& ec) const noexcept {
 			return lookup<ObjectType>(id, GIT_OID_RAWSZ, ec);
 		}
 		template <typename ObjectType>
-		ObjectType lookup(git_oid const& id,
+		ObjectType lookup(git::oid_view id,
 		                  size_t prefix,
 		                  std::error_code& ec) const noexcept {
 			return git::create_object<ObjectType>(ec, git_object_lookup_prefix,
-			                                      this->get(), &id, prefix,
+			                                      this->get(), id.ref, prefix,
 			                                      ObjectType::OBJECT_TYPE);
 		}
 

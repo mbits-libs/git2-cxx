@@ -60,7 +60,7 @@ namespace cov::testing {
 		    {"Johnny Appleseed"sv, "johnny@appleseed.com"sv},
 		    {"Johnny Committer"sv, "committer@appleseed.com"sv},
 		    "Subject, isn't it?\n\nBody para 1\n\nBody para 2\n"sv, commit, add,
-		    {1250, {300, 299}, {0, 0}, {0, 0}});
+		    {1250, {300, 299}, {0, 0}, {0, 0}}, {});
 		ASSERT_TRUE(report);
 
 		auto view = ph::report_view::from(*report);

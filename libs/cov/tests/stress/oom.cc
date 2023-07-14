@@ -40,7 +40,7 @@ namespace cov::testing {
 		    id, parent_id, zero, commit_id, "develop"sv,
 		    {"Johnny Appleseed"sv, "johnny@appleseed.com"sv},
 		    {"Johnny Committer"sv, "committer@appleseed.com"sv}, message,
-		    commit, add, default_stats);
+		    commit, add, default_stats, {});
 	}
 
 	static constexpr auto message =

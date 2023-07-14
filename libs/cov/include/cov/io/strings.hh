@@ -3,12 +3,17 @@
 
 #pragma once
 
+#include <cov/io/types.hh>
 #include <functional>
 #include <set>
 #include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
+
+namespace cov {
+	struct read_stream;
+}
 
 namespace cov::io {
 	class strings_view_base {
@@ -62,9 +67,27 @@ namespace cov::io {
 		constexpr std::string_view at(size_t offset) const noexcept {
 			return offset >= size_ ? std::string_view{} : block_ + offset;
 		}
+		constexpr std::string_view at(io::str offset) const noexcept {
+			return at(std::to_underlying(offset));
+		}
 
 		constexpr bool is_valid(size_t offset) const noexcept {
 			return (offset <= size_) && (!offset || !block_[offset - 1]);
+		}
+
+		constexpr bool is_valid(io::str offset) const noexcept {
+			return is_valid(std::to_underlying(offset));
+		}
+
+		template <typename Header>
+		constexpr block after() const noexcept {
+			return {.offset = static_cast<uint32_t>(sizeof(Header) /
+			                                        sizeof(uint32_t)),
+			        .size = static_cast<uint32_t>(size() / sizeof(uint32_t))};
+		}
+		template <typename Header, typename Entry>
+		constexpr array_ref align_array(size_t count) const noexcept {
+			return array_ref::from<Entry>(size() + sizeof(Header), count);
 		}
 
 	protected:
@@ -87,6 +110,7 @@ namespace cov::io {
 		strings_view& operator=(strings_view const&);
 		strings_view& operator=(strings_view&&) noexcept;
 
+		bool load_from(cov::read_stream& in, block const& strings);
 		void resync() noexcept;
 	};
 

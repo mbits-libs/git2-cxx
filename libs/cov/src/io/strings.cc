@@ -2,6 +2,8 @@
 // This code is licensed under MIT license (see LICENSE for details)
 
 #include <cov/io/strings.hh>
+#include <cov/io/types.hh>
+#include <cov/streams.hh>
 
 namespace cov::io {
 	strings_view::strings_view(strings_view const& other)
@@ -28,6 +30,12 @@ namespace cov::io {
 		resync();
 		other.resync();
 		return *this;
+	}
+
+	bool strings_view::load_from(cov::read_stream& in, block const& strings) {
+		if (!in.load(data, strings.size * sizeof(uint32_t))) return false;
+		update(data.data(), data.size());
+		return true;
 	}
 
 	void strings_view::resync() noexcept { update(data.data(), data.size()); }

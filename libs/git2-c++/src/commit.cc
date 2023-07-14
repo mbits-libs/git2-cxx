@@ -13,7 +13,7 @@ namespace git {
 	}
 
 	commit commit::lookup(repository_handle repo,
-	                      git_oid const& id,
+	                      oid_view id,
 	                      std::error_code& ec) noexcept {
 		return repo.lookup<commit>(id, ec);
 	}

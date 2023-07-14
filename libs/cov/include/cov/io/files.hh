@@ -7,10 +7,10 @@
 #include <cov/report.hh>
 
 namespace cov::io::handlers {
-	struct report_files : db_handler_for<cov::report_files> {
+	struct files : db_handler_for<cov::files> {
 		ref_ptr<counted> load(uint32_t magic,
 		                      uint32_t version,
-		                      git_oid const& id,
+		                      git::oid_view id,
 		                      read_stream& in,
 		                      std::error_code& ec) const override;
 		bool store(ref_ptr<counted> const& obj,
