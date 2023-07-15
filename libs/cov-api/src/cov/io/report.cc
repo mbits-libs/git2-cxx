@@ -221,6 +221,13 @@ namespace cov::io::handlers {
 		    header.added.to_seconds(), header.stats, std::move(builds));
 	}
 
+#if defined(__GNUC__)
+// The warning is legit, since as_a<> can return nullptr, if there is no
+// cov::report in type tree branch, but this should be called from within
+// db_object::store, which is guarded by report::recognized
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wnull-dereference"
+#endif
 	bool report::store(ref_ptr<counted> const& value, write_stream& out) const {
 		auto const obj =
 		    as_a<cov::report>(static_cast<object const*>(value.get()));
@@ -288,6 +295,9 @@ namespace cov::io::handlers {
 
 		return true;
 	}
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
 }  // namespace cov::io::handlers
 
 namespace cov {

@@ -441,6 +441,8 @@ namespace cov::testing {
 		static constexpr io::v1::coverage_stats stats{
 		    .lines_total = 1'000'000,
 		    .lines = {.relevant = 1'000'000, .visited = 657'823},
+		    .functions = io::v1::stats::init(),
+		    .branches = io::v1::stats::init(),
 		};
 
 		static constexpr std::tuple<unsigned char, io::v1::stats::ratio<>>
