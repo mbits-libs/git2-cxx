@@ -252,5 +252,4 @@ else()
   string(APPEND COV_PROPERTIES "\n-psanitizer=off")
 endif()
 
-message("${COV_PROPERTIES}")
 file(GENERATE OUTPUT "${PROJECT_BINARY_DIR}/report_answers.txt" CONTENT "${COV_PROPERTIES}\n")
