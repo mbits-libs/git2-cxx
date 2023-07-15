@@ -145,19 +145,27 @@ parser.add_argument(
     required=False,
     help="print steps and commands, do nothing",
 )
-parser.add_argument(
+group = parser.add_mutually_exclusive_group()
+group.add_argument(
     "--dev",
     required=False,
     action="store_true",
     help=f'shortcut for "-c os={matrix.platform} '
     f'compiler={default_compiler()} build_type=Debug sanitizer=OFF"',
 )
-parser.add_argument(
+group.add_argument(
     "--rel",
     required=False,
     action="store_true",
     help=f'shortcut for "-c os={matrix.platform} '
     f'compiler={default_compiler()} build_type=Release sanitizer=OFF"',
+)
+group.add_argument(
+    "--sane",
+    required=False,
+    action="store_true",
+    help=f'shortcut for "-c os={matrix.platform} '
+    f'compiler={default_compiler()} build_type=Debug sanitizer=ON"',
 )
 parser.add_argument(
     "--cutdown-os",
@@ -234,15 +242,13 @@ def main():
         parser.error("-s/--step and -S are mutually exclusive")
     if len(args.steps_plus):
         args.steps = _extend(args.steps_plus, args.steps)
-    if args.dev or args.rel:
-        if args.dev and args.rel:
-            parser.error("--dev and --rel are mutually exclusive")
+    if args.dev or args.rel or args.sane:
         args.configs.append(
             [
                 f"os={matrix.platform}",
                 f"compiler={default_compiler()}",
                 f"build_type={'Release' if args.rel else 'Debug'}",
-                "sanitizer=OFF",
+                f"sanitizer={'ON' if args.sane else 'OFF'}",
             ]
         )
     args.configs = _config(_flatten(args.configs), not (args.official or args.github))
