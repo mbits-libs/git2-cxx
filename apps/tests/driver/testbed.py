@@ -122,9 +122,7 @@ def task(
             actual[0],
             *[test.to_lines(stream) for stream in actual[1:]],
         ]
-        with open(tested.filename, "w") as f:
-            json.dump(tested.data, f, indent=4)
-            print(file=f)
+        tested.store()
         return (TaskResult.SAVED, test_id, None, tempdir)
 
     clipped = tested.clip(actual)

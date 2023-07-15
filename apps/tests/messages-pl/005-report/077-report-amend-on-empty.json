@@ -9,8 +9,8 @@
         "",
         [
             "[ADD] src/main.cc",
-            "u\u017cycie: cov report [-h] <plik-raportu> [-f <filtr>] [--amend]",
-            "cov report: b\u0142\u0105d: nie masz nic do poprawienia\n"
+            "użycie: cov report [-h] <plik-raportu> [-f <filtr>] [--amend]",
+            "cov report: błąd: nie masz nic do poprawienia\n"
         ]
     ],
     "prepare": [

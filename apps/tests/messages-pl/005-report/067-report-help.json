@@ -4,15 +4,15 @@
     "expected": [
         0,
         [
-            "u\u017cycie: cov report [-h] <plik-raportu> [-f <filtr>] [--amend]",
+            "użycie: cov report [-h] <plik-raportu> [-f <filtr>] [--amend]",
             "",
             "argumenty pozycyjne:",
             " <plik-raportu>       wybiera raport do zaimportowania",
             "",
             "argumenty opcjonalne:",
             " -h, --help           pokazuje ten komunikat pomocy i wychodzi",
-            " -f, --filter <filtr> filtruje inne formaty raport\u00f3w do wewn\u0119trznego formatu cov; znane filtry to: \u2018cobertura\u2019 i \u2018coveralls\u2019",
-            " --amend              zast\u0119puje ko\u0144c\u00f3wk\u0119 bie\u017c\u0105cej ga\u0142\u0119zi, tworz\u0105c nowy zapis\n"
+            " -f, --filter <filtr> filtruje inne formaty raportów do wewnętrznego formatu cov; znane filtry to: ‘cobertura’ i ‘coveralls’",
+            " --amend              zastępuje końcówkę bieżącej gałęzi, tworząc nowy zapis\n"
         ],
         ""
     ]

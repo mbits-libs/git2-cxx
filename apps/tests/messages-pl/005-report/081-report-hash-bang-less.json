@@ -4,7 +4,7 @@
     "expected": [
         1,
         "",
-        "cov report: b\u0142\u0105d: nie mo\u017cna u\u017cy\u0107 filtra hash-bang-less\n"
+        "cov report: błąd: nie można użyć filtra hash-bang-less\n"
     ],
     "prepare": [
         "unpack $DATA/repo.git.tar $TMP",
