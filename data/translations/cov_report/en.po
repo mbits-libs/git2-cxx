@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cov latest\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-14 19:44+0200\n"
-"PO-Revision-Date: 2022-08-14 19:46+0200\n"
+"POT-Creation-Date: 2023-07-15 13:16+0200\n"
+"PO-Revision-Date: 2023-07-15 13:21+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: en\n"
@@ -83,16 +83,14 @@ msgctxt "ERROR_REPORT_ISSUES"
 msgid "there were issues with {}"
 msgstr "there were issues with {}"
 
-#. Description for the report file argument; the list at the end uses
-#. REPORT_FILE_DESCRIPTION_LIST_END
+#. Description for the --filter argument; the list at the end uses REPORT_FILE_DESCRIPTION_LIST_END
 msgctxt "FILTER_DESCRIPTION"
 msgid ""
 "filters other report formats to internal cov format; known filters are: {}"
 msgstr ""
 "filters other report formats to internal cov format; known filters are: {}"
 
-#. Final part of the report file argument description; together the list will
-#. be "known filters are: 'first', 'second', 'third' and 'fourth'"
+#. Final part of the --filter argument description; together the list will be "known filters are: 'first', 'second', 'third' and 'fourth'"
 msgctxt "FILTER_DESCRIPTION_LIST_END"
 msgid "{} and {}"
 msgstr "{} and {}"
@@ -107,8 +105,7 @@ msgctxt "MESSAGE_DETACHED_HEAD"
 msgid "detached HEAD"
 msgstr "detached HEAD"
 
-#. Description for commit in current report; will become "based on
-#. 13a39fbf9@main"
+#. Description for commit in current report; will become "based on 13a39fbf9@main"
 msgctxt "MESSAGE_FIELD_GIT_COMMIT"
 msgid "based on"
 msgstr "based on"
@@ -124,6 +121,26 @@ msgid "{} file"
 msgid_plural "{} files"
 msgstr[0] "one file"
 msgstr[1] "{} files"
+
+#. Description for the --prop argument
+msgctxt "PROP_DESCRIPTION"
+msgid ""
+"adds a property to this build report; if the <value> is one of 'true', "
+"'false', 'on' or 'off', it will treated as a boolean, if it looks like a "
+"whole number, it will be treated as a number, otherwise it will be treated "
+"as string; good names for properties could be 'os', 'arch', 'build_type' or "
+"'compiler'"
+msgstr ""
+"adds a property to this build report; if the <value> is one of 'true', "
+"'false', 'on' or 'off', it will treated as a boolean, if it looks like a "
+"whole number, it will be treated as a number, otherwise it will be treated "
+"as string; good names for properties could be 'os', 'arch', 'build_type' or "
+"'compiler'"
+
+#. Name of flag/property argument
+msgctxt "PROP_META"
+msgid "<property>=<value>"
+msgstr "<property>=<value>"
 
 #. Description for the report file argument
 msgctxt "REPORT_FILE_DESCRIPTION"

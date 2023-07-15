@@ -8,12 +8,21 @@
 	REPORT_FILE_META = "<report-file>";
 	[help("Name of filter argument"), id(-1)]
 	FILTER_META = "<filter>";
+	[help("Name of flag/property argument"), id(-1)]
+	PROP_META = "<property>=<value>";
     [help("Description for the report file argument"), id(-1)]
     REPORT_FILE_DESCRIPTION = "selects report to import";
-    [help("Description for the report file argument; the list at the end uses REPORT_FILE_DESCRIPTION_LIST_END"), id(-1)]
+    [help("Description for the --filter argument; the list at the end uses REPORT_FILE_DESCRIPTION_LIST_END"), id(-1)]
     FILTER_DESCRIPTION = "filters other report formats to internal cov format; known filters are: {}";
-    [help("Final part of the report file argument description; together the list will be \"known filters are: 'first', 'second', 'third' and 'fourth'\""), id(-1)]
+    [help("Final part of the --filter argument description; together the list will be \"known filters are: 'first', 'second', 'third' and 'fourth'\""), id(-1)]
     FILTER_DESCRIPTION_LIST_END = "{} and {}";
+    [help("Description for the --prop argument"), id(-1)]
+    PROP_DESCRIPTION =
+        "adds a property to this build report; "
+        "if the <value> is one of 'true', 'false', 'on' or 'off', it will treated as a boolean, "
+        "if it looks like a whole number, it will be treated as a number, "
+        "otherwise it will be treated as string; "
+        "good names for properties could be 'os', 'arch', 'build_type' or 'compiler'";
     [help("Description for the --amend argument"), id(-1)]
     AMEND_DESCRIPTION = "replaces the tip of the current branch by creating a new commit";
     [help("Error message for non-0 result code from a filter"), id(-1)]

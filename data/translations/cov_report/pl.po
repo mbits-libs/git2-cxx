@@ -7,15 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cov latest\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-14 19:44+0200\n"
-"PO-Revision-Date: 2022-08-14 19:46+0200\n"
+"POT-Creation-Date: 2023-07-15 13:16+0200\n"
+"PO-Revision-Date: 2023-07-15 13:25+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 "
+"|| n%100>14) ? 1 : 2);\n"
 "X-Generator: Poedit 2.4.2\n"
 
 #. Description for the --amend argument
@@ -83,17 +84,15 @@ msgctxt "ERROR_REPORT_ISSUES"
 msgid "there were issues with {}"
 msgstr "wystąpiły problemy z {}"
 
-#. Description for the report file argument; the list at the end uses
-#. REPORT_FILE_DESCRIPTION_LIST_END
+#. Description for the --filter argument; the list at the end uses REPORT_FILE_DESCRIPTION_LIST_END
 msgctxt "FILTER_DESCRIPTION"
 msgid ""
 "filters other report formats to internal cov format; known filters are: {}"
 msgstr ""
-"filtruje inne formaty raportów do wewnętrznego formatu cov; znane filtry to:"
-" {}"
+"filtruje inne formaty raportów do wewnętrznego formatu cov; znane filtry to: "
+"{}"
 
-#. Final part of the report file argument description; together the list will
-#. be "known filters are: 'first', 'second', 'third' and 'fourth'"
+#. Final part of the --filter argument description; together the list will be "known filters are: 'first', 'second', 'third' and 'fourth'"
 msgctxt "FILTER_DESCRIPTION_LIST_END"
 msgid "{} and {}"
 msgstr "{} i {}"
@@ -108,8 +107,7 @@ msgctxt "MESSAGE_DETACHED_HEAD"
 msgid "detached HEAD"
 msgstr "odłączone HEAD"
 
-#. Description for commit in current report; will become "based on
-#. 13a39fbf9@main"
+#. Description for commit in current report; will become "based on 13a39fbf9@main"
 msgctxt "MESSAGE_FIELD_GIT_COMMIT"
 msgid "based on"
 msgstr "w oparciu o"
@@ -126,6 +124,26 @@ msgid_plural "{} files"
 msgstr[0] "jeden plik"
 msgstr[1] "{} pliki"
 msgstr[2] "{} plików"
+
+#. Description for the --prop argument
+msgctxt "PROP_DESCRIPTION"
+msgid ""
+"adds a property to this build report; if the <value> is one of 'true', "
+"'false', 'on' or 'off', it will treated as a boolean, if it looks like a "
+"whole number, it will be treated as a number, otherwise it will be treated "
+"as string; good names for properties could be 'os', 'arch', 'build_type' or "
+"'compiler'"
+msgstr ""
+"dodaje właściwość do tego raportu z kompilacji; jeśli <wartość> jest jedną z "
+"„true”, „false”, „on” or „off”, będzie traktowana jako wartość logiczna, "
+"jeśli wygląda jak liczba całkowita, będzie traktowana jako liczba, w "
+"przeciwnym razie będzie traktowana jako ciąg znaków; dobrymi nazwami "
+"właściwości mogą być „os”, „arch”, „build_type” lub „compiler”"
+
+#. Name of flag/property argument
+msgctxt "PROP_META"
+msgid "<property>=<value>"
+msgstr "<właściwość>=<wartość>"
 
 #. Description for the report file argument
 msgctxt "REPORT_FILE_DESCRIPTION"

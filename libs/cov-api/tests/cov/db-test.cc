@@ -60,6 +60,7 @@ namespace cov::testing {
 		                         {104, 15}},
 		               .finish = 20}}};
 		auto const props = "{ \"os\": \"qnx\",  \"build_type\": \"Debug\" }"sv;
+		auto const expected_props = "\"build_type\":\"Debug\",\"os\":\"qnx\""sv;
 
 		// write
 		{
@@ -103,7 +104,7 @@ namespace cov::testing {
 			ASSERT_TRUE(cvg_report);
 			ASSERT_TRUE(backend->write(report_id, cvg_report));
 		}
-		ASSERT_EQ("9894b1593157fc0613f3fc1d32482125284b9be9"sv,
+		ASSERT_EQ("f83893182e8d5bcb888133d0765a847dc719a7b5"sv,
 		          setup::get_oid(report_id));
 
 		// read
@@ -121,12 +122,12 @@ namespace cov::testing {
 
 			auto builds = cvg_report->entries();
 			ASSERT_EQ(1, builds.size());
-			ASSERT_EQ(props, builds[0]->props_json());
+			ASSERT_EQ(expected_props, builds[0]->props_json());
 
 			auto cvg_build = backend->lookup<cov::build>(builds[0]->build_id());
 			ASSERT_TRUE(cvg_build);
 			ASSERT_EQ(rprt.add_time_utc, cvg_build->add_time_utc());
-			ASSERT_EQ(props, cvg_build->props_json());
+			ASSERT_EQ(expected_props, cvg_build->props_json());
 			ASSERT_EQ(cvg_report->file_list_id(), cvg_build->file_list_id());
 
 			auto cvg_files =

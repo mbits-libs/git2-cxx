@@ -49,7 +49,7 @@ target_link_options(cov-rt PRIVATE ${ADDITIONAL_LINK_FLAGS})
 target_include_directories(cov-rt PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}/include
   ${CMAKE_CURRENT_BINARY_DIR}/include)
-target_link_libraries(cov-rt PUBLIC app json)
+target_link_libraries(cov-rt PUBLIC app)
 
 set_target_properties(cov-rt PROPERTIES FOLDER libs)
 

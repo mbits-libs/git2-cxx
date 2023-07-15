@@ -98,6 +98,8 @@ namespace cov {
 			bool remove(std::string_view props);
 			std::vector<std::unique_ptr<build>> release();
 
+			static std::string properties(
+			    std::span<std::string const> const& propset);
 			static std::string normalize(std::string_view props);
 
 		private:

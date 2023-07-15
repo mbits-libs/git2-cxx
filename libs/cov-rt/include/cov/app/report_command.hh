@@ -28,6 +28,7 @@ namespace cov::app::builtin::report {
 		struct parse_results {
 			cov::repository repo{};
 			report_info report{};
+			std::string props{};
 		};
 		parse_results parse();
 
@@ -42,7 +43,8 @@ namespace cov::app::builtin::report {
 		                 cov::repository& repo,
 		                 git::oid_view file_list_id,
 		                 date::sys_seconds add_time_utc,
-		                 io::v1::coverage_stats const& stats);
+		                 io::v1::coverage_stats const& stats,
+		                 std::string_view props);
 
 		new_head update_current_branch(
 		    cov::repository& repo,
@@ -110,6 +112,7 @@ namespace cov::app::builtin::report {
 
 		std::string report_{};
 		std::optional<std::string> filter_{};
+		std::vector<std::string> props_{};
 		bool amend_{};
 	};
 
