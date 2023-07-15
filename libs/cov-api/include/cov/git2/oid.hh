@@ -38,9 +38,9 @@ namespace git {
 
 	struct oid : basic_oid<oid> {
 		git_oid id{};
-		oid() = default;
-		explicit oid(git_oid const& ref) : id{ref} {}
-		void assign(git_oid const& ref) { id = ref; }
+		oid() noexcept = default;
+		explicit oid(git_oid const& ref) noexcept : id{ref} {}
+		void assign(git_oid const& ref) noexcept { id = ref; }
 
 		git_oid const* ptr() const noexcept { return &id; }
 
