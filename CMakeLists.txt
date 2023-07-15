@@ -114,6 +114,8 @@ if (MSVC)
   if (COV_SANITIZE)
     list(APPEND ADDITIONAL_WALL_FLAGS
       /fsanitize=address
+      /D_DISABLE_VECTOR_ANNOTATION
+      /D_DISABLE_STRING_ANNOTATION
     )
   endif()
 else()
@@ -187,4 +189,37 @@ if (CMAKE_GENERATOR MATCHES "Visual Studio" AND TARGET cov_coveralls_test)
     lighter-test lighter-stress-test
     cov
   )
+endif()
+
+if (MSVC_VERSION GREATER_EQUAL 1936 AND MSVC_IDE)
+  foreach (TGT
+    cov
+    cov-rt
+    json
+    app_main
+    app
+    cov-api
+    date-tz
+    lighter
+    hilite-cxx
+    hilite-py
+    hilite-ts
+    hilite
+    testing-lib
+    cov-echo
+    git2-test
+    git2-stress-test
+    cov-test
+    cov-stress-test
+    cov-rt-test
+    cov-rt-stress-test
+    lighter-test
+    lighter-stress-test
+    date-tz
+    json
+  )
+    if(TARGET ${TGT})
+      set_target_properties(${TGT} PROPERTIES VS_USER_PROPS "${PROJECT_SOURCE_DIR}/cmake/VS17.NoModules.props")
+    endif()
+  endforeach()
 endif()
