@@ -371,7 +371,7 @@ Diff:
         self.store()
 
     def store(self):
-        with open(self.filename, "w") as f:
+        with open(self.filename, "w", encoding="UTF-8") as f:
             json.dump(self.data, f, indent=4, ensure_ascii=False)
             print(file=f)
 
@@ -404,5 +404,5 @@ Diff:
 
     @staticmethod
     def load(filename, count):
-        with open(filename) as f:
+        with open(filename, encoding="UTF-8") as f:
             return Test(json.load(f), filename, count)
