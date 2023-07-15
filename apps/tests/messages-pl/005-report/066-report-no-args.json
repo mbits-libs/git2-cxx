@@ -5,7 +5,7 @@
         2,
         "",
         [
-            "użycie: cov report [-h] <plik-raportu> [-f <filtr>] [--amend]",
+            "użycie: cov report [-h] <plik-raportu> [-f <filtr>] [-p <właściwość>=<wartość> ...] [--amend]",
             "cov report: błąd: argument <plik-raportu> jest wymagany\n"
         ]
     ]

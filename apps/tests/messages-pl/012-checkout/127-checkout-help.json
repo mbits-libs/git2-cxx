@@ -4,7 +4,7 @@
     "expected": [
         0,
         [
-            "u\u017cycie: ",
+            "użycie: ",
             " cov checkout [-h] <nazwa>",
             " cov checkout [-h] --detach [<nazwa>]",
             " cov checkout [-h] [--detach] <raport>",
@@ -12,13 +12,13 @@
             " cov checkout [-h] --orphan <nazwa>",
             "",
             "argumenty pozycyjne:",
-            " <nazwa>                       wybiera ga\u0142\u0105\u017a, je\u015bli istnieje; je\u015bli podana nazwa jest raportem lub znacznikiem, po wybraniu od\u0142\u0105cza si\u0119",
+            " <nazwa>                       wybiera gałąź, jeśli istnieje; jeśli podana nazwa jest raportem lub znacznikiem, po wybraniu odłącza się",
             "",
             "argumenty opcjonalne:",
             " -h, --help                    pokazuje ten komunikat pomocy i wychodzi",
-            " --detach [<nazwa>]            od\u0142\u0105cza HEAD; je\u015bli podano dodatkow\u0105 nazw\u0119, najpierw wybiera wskazywany przez ni\u0105 raport",
-            " -b <nazwa> [<punkt-startowy>] dla nieistniej\u0105cych ga\u0142\u0119zi tworzy ga\u0142\u0105\u017a i wybiera j\u0105",
-            " --orphan <nazwa>              tworzy i wybiera osierocon\u0105 ga\u0142\u0105\u017a\n"
+            " --detach [<nazwa>]            odłącza HEAD; jeśli podano dodatkową nazwę, najpierw wybiera wskazywany przez nią raport",
+            " -b <nazwa> [<punkt-startowy>] dla nieistniejących gałęzi tworzy gałąź i wybiera ją",
+            " --orphan <nazwa>              tworzy i wybiera osieroconą gałąź\n"
         ],
         ""
     ],

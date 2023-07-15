@@ -3,7 +3,7 @@
     "args": "init",
     "expected": [
         1,
-        "Repozytorium Cov ju\u017c istnieje w $TMP/.git/.covdata\n",
+        "Repozytorium Cov już istnieje w $TMP/.git/.covdata\n",
         ""
     ],
     "prepare": [

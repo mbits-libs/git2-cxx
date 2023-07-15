@@ -4,7 +4,7 @@
     "expected": [
         2,
         "",
-        "cov branch: b\u0142\u0105d: nie mo\u017cna usun\u0105\u0107 ga\u0142\u0119zi \u201emain\u201d wybranej w \u201e$TMP/revparse/.git/.covdata\u201d\n"
+        "cov branch: błąd: nie można usunąć gałęzi „main” wybranej w „$TMP/revparse/.git/.covdata”\n"
     ],
     "prepare": [
         "unpack $DATA/revparse.tar $TMP",

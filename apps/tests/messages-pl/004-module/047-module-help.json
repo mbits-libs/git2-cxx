@@ -4,24 +4,24 @@
     "expected": [
         0,
         [
-            "u\u017cycie: ",
+            "użycie: ",
             " cov module [-h] [<zapis-gita>]",
             " cov module [-h] --show-sep [<zapis-gita>]",
-            " cov module [-h] --set-sep <warto\u015b\u0107>",
+            " cov module [-h] --set-sep <wartość>",
             " cov module [-h] --add <nazwa> <katalog>",
             " cov module [-h] --remove <nazwa> <katalog>",
             " cov module [-h] --remove-all <nazwa>",
             "",
             "argumenty pozycyjne:",
-            " brak_argument\u00f3w            drukuje list\u0119 modu\u0142\u00f3w z katalogu roboczego git i wychodzi",
-            " <zapis-gita>               drukuje list\u0119 modu\u0142\u00f3w dla danego zapisu i wychodzi",
+            " brak_argumentów            drukuje listę modułów z katalogu roboczego git i wychodzi",
+            " <zapis-gita>               drukuje listę modułów dla danego zapisu i wychodzi",
             "",
             "argumenty opcjonalne:",
-            " --show-sep [<zapis-gita>]  drukuje separator nazwy modu\u0142u albo z katalogu roboczego, albo z zapisu",
-            " --set-sep <warto\u015b\u0107>        ustawia nowy separator nazw modu\u0142\u00f3w",
-            " --add <nazwa> <katalog>    dodaje filtr katalogu do nowego lub istniej\u0105cego modu\u0142u",
-            " --remove <nazwa> <katalog> usuwa filtr katalogu z danego modu\u0142u",
-            " --remove-all <nazwa>       usuwa wszystkie filtry z modu\u0142u, w efekcie go usuwaj\u0105c\n"
+            " --show-sep [<zapis-gita>]  drukuje separator nazwy modułu albo z katalogu roboczego, albo z zapisu",
+            " --set-sep <wartość>        ustawia nowy separator nazw modułów",
+            " --add <nazwa> <katalog>    dodaje filtr katalogu do nowego lub istniejącego modułu",
+            " --remove <nazwa> <katalog> usuwa filtr katalogu z danego modułu",
+            " --remove-all <nazwa>       usuwa wszystkie filtry z modułu, w efekcie go usuwając\n"
         ],
         ""
     ]

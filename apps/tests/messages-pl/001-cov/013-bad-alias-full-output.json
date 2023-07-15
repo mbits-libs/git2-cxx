@@ -5,18 +5,18 @@
         1,
         "",
         [
-            "u\u017cycie: cov [-h] [-C <katalog>] <polecenie> [<argumenty>]",
-            "cov: \u201edefinitely-not-a-tool\u201d nie jest poleceniem cov",
+            "użycie: cov [-h] [-C <katalog>] <polecenie> [<argumenty>]",
+            "cov: „definitely-not-a-tool” nie jest poleceniem cov",
             "",
             "typowe polecenia:",
             " init   tworzy nowe repozytorium cov",
-            " config pokazuje i/lub ustawia r\u00f3\u017cne ustawienia",
-            " module definiuje grupy plik\u00f3w",
-            " report do\u0142\u0105cza raport do repozytorium",
-            " remove usuwa okre\u015blony raport z repozytorium",
-            " log    drukuje list\u0119 raport\u00f3w",
+            " config pokazuje i/lub ustawia różne ustawienia",
+            " module definiuje grupy plików",
+            " report dołącza raport do repozytorium",
+            " remove usuwa określony raport z repozytorium",
+            " log    drukuje listę raportów",
             " show   pokazuje konkretny raport",
-            " serve  uruchamia lokalny serwer WWW raport\u00f3w\n"
+            " serve  uruchamia lokalny serwer WWW raportów\n"
         ]
     ],
     "prepare": [

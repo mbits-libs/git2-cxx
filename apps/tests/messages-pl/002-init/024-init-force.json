@@ -5,7 +5,7 @@
         0,
         [
             "Ponownie zainicjowano puste repozytorium Cov w $TMP/.git/.covdata",
-            " U\u017cywaj\u0105c repozytorium Git w $TMP/.git\n"
+            " Używając repozytorium Git w $TMP/.git\n"
         ],
         ""
     ],

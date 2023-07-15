@@ -4,7 +4,7 @@
     "expected": [
         2,
         "",
-        "cov tag: b\u0142\u0105d: znacznik \u201eH\u201d ju\u017c istnieje\n"
+        "cov tag: błąd: znacznik „H” już istnieje\n"
     ],
     "prepare": [
         "unpack $DATA/revparse.tar $TMP",
