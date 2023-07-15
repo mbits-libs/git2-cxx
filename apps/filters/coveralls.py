@@ -15,11 +15,15 @@ def lines_from(lines: List[Optional[int]]) -> Dict[int, int]:
 
 
 def cov_from(coveralls: dict) -> dict:
-    return {
+    result = {
         "name": coveralls["name"],
         "digest": f"md5:{coveralls['source_digest']}",
         "line_coverage": lines_from(coveralls["coverage"]),
     }
+    functions = coveralls.get("functions")
+    if functions is not None and len(functions) > 0:
+        result["functions"] = functions
+    return result
 
 
 data = json.load(sys.stdin)

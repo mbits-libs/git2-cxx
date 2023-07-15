@@ -5,6 +5,7 @@
 import argparse
 import os
 from typing import List
+
 from driver.test import Test
 
 __dir__ = os.path.dirname(__file__)
