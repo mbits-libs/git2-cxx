@@ -4,12 +4,11 @@
 - [x] Directory initialization/discovery
 - [x] Add file serdes
   - [x] `report`
-  - [x] `report_file`
+  - [x] `build`
+  - [x] `files`
   - [x] `line_coverage`
-  - [ ] `branch_coverage`
   - [ ] `function_coverage`
-  - [ ] `report_set` **\[breaking, must be done pre-release]**
-  - [ ] `propset`
+  - [ ] `branch_coverage`
 - [x] Wrap I/O in Z streams _(0.2.0-alpha)_
 - [x] Idea of references, tags and "branches" _(0.3.0-alpha)_
 - [x] Report format for `log` _(0.4.1-alpha)_
@@ -50,8 +49,6 @@
     - [x] coveralls
     - [x] cobertura
     - [x] `cov report --amend`
-      - [ ] `cov report --flag`
-      - [ ] `$COV_FILTER_PATH`
     - [x] extract `make_u8path`/`get_u8path` to cov-rt
   - [x] code cleanup
     - [x] add documentation
@@ -63,6 +60,9 @@
   - [ ] `cov show` _(0.17.0)_
     - [x] Report / component / directory view
     - [x] File view
+  - [x] `cov report` reprise
+    - [ ] `cov report --flag`
+    - [ ] `$COV_FILTER_PATH`
   - [ ] `cov cherry-pick` (?)
   - [ ] Support for `less`
   - [ ] Major release

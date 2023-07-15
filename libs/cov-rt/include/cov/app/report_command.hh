@@ -7,6 +7,7 @@
 #include <cov/app/errors_tr.hh>
 #include <cov/app/report.hh>
 #include <cov/repository.hh>
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
