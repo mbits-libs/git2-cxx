@@ -127,22 +127,23 @@ namespace cov::io::handlers {
 			if (!in.load(buffer, entry_size)) return {};
 			auto const& entry_v0 =
 			    *reinterpret_cast<v1::files::basic const*>(buffer.data());
-			auto const& entry_v1 =
-			    *reinterpret_cast<v1::files::ext const*>(buffer.data());
 
 			if (!strings.is_valid(entry_v0.path)) return {};
 
-			if (entry_size < sizeof(v1::files::ext) / sizeof(uint32_t))
+			if (entry_size < sizeof(v1::files::ext)) {
 				builder.add(strings.at(entry_v0.path),
 				            v1::coverage_stats::from(entry_v0.stats),
 				            entry_v0.contents, entry_v0.line_coverage, zero_id,
 				            zero_id);
-			else
+			} else {
+				auto const& entry_v1 =
+				    *reinterpret_cast<v1::files::ext const*>(buffer.data());
 				builder.add(strings.at(entry_v1.path),
 				            v1::coverage_stats::from(entry_v1.stats),
 				            entry_v1.contents, entry_v1.line_coverage,
 				            entry_v1.function_coverage,
 				            entry_v1.branch_coverage);
+			}
 		}
 
 		ec.clear();
