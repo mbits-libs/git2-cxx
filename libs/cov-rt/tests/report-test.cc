@@ -201,7 +201,9 @@ namespace cov::app::testing {
 		    {.value = 0x7ffffff3u, .is_null = 1u}};
 		io::v1::coverage_stats expected_status{
 		    .lines_total = 4294967295u,
-		    .lines = {.relevant = 4u, .visited = 3u}};
+		    .lines = {.relevant = 4u, .visited = 3u},
+		    .functions = io::v1::stats::init(),
+		    .branches = io::v1::stats::init()};
 		ASSERT_EQ(expected_coverage, actual_coverage);
 		ASSERT_EQ(expected_status, actual_status);
 	}

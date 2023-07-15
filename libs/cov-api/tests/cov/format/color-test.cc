@@ -130,22 +130,34 @@ namespace cov::testing {
 		    {
 		        .clr = color::rating,
 		        .expected = color::green,
-		        .stats{.lines_total{}, .lines{.relevant{100}, .visited{100}}},
+		        .stats{.lines_total{},
+		               .lines{.relevant{100}, .visited{100}},
+		               .functions = io::v1::stats::init(),
+		               .branches = io::v1::stats::init()},
 		    },
 		    {
 		        .clr = color::bg_rating,
 		        .expected = color::bg_yellow,
-		        .stats{.lines_total{}, .lines{.relevant{100}, .visited{89}}},
+		        .stats{.lines_total{},
+		               .lines{.relevant{100}, .visited{89}},
+		               .functions = io::v1::stats::init(),
+		               .branches = io::v1::stats::init()},
 		    },
 		    {
 		        .clr = color::faint_rating,
 		        .expected = color::faint_red,
-		        .stats{.lines_total{}, .lines{.relevant{100}, .visited{70}}},
+		        .stats{.lines_total{},
+		               .lines{.relevant{100}, .visited{70}},
+		               .functions = io::v1::stats::init(),
+		               .branches = io::v1::stats::init()},
 		    },
 		    {
 		        .clr = color::blue,
 		        .expected = color::blue,
-		        .stats{.lines_total{}, .lines{.relevant{100}, .visited{70}}},
+		        .stats{.lines_total{},
+		               .lines{.relevant{100}, .visited{70}},
+		               .functions = io::v1::stats::init(),
+		               .branches = io::v1::stats::init()},
 		    }};
 
 		for (auto const [clr, expected, stats] : marks) {
