@@ -9,7 +9,6 @@
     {"os": "windows", "compiler": "clang"},
     {"os": "windows", "compiler": "gcc"},
     {"os": "ubuntu", "compiler": "msvc"},
-    {"os": "windows", "sanitizer": true},
     {"build_type": "Release", "sanitizer": true}
   ],
   "include": [
