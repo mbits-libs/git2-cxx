@@ -21,7 +21,7 @@ namespace cov::app::builtin::report {
 		using namespace str;
 		parser p{{tool, args},
 		         {platform::locale_dir(), ::lngs::system_locales()}};
-		auto [repo, report] = p.parse();
+		auto [repo, report, props] = p.parse();
 
 		std::error_code ec{};
 		auto const commit = git_commit::load(repo.git(), report.git.head, ec);
@@ -52,10 +52,10 @@ namespace cov::app::builtin::report {
 		    std::chrono::system_clock::now());
 
 		git::oid build_id{};
-		p.store_build(build_id, repo, file_coverage, now, coverage);
+		p.store_build(build_id, repo, file_coverage, now, coverage, props);
 
 		cov::report::builder builds{};
-		builds.add(build_id, {}, coverage);
+		builds.add(build_id, props, coverage);
 
 		auto const [branch, current_id, same_report] =
 		    p.update_current_branch(repo, file_coverage, report.git, commit,

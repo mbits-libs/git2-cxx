@@ -63,6 +63,10 @@ namespace cov::app::builtin::report {
 		parser_.arg(filter_, "f", "filter")
 		    .meta(tr_(replng::FILTER_META))
 		    .help(tr_.format(replng::FILTER_DESCRIPTION, quoted_list(filters)));
+		parser_.arg(props_, "p", "prop")
+		    .meta(tr_(replng::PROP_META))
+		    .help(tr_(replng::PROP_DESCRIPTION))
+		    .opt();
 		parser_.set<std::true_type>(amend_, "amend")
 		    .help(tr_(replng::AMEND_DESCRIPTION))
 		    .opt();
@@ -83,6 +87,7 @@ namespace cov::app::builtin::report {
 				error(tr_.format(replng::ERROR_REPORT_ISSUES, report_));
 			}
 		}
+		result.props = cov::report::builder::properties(props_);
 		return result;
 	}  // GCOV_EXCL_LINE[GCC] -- and now it wants th throw something...
 
@@ -127,9 +132,10 @@ namespace cov::app::builtin::report {
 	                         cov::repository& repo,
 	                         git::oid_view file_list_id,
 	                         date::sys_seconds add_time_utc,
-	                         io::v1::coverage_stats const& stats) {
+	                         io::v1::coverage_stats const& stats,
+	                         std::string_view props) {
 		auto const build =
-		    cov::build::create(file_list_id, add_time_utc, {}, stats);
+		    cov::build::create(file_list_id, add_time_utc, props, stats);
 		return repo.write(out, build);
 	}
 

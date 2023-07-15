@@ -1,11 +1,13 @@
 // Copyright (c) 2022 Marcin Zdun
 // This code is licensed under MIT license (see LICENSE for details)
 
+#include <charconv>
 #include <cov/git2/blob.hh>
 #include <cov/io/report.hh>
 #include <cov/io/strings.hh>
 #include <cov/io/types.hh>
 #include <cov/repository.hh>
+#include <json/json.hpp>
 
 namespace cov::io::handlers {
 	namespace {
@@ -27,14 +29,18 @@ namespace cov::io::handlers {
 			           std::string_view props,
 			           io::v1::coverage_stats const& stats)
 			    : build_id_{build_id.oid()}
-			    , props_{props.data(), props.size()}
+			    , props_{cov::report::builder::normalize(props)}
 			    , stats_{stats} {}
 
 			~build_impl() = default;
 
-			git::oid const& build_id() const noexcept { return build_id_; }
-			std::string_view props_json() const noexcept { return props_; }
-			io::v1::coverage_stats const& stats() const noexcept {
+			git::oid const& build_id() const noexcept override {
+				return build_id_;
+			}
+			std::string_view props_json() const noexcept override {
+				return props_;
+			}
+			io::v1::coverage_stats const& stats() const noexcept override {
 				return stats_;
 			}
 
@@ -285,6 +291,62 @@ namespace cov::io::handlers {
 }  // namespace cov::io::handlers
 
 namespace cov {
+	namespace {
+		std::string_view strip(std::string_view str) {
+			while (!str.empty() &&
+			       std::isspace(static_cast<unsigned char>(str.front())))
+				str = str.substr(1);
+			while (!str.empty() &&
+			       std::isspace(static_cast<unsigned char>(str.back())))
+				str = str.substr(0, str.size() - 1);
+			return str;
+		}
+
+		json::string to_u8s(std::string_view view) {
+			return {reinterpret_cast<char8_t const*>(view.data()), view.size()};
+		}
+
+		std::string from_u8s(std::u8string_view view) {
+			return {reinterpret_cast<char const*>(view.data()), view.size()};
+		}
+
+		json::node node(std::string_view value) {
+			if (value.empty()) return json::string{};
+			if (value.front() == '\'') {
+				value = value.substr(1);
+				if (!value.empty() && value.back() == '\'')
+					value = value.substr(0, value.size() - 1);
+				return to_u8s(value);
+			}
+			if (value.front() == '"') {
+				value = value.substr(1);
+				if (!value.empty() && value.back() == '"')
+					value = value.substr(0, value.size() - 1);
+				return to_u8s(value);
+			}
+			if (value == "true"sv || value == "on"sv) return true;
+			if (value == "false"sv || value == "off"sv) return false;
+
+			long long result{};
+			auto const begin = value.data();
+			auto const end = begin + value.size();
+			auto const [ptr, err] = std::from_chars(begin, end, result);
+			if (ptr == end && err == std::errc{}) return result;
+
+			return to_u8s(value);
+		}
+
+		std::string escape_dict(json::node const& data) {
+			json::string result;
+			json::write_json(result, data, json::concise);
+			auto view = std::basic_string_view{result};
+			if (!view.empty() && view.front() == u8'{') {
+				view = view.substr(1, view.size() - 2);
+			}
+			return from_u8s(view);
+		}
+	}  // namespace
+
 	report::build::~build() {}
 
 	ref_ptr<report> report::create(
@@ -337,8 +399,37 @@ namespace cov {
 		return entries;
 	}  // GCOV_EXCL_LINE[GCC]
 
+	std::string report::builder::properties(
+	    std::span<std::string const> const& propset) {
+		json::map result{};
+		for (auto const& prop : propset) {
+			auto const property = strip(prop);
+			auto const pos = property.find('=');
+			if (pos == std::string_view::npos) {
+				result[to_u8s(property)] = json::string{};
+				continue;
+			}
+			auto const name = strip(property.substr(0, pos));
+			auto const value = strip(property.substr(pos + 1));
+			result[to_u8s(name)] = node(value);
+		}
+		return escape_dict(result);
+	}
+
 	std::string report::builder::normalize(std::string_view props) {
-		// TODO: got through a JSON parser
-		return {props.data(), props.size()};
+		props = strip(props);
+		if (props.empty()) return {};
+
+		std::string text{};
+		if (props.front() != '{') {
+			text.reserve(props.size() + 2);
+			text.push_back('{');
+			text.append(props);
+			text.push_back('}');
+			props = text;
+		}
+
+		auto const node = json::read_json(to_u8s(props));
+		return escape_dict(node);
 	}
 }  // namespace cov

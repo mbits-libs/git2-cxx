@@ -4,7 +4,7 @@
         2,
         "",
         [
-            "usage: cov report [-h] <report-file> [-f <filter>] [--amend]",
+            "usage: cov report [-h] <report-file> [-f <filter>] [-p <property>=<value> ...] [--amend]",
             "cov report: error: there were issues with $DATA/no-git-coverage.json\n"
         ]
     ],

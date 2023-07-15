@@ -108,7 +108,7 @@ target_link_options(cov-api PRIVATE ${ADDITIONAL_LINK_FLAGS})
 target_include_directories(cov-api PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}/include
   ${CMAKE_CURRENT_BINARY_DIR}/include)
-target_link_libraries(cov-api PUBLIC libgit2::libgit2 fmt::fmt date::date-tz mbits::args PRIVATE hilite openssl::openssl)
+target_link_libraries(cov-api PUBLIC libgit2::libgit2 fmt::fmt date::date-tz mbits::args json PRIVATE hilite openssl::openssl)
 
 set_target_properties(cov-api PROPERTIES FOLDER libs)
 

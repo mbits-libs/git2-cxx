@@ -7,10 +7,6 @@
 
 namespace cov::io::handlers {
 	namespace {
-		std::string S(std::string_view value) {
-			return {value.data(), value.size()};
-		}
-
 		struct impl : counted_impl<cov::build> {
 			explicit impl(git::oid_view oid,
 			              git::oid_view file_list,
@@ -20,7 +16,7 @@ namespace cov::io::handlers {
 			    : oid_{oid.oid()}
 			    , file_list_{file_list.oid()}
 			    , add_time_utc_{add_time_utc}
-			    , props_json_{S(props_json)}
+			    , props_json_{cov::report::builder::normalize(props_json)}
 			    , stats_{stats} {}
 
 			git::oid const& oid() const noexcept override { return oid_; }

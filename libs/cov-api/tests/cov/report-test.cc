@@ -19,7 +19,7 @@ namespace cov::testing {
 
 		    // strings
 		    "\x25\x00\x00\x00"
-		    "\x18\x00\x00\x00"
+		    "\x17\x00\x00\x00"
 
 		    // parent report
 		    "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
@@ -29,22 +29,22 @@ namespace cov::testing {
 		    "\x00\x00\x00\x00"
 
 		    // builds ref
-		    "\x3D\x00\x00\x00"
+		    "\x3C\x00\x00\x00"
 		    "\x0D\x00\x00\x00"
 		    "\x02\x00\x00\x00"
 
 		    // added
 		    "\x33\x22\x11\x00\x77\x66\x55\x44"
 		    // - branch (str)
-		    "\x20\x00\x00\x00"
+		    "\x3E\x00\x00\x00"
 		    // - author (report_email)
-		    "\x0F\x00\x00\x00"
-		    "\x28\x00\x00\x00"
+		    "\x2D\x00\x00\x00"
+		    "\x46\x00\x00\x00"
 		    // - committer (report_email)
-		    "\x0F\x00\x00\x00"
-		    "\x28\x00\x00\x00"
+		    "\x2D\x00\x00\x00"
+		    "\x46\x00\x00\x00"
 		    // - message (str)
-		    "\x00\x00\x00\x00"
+		    "\x1E\x00\x00\x00"
 		    // - commit_id (oid)
 		    "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
 		    "\x00\x00\x00\x00"
@@ -62,12 +62,12 @@ namespace cov::testing {
 
 		    // strings
 		    // 3456789'123456789'123456789
-		    "Initial commit\x00"        //  0, 15 :: 0x00
-		    "Johnny Appleseed\x00"      // 15, 17 :: 0x0F
-		    "develop\x00"               // 32,  8 :: 0x20
-		    "johnny@appleseed.com\x00"  // 40, 21 :: 0x28
-		    "{\"prop\":\"set#1\"}\x00"  // 61, 17 :: 0x3D
-		    "{\"prop\":\"set#2\"}\x00"  // 78, 17 :: 0x4E
+		    "\"prop\":\"set#1\"\x00"    //  0, 15 :: 0x00
+		    "\"prop\":\"set#2\"\x00"    // 15, 15 :: 0x0F
+		    "Initial commit\x00"        // 30, 15 :: 0x1E
+		    "Johnny Appleseed\x00"      // 45, 17 :: 0x2D
+		    "develop\x00"               // 62,  8 :: 0x3E
+		    "johnny@appleseed.com\x00"  // 70, 21 :: 0x46
 		    "\x00"
 
 		    // prop=set#1
@@ -75,7 +75,7 @@ namespace cov::testing {
 		    "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
 		    "\x00\x00\x00\x00"
 		    // - propset
-		    "\x3D\x00\x00\x00"
+		    "\x00\x00\x00\x00"
 		    // - stats
 		    "\xE2\x04\x00\x00"
 		    "\x2C\x01\x00\x00"
@@ -90,7 +90,7 @@ namespace cov::testing {
 		    "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
 		    "\x00\x00\x00\x00"
 		    // - propset
-		    "\x4E\x00\x00\x00"
+		    "\x0F\x00\x00\x00"
 		    // - stats
 		    "\xE2\x04\x00\x00"
 		    "\x2C\x01\x00\x00"
@@ -224,8 +224,8 @@ namespace cov::testing {
 		ASSERT_EQ(2, rprt->entries().size());
 
 		static constexpr std::string_view props[] = {
-		    "{\"prop\":\"set#1\"}"sv,
-		    "{\"prop\":\"set#2\"}"sv,
+		    "\"prop\":\"set#1\""sv,
+		    "\"prop\":\"set#2\""sv,
 		};
 
 		auto prop = props;
@@ -404,25 +404,31 @@ namespace cov::testing {
 		        {
 		            .lines_total = 1250,
 		            .lines = {.relevant = 300, .visited = 299},
+		            .functions = io::v1::stats::init(),
+		            .branches = io::v1::stats::init(),
 		        },
 		    .entries =
 		        cov::report::builder{}
 		            .add_nfo({
 		                .build_id{},
-		                .props = "{\"prop\":\"set#1\"}",
+		                .props = "\"prop\":\"set#1\"",
 		                .stats =
 		                    {
 		                        .lines_total = 1250,
 		                        .lines = {.relevant = 300, .visited = 299},
+		                        .functions = io::v1::stats::init(),
+		                        .branches = io::v1::stats::init(),
 		                    },
 		            })
 		            .add_nfo({
 		                .build_id{},
-		                .props = "{\"prop\":\"set#2\"}",
+		                .props = "\"prop\":\"set#2\"",
 		                .stats =
 		                    {
 		                        .lines_total = 1250,
 		                        .lines = {.relevant = 300, .visited = 299},
+		                        .functions = io::v1::stats::init(),
+		                        .branches = io::v1::stats::init(),
 		                    },
 		            })
 		            .release()};
