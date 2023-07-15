@@ -362,6 +362,19 @@ Diff:
 
         return result
 
+    def nullify(self, lang: Optional[str]):
+        if lang is not None:
+            self.lang = lang
+            self.data["lang"] = lang
+        self.expected = None
+        self.data["expected"] = None
+        self.store()
+
+    def store(self):
+        with open(self.filename, "w") as f:
+            json.dump(self.data, f, indent=4, ensure_ascii=False)
+            print(file=f)
+
     def path(self, filename):
         return os.path.join(self.cwd, filename)
 
