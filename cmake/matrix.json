@@ -23,6 +23,16 @@
             ]
         },
         {
+            "name": "release-libcxx-ninja",
+            "displayName": "Ninja (Release) & libc++",
+            "description": "Release build using Ninja generator and libc++",
+            "inherits": [
+                "libcxx",
+                "release-base",
+                "ninja-base"
+            ]
+        },
+        {
             "name": "release-make",
             "displayName": "Makefile (Release)",
             "description": "Release build using Unix Makefiles generator",
@@ -55,6 +65,16 @@
             "description": "Debug build using Ninja generator",
             "inherits": [
                 "debug",
+                "ninja-base"
+            ]
+        },
+        {
+            "name": "debug-libcxx-ninja",
+            "displayName": "Ninja (Debug) & libc++",
+            "description": "Debug build using Ninja generator and libc++",
+            "inherits": [
+                "libcxx",
+                "debug-base",
                 "ninja-base"
             ]
         },
