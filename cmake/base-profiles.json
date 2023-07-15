@@ -10,6 +10,14 @@
             "toolchainFile": "${sourceDir}/build/conan/conan_toolchain.cmake"
         },
         {
+            "name": "libcxx",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_POLICY_DEFAULT_CMP0091": "NEW"
+            },
+            "toolchainFile": "${sourceDir}/cmake/libcxx_toolchain.cmake"
+        },
+        {
             "name": "release-base",
             "hidden": true,
             "cacheVariables": {
