@@ -3,12 +3,12 @@
 
 #pragma once
 
-#include <cov/object.hh>
-#include <cov/report.hh>
-#include <filesystem>
 #include <cov/git2/config.hh>
 #include <cov/git2/oid.hh>
 #include <cov/git2/repository.hh>
+#include <cov/object.hh>
+#include <cov/report.hh>
+#include <filesystem>
 #include <memory>
 #include <span>
 #include <string>
