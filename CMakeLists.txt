@@ -173,6 +173,8 @@ set(SHARE_DIR share/cov-${PROJECT_VERSION_SHORT})
 set(CORE_DIR libexec/cov)
 set(CORE_ROOT_DIR "../..")
 
+message(STATUS "Sanitizer: ${COV_SANITIZE}")
+
 add_subdirectory(external)
 add_subdirectory(libs)
 add_subdirectory(apps)
