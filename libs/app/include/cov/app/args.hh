@@ -26,7 +26,9 @@ namespace cov::app {
 		parser_holder(::args::args_view const& arguments,
 		              std::string const& description,
 		              ::args::base_translator const* tr)
-		    : parser_{description, arguments, tr} {}
+		    : parser_{description, arguments, tr} {
+			parser_.use_answer_file();
+		}
 
 		void parse() { parser_.parse(); }
 
