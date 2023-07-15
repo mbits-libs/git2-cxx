@@ -204,7 +204,7 @@ namespace cov::io::handlers {
 		std::vector<std::unique_ptr<cov::report::build>> builds{};
 		if (!load_resources(builds, in, strings,
 		                    static_cast<uint32_t>(entry_size),
-		                    static_cast<uint32_t>(header.builds.count)))
+		                    header.builds.count))
 			return {};
 
 		ec.clear();
