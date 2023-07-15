@@ -2,9 +2,7 @@
     "args": "module --show-sep",
     "expected": [
         0,
-        [
-            " :: \n"
-        ],
+        " :: \n",
         ""
     ],
     "prepare": [

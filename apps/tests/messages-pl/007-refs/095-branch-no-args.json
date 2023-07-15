@@ -5,8 +5,8 @@
         2,
         "",
         [
-            "u\u017cycie: cov branch [-h] [<nazwa> [<punkt-startowy>] | -d <nazwa>... | -l [<wzorzec>...] | --show-current]",
-            "cov branch: b\u0142\u0105d: Nie mo\u017cna znale\u017a\u0107 repozytorium Cov w $TMP\n"
+            "użycie: cov branch [-h] [<nazwa> [<punkt-startowy>] | -d <nazwa>... | -l [<wzorzec>...] | --show-current]",
+            "cov branch: błąd: Nie można znaleźć repozytorium Cov w $TMP\n"
         ]
     ],
     "prepare": [

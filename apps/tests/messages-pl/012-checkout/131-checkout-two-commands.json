@@ -5,8 +5,8 @@
         2,
         "",
         [
-            "u\u017cycie: cov checkout [-h] [--detach|-b|--orphan] <nazwa> [<punkt-startowy>]",
-            "cov checkout: b\u0142\u0105d: argument -b: nie mo\u017cna u\u017cywa\u0107 z --orphan\n"
+            "użycie: cov checkout [-h] [--detach|-b|--orphan] <nazwa> [<punkt-startowy>]",
+            "cov checkout: błąd: argument -b: nie można używać z --orphan\n"
         ]
     ],
     "prepare": [

@@ -5,8 +5,8 @@
         2,
         "",
         [
-            "u\u017cycie: cov config [-h] [<opcje-pliku>] [<nazwa> [<warto\u015b\u0107>] | --unset <nazwa> | -l | --list]",
-            "cov config: b\u0142\u0105d: nieprawid\u0142owa nazwa elementu konfiguracji \u201egroup-other\u201d\n"
+            "użycie: cov config [-h] [<opcje-pliku>] [<nazwa> [<wartość>] | --unset <nazwa> | -l | --list]",
+            "cov config: błąd: nieprawidłowa nazwa elementu konfiguracji „group-other”\n"
         ]
     ],
     "prepare": [

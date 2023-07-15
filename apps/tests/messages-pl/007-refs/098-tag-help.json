@@ -4,17 +4,17 @@
     "expected": [
         0,
         [
-            "u\u017cycie: cov tag [-h] [<nazwa> [<punkt-startowy>] | -d <nazwa>... | -l [<wzorzec>...]]",
+            "użycie: cov tag [-h] [<nazwa> [<punkt-startowy>] | -d <nazwa>... | -l [<wzorzec>...]]",
             "",
             "argumenty pozycyjne:",
-            " <nazwa>                   tworzy nowy znacznik o podanej nazwie; je\u015bli znacznik ju\u017c istnieje, to polecenie zako\u0144czy si\u0119 niepowodzeniem",
-            " <punkt-startowy>          u\u017cywa podanej referencji zamiast HEAD",
+            " <nazwa>                   tworzy nowy znacznik o podanej nazwie; jeśli znacznik już istnieje, to polecenie zakończy się niepowodzeniem",
+            " <punkt-startowy>          używa podanej referencji zamiast HEAD",
             "",
             "argumenty opcjonalne:",
             " -h, --help                pokazuje ten komunikat pomocy i wychodzi",
-            " -f, --force               wymusza utworzenie nowego znacznika nawet, je\u015bli ten ju\u017c istnieje",
-            " -l, --list [<wzorzec>...] wy\u015bwietla znane znaczniki; je\u015bli istnieje jakikolwiek wzorzec z symbolem wieloznacznym pow\u0142oki, pokazuje tylko znaczniki pasuj\u0105ce do wzorca (wzorc\u00f3w); gdy podano wiele wzor\u00f3w, je\u015bli kt\u00f3rykolwiek z nich pasuje, znacznik jest wy\u015bwietlany",
-            " -d, --delete <nazwa>...   usuwa istniej\u0105ce znaczniki o podanych nazwach\n"
+            " -f, --force               wymusza utworzenie nowego znacznika nawet, jeśli ten już istnieje",
+            " -l, --list [<wzorzec>...] wyświetla znane znaczniki; jeśli istnieje jakikolwiek wzorzec z symbolem wieloznacznym powłoki, pokazuje tylko znaczniki pasujące do wzorca (wzorców); gdy podano wiele wzorów, jeśli którykolwiek z nich pasuje, znacznik jest wyświetlany",
+            " -d, --delete <nazwa>...   usuwa istniejące znaczniki o podanych nazwach\n"
         ],
         ""
     ],

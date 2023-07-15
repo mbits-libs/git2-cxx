@@ -2,9 +2,7 @@
     "args": "branch --show-current",
     "expected": [
         0,
-        [
-            "main\n"
-        ],
+        "main\n",
         ""
     ],
     "prepare": [

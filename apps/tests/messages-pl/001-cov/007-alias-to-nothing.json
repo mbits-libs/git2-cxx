@@ -4,7 +4,7 @@
     "expected": [
         22,
         "",
-        "pusty alias dla \u201efinish-worse\u201d"
+        "pusty alias dla „finish-worse”"
     ],
     "prepare": [
         "cd '$DATA'",

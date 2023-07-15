@@ -9,7 +9,7 @@
         "",
         [
             "[ADD] src/main.cc",
-            "użycie: cov report [-h] <plik-raportu> [-f <filtr>] [--amend]",
+            "użycie: cov report [-h] <plik-raportu> [-f <filtr>] [-p <właściwość>=<wartość> ...] [--amend]",
             "cov report: błąd: nie masz nic do poprawienia\n"
         ]
     ],
