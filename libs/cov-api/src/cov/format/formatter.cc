@@ -184,7 +184,7 @@ namespace cov::placeholder {
 				if (force || ctx.client->prop_names) {
 					color_str(color::faint_yellow,
 					          fmt::format("{}{}: ", prefix, *key));
-				} else {
+				} else if (!prefix.empty()) {
 					color_str(color::faint_yellow, prefix);
 				}
 			}
