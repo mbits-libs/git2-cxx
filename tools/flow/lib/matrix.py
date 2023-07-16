@@ -449,7 +449,11 @@ class steps:
         version = get_version()
         legacy_reporter = os.environ.get("LEGACY_COV")
         report = f"build/{config['preset']}/coveralls.json"
-        runner.call(reporter, "report", "--filter", "coveralls", report)
+        response = f"build/{config['preset']}/report_answers.txt"
+        at_args = []
+        if os.path.isfile(response):
+            at_args.append(f"@{response}")
+        runner.call(reporter, "report", "--filter", "coveralls", report, *at_args)
         if legacy_reporter is not None:
             runner.call(legacy_reporter, "import", "--in", report, "--amend")
         if version.tag() in tags:
