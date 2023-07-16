@@ -15,7 +15,7 @@ import lib.runner as runner
 DEF_STEPS = {
     "config": ["Conan", "CMake"],
     "build": ["Build"],
-    "verify": ["Build", "Test", "Coverage", "Pack", "Artifacts", "BinInst", "DevInst"],
+    "verify": ["Build", "Test", "Report", "Pack", "Artifacts", "BinInst", "DevInst"],
 }
 cmd = os.path.splitext(os.path.basename(sys.argv[0]))[0]
 
