@@ -61,11 +61,15 @@
     - [x] Report / component / directory view
     - [x] File view
   - [x] `cov report` reprise
-    - [ ] `cov report --flag`
+    - [x] `cov report --prop`
+    - [x] show propset in `report`
+    - [ ] show propset in `log`
+    - [ ] show propset in non-`log` `show`s
     - [ ] `$COV_FILTER_PATH`
   - [ ] `cov cherry-pick` (?)
   - [ ] Support for `less`
   - [ ] Major release
+    - [ ] Freeze translation IDs
     - Update schema id and references in filters
 - [ ] `cov serve`
   - [ ] Boost.Beast WS
@@ -91,6 +95,9 @@
   - [ ] `cov report` taking more, than one report
     - with single filter?
     - with filter per input?
+    - build set manipulation (adding, removing from HEAD)?
+- [ ] Direct `gcov` JSON.GZ filter
+- [ ] Direct `llvm-cov` filter
 - [ ] Add report object cache
 - [ ] Highlight partial C++ strings
 - [ ] Add hilite for Python

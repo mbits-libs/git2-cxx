@@ -55,10 +55,12 @@
     MESSAGE_DETACHED_HEAD = "detached HEAD";
     [help("Number of files in current report"), plural("{} files"), id(-1)]
     MESSAGE_FILE_COUNT = "{} file";
-    [help("Description for commit in current report; will become \"based on 13a39fbf9@main\""), id(-1)]
+    [help("Label for commit in current report; will become \"based on 13a39fbf9@main\""), id(-1)]
     MESSAGE_FIELD_GIT_COMMIT = "based on";
-    [help("Description for parent of current report; will become \"parent d4965abfb\""), id(-1)]
+    [help("Label for parent of current report; will become \"parent d4965abfb\""), id(-1)]
     MESSAGE_FIELD_PARENT_REPORT = "parent";
+    [help("Label for any build of current report; will become \"contains d78a93e48\""), id(-1)]
+    MESSAGE_FIELD_CONTAINS_BUILD = "contains";
     [help("Warning message for adding a coverage with no changes to previous report"), id(-1)]
     WARNING_NO_CHANGES_IN_REPORT = "no changes in reported coverage";
 }

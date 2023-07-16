@@ -63,6 +63,24 @@ If there is an ✔ beside a color, it means this color could be prefixed with ei
 |`%md`|ref names, each group colored separately, like the --decorate option of git-log[1]|
 |`%mD`|ref names without the " (", ")" wrapping, each group colored separately.|
 
+## Placeholders that expand to information extracted from the build
+
+Within context of a build report, few report-oriented change meaning and refer to only the build and not whole report
+
+|Placeholder|New meaning|
+|-|-|
+|`%Hr`|build hash|
+|`%hr`|abbreviated build hash|
+|`%pP`|build percentage|
+|`%pT`|build lines total|
+|`%pR`|build lines relevant|
+|`%pC`|build lines covered|
+|`%pr`|build lines rating, either `pass`, `incomplete` or `fail`, depending on how report coverage compares to preset ratings (currently 90% for passing and 75% for incomplete)|
+|`%d`|build properties|
+|`%D`|build properties without the " (", ")" wrapping.|
+|`%md`|build properties, each property colored separately|
+|`%mD`|build properties without the " (", ")" wrapping, each property colored separately.|
+
 ## Placeholders that expand to information extracted from the commit
 
 Below, "person" is either author or committer.
