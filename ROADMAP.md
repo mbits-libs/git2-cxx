@@ -6,7 +6,7 @@
   - [x] `report`
   - [x] `build`
   - [x] `files`
-  - [x] `line_coverage`
+  - [x] `line_coverage` _(0.18.0)_
   - [ ] `function_coverage`
   - [ ] `branch_coverage`
 - [x] Wrap I/O in Z streams _(0.2.0-alpha)_
@@ -57,13 +57,13 @@
   - [x] `cov log` _(0.14.0)_
   - [x] `cov tag` / `branch` / `checkout` _(0.15.0)_
   - [x] `cov reset` _(0.16.0)_
-  - [ ] `cov show` _(0.17.0)_
+  - [x] `cov show` _(0.17.0)_
     - [x] Report / component / directory view
     - [x] File view
   - [x] `cov report` reprise
     - [x] `cov report --prop`
     - [x] show propset in `report`
-    - [x] show propset in non-`log` `show`s
+    - [x] show propset in non-`log` `show`s _(0.18.0)_
     - [ ] show propset in `log`
     - [ ] `$COV_FILTER_PATH`
   - [ ] `cov cherry-pick` (?)

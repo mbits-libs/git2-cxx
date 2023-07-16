@@ -25,7 +25,12 @@ SCOPE_FIX = {"ws": "webapi", "rest": "webapi", "lngs": "lang"}
 #####################################################################
 
 
-def release(take_all: bool, forced_level: Optional[int], stability: Optional[str]):
+def release(
+    take_all: bool,
+    forced_level: Optional[int],
+    stability: Optional[str],
+    show_changelog: bool,
+):
     project = get_version()
     github_link = f"https://github.com/{GITHUB_ORG}/{project.name.value}"
     tags = get_tags(project)
@@ -41,7 +46,7 @@ def release(take_all: bool, forced_level: Optional[int], stability: Optional[str
             stability = f"-{stability}"
         next_stability = stability
     next_tag = f"v{bump_version(project.ver(), level)}{next_stability}"
-    if not Environment.DRY_RUN:
+    if not Environment.DRY_RUN or show_changelog:
         update_changelog(log, next_tag, project.tag(), github_link)
         set_version(next_tag[1:])
 
@@ -117,12 +122,18 @@ def upload(archive: str):
             print(f"- {name}", file=sys.stderr)
 
 
-parser = argparse.ArgumentParser(usage="Creates a release draft in GitHub")
+parser = argparse.ArgumentParser(description="Creates a release draft in GitHub")
 parser.add_argument(
     "--dry-run",
     action="store_true",
     required=False,
     help="print commands, change nothing",
+)
+parser.add_argument(
+    "--show-changelog",
+    action="store_true",
+    required=False,
+    help="modifies CHANGELOG.md and CMakeLists.txt even with --dry-run",
 )
 parser.add_argument(
     "--all",
@@ -170,7 +181,12 @@ def __main__():
         if args.upload is not None:
             upload(args.upload)
         else:
-            release(args.all, FORCED_LEVEL.get(args.force), args.stability)
+            release(
+                args.all,
+                FORCED_LEVEL.get(args.force),
+                args.stability,
+                args.show_changelog,
+            )
     except subprocess.CalledProcessError as e:
         if e.stdout:
             print(e.stdout.decode("utf-8"), file=sys.stdout)

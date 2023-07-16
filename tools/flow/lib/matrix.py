@@ -361,7 +361,7 @@ class steps:
         )
 
     @staticmethod
-    @step_call("Artifacts")
+    @step_call("Store")
     def store(config: dict):
         preset = config["preset"]
         packages_dir = f"build/{preset}/packages"
