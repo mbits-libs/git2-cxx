@@ -231,6 +231,8 @@ namespace cov::placeholder {
 		sys_seconds date{};
 		git_commit_view git{};
 		io::v1::coverage_stats const* stats{};
+		std::map<std::string, cov::report::property> properties{};
+		bool has_properties{false};
 
 		iterator format(iterator out, internal_context& ctx, report fld) const;
 		iterator format(iterator out, internal_context& ctx, color fld) const;
@@ -260,6 +262,19 @@ namespace cov::placeholder {
 			    .stats = &report.stats(),
 			};
 		}
+		static report_view from(cov::report const& report,
+		                        cov::report::build const& entry) noexcept {
+			return {
+			    .id = &entry.build_id().id,
+			    .parent = &report.parent_id().id,
+			    .file_list = &report.file_list_id().id,
+			    .date = report.add_time_utc(),
+			    .git = git_commit_view::from(report),
+			    .stats = &entry.stats(),
+			    .properties = entry.properties(),
+			    .has_properties = true,
+			};
+		}
 
 	private:
 		struct width_cleaner {
@@ -278,7 +293,7 @@ namespace cov {
 		static std::string shell_colorize(placeholder::color, void*);
 
 		std::string format(placeholder::report_view const&,
-		                   placeholder::context const&);
+		                   placeholder::context const&) const;
 
 		std::vector<placeholder::format> const& parsed() const noexcept {
 			return format_;

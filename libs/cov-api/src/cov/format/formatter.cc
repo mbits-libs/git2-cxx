@@ -158,6 +158,84 @@ namespace cov::placeholder {
 			return fmt::format_to(out, "{}", value);
 		}
 
+		struct property_visitor {
+			iterator out;
+			bool magic_colors;
+			report_view const& view;
+			internal_context& ctx;
+			std::string const* key{};
+			std::string_view prefix{};
+
+			iterator color_str(iterator out_iter,
+			                   color clr,
+			                   std::string_view str) const {
+				if (magic_colors) out_iter = view.format(out_iter, ctx, clr);
+				out_iter = format_str(out_iter, str);
+				if (magic_colors)
+					out_iter = view.format(out_iter, ctx, color::reset);
+				return out_iter;
+			}
+
+			void color_str(color clr, std::string_view str) {
+				out = color_str(out, clr, str);
+			}
+
+			void color_key() {
+				color_str(color::yellow, fmt::format("{}{}=", prefix, *key));
+			}
+
+			void operator()(std::string_view str) {
+				color_key();
+				color_str(color::bold_yellow, str);
+			}
+
+			void operator()(long long val) {
+				color_key();
+				color_str(color::bold_green, fmt::format("{}", val));
+			}
+
+			void operator()(bool val) {
+				color_key();
+				color_str(color::bold_blue, val ? "true"sv : "false"sv);
+			}
+		};
+
+		iterator format_properties(iterator out,
+		                           bool wrapped,
+		                           bool magic_colors,
+		                           report_view const& view,
+		                           internal_context& ctx) {
+			if (view.properties.empty() || !ctx.client->decorate) return out;
+
+			property_visitor painter{out, magic_colors, view, ctx};
+
+			bool first = true;
+			for (auto const& [key, value] : view.properties) {
+				painter.key = &key;
+				painter.prefix = {};
+				if (first) {
+					first = false;
+					if (wrapped) painter.prefix = " ("sv;
+				} else {
+					painter.prefix = ", "sv;
+				}
+				std::visit(painter, value);
+			}
+			out = painter.out;
+
+			if (!first && wrapped) {
+				if (magic_colors) {
+					out = view.format(out, ctx, color::yellow);
+					*out++ = ')';
+					out = view.format(out, ctx, color::reset);
+				} else {
+					*out++ = ')';
+				}
+			}
+
+			return out;
+		}
+
 		enum class Z { none, ISO, ISO_colon };
 
 		template <typename Storage, typename Ratio>
@@ -469,15 +547,23 @@ namespace cov::placeholder {
 			case report::file_list_hash_abbr:
 				return format_hash(out, file_list, ctx.client->hash_length);
 			case report::ref_names:
+				if (has_properties)
+					return format_properties(out, true, false, *this, ctx);
 				return ctx.client->names.format(out, id, true, false, *this,
 				                                ctx);
 			case report::ref_names_unwrapped:
+				if (has_properties)
+					return format_properties(out, false, false, *this, ctx);
 				return ctx.client->names.format(out, id, false, false, *this,
 				                                ctx);
 			case report::magic_ref_names:
+				if (has_properties)
+					return format_properties(out, true, true, *this, ctx);
 				return ctx.client->names.format(out, id, true, true, *this,
 				                                ctx);
 			case report::magic_ref_names_unwrapped:
+				if (has_properties)
+					return format_properties(out, false, true, *this, ctx);
 				return ctx.client->names.format(out, id, false, true, *this,
 				                                ctx);
 			case report::branch:
@@ -535,7 +621,7 @@ namespace cov::placeholder {
 
 namespace cov {
 	std::string formatter::format(placeholder::report_view const& report,
-	                              placeholder::context const& ctx) {
+	                              placeholder::context const& ctx) const {
 		std::string result{};
 
 		placeholder::internal_context int_ctx{

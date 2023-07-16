@@ -11,6 +11,7 @@
 #include <string>
 #include <string_view>
 #include <utility>
+#include <variant>
 #include <vector>
 
 namespace cov {
@@ -21,10 +22,12 @@ namespace cov {
 	};
 
 	struct report : object_with_id {
+		using property = std::variant<std::string, long long, bool>;
 		struct build {
 			virtual ~build();
 			virtual git::oid const& build_id() const noexcept = 0;
 			virtual std::string_view props_json() const noexcept = 0;
+			virtual std::map<std::string, property> properties() const;
 			virtual io::v1::coverage_stats const& stats() const noexcept = 0;
 		};
 

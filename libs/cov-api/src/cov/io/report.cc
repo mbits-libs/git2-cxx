@@ -442,4 +442,36 @@ namespace cov {
 		auto const node = json::read_json(to_u8s(props));
 		return escape_dict(node);
 	}
+
+	std::map<std::string, report::property> report::build::properties() const {
+		std::map<std::string, property> result{};
+
+		auto props = props_json();
+		if (props.empty()) return result;
+
+		std::string text{};
+		if (props.front() != '{') {
+			text.reserve(props.size() + 2);
+			text.push_back('{');
+			text.append(props);
+			text.push_back('}');
+			props = text;
+		}
+
+		auto const node = json::read_json(to_u8s(props));
+		auto const map = json::cast<json::map>(node);
+		if (!map) return {};
+
+		for (auto const& [key, value] : *map) {
+			if (auto const str = json::cast<json::string>(value); str) {
+				result[from_u8s(key)] = from_u8s(*str);
+			} else if (auto const b = json::cast<bool>(value); b) {
+				result[from_u8s(key)] = *b;
+			} else if (auto const num = json::cast<long long>(value); num) {
+				result[from_u8s(key)] = *num;
+			}
+		}
+		return result;
+	}
+
 }  // namespace cov

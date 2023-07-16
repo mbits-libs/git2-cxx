@@ -269,15 +269,32 @@ namespace cov::app::builtin::report {
 			format.append(chunk);
 
 		using namespace std::chrono;
-		auto const view = placeholder::report_view::from(report);
 		auto const now = floor<seconds>(system_clock::now());
-		auto message = formatter::from(format).format(
-		    view, {.now = now,
-		           .hash_length = 9,
-		           .names = {},
-		           .colorize = formatter::shell_colorize});
+		{
+			auto const view = placeholder::report_view::from(report);
+			auto const message = formatter::from(format).format(
+			    view, {.now = now,
+			           .hash_length = 9,
+			           .names = {},
+			           .colorize = formatter::shell_colorize});
 
-		std::fputs(message.c_str(), stdout);
+			std::fputs(message.c_str(), stdout);
+		}
+
+		auto const build_format = formatter::from(
+		    fmt::format(" %C(faint normal){} %hr:%Creset "
+		                "%C(rating)%pP%Creset%md%n",
+		                tr(replng::MESSAGE_FIELD_CONTAINS_BUILD)));
+		for (auto const& build : report.entries()) {
+			auto const view = placeholder::report_view::from(report, *build);
+			auto const message = build_format.format(
+			    view, {.now = now,
+			           .hash_length = 9,
+			           .names = {},
+			           .colorize = formatter::shell_colorize});
+
+			std::fputs(message.c_str(), stdout);
+		}
 	}
 
 	std::string parser::quoted_list(std::span<std::string_view const> names) {
