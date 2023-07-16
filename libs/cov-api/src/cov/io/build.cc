@@ -49,16 +49,25 @@ namespace cov::io::handlers {
 	                             std::error_code& ec) const {
 		ec = make_error_code(errc::bad_syntax);
 		v1::build build{};
-		if (!in.load(build)) return {};
-		if (build.strings.offset < (sizeof(build) / sizeof(uint32_t)))
+		if (!in.load(build)) {
 			return {};
+		}
+		if (build.strings.offset < (sizeof(build) / sizeof(uint32_t))) {
+			return {};
+		}
 
-		if (!in.skip((build.strings.offset * sizeof(uint32_t)) - sizeof(build)))
+		if (!in.skip((build.strings.offset * sizeof(uint32_t)) -
+		             sizeof(build))) {
 			return {};
+		}
 		strings_view strings{};
-		if (!strings.load_from(in, build.strings)) return {};
+		if (!strings.load_from(in, build.strings)) {
+			return {};
+		}
 
-		if (!strings.is_valid(build.propset)) return {};
+		if (!strings.is_valid(build.propset)) {
+			return {};
+		}
 		auto propset = strings.at(build.propset);
 
 		ec.clear();
