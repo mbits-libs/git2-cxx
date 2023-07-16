@@ -143,17 +143,19 @@ namespace cov::io::handlers {
 
 			if (entry_size < sizeof(v1::files::ext)) {
 				builder.add(strings.at(entry_v0.path),
-				            v1::coverage_stats::from(entry_v0.stats),
-				            entry_v0.contents, entry_v0.line_coverage, zero_id,
+				            {entry_v0.lines_total, entry_v0.lines.summary,
+				             io::v1::stats::init(), io::v1::stats::init()},
+				            entry_v0.contents, entry_v0.lines.details, zero_id,
 				            zero_id);
 			} else {
 				auto const& entry_v1 =
 				    *reinterpret_cast<v1::files::ext const*>(buffer.data());
-				builder.add(strings.at(entry_v1.path),
-				            v1::coverage_stats::from(entry_v1.stats),
-				            entry_v1.contents, entry_v1.line_coverage,
-				            entry_v1.function_coverage,
-				            entry_v1.branch_coverage);
+				builder.add(
+				    strings.at(entry_v1.path),
+				    {entry_v1.lines_total, entry_v1.lines.summary,
+				     entry_v1.functions.summary, entry_v1.branches.summary},
+				    entry_v1.contents, entry_v1.lines.details,
+				    entry_v1.functions.details, entry_v1.branches.details);
 			}
 		}
 
@@ -173,26 +175,30 @@ namespace cov::io::handlers {
 	template <>
 	struct init_entry<v1::files::basic> {
 		static v1::files::basic get(cov::files::entry const& in, str path32) {
+			auto const& stats = in.stats();
 			return {
 			    .path = path32,
-			    .stats = in.stats().to_short(),
 			    .contents = in.contents().id,
-			    .line_coverage = in.line_coverage().id,
+			    .lines_total = stats.lines_total,
+			    .lines = {.summary = stats.lines,
+			              .details = in.line_coverage().id},
 			};
 		}
 	};
 	template <>
 	struct init_entry<v1::files::ext> {
 		static v1::files::ext get(cov::files::entry const& in, str path32) {
+			auto const& stats = in.stats();
 			return {
 			    .path = path32,
-			    .stats = in.stats().to_short(),
 			    .contents = in.contents().id,
-			    .line_coverage = in.line_coverage().id,
-			    .functions = in.stats().functions,
-			    .branches = in.stats().branches,
-			    .function_coverage = in.function_coverage().id,
-			    .branch_coverage = in.branch_coverage().id,
+			    .lines_total = stats.lines_total,
+			    .lines = {.summary = stats.lines,
+			              .details = in.line_coverage().id},
+			    .functions = {.summary = stats.functions,
+			                  .details = in.function_coverage().id},
+			    .branches = {.summary = stats.branches,
+			                 .details = in.branch_coverage().id},
 			};
 		}
 	};

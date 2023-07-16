@@ -7,22 +7,23 @@
         1,
         "",
         [
-            "usage: cov [-h] [-C <dir>] <command> [<args>]",
-            "cov: \"fourth\" is not a cov command",
+            "użycie: cov [-h] [-C <katalog>] <polecenie> [<argumenty>]",
+            "cov: „fourth” nie jest poleceniem cov",
             "",
-            "common commands:",
-            " init   creates a new cov repo",
-            " config shows and/or sets various settings",
-            " module defines file groups",
-            " report appends a report to repo",
-            " remove removes a particular report from repo",
-            " log    prints a list of reports",
-            " show   shows a specific report",
-            " serve  starts a local webserver with reports\n"
+            "typowe polecenia:",
+            " init   tworzy nowe repozytorium cov",
+            " config pokazuje i/lub ustawia różne ustawienia",
+            " module definiuje grupy plików",
+            " report dołącza raport do repozytorium",
+            " remove usuwa określony raport z repozytorium",
+            " log    drukuje listę raportów",
+            " show   pokazuje konkretny raport",
+            " serve  uruchamia lokalny serwer WWW raportów\n"
         ]
     ],
     "prepare": [
         "cd '$DATA'",
         "mkdirs '$DATA/bad-recurse/.covdata/objects/coverage'"
-    ]
+    ],
+    "lang": "pl"
 }

@@ -6,12 +6,12 @@
     "expected": [
         0,
         [
-            "\u001b[33mec37d0753\u001b[m (Commit M, 2023-07-14) \u001b[31m5c5887beb@feat/git-1\u001b[m",
-            "\u001b[33mabd0e88ef\u001b[m (Commit N, 2023-07-14) \u001b[31m33e00c45f@feat/git-1\u001b[m",
-            "\u001b[33mca4a00c30\u001b[m (Commit O, 2023-07-14) \u001b[31m97f9cc7ff@feat/git-1\u001b[m",
-            "\u001b[33ma92306133\u001b[m (Commit F, 2023-07-14) \u001b[31mfef5de748@main\u001b[m",
-            "\u001b[33m7115c0526\u001b[m (Commit G, 2023-07-14) \u001b[31m6027b3d7b@main\u001b[m",
-            "\u001b[33mdd6999226\u001b[m (Commit H, 2023-07-14) \u001b[31mb2a86e548@main\u001b[m\n"
+            "\u001b[33m86e233ce9\u001b[m (Commit M, 2023-07-16) \u001b[31md3a16a183@feat/git-1\u001b[m",
+            "\u001b[33m39161590f\u001b[m (Commit N, 2023-07-16) \u001b[31m7ac99226b@feat/git-1\u001b[m",
+            "\u001b[33mdc3e601ee\u001b[m (Commit O, 2023-07-16) \u001b[31m6c7588a1b@feat/git-1\u001b[m",
+            "\u001b[33mebadfd936\u001b[m (Commit F, 2023-07-16) \u001b[31m366f0b00e@main\u001b[m",
+            "\u001b[33m3dda7ce58\u001b[m (Commit G, 2023-07-16) \u001b[31m4145cfa16@main\u001b[m",
+            "\u001b[33m5ddd759ac\u001b[m (Commit H, 2023-07-16) \u001b[31mc578c5492@main\u001b[m\n"
         ],
         ""
     ],

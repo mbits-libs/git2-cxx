@@ -23,6 +23,8 @@ for dirname in sys.argv[1:]:
     if dirname[-1] == "/":
         dirname = dirname[:-1]
     for root, dirs, files in os.walk(dirname):
+        if root[:2] == "./":
+            root = root[2:]
         root = root.replace("\\", "/")
         if root[-6:] == "/hooks" or root[-5:] == "/logs":
             continue
@@ -33,7 +35,7 @@ for dirname in sys.argv[1:]:
                 dirlist.append(root)
             continue
         filelist.extend(
-            f"{root}/{filename}"
+            filename if root == "." else f"{root}/{filename}"
             for filename in files
             if filename not in ["exclude", "description", "COMMIT_EDITMSG"]
         )
