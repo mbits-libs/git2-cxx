@@ -436,11 +436,11 @@ class steps:
 
     @staticmethod
     @step_call(
-        "Coverage",
+        "Report",
         flags=step_info.VERBOSE,
         visible=lambda config: config.get("coverage", False) == True,
     )
-    def coverage(config: dict):
+    def report(config: dict):
         reporter = f"build/{config['preset']}/bin/cov"
         tag_process = subprocess.run([reporter, "tag"], stdout=subprocess.PIPE)
         tags = (
@@ -472,7 +472,7 @@ class steps:
             steps.configure_cmake,
             steps.build,
             steps.test,
-            steps.coverage,
+            steps.report,
             steps.pack,
             steps.store,
             steps.bin_inst,
