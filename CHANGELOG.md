@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) and [COMMITS.md](COMMITS.md) for commit guidelines.
 
+## [0.18.0](https://github.com/mzdun/cov/compare/v0.17.3...v0.18.0) (2023-07-16)
+
+### New Features
+
+- show properties in non-root views ([5ced119](https://github.com/mzdun/cov/commit/5ced1196252ce3f92a5bfbfed71c522647899398))
+- prepare properties answer file with cmake ([67699bb](https://github.com/mzdun/cov/commit/67699bb55518511ec5afc3e6d646208ec83fbd8c))
+- **api**: merge two lowest-level libraries ([17cb7fe](https://github.com/mzdun/cov/commit/17cb7fe953360c1499d050ba15180c8e46ad9484))
+- **api**: shake up the data structures ([0d51e15](https://github.com/mzdun/cov/commit/0d51e1513bfc010c5e4ae0b7c8c3676c17ca32c1))
+- **api**: adding functions and branches to stats ([3540b3e](https://github.com/mzdun/cov/commit/3540b3eed53cf61be50c1d98c50d0931467a1ab1))
+- **api**: prep for multiple total/visited pairs ([4014755](https://github.com/mzdun/cov/commit/40147559bb2927e6d75f7838089ce735faeccefc))
+- **api**: store additional OIDs in report files ([94edd09](https://github.com/mzdun/cov/commit/94edd099de2ffe89505a8f97ee506c6f9a6b842b))
+- **api**: expose additional OIDs from report_entry ([a9aed8f](https://github.com/mzdun/cov/commit/a9aed8f17b62d4e78d2fd40844e5ed2dbf3e1c97))
+- **api**: select preferred version for io handler ([dc6e9c4](https://github.com/mzdun/cov/commit/dc6e9c40a772f8b2b94f825ff2a429a194c840a8))
+- **api, core**: normalize build properties ([61a97d3](https://github.com/mzdun/cov/commit/61a97d3672f0c1db0871575f51b660b2d9d96ca8))
+- **core**: show builds as part of `report` ([2f0fff7](https://github.com/mzdun/cov/commit/2f0fff7cc7b198c28773a28dadc593b33bc9b90b))
+
+### Bug Fixes
+
+- update build scripts ([c26fb5e](https://github.com/mzdun/cov/commit/c26fb5e8312bcdcaf01200b1b42b7296a239847c))
+- apply further linter comments ([861091c](https://github.com/mzdun/cov/commit/861091c2ef5ef607416cd52dacd829a456af5580))
+- remove UB issue from files loader ([481c8ce](https://github.com/mzdun/cov/commit/481c8cef99114a57706e0dfbdf56531bc1d90af9)), closes [#43](https://github.com/mzdun/cov/issues/43)
+- apply further linter comments ([7624e9c](https://github.com/mzdun/cov/commit/7624e9c7f65619a17f21630bc9fb45ca9b48f8db))
+- apply linter comments ([50d9528](https://github.com/mzdun/cov/commit/50d95288057b9b502ec0670abc06a006992b3a9b))
+- **api**: add missing files stats ([0deb2de](https://github.com/mzdun/cov/commit/0deb2dece2caec7e8c4baf5f08230cef2bd35f24))
+
+### BREAKING CHANGES
+
+Data structures between 0.17.3 and 0.18.0 change to the point of being unusable. Store your local aliases from `.git/.covdata/setup`, remove the `.git/.covdata` and re-init the cov repo with newest version of tools (via `cov init`).
+
 ## [0.17.3](https://github.com/mzdun/cov/compare/v0.17.2...v0.17.3) (2023-07-10)
 
 ### Continuos Integration
