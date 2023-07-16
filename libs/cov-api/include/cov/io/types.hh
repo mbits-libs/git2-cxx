@@ -266,11 +266,6 @@ namespace cov::io {
 			bool operator==(coverage_diff const&) const noexcept = default;
 		};
 
-		struct coverage_stats_short {
-			uint32_t lines_total;
-			stats lines;
-		};
-
 		struct coverage_stats {
 			uint32_t lines_total;
 			stats lines;
@@ -281,31 +276,7 @@ namespace cov::io {
 				return {0, stats::init(), stats::init(), stats::init()};
 			}
 
-			static constexpr coverage_stats from(
-			    coverage_stats_short const& shorter) noexcept {
-				return {shorter.lines_total, shorter.lines, stats::init(),
-				        stats::init()};
-			}
-
-			constexpr coverage_stats_short to_short() const noexcept {
-				return {lines_total, lines};
-			}
-
 			bool operator==(coverage_stats const&) const noexcept = default;
-
-			coverage_stats& operator+=(
-			    coverage_stats_short const& rhs) noexcept {
-				lines_total = add_u32(lines_total, rhs.lines_total);
-				lines += rhs.lines;
-				return *this;
-			}
-
-			coverage_stats operator+(
-			    coverage_stats_short const& rhs) const noexcept {
-				auto tmp = coverage_stats{*this};
-				tmp += rhs;
-				return tmp;
-			}
 
 			coverage_stats& operator+=(coverage_stats const& rhs) noexcept {
 				lines_total = add_u32(lines_total, rhs.lines_total);
@@ -438,11 +409,15 @@ namespace cov::io {
 		static_assert(sizeof(build) == sizeof(uint32_t[17]),
 		              "build does not pack well here");
 
-#define FILES_ENTRY_BASIC       \
-	str path;                   \
-	coverage_stats_short stats; \
-	git_oid contents;           \
-	git_oid line_coverage
+		struct report_entry_stats {
+			stats summary;
+			git_oid details;
+		};
+#define FILES_ENTRY_BASIC \
+	str path;             \
+	git_oid contents;     \
+	uint32_t lines_total; \
+	report_entry_stats lines
 
 		struct files {
 			struct basic {
@@ -451,8 +426,8 @@ namespace cov::io {
 
 			struct ext {
 				FILES_ENTRY_BASIC;
-				git_oid function_coverage;
-				git_oid branch_coverage;
+				report_entry_stats functions;
+				report_entry_stats branches;
 			};
 
 			block strings;
@@ -465,7 +440,7 @@ namespace cov::io {
 		static_assert(sizeof(files::basic) == sizeof(uint32_t[14]),
 		              "files::basic does not pack well here");
 
-		static_assert(sizeof(files::ext) == sizeof(uint32_t[24]),
+		static_assert(sizeof(files::ext) == sizeof(uint32_t[28]),
 		              "files::ext does not pack well here");
 
 		struct line_coverage {

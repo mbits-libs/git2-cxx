@@ -3,12 +3,12 @@
     "expected": [
         0,
         [
-            "2d5494169    0%  Commit K 5c35a1c71@feat/git-1",
-            "087defdff    0%  Commit L 651ed7cc4@feat/git-1",
-            "ec37d0753    0%  Commit M 5c5887beb@feat/git-1",
-            "abd0e88ef    0%  Commit N 33e00c45f@feat/git-1",
-            "ca4a00c30    0%  Commit O 97f9cc7ff@feat/git-1",
-            "a92306133    0%  Commit F fef5de748@main\n"
+            "a95889935    0%  Commit K 887bdc56c@feat/git-1",
+            "0479314ba    0%  Commit L dd9560705@feat/git-1",
+            "86e233ce9    0%  Commit M d3a16a183@feat/git-1",
+            "39161590f    0%  Commit N 7ac99226b@feat/git-1",
+            "dc3e601ee    0%  Commit O 6c7588a1b@feat/git-1",
+            "ebadfd936    0%  Commit F 366f0b00e@main\n"
         ],
         ""
     ],

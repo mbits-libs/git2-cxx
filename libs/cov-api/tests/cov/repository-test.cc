@@ -475,7 +475,7 @@ namespace cov::testing {
 			ASSERT_TRUE(cvg_report);
 			ASSERT_TRUE(backend->write(report_id, cvg_report));
 		}
-		ASSERT_EQ("b0538c84a865b950eb71435c358b0487e7bc3d63"sv,
+		ASSERT_EQ("eeba446d6981e087402dc05001186169c286e605"sv,
 		          setup::get_oid(report_id));
 
 		// read
@@ -594,7 +594,7 @@ namespace cov::testing {
 			ASSERT_TRUE(cvg_report);
 			ASSERT_TRUE(repo.write(report_id, cvg_report));
 		}
-		ASSERT_EQ("b0538c84a865b950eb71435c358b0487e7bc3d63"sv,
+		ASSERT_EQ("eeba446d6981e087402dc05001186169c286e605"sv,
 		          setup::get_oid(report_id));
 
 		// read

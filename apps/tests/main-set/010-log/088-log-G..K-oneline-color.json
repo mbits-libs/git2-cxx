@@ -3,12 +3,12 @@
     "expected": [
         0,
         [
-            "\u001b[33m2d5494169\u001b[m\u001b[33m (\u001b[m\u001b[1;33mtag: K\u001b[m\u001b[33m, \u001b[m\u001b[1;32mfeat/cov-1\u001b[m\u001b[33m)\u001b[m \u001b[41m   0% \u001b[m Commit K \u001b[31m5c35a1c71@feat/git-1\u001b[m",
-            "\u001b[33m087defdff\u001b[m\u001b[33m (\u001b[m\u001b[1;33mtag: L\u001b[m\u001b[33m)\u001b[m \u001b[41m   0% \u001b[m Commit L \u001b[31m651ed7cc4@feat/git-1\u001b[m",
-            "\u001b[33mec37d0753\u001b[m\u001b[33m (\u001b[m\u001b[1;33mtag: M\u001b[m\u001b[33m)\u001b[m \u001b[41m   0% \u001b[m Commit M \u001b[31m5c5887beb@feat/git-1\u001b[m",
-            "\u001b[33mabd0e88ef\u001b[m\u001b[33m (\u001b[m\u001b[1;33mtag: N\u001b[m\u001b[33m)\u001b[m \u001b[41m   0% \u001b[m Commit N \u001b[31m33e00c45f@feat/git-1\u001b[m",
-            "\u001b[33mca4a00c30\u001b[m\u001b[33m (\u001b[m\u001b[1;33mtag: O\u001b[m\u001b[33m)\u001b[m \u001b[41m   0% \u001b[m Commit O \u001b[31m97f9cc7ff@feat/git-1\u001b[m",
-            "\u001b[33ma92306133\u001b[m\u001b[33m (\u001b[m\u001b[1;33mtag: F\u001b[m\u001b[33m)\u001b[m \u001b[41m   0% \u001b[m Commit F \u001b[31mfef5de748@main\u001b[m\n"
+            "\u001b[33ma95889935\u001b[m\u001b[33m (\u001b[m\u001b[1;33mtag: K\u001b[m\u001b[33m, \u001b[m\u001b[1;32mfeat/cov-1\u001b[m\u001b[33m)\u001b[m \u001b[41m   0% \u001b[m Commit K \u001b[31m887bdc56c@feat/git-1\u001b[m",
+            "\u001b[33m0479314ba\u001b[m\u001b[33m (\u001b[m\u001b[1;33mtag: L\u001b[m\u001b[33m)\u001b[m \u001b[41m   0% \u001b[m Commit L \u001b[31mdd9560705@feat/git-1\u001b[m",
+            "\u001b[33m86e233ce9\u001b[m\u001b[33m (\u001b[m\u001b[1;33mtag: M\u001b[m\u001b[33m)\u001b[m \u001b[41m   0% \u001b[m Commit M \u001b[31md3a16a183@feat/git-1\u001b[m",
+            "\u001b[33m39161590f\u001b[m\u001b[33m (\u001b[m\u001b[1;33mtag: N\u001b[m\u001b[33m)\u001b[m \u001b[41m   0% \u001b[m Commit N \u001b[31m7ac99226b@feat/git-1\u001b[m",
+            "\u001b[33mdc3e601ee\u001b[m\u001b[33m (\u001b[m\u001b[1;33mtag: O\u001b[m\u001b[33m)\u001b[m \u001b[41m   0% \u001b[m Commit O \u001b[31m6c7588a1b@feat/git-1\u001b[m",
+            "\u001b[33mebadfd936\u001b[m\u001b[33m (\u001b[m\u001b[1;33mtag: F\u001b[m\u001b[33m)\u001b[m \u001b[41m   0% \u001b[m Commit F \u001b[31m366f0b00e@main\u001b[m\n"
         ],
         ""
     ],

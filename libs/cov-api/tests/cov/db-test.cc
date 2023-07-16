@@ -104,7 +104,7 @@ namespace cov::testing {
 			ASSERT_TRUE(cvg_report);
 			ASSERT_TRUE(backend->write(report_id, cvg_report));
 		}
-		ASSERT_EQ("f83893182e8d5bcb888133d0765a847dc719a7b5"sv,
+		ASSERT_EQ("bd6a8c2bbd43d5f4aa26f20ae1964066015358bc"sv,
 		          setup::get_oid(report_id));
 
 		// read
