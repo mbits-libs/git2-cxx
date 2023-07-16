@@ -97,10 +97,9 @@ namespace cov::testing {
 	        .expected{
 	            .props = R"("name1":"value","name2":false,"name3":314)"sv,
 	            .simple = "value, name2: off, name3: 314"sv,
-	            .simple_colors =
-	                "\x1B[2;33m\x1B[m\x1B[33mvalue\x1B[m\x1B[2;33m, "
-	                "name2: \x1B[m\x1B[34moff\x1B[m\x1B[2;33m, "
-	                "name3: \x1B[m\x1B[32m314\x1B[m"sv,
+	            .simple_colors = "\x1B[33mvalue\x1B[m\x1B[2;33m, "
+	                             "name2: \x1B[m\x1B[34moff\x1B[m\x1B[2;33m, "
+	                             "name3: \x1B[m\x1B[32m314\x1B[m"sv,
 	            .wrapped = " (value, name2: off, name3: 314)"sv,
 	            .wrapped_colors =
 	                "\x1B[2;33m (\x1B[m\x1B[33mvalue\x1B[m\x1B[2;33m, "

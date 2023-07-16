@@ -1,0 +1,26 @@
+{
+    "args": "show -m MAIN",
+    "expected": [
+        0,
+        [
+            "module MAIN",
+            "build Debug, flag: on, qnx",
+            "",
+            "+-------+----------+---------+----------+---------+-------+",
+            "| NAME  | COVERAGE | COVERED | RELEVANT | MISSING | TOTAL |",
+            "+-------+----------+---------+----------+---------+-------+",
+            "| D src |   66.67% |       2 |        3 |       1 |     5 |",
+            "+-------+----------+---------+----------+---------+-------+\n"
+        ],
+        ""
+    ],
+    "prepare": [
+        "unpack $DATA/repo.git.tar $TMP",
+        "cd '$TMP'",
+        "git clone repo.git",
+        "cd '$TMP/repo'",
+        "cov init",
+        "cov report $DATA/build-coverage.json -f create-report -pos=qnx -pbuild_type=Debug -pflag=true",
+        "cov module --add MAIN src/"
+    ]
+}

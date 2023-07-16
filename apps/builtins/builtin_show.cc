@@ -76,7 +76,8 @@ namespace cov::app::builtin::show {
 		auto const is_root = !is_standalone && view.module.filter.empty() &&
 		                     view.fname.prefix.empty();
 
-		auto const build_printer = [](auto const& report, auto const& builds) {
+		auto const build_printer = [](app::show::parser const& p,
+		                              auto const& report, auto const& builds) {
 			using namespace std::chrono;
 			auto const now = floor<seconds>(system_clock::now());
 			auto const build_format =
@@ -86,13 +87,13 @@ namespace cov::app::builtin::show {
 				auto const view =
 				    placeholder::report_view::from(report, *build);
 				if (view.properties.empty()) continue;
-				auto const message = build_format.format(
-				    view, {.now = now,
-				           .hash_length = 9,
-				           .names = {},
-				           .colorize = formatter::shell_colorize,
-				           .decorate = true,
-				           .prop_names = false});
+				auto const message =
+				    build_format.format(view, {.now = now,
+				                               .hash_length = 9,
+				                               .names = {},
+				                               .colorize = p.colorizer(),
+				                               .decorate = true,
+				                               .prop_names = false});
 				fmt::print("{}", message);
 			}
 		};
@@ -114,7 +115,7 @@ namespace cov::app::builtin::show {
 			fmt::print("{}file {}{}\n", ctx.color_for(color::yellow),
 			           entries.front().name.expanded,
 			           ctx.color_for(color::reset));
-			build_printer(*report, builds);
+			build_printer(p, *report, builds);
 			fmt::print("\n");
 		} else {
 			std::span<std::unique_ptr<cov::report::build> const> builds{};
@@ -130,10 +131,8 @@ namespace cov::app::builtin::show {
 				fmt::print("{}directory {}{}\n", ctx.color_for(color::yellow),
 				           view.fname.prefix, ctx.color_for(color::reset));
 			}
-			build_printer(*report, builds);
-			if (!view.module.filter.empty() || !view.fname.prefix.empty() ||
-			    !builds.empty())
-				fmt::print("\n");
+			build_printer(p, *report, builds);
+			fmt::print("\n");
 		}
 
 		ctx.print_table(entries);
