@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file. See [Conven
 
 ### Bug Fixes
 
-- remove UB issue from files loader ([67fb6f7](https://github.com/mzdun/cov/commit/67fb6f7a332a468f310aa521802d865866f12e96)), closes #43
+- remove UB issue from files loader ([67fb6f7](https://github.com/mzdun/cov/commit/67fb6f7a332a468f310aa521802d865866f12e96)), closes [#43](https://github.com/mzdun/cov/issues/43)
 
 **Full Changelog**: https://github.com/mzdun/cov/compare/v0.17.3...v0.18.0
 ## [0.17.3](https://github.com/mzdun/cov/compare/v0.17.2...v0.17.3) (2023-07-10)
