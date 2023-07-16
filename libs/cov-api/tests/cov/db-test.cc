@@ -125,7 +125,10 @@ namespace cov::testing {
 			ASSERT_EQ(expected_props, builds[0]->props_json());
 
 			auto cvg_build = backend->lookup<cov::build>(builds[0]->build_id());
+			cov::object_with_id const* obj_build = cvg_build.get();
 			ASSERT_TRUE(cvg_build);
+			ASSERT_EQ(cov::obj_build, obj_build->type());
+			ASSERT_EQ(builds[0]->build_id(), obj_build->oid());
 			ASSERT_EQ(rprt.add_time_utc, cvg_build->add_time_utc());
 			ASSERT_EQ(expected_props, cvg_build->props_json());
 			ASSERT_EQ(cvg_report->file_list_id(), cvg_build->file_list_id());

@@ -100,23 +100,30 @@ namespace cov::io::handlers {
 	                             std::error_code& ec) const {
 		ec = make_error_code(errc::bad_syntax);
 		v1::files header{};
-		if (!in.load(header)) return {};
+		if (!in.load(header)) {
+			return {};
+		}
 		auto const entry_size = header.entries.size * sizeof(uint32_t);
 		if (entry_size < sizeof(v1::files::basic) ||
 		    header.strings.offset < sizeof(v1::files) / sizeof(uint32_t) ||
-		    header.entries.offset < header.strings.offset)
+		    header.entries.offset < header.strings.offset) {
 			return {};
+		}
 
 		if (!in.skip((header.strings.offset * sizeof(uint32_t)) -
-		             sizeof(header)))
+		             sizeof(header))) {
 			return {};
+		}
 		strings_view strings{};
-		if (!strings.load_from(in, header.strings)) return {};
+		if (!strings.load_from(in, header.strings)) {
+			return {};
+		}
 
 		if (!in.skip((header.entries.offset -
 		              (header.strings.offset + header.strings.size)) *
-		             sizeof(uint32_t)))
+		             sizeof(uint32_t))) {
 			return {};
+		}
 
 		cov::files::builder builder{};
 		std::vector<std::byte> buffer{};
@@ -124,11 +131,15 @@ namespace cov::io::handlers {
 		static const git_oid zero_id{};
 
 		for (uint32_t index = 0; index < header.entries.count; ++index) {
-			if (!in.load(buffer, entry_size)) return {};
+			if (!in.load(buffer, entry_size)) {
+				return {};
+			}
 			auto const& entry_v0 =
 			    *reinterpret_cast<v1::files::basic const*>(buffer.data());
 
-			if (!strings.is_valid(entry_v0.path)) return {};
+			if (!strings.is_valid(entry_v0.path)) {
+				return {};
+			}
 
 			if (entry_size < sizeof(v1::files::ext)) {
 				builder.add(strings.at(entry_v0.path),
@@ -178,6 +189,8 @@ namespace cov::io::handlers {
 			    .stats = in.stats().to_short(),
 			    .contents = in.contents().id,
 			    .line_coverage = in.line_coverage().id,
+			    .functions = in.stats().functions,
+			    .branches = in.stats().branches,
 			    .function_coverage = in.function_coverage().id,
 			    .branch_coverage = in.branch_coverage().id,
 			};
@@ -226,22 +239,31 @@ namespace cov::io::handlers {
 		                         entries.size()),
 		};
 
-		if (!out.store(hdr)) return false;
-		if (!out.store({stg.data(), stg.size()})) return false;
+		if (!out.store(hdr)) {
+			return false;
+		}
+		if (!out.store({stg.data(), stg.size()})) {
+			return false;
+		}
 
 		for (auto const& entry_ptr : entries) {
 			auto& in = *entry_ptr;
 
 			auto const path = stg.locate_or(in.path(), stg.size() + 1);
 			auto const path32 = uint_32(path);
-			if (path != path32 || path32 > stg.size()) return false;
+			if (path != path32 || path32 > stg.size()) {
+				return false;
+			}
 			auto const str32 = static_cast<str>(path32);
 
 			if (only_lines) {
-				if (!store_entry<v1::files::basic>(in, str32, out))
+				if (!store_entry<v1::files::basic>(in, str32, out)) {
 					return false;
+				}
 			} else {
-				if (!store_entry<v1::files::ext>(in, str32, out)) return false;
+				if (!store_entry<v1::files::ext>(in, str32, out)) {
+					return false;
+				}
 			}
 		}
 

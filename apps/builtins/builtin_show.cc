@@ -85,6 +85,7 @@ namespace cov::app::builtin::show {
 			for (auto const& build : builds) {
 				auto const view =
 				    placeholder::report_view::from(report, *build);
+				if (view.properties.empty()) continue;
 				auto const message = build_format.format(
 				    view, {.now = now,
 				           .hash_length = 9,
