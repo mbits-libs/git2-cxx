@@ -168,6 +168,7 @@ namespace cov::placeholder {
 		                         void* app) = {};
 		std::string (*colorize)(color, void* app) = {};
 		bool decorate{false};
+		bool prop_names{true};
 
 		bool operator==(context const&) const noexcept = default;
 		static context from(cov::repository const&,

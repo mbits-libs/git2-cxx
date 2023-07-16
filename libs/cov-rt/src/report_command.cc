@@ -276,7 +276,8 @@ namespace cov::app::builtin::report {
 			    view, {.now = now,
 			           .hash_length = 9,
 			           .names = {},
-			           .colorize = formatter::shell_colorize});
+			           .colorize = formatter::shell_colorize,
+			           .decorate = true});
 
 			std::fputs(message.c_str(), stdout);
 		}
@@ -291,7 +292,8 @@ namespace cov::app::builtin::report {
 			    view, {.now = now,
 			           .hash_length = 9,
 			           .names = {},
-			           .colorize = formatter::shell_colorize});
+			           .colorize = formatter::shell_colorize,
+			           .decorate = true});
 
 			std::fputs(message.c_str(), stdout);
 		}

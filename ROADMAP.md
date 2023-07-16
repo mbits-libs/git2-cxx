@@ -63,8 +63,8 @@
   - [x] `cov report` reprise
     - [x] `cov report --prop`
     - [x] show propset in `report`
+    - [x] show propset in non-`log` `show`s
     - [ ] show propset in `log`
-    - [ ] show propset in non-`log` `show`s
     - [ ] `$COV_FILTER_PATH`
   - [ ] `cov cherry-pick` (?)
   - [ ] Support for `less`

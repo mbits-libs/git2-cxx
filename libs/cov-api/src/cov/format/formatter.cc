@@ -180,23 +180,28 @@ namespace cov::placeholder {
 				out = color_str(out, clr, str);
 			}
 
-			void color_key() {
-				color_str(color::yellow, fmt::format("{}{}=", prefix, *key));
+			void color_key(bool force) {
+				if (force || ctx.client->prop_names) {
+					color_str(color::faint_yellow,
+					          fmt::format("{}{}: ", prefix, *key));
+				} else {
+					color_str(color::faint_yellow, prefix);
+				}
 			}
 
 			void operator()(std::string_view str) {
-				color_key();
-				color_str(color::bold_yellow, str);
+				color_key(false);
+				color_str(color::yellow, str);
 			}
 
 			void operator()(long long val) {
-				color_key();
-				color_str(color::bold_green, fmt::format("{}", val));
+				color_key(true);
+				color_str(color::green, fmt::format("{}", val));
 			}
 
 			void operator()(bool val) {
-				color_key();
-				color_str(color::bold_blue, val ? "true"sv : "false"sv);
+				color_key(true);
+				color_str(color::blue, val ? "on"sv : "off"sv);
 			}
 		};
 
@@ -225,7 +230,7 @@ namespace cov::placeholder {
 
 			if (!first && wrapped) {
 				if (magic_colors) {
-					out = view.format(out, ctx, color::yellow);
+					out = view.format(out, ctx, color::faint_yellow);
 					*out++ = ')';
 					out = view.format(out, ctx, color::reset);
 				} else {

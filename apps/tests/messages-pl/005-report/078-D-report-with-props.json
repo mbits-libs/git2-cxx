@@ -1,6 +1,5 @@
 {
-    "lang": "pl",
-    "args": "report $DATA/build-coverage.json -f create-report --amend",
+    "args": "report $DATA/build-coverage.json -f create-report -pos=qnx -pdebug=false -pcompiler=javac",
     "patches": {
         "\u001b\\[31m\\[main [0-9a-fA-F]+\\]\u001b\\[m second": "\u001b[31m[main $REPORT]\u001b[m second",
         " \u001b\\[2;37mzawiera [0-9a-fA-F]+:\u001b\\[m (.+)": " \u001b[2;37mzawiera $BUILD:\u001b[m \\1"
@@ -11,7 +10,7 @@
             "\u001b[31m[main $REPORT]\u001b[m second",
             " jeden plik, \u001b[31m 67%\u001b[m (2/3, -1)",
             " \u001b[2;37mw oparciu o\u001b[m \u001b[2;33m384512442@main\u001b[m",
-            " \u001b[2;37mzawiera $BUILD:\u001b[m \u001b[31m 67%\u001b[m\n"
+            " \u001b[2;37mzawiera $BUILD:\u001b[m \u001b[31m 67%\u001b[m\u001b[2;33m (compiler: \u001b[m\u001b[33mjavac\u001b[m\u001b[2;33m, debug: \u001b[m\u001b[34moff\u001b[m\u001b[2;33m, os: \u001b[m\u001b[33mqnx\u001b[m\u001b[2;33m)\u001b[m\n"
         ],
         "[ADD] src/main.cc\n"
     ],
@@ -20,7 +19,7 @@
         "cd '$TMP'",
         "git clone repo.git",
         "cd '$TMP/repo'",
-        "cov init",
-        "cov report $DATA/build-coverage.json -f create-report"
-    ]
+        "cov init"
+    ],
+    "lang": "pl"
 }

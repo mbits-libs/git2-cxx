@@ -6,7 +6,7 @@
         "\u001b\\[31m\\[main [0-9a-fA-F]+\\]\u001b\\[m reported files": "\u001b[31m[main $REPORT]\u001b[m reported files",
         " \u001b\\[2;37mw oparciu o\u001b\\[m \u001b\\[2;33m[0-9a-fA-F]+@main\u001b\\[m": " \u001b[2;37mw oparciu o\u001b[m \u001b[2;33m$HEAD@main\u001b[m",
         " rodzic [0-9a-fA-F]+": " rodzic $PARENT",
-        " \u001b\\[2;37mzawiera [0-9a-fA-F]+:\u001b\\[m \u001b\\[33m 86%\u001b\\[m": " \u001b[2;37mzawiera $BUILD:\u001b[m \u001b[33m 86%\u001b[m"
+        " \u001b\\[2;37mzawiera [0-9a-fA-F]+:\u001b\\[m (.+)": " \u001b[2;37mzawiera $BUILD:\u001b[m \\1"
     },
     "expected": [
         0,

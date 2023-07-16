@@ -94,8 +94,9 @@ class Env:
             patched = patches[patch]
             pattern = re.compile(patch)
             for lineno in range(len(lines)):
-                if pattern.match(lines[lineno]):
-                    lines[lineno] = patched
+                m = pattern.match(lines[lineno])
+                if m:
+                    lines[lineno] = m.expand(patched)
         return "\n".join(lines)
 
 
