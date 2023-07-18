@@ -1,0 +1,185 @@
+# The configurations that used for the recording, feel free to edit them
+config:
+
+  # Specify a command to be executed
+  # like `/bin/bash -l`, `ls`, or any other commands
+  # the default is bash for Linux
+  # or powershell.exe for Windows
+  command: ./type.py
+  
+  # Specify the current working directory path
+  # the default is the current working directory path
+  cwd: ~/code/cov/data/assets
+  
+  # Export additional ENV variables
+  env:
+    recording: true
+  
+  # Explicitly set the number of columns
+  # or use `auto` to take the current
+  # number of columns of your shell
+  cols: 120
+  
+  # Explicitly set the number of rows
+  # or use `auto` to take the current
+  # number of rows of your shell
+  rows: 32
+  
+  # Amount of times to repeat GIF
+  # If value is -1, play once
+  # If value is 0, loop indefinitely
+  # If value is a positive number, loop n times
+  repeat: 0
+  
+  # Quality
+  # 1 - 100
+  quality: 100
+  
+  # Delay between frames in ms
+  # If the value is `auto` use the actual recording delays
+  frameDelay: auto
+  
+  # Maximum delay between frames in ms
+  # Ignored if the `frameDelay` isn't set to `auto`
+  # Set to `auto` to prevent limiting the max idle time
+  maxIdleTime: auto
+  
+  # The surrounding frame box
+  # The `type` can be null, window, floating, or solid`
+  # To hide the title use the value null
+  # Don't forget to add a backgroundColor style with a null as type
+  frameBox:
+    type: solid
+    title: null
+    style:
+      border: 0px black solid
+      # boxShadow: none
+      # margin: 0px
+  
+  # Add a watermark image to the rendered gif
+  # You need to specify an absolute path for
+  # the image on your machine or a URL, and you can also
+  # add your own CSS styles
+  watermark:
+    imagePath: null
+    style:
+      position: absolute
+      right: 15px
+      bottom: 15px
+      width: 100px
+      opacity: 0.9
+  
+  # Cursor style can be one of
+  # `block`, `underline`, or `bar`
+  cursorStyle: block
+  
+  # Font family
+  # You can use any font that is installed on your machine
+  # in CSS-like syntax
+  fontFamily: "Ubuntu Mono, Monaco, Lucida Console, Monospace"
+  
+  # The size of the font
+  fontSize: 12
+  
+  # The height of lines
+  lineHeight: 1
+  
+  # The spacing between letters
+  letterSpacing: 0
+  
+  # Theme
+  theme:
+    background: "transparent"
+    foreground: "#c2c4c2"
+    cursor: "#c7c7c7"
+    black: "#232628"
+    red: "#d65755"
+    green: "#b3e33b"
+    yellow: "#e1df11"
+    blue: "#4d8ed3"
+    magenta: "#ae89fe"
+    cyan: "#708387"
+    white: "#d5d5d0"
+    brightBlack: "#626566"
+    brightRed: "#f14c4c"
+    brightGreen: "#23d18b"
+    brightYellow: "#ebdf86"
+    brightBlue: "#3b8eea"
+    brightMagenta: "#ae89fe"
+    brightCyan: "#b1c6ca"
+    brightWhite: "#f9f9f4"
+  
+# Records, feel free to edit them
+records:
+  - delay: 0
+    content: "\e[01;32mmarcin@nuc7\e[00m:\e[01;34m~/code/cov\e[00m$ "
+  - delay: 100
+    content: co
+  - delay: 100
+    content: 'v '
+  - delay: 100
+    content: sh
+  - delay: 100
+    content: ow
+  - delay: 100
+    content: ' v'
+  - delay: 100
+    content: '0.'
+  - delay: 100
+    content: '18'
+  - delay: 100
+    content: '.0'
+  - delay: 100
+    content: ..
+  - delay: 100
+    content: ':l'
+  - delay: 100
+    content: ib
+  - delay: 100
+    content: s/
+  - delay: 100
+    content: co
+  - delay: 100
+    content: v-
+  - delay: 100
+    content: ap
+  - delay: 100
+    content: i/
+  - delay: 100
+    content: in
+  - delay: 100
+    content: cl
+  - delay: 100
+    content: ud
+  - delay: 100
+    content: e/
+  - delay: 100
+    content: co
+  - delay: 100
+    content: v
+  - delay: 100
+    content: "\r\n"
+  - delay: 20
+    content: "\e[33mdirectory libs/cov-api/include/cov/\e[m\r\n\e[33mbuild\e[m \e[33mx86_64\e[m\e[2;33m, \e[m\e[33mDebug\e[m\e[2;33m, \e[m\e[33mgcc\e[m\e[2;33m, \e[m\e[33mstdc++\e[m\e[2;33m, \e[m\e[33m12.1.0\e[m\e[2;33m, \e[m\e[33mnuc7\e[m\e[2;33m, \e[m\e[33mubuntu\e[m\e[2;33m, \e[m\e[33m22.04\e[m\e[2;33m, sanitizer: \e[m\e[34moff\e[m\r\n\r\n+------------------+----------+---------+----------+---------+---------+\r\n| NAME             | COVERAGE | COVERED | RELEVANT | MISSING |  TOTAL  |\r\n+------------------+----------+---------+----------+---------+---------+\r\n| D git2           |  \e[1;32m100.00%\e[m |     206 |      206 |       0 | 1023    |\r\n| D hash           |  \e[1;32m100.00%\e[m |     103 |      103 |       0 |  256    |\r\n| D io             |  \e[1;32m100.00%\e[m |     210 |      210 |       0 |  939    |\r\n|   branch.hh      |  \e[1;32m100.00%\e[m |       6 |        6 |       0 |   36    |\r\n|   counted.hh     |  \e[1;32m100.00%\e[m |      80 |       80 |       0 |  194    |\r\n|   db.hh          |  \e[1;32m100.00%\e[m |       6 |        6 |       0 |   33    |\r\n|   discover.hh    |  \e[1;32m100.00%\e[m |       2 |        2 |       0 |   19    |\r\n|   error.hh       |  \e[1;32m100.00%\e[m |       5 |        5 |       0 |   29    |\r\n|   format.hh      |   \e[1;32m92.00%\e[m |      46 |       50 |       4 |  395 \e[2;37m+9\e[m |\r\n|   format_args.hh |  \e[1;32m100.00%\e[m |       7 |        7 |       0 |   71    |\r\n|   module.hh      |  \e[1;32m100.00%\e[m |       4 |        4 |       0 |   73    |\r\n|   object.hh      |  \e[1;32m100.00%\e[m |      19 |       19 |       0 |   92    |\r\n|   projection.hh  |  \e[1;32m100.00%\e[m |      38 |       38 |       0 |  102    |\r\n|   random.hh      |  \e[1;32m100.00%\e[m |       9 |        9 |       0 |   47    |\r\n|   reference.hh   |  \e[1;32m100.00%\e[m |      23 |       23 |       0 |  122    |\r\n|   report.hh      |  \e[1;32m100.00%\e[m |      19 |       19 |       0 |  197    |\r\n|   repository.hh  |  \e[1;32m100.00%\e[m |      45 |       45 |       0 |  209    |\r\n|   streams.hh     |  \e[1;32m100.00%\e[m |      17 |       17 |       0 |   87    |\r\n|   tabular.hh     |  \e[1;32m100.00%\e[m |      68 |       68 |       0 |  179    |\r\n|   tag.hh         |  \e[1;32m100.00%\e[m |       6 |        6 |       0 |   35    |\r\n|   zstream.hh     |  \e[1;32m100.00%\e[m |      21 |       21 |       0 |   80    |\r\n+------------------+----------+---------+----------+---------+---------+\r\n| > TOTAL          |   \e[1;32m99.58%\e[m |     940 |      944 |       4 | 4218 \e[2;37m+9\e[m |\r\n+------------------+----------+---------+----------+---------+---------+\r\n\e[01;32mmarcin@nuc7\e[00m:\e[01;34m~/code/cov\e[00m$ "
+  - delay: 2500
+    content: 'cov show v0.18.0..:libs/cov-api/include/cov'
+  - delay: 200
+    content: /f
+  - delay: 100
+    content: or
+  - delay: 100
+    content: ma
+  - delay: 100
+    content: t.
+  - delay: 100
+    content: hh
+  - delay: 100
+    content: "\r\n"
+  - delay: 20
+    content: "\e[33mfile libs/cov-api/include/cov/format.hh\e[m\r\n\e[33mbuild\e[m \e[33mx86_64\e[m\e[2;33m, \e[m\e[33mDebug\e[m\e[2;33m, \e[m\e[33mgcc\e[m\e[2;33m, \e[m\e[33mstdc++\e[m\e[2;33m, \e[m\e[33m12.1.0\e[m\e[2;33m, \e[m\e[33mnuc7\e[m\e[2;33m, \e[m\e[33mubuntu\e[m\e[2;33m, \e[m\e[33m22.04\e[m\e[2;33m, sanitizer: \e[m\e[34moff\e[m\r\n\r\n+-------------+----------+---------+----------+---------+--------+\r\n| NAME        | COVERAGE | COVERED | RELEVANT | MISSING | TOTAL  |\r\n+-------------+----------+---------+----------+---------+--------+\r\n|   format.hh |   \e[1;32m92.00%\e[m |      46 |       50 |       4 | 395 \e[2;37m+9\e[m |\r\n+-------------+----------+---------+----------+---------+--------+\r\n"
+  - delay: 26
+    content: "\r\n 159 |    |  \r\n 160 |    |      \e[1;37mtemplate\e[m <typename Variant>\e[m\r\n 161 |    |      \e[1;37mstruct\e[m block_t {\e[m\r\n 162 | 0x | \e[0;49;31m-        block_type type{};\e[m\r\n 163 | 0x | \e[0;49;31m-        std::string ref{};\e[m\r\n 164 | 0x | \e[0;49;31m-        std::vector<Variant> opcodes{};\e[m\r\n 165 |    |  \r\n 166 | 0x | \e[0;49;31m-        \e[1;31mbool\e[0;49;31m \e[1;31moperator\e[0;49;31m==(block_t \e[1;31mconst\e[0;49;31m&) \e[1;31mconst\e[0;49;31m \e[1;31mnoexcept\e[0;49;31m = \e[1;31mdefault\e[0;49;31m;\e[m\r\n 167 |    |      };\r\n 168 |    |  \r\n 169 |    |      \e[1;37mstruct\e[m printable : extend<common, block_t<printable>>::type {\e[m\r\n\r\n\e[01;32mmarcin@nuc7\e[00m:\e[01;34m~/code/cov\e[00m$ "
+  - delay: 2500
+    content: clear
+  - delay: 200
+    content: "\r\n\e[H\e[2J\e[3J\r\n"
