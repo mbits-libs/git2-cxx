@@ -15,7 +15,7 @@ namespace cov::testing {
 	struct parser_test {
 		std::string_view name;
 		std::string_view tmplt{};
-		std::vector<ph::format> expected{};
+		std::vector<ph::printable> expected{};
 
 		friend std::ostream& operator<<(std::ostream& out,
 		                                parser_test const& param) {
@@ -26,7 +26,7 @@ namespace cov::testing {
 	class format_parser : public TestWithParam<parser_test> {};
 
 	struct visit {
-		ph::format const& value;
+		ph::printable const& value;
 		struct sub {
 			std::ostream& out;
 
@@ -39,6 +39,12 @@ namespace cov::testing {
 			std::ostream& operator()(ph::width const& w) {
 				return out << "%w(" << w.total << ',' << w.indent1 << ','
 				           << w.indent2 << ')';
+			}
+			std::ostream& operator()(ph::self s) {
+				return out << "%self{" << static_cast<int>(s) << '}';
+			}
+			std::ostream& operator()(ph::stats s) {
+				return out << "%stats{" << static_cast<int>(s) << '}';
 			}
 			std::ostream& operator()(ph::report r) {
 				return out << "%report{" << static_cast<int>(r) << '}';
@@ -60,6 +66,15 @@ namespace cov::testing {
 				}
 				return out << "fld{" << static_cast<int>(pair.second) << '}';
 			}
+
+			std::ostream& operator()(ph::block const& loop) {
+				out << "%[" << static_cast<int>(loop.type) << ' ' << loop.ref
+				    << '{';
+				for (auto const& item : loop.opcodes) {
+					out << visit{item};
+				}
+				return out << "}]";
+			}
 		};
 		friend std::ostream& operator<<(std::ostream& out,
 		                                visit const& visitor) {
@@ -68,7 +83,7 @@ namespace cov::testing {
 	};
 
 	struct print {
-		std::vector<ph::format> const& format;
+		std::vector<ph::printable> const& format;
 		friend std::ostream& operator<<(std::ostream& out, print const& param) {
 			out << '{';
 			auto first = true;
@@ -172,6 +187,49 @@ namespace cov::testing {
 	    MAKE_COLOR_TEST("C(bold rating)", ph::color::bold_rating),
 	    MAKE_COLOR_TEST("C(bg rating)", ph::color::bg_rating),
 	    MAKE_COLOR_TEST("C(faint rating)", ph::color::faint_rating),
+
+	    MAKE_TEST("report hash", "%HR", ph::self::primary_hash),
+	    MAKE_TEST("contents hash", "%HC", ph::self::primary_hash),
+	    MAKE_TEST("primary hash", "%H1", ph::self::primary_hash),
+
+	    MAKE_TEST("file list hash", "%HF", ph::self::secondary_hash),
+	    MAKE_TEST("lines hash", "%HL", ph::self::secondary_hash),
+	    MAKE_TEST("secondary hash", "%H2", ph::self::secondary_hash),
+
+	    MAKE_TEST("parent hash", "%HP", ph::self::tertiary_hash),
+	    MAKE_TEST("functions hash", "%Hf", ph::self::tertiary_hash),
+	    MAKE_TEST("tertiary hash", "%H3", ph::self::tertiary_hash),
+
+	    MAKE_TEST("git commit hash", "%HG", ph::self::quaternary_hash),
+	    MAKE_TEST("branches hash", "%HB", ph::self::quaternary_hash),
+	    MAKE_TEST("quaternary hash", "%H4", ph::self::quaternary_hash),
+
+	    MAKE_TEST("report hash (abbr)", "%hR", ph::self::primary_hash_abbr),
+	    MAKE_TEST("contents hash (abbr)", "%hC", ph::self::primary_hash_abbr),
+	    MAKE_TEST("primary hash (abbr)", "%h1", ph::self::primary_hash_abbr),
+
+	    MAKE_TEST("file list hash (abbr)",
+	              "%hF",
+	              ph::self::secondary_hash_abbr),
+	    MAKE_TEST("lines hash (abbr)", "%hL", ph::self::secondary_hash_abbr),
+	    MAKE_TEST("secondary hash (abbr)",
+	              "%h2",
+	              ph::self::secondary_hash_abbr),
+
+	    MAKE_TEST("parent hash (abbr)", "%hP", ph::self::tertiary_hash_abbr),
+	    MAKE_TEST("functions hash (abbr)", "%hf", ph::self::tertiary_hash_abbr),
+	    MAKE_TEST("tertiary hash (abbr)", "%h3", ph::self::tertiary_hash_abbr),
+
+	    MAKE_TEST("git commit hash (abbr)",
+	              "%hG",
+	              ph::self::quaternary_hash_abbr),
+	    MAKE_TEST("branches hash (abbr)",
+	              "%hB",
+	              ph::self::quaternary_hash_abbr),
+	    MAKE_TEST("quaternary hash (abbr)",
+	              "%h4",
+	              ph::self::quaternary_hash_abbr),
+
 	    MAKE_TEST("refs", "%d", ph::report::ref_names),
 	    MAKE_TEST("refs unwrapped", "%D", ph::report::ref_names_unwrapped),
 	    MAKE_TEST("magic refs", "%md", ph::report::magic_ref_names),
@@ -182,25 +240,26 @@ namespace cov::testing {
 	    MAKE_TEST("sanitized subject", "%f", ph::commit::subject_sanitized),
 	    MAKE_TEST("body", "%b", ph::commit::body),
 	    MAKE_TEST("raw body", "%B", ph::commit::body_raw),
-	    MAKE_TEST("report hash", "%Hr", ph::report::hash),
-	    MAKE_TEST("commit hash", "%Hc", ph::commit::hash),
-	    MAKE_TEST("report hash (abbr)", "%hr", ph::report::hash_abbr),
-	    MAKE_TEST("commit hash (abbr)", "%hc", ph::commit::hash_abbr),
-	    MAKE_TEST("parent hash", "%rP", ph::report::parent_hash),
-	    MAKE_TEST("parent hash (abbr)", "%rp", ph::report::parent_hash_abbr),
-	    MAKE_TEST("file list hash", "%rF", ph::report::file_list_hash),
-	    MAKE_TEST("file list hash (abbr)",
-	              "%rf",
-	              ph::report::file_list_hash_abbr),
 	    MAKE_TEST("branch", "%rD", ph::report::branch),
-	    MAKE_TEST("percent", "%pP", ph::report::lines_percent),
-	    MAKE_TEST("total", "%pT", ph::report::lines_total),
-	    MAKE_TEST("relevant", "%pR", ph::report::lines_relevant),
-	    MAKE_TEST("covered", "%pC", ph::report::lines_covered),
-	    MAKE_TEST("covered", "%pr", ph::report::lines_rating),
+
+	    MAKE_TEST("total text lines", "%pL", ph::stats::lines),
+	    MAKE_TEST("lines (percent)", "%pPL", ph::stats::lines_percent),
+	    MAKE_TEST("lines (total)", "%pTL", ph::stats::lines_total),
+	    MAKE_TEST("lines (visited)", "%pVL", ph::stats::lines_visited),
+	    MAKE_TEST("lines (rating)", "%prL", ph::stats::lines_rating),
+	    MAKE_TEST("functions (percent)", "%pPF", ph::stats::functions_percent),
+	    MAKE_TEST("functions (total)", "%pTF", ph::stats::functions_total),
+	    MAKE_TEST("functions (visited)", "%pVF", ph::stats::functions_visited),
+	    MAKE_TEST("functions (rating)", "%prF", ph::stats::functions_rating),
+	    MAKE_TEST("branches (percent)", "%pPB", ph::stats::branches_percent),
+	    MAKE_TEST("branches (total)", "%pTB", ph::stats::branches_total),
+	    MAKE_TEST("branches (visited)", "%pVB", ph::stats::branches_visited),
+	    MAKE_TEST("branches (rating)", "%prB", ph::stats::branches_rating),
+
 	    MAKE_DATE_TEST("report", "r", ph::who::reporter),
 	    MAKE_PERSON_TEST("author", "a", ph::who::author),
 	    MAKE_PERSON_TEST("committer", "c", ph::who::committer),
+
 	    MAKE_TEST("empty width", "%w()", (ph::width{76, 6, 9})),
 	    MAKE_TEST("width (1 arg)", "%w(60)", (ph::width{60, 6, 9})),
 	    MAKE_TEST("width (indent only)", "%w(0, 6)", (ph::width{0, 6, 6})),

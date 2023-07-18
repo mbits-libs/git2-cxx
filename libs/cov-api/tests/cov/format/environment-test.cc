@@ -65,22 +65,22 @@ namespace cov::placeholder {
 		           << r.passing << '}';
 	}
 
-	std::ostream& operator<<(std::ostream& out, context const& ctx) {
-		out << "{.hash_length=" << ctx.hash_length << "u, .names=" << ctx.names
-		    << ", .marks" << ctx.marks;
-		if (!ctx.time_zone.empty())
-			testing::print_view(out << ", .time_zone=", ctx.time_zone);
-		if (!ctx.locale.empty())
-			testing::print_view(out << ", .locale=", ctx.locale);
-		if (ctx.app) out << ", .app=" << ctx.app;
-		if (ctx.translate) out << ", .translate=" << ctx.translate;
-		if (ctx.colorize) {
-			if (ctx.colorize == formatter::shell_colorize)
+	std::ostream& operator<<(std::ostream& out, environment const& env) {
+		out << "{.hash_length=" << env.hash_length << "u, .names=" << env.names
+		    << ", .marks" << env.marks;
+		if (!env.time_zone.empty())
+			testing::print_view(out << ", .time_zone=", env.time_zone);
+		if (!env.locale.empty())
+			testing::print_view(out << ", .locale=", env.locale);
+		if (env.app) out << ", .app=" << env.app;
+		if (env.translate) out << ", .translate=" << env.translate;
+		if (env.colorize) {
+			if (env.colorize == formatter::shell_colorize)
 				out << ", .colorize=formatter::shell_colorize";
 			else
-				out << ", .colorize=" << ctx.colorize;
+				out << ", .colorize=" << env.colorize;
 		}
-		if (ctx.decorate) out << ", .decorate=true";
+		if (env.decorate) out << ", .decorate=true";
 		return out << '}';
 	}
 }  // namespace cov::placeholder
@@ -106,7 +106,7 @@ namespace cov::testing {
 		std::string_view name;
 		std::string_view location;
 		std::vector<path_info> steps;
-		ph::context expected{};
+		ph::environment expected{};
 		struct {
 			color_feature clr{use_feature::yes};
 			decorate_feature decorate{use_feature::yes};
@@ -117,9 +117,9 @@ namespace cov::testing {
 			return out << param.name;
 		}
 	};
-	class context : public ::testing::TestWithParam<context_test> {};
+	class environment : public ::testing::TestWithParam<context_test> {};
 
-	TEST_P(context, create) {
+	TEST_P(environment, create) {
 		auto const& [_, location, steps, almost_expected, tweaks] = GetParam();
 
 		git::init init{};
@@ -136,7 +136,7 @@ namespace cov::testing {
 		ASSERT_FALSE(ec);
 
 		auto const actual =
-		    ph::context::from(repo, tweaks.clr, tweaks.decorate);
+		    ph::environment::from(repo, tweaks.clr, tweaks.decorate);
 
 		auto expected = almost_expected;
 		expected.now = actual.now;
@@ -305,5 +305,5 @@ namespace cov::testing {
 	    },
 	};
 
-	INSTANTIATE_TEST_SUITE_P(tests, context, ::testing::ValuesIn(tests));
+	INSTANTIATE_TEST_SUITE_P(tests, environment, ::testing::ValuesIn(tests));
 }  // namespace cov::testing
