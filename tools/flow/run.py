@@ -161,6 +161,13 @@ group.add_argument(
     f'compiler={default_compiler()} build_type=Release sanitizer=OFF"',
 )
 group.add_argument(
+    "--both",
+    required=False,
+    action="store_true",
+    help=f'shortcut for "-c os={matrix.platform} '
+    f'compiler={default_compiler()} build_type=Debug build_type=Release sanitizer=OFF"',
+)
+group.add_argument(
     "--sane",
     required=False,
     action="store_true",
@@ -242,7 +249,7 @@ def main():
         parser.error("-s/--step and -S are mutually exclusive")
     if len(args.steps_plus):
         args.steps = _extend(args.steps_plus, args.steps)
-    if args.dev or args.rel or args.sane:
+    if args.dev or args.rel or args.both or args.sane:
         args.configs.append(
             [
                 f"os={matrix.platform}",
@@ -251,6 +258,8 @@ def main():
                 f"sanitizer={'ON' if args.sane else 'OFF'}",
             ]
         )
+        if args.both:
+            args.configs.append(["build_type=Release"])
     args.configs = _config(_flatten(args.configs), not (args.official or args.github))
     runner.runner.DRY_RUN = args.dry_run
     runner.runner.CUTDOWN_OS = args.cutdown_os
