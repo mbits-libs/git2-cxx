@@ -3,6 +3,7 @@
     "patches": {
         "\u001b\\[33mreport [0-9a-f]{40}\u001b\\[m": "\u001b[33mreport $REPORT_HASH\u001b[m",
         "commit [0-9a-f]{40}": "commit $COMMIT_HASH",
+        "build  [0-9a-f]{40} (.*)": "build  $BUILD_HASH \\1",
         "Added:     .*": "Added:     $NOW"
     },
     "expected": [
@@ -10,6 +11,7 @@
         [
             "\u001b[33mreport $REPORT_HASH\u001b[m",
             "commit $COMMIT_HASH",
+            "build  $BUILD_HASH [ 86%]",
             "GitBranch: main",
             "Coverage:  [ 86%] \u001b[2;37m6/7\u001b[m \u001b[2;33m(incomplete)\u001b[m",
             "Author:    Johnny Appleseed <johnny@appleseed.com>",

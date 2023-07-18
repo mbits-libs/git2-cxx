@@ -65,9 +65,9 @@ namespace cov::app::builtin::show {
 		auto entries = view.project(report_diff(info, ec));
 		if (ec) p.error(ec, p.tr());
 
-		app::show::context ctx{
+		app::show::environment env{
 		    .colorizer = p.colorizer(),
-		    .marks = placeholder::context::rating_from(info.repo)};
+		    .marks = placeholder::environment::rating_from(info.repo)};
 
 		auto const is_standalone =
 		    entries.size() == 1 &&
@@ -76,26 +76,22 @@ namespace cov::app::builtin::show {
 		auto const is_root = !is_standalone && view.module.filter.empty() &&
 		                     view.fname.prefix.empty();
 
-		auto const build_printer = [](app::show::parser const& p,
-		                              auto const& report, auto const& builds) {
+		auto const build_printer = [repo = &info.repo](
+		                               app::show::parser const& p,
+		                               cov::report const* report) {
 			using namespace std::chrono;
 			auto const now = floor<seconds>(system_clock::now());
 			auto const build_format =
-			    formatter::from("%C(yellow)build%Creset %mD%n");
-
-			for (auto const& build : builds) {
-				auto const view =
-				    placeholder::report_view::from(report, *build);
-				if (view.properties.empty()) continue;
-				auto const message =
-				    build_format.format(view, {.now = now,
-				                               .hash_length = 9,
-				                               .names = {},
-				                               .colorize = p.colorizer(),
-				                               .decorate = true,
-				                               .prop_names = false});
-				fmt::print("{}", message);
-			}
+			    formatter::from("%{B[%{?[%C(yellow)build%Creset %mD%n%]}%]}");
+			auto facade =
+			    placeholder::object_facade::present_report(report, repo);
+			fmt::print("{}", build_format.format(facade.get(),
+			                                     {.now = now,
+			                                      .hash_length = 9,
+			                                      .names = {},
+			                                      .colorize = p.colorizer(),
+			                                      .decorate = true,
+			                                      .prop_names = false}));
 		};
 
 		if (is_root) {
@@ -107,35 +103,31 @@ namespace cov::app::builtin::show {
 
 			p.show.print(info.repo, info.range, 1);
 		} else if (is_standalone) {
-			std::span<std::unique_ptr<cov::report::build> const> builds{};
+			fmt::print("{}file {}{}\n", env.color_for(color::yellow),
+			           entries.front().name.expanded,
+			           env.color_for(color::reset));
+
 			auto const report =
 			    info.repo.lookup<cov::report>(info.range.to, ec);
-			if (!ec && report) builds = report->entries();
-
-			fmt::print("{}file {}{}\n", ctx.color_for(color::yellow),
-			           entries.front().name.expanded,
-			           ctx.color_for(color::reset));
-			build_printer(p, *report, builds);
+			if (!ec && report) build_printer(p, report.get());
 			fmt::print("\n");
 		} else {
-			std::span<std::unique_ptr<cov::report::build> const> builds{};
-			auto const report =
-			    info.repo.lookup<cov::report>(info.range.to, ec);
-			if (!ec && report) builds = report->entries();
-
 			if (!view.module.filter.empty()) {
-				fmt::print("{}module {}{}\n", ctx.color_for(color::yellow),
-				           view.module.filter, ctx.color_for(color::reset));
+				fmt::print("{}module {}{}\n", env.color_for(color::yellow),
+				           view.module.filter, env.color_for(color::reset));
 			}
 			if (!view.fname.prefix.empty()) {
-				fmt::print("{}directory {}{}\n", ctx.color_for(color::yellow),
-				           view.fname.prefix, ctx.color_for(color::reset));
+				fmt::print("{}directory {}{}\n", env.color_for(color::yellow),
+				           view.fname.prefix, env.color_for(color::reset));
 			}
-			build_printer(p, *report, builds);
+
+			auto const report =
+			    info.repo.lookup<cov::report>(info.range.to, ec);
+			if (!ec && report) build_printer(p, report.get());
 			fmt::print("\n");
 		}
 
-		ctx.print_table(entries);
+		env.print_table(entries);
 
 		if (!is_standalone) return 0;
 

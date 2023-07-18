@@ -4,7 +4,7 @@
     "expected": [
         0,
         [
-            "użycie: cov log [-h] [<zakres-rewizji>] [-n <liczba>] [--oneline] [--format <format>] [--abbrev-hash] [--no-abbrev-hash] [--color <kiedy>] [--decorate <jak>]",
+            "użycie: cov log [-h] [<zakres-rewizji>] [-n <liczba>] [--oneline] [--format <format>] [--abbrev-hash] [--no-abbrev-hash] [--prop-names] [--no-prop-names] [--color <kiedy>] [--decorate <jak>]",
             "",
             "argumenty pozycyjne:",
             " <zakres-rewizji>         pokazuje tylko raporty z określonego zakresu rewizji",
@@ -16,6 +16,8 @@
             " --format <format>        wyświetla zawartość dzienników raportu w danym formacie, gdzie <format> może być jednym z „oneline”, „short”, „medium”, „full”, „fuller”, „reference”, „raw” i „pretty:<string>”; gdy <format> nie jest żadnym z powyższych i zawiera %symbol zastępczy, działa tak, jakby zostało wywołane --format=pretty:<format>",
             " --abbrev-hash            zamiast wyświetlać pełną 40-bajtową szesnastkową nazwę obiektu raportu, pokazuje prefiks, który nazywa obiekty jednoznacznie",
             " --no-abbrev-hash         pokazuje pełną 40-bajtową szesnastkową nazwę obiektu raportu",
+            " --prop-names             pokazuje wszystkie właściwości kompilacji z nazwami właściwości",
+            " --no-prop-names          pokazuje właściwości kompilacji, które są ciągami znaków, bez nazw właściwości; ponieważ flagi logiczne i liczby nie przekazują znaczenia, są nadal wyświetlane z nazwami właściwości",
             " --color <kiedy>          używa koloru na wyjściu; <kiedy> jest jednym z „never” (nigdy), „always” (zawsze) lub „auto”",
             " --decorate <jak>         drukuje referencje wyświetlanych raportów; <jak> jest jednym z „short” (krótkie), „auto” lub „no” (nie)\n"
         ],
