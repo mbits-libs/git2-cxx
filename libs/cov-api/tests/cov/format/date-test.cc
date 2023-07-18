@@ -8,6 +8,7 @@
 
 namespace cov::testing {
 	using namespace ::std::literals;
+	using namespace ::git::literals;
 	using ::testing::TestWithParam;
 	using ::testing::ValuesIn;
 	namespace ph = placeholder;
@@ -42,7 +43,7 @@ namespace cov::testing {
 		auto const& [commit, add, time_zone, locale] = tweaks;
 		auto fmt = formatter::from(tmplt);
 
-		ph::context ctx = {
+		ph::environment env = {
 		    .now = now(),
 		    .hash_length = 9,
 		    .names = {},
@@ -50,10 +51,10 @@ namespace cov::testing {
 		    .locale = locale,
 		};
 
-		git_oid id{}, parent_id{}, commit_id{}, zero{};
-		git_oid_fromstr(&id, "112233445566778899aabbccddeeff0012345678");
-		git_oid_fromstr(&parent_id, "8765432100ffeeddccbbaa998877665544332211");
-		git_oid_fromstr(&commit_id, "36109a1c35e0d5cf3e5e68d896c8b1b4be565525");
+		git::oid zero{};
+		auto const id = "112233445566778899aabbccddeeff0012345678"_oid;
+		auto const parent_id = "8765432100ffeeddccbbaa998877665544332211"_oid;
+		auto const commit_id = "36109a1c35e0d5cf3e5e68d896c8b1b4be565525"_oid;
 
 		auto report = report::create(
 		    id, parent_id, zero, commit_id, "develop"sv,
@@ -63,8 +64,8 @@ namespace cov::testing {
 		    {1250, {300, 299}, {0, 0}, {0, 0}}, {});
 		ASSERT_TRUE(report);
 
-		auto view = ph::report_view::from(*report);
-		auto actual = fmt.format(view, ctx);
+		auto facade = ph::object_facade::present_report(report.get(), nullptr);
+		auto actual = fmt.format(facade.get(), env);
 		ASSERT_EQ(expected, actual);
 	}  // namespace cov::testing
 
@@ -202,67 +203,67 @@ namespace cov::testing {
 	    },
 	    {
 	        "in the future"sv,
-	        "%hr (from %hc) %pP (%pr) added %rr"sv,
+	        "%hR (from %hG) %pPL (%prL) added %rr"sv,
 	        "112233445 (from 36109a1c3) 100% (pass) added in the future"sv,
 	        {.add = now() + 1s},
 	    },
 	    {
 	        "1/2 min ago"sv,
-	        "%hr (from %hc) %pP (%pr) added %rr"sv,
+	        "%hR (from %hG) %pPL (%prL) added %rr"sv,
 	        "112233445 (from 36109a1c3) 100% (pass) added 31 seconds ago"sv,
 	        {.add = now() - 31s},
 	    },
 	    {
 	        "5 min ago"sv,
-	        "%hr (from %hc) %pP (%pr) added %rr"sv,
+	        "%hR (from %hG) %pPL (%prL) added %rr"sv,
 	        "112233445 (from 36109a1c3) 100% (pass) added 5 minutes ago"sv,
 	        {.add = now() - 5min},
 	    },
 	    {
 	        "hours ago"sv,
-	        "%hr (from %hc) %pP (%pr) added %rr"sv,
+	        "%hR (from %hG) %pPL (%prL) added %rr"sv,
 	        "112233445 (from 36109a1c3) 100% (pass) added 25 hours ago"sv,
 	        {.add = now() - 25h},
 	    },
 	    {
 	        "days ago"sv,
-	        "%hr (from %hc) %pP (%pr) added %rr"sv,
+	        "%hR (from %hG) %pPL (%prL) added %rr"sv,
 	        "112233445 (from 36109a1c3) 100% (pass) added 4 days ago"sv,
 	        {.add = now() - 4_d},
 	    },
 	    {
 	        "weeks ago"sv,
-	        "%hr (from %hc) %pP (%pr) added %rr"sv,
+	        "%hR (from %hG) %pPL (%prL) added %rr"sv,
 	        "112233445 (from 36109a1c3) 100% (pass) added 2 weeks ago"sv,
 	        {.add = now() - 14_d},
 	    },
 	    {
 	        "many weeks ago"sv,
-	        "%hr (from %hc) %pP (%pr) added %rr"sv,
+	        "%hR (from %hG) %pPL (%prL) added %rr"sv,
 	        "112233445 (from 36109a1c3) 100% (pass) added 9 weeks ago"sv,
 	        {.add = now() - 65_d},
 	    },
 	    {
 	        "months ago"sv,
-	        "%hr (from %hc) %pP (%pr) added %rr"sv,
+	        "%hR (from %hG) %pPL (%prL) added %rr"sv,
 	        "112233445 (from 36109a1c3) 100% (pass) added 2 months ago"sv,
 	        {.add = now() - 70_d},
 	    },
 	    {
 	        "year ago"sv,
-	        "%hr (from %hc) %pP (%pr) added %rr"sv,
+	        "%hR (from %hG) %pPL (%prL) added %rr"sv,
 	        "112233445 (from 36109a1c3) 100% (pass) added one year ago"sv,
 	        {.add = now() - 365_d},
 	    },
 	    {
 	        "2 years, 3 months ago"sv,
-	        "%hr (from %hc) %pP (%pr) added %rr"sv,
+	        "%hR (from %hG) %pPL (%prL) added %rr"sv,
 	        "112233445 (from 36109a1c3) 100% (pass) added 2 years, 3 months ago"sv,
 	        {.add = now() - (2 * 365_d + 80_d)},
 	    },
 	    {
 	        "5+ years"sv,
-	        "%hr (from %hc) %pP (%pr) added %rr"sv,
+	        "%hR (from %hG) %pPL (%prL) added %rr"sv,
 	        "112233445 (from 36109a1c3) 100% (pass) added 6 years ago"sv,
 	        {.add = now() - (6 * 365_d + 80_d)},
 	    },

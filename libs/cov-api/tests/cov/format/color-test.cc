@@ -62,7 +62,7 @@ namespace cov::testing {
 		auto const& [_, tmplt, expected, tweaks] = GetParam();
 		auto fmt = formatter::from(tmplt);
 
-		ph::context ctx = {
+		ph::environment env = {
 		    .now = jul5,
 		    .hash_length = 9,
 		    .names = {.HEAD = {},
@@ -81,8 +81,8 @@ namespace cov::testing {
 		auto report = make_report(id, tweaks.stats);
 		ASSERT_TRUE(report);
 
-		auto view = ph::report_view::from(*report);
-		auto actual = fmt.format(view, ctx);
+		auto facade = ph::object_facade::present_report(report.get(), nullptr);
+		auto actual = fmt.format(facade.get(), env);
 		std::fputs(actual.c_str(), stdout);
 		std::fputc('\n', stdout);
 		ASSERT_EQ(expected.nocolor, actual);
@@ -92,7 +92,7 @@ namespace cov::testing {
 		auto const& [_, tmplt, expected, tweaks] = GetParam();
 		auto fmt = formatter::from(tmplt);
 
-		ph::context ctx = {
+		ph::environment env = {
 		    .now = jul5,
 		    .hash_length = 9,
 		    .names = {.HEAD = {},
@@ -111,8 +111,8 @@ namespace cov::testing {
 		auto report = make_report(id, tweaks.stats);
 		ASSERT_TRUE(report);
 
-		auto view = ph::report_view::from(*report);
-		auto actual = fmt.format(view, ctx);
+		auto facade = ph::object_facade::present_report(report.get(), nullptr);
+		auto actual = fmt.format(facade.get(), env);
 		std::fputs(actual.c_str(), stdout);
 		std::fputc('\n', stdout);
 		ASSERT_EQ(expected.shell, actual);
@@ -161,7 +161,7 @@ namespace cov::testing {
 		    }};
 
 		for (auto const [clr, expected, stats] : marks) {
-			auto const actual = formatter::apply_mark(clr, stats, rating);
+			auto const actual = formatter::apply_mark(clr, stats.lines, rating);
 			EXPECT_EQ(expected, actual);
 		}
 	}
@@ -171,9 +171,9 @@ namespace cov::testing {
 	    std::ratio_multiply<std::chrono::hours::period, std::ratio<24>>>;
 
 	static constexpr auto rating_tmplt =
-	    "%C(red)%hr%Creset%C(yellow)%d%Creset %C(bg rating) %pP %Creset "
-	    "%C(faint normal)%pC/%pR%Creset %C(bold rating)(%pr)%Creset - "
-	    "%Cred[%hc@%rD]%Creset %s %Cblue<%an>%Creset %C(green)(committed %cr, "
+	    "%C(red)%hR%Creset%C(yellow)%d%Creset %C(bg rating) %pPL %Creset "
+	    "%C(faint normal)%pVL/%pTL%Creset %C(bold rating)(%prL)%Creset - "
+	    "%Cred[%hG@%rD]%Creset %s %Cblue<%an>%Creset %C(green)(committed %cr, "
 	    "added %rr)%C(reset)"sv;
 
 	static color_test const tests[] = {

@@ -40,7 +40,7 @@ namespace cov::testing {
 
 	class format : public TestWithParam<format_test> {
 	protected:
-		ph::context context(std::string const& head, bool use_color) {
+		ph::environment environment(std::string const& head, bool use_color) {
 			return {
 			    .now = now(),
 			    .hash_length = 9,
@@ -102,8 +102,8 @@ namespace cov::testing {
 		    tweaks;
 		auto fmt = formatter::from(tmplt);
 
-		ph::context ctx = context(head, use_color);
-		if (marks) ctx.marks = *marks;
+		ph::environment env = environment(head, use_color);
+		if (marks) env.marks = *marks;
 		git_oid id{};
 		git_oid_fromstr(&id, report_id.empty()
 		                         ? "112233445566778899aabbccddeeff0012345678"
@@ -134,8 +134,8 @@ namespace cov::testing {
 		    commit, add, stats);
 		ASSERT_TRUE(report);
 
-		auto view = ph::report_view::from(*report);
-		auto actual = fmt.format(view, ctx);
+		auto facade = ph::object_facade::present_report(report.get(), nullptr);
+		auto actual = fmt.format(facade.get(), env);
 		ASSERT_EQ(expected, actual);
 	}  // namespace cov::testing
 
@@ -143,7 +143,7 @@ namespace cov::testing {
 	    {"empty"sv},
 	    {
 	        "HEAD"sv,
-	        "%hr%d %pC/%pR %pP (%pr) - from [%hc] %s <%an>"sv,
+	        "%hR%d %pVL/%pTL %pPL (%prL) - from [%hG] %s <%an>"sv,
 	        "112233445 (HEAD -> feat/task-1, tag: v1.0.1) 299/300 "
 	        "100% (pass) - from [36109a1c3] Subject, isn't it? <Johnny "
 	        "Appleseed>"sv,
@@ -151,7 +151,7 @@ namespace cov::testing {
 	    },
 	    {
 	        "HEAD (magic colors)"sv,
-	        "%hr%md %pC/%pR %pP (%pr) - from [%hc] %s <%an>"sv,
+	        "%hR%md %pVL/%pTL %pPL (%prL) - from [%hG] %s <%an>"sv,
 	        "112233445\x1B[33m (\x1B[m\x1B[1;36mHEAD -> "
 	        "\x1B[m\x1B[1;32mfeat/task-1\x1B[m\x1B[33m, \x1B[m\x1B[1;33mtag: "
 	        "v1.0.1\x1B[m\x1B[33m)\x1B[m 299/300 100% (pass) - from "
@@ -161,7 +161,7 @@ namespace cov::testing {
 	    },
 	    {
 	        "detached HEAD"sv,
-	        "%hr%d %pC/%pR %pP (%pr) - from [%hc] %s <%an>"sv,
+	        "%hR%d %pVL/%pTL %pPL (%prL) - from [%hG] %s <%an>"sv,
 	        "112233445 (HEAD, tag: v1.0.1, feat/task-1) 299/300 100% (pass) - "
 	        "from [36109a1c3] Subject, isn't it? <Johnny Appleseed>"sv,
 	        {.report = "112233445566778899aabbccddeeff0012345678"sv,
@@ -169,7 +169,7 @@ namespace cov::testing {
 	    },
 	    {
 	        "detached HEAD (magic colors)"sv,
-	        "%hr%md %pC/%pR %pP (%pr) - from [%hc] %s <%an>"sv,
+	        "%hR%md %pVL/%pTL %pPL (%prL) - from [%hG] %s <%an>"sv,
 	        "112233445\x1B[33m (\x1B[m\x1B[1;36mHEAD\x1B[m\x1B[33m, "
 	        "\x1B[m\x1B[1;33mtag: v1.0.1\x1B[m\x1B[33m, "
 	        "\x1B[m\x1B[1;32mfeat/task-1\x1B[m\x1B[33m)\x1B[m 299/300 100% "
@@ -180,7 +180,7 @@ namespace cov::testing {
 	    },
 	    {
 	        "detached HEAD (magic colors unwrapped)"sv,
-	        "%hr [%mD] %pC/%pR %pP (%pr) - from [%hc] %s <%an>"sv,
+	        "%hR [%mD] %pVL/%pTL %pPL (%prL) - from [%hG] %s <%an>"sv,
 	        "112233445 [\x1B[1;36mHEAD\x1B[m\x1B[33m, \x1B[m\x1B[1;33mtag: "
 	        "v1.0.1\x1B[m\x1B[33m, \x1B[m\x1B[1;32mfeat/task-1\x1B[m] 299/300 "
 	        "100% (pass) - from [36109a1c3] Subject, isn't it? <Johnny "
@@ -191,7 +191,7 @@ namespace cov::testing {
 	    },
 	    {
 	        "main"sv,
-	        "%hr%d %pC/%pR %pP (%pr) - from [%hc] %s <%an>"sv,
+	        "%hR%d %pVL/%pTL %pPL (%prL) - from [%hG] %s <%an>"sv,
 	        "221144335 (main) 226/300  75% (incomplete) - from [36109a1c3] "
 	        "Subject, isn't it? <Johnny Appleseed>"sv,
 	        {.report = "221144335566778899aabbccddeeff0012345678"sv,
@@ -199,7 +199,7 @@ namespace cov::testing {
 	    },
 	    {
 	        "v1.0.0"sv,
-	        "%hr%d %pC/%pR %pP (%pr) - from [%hc] %s <%an>"sv,
+	        "%hR%d %pVL/%pTL %pPL (%prL) - from [%hG] %s <%an>"sv,
 	        "221133445 (tag: v1.0.0) 270/300  90% (pass) - from [36109a1c3] "
 	        "Subject, isn't it? <Johnny Appleseed>"sv,
 	        {.report = "221133445566778899aabbccddeeff0012345678"sv,
@@ -207,7 +207,7 @@ namespace cov::testing {
 	    },
 	    {
 	        "no refs"sv,
-	        "%hr%d %pC/%pR %pP (%pr) - from [%hc] %s <%an>"sv,
+	        "%hR%d %pVL/%pTL %pPL (%prL) - from [%hG] %s <%an>"sv,
 	        "442211335 100/300  33% (fail) - from [36109a1c3] Subject, isn't "
 	        "it? <Johnny Appleseed>"sv,
 	        {.report = "442211335566778899aabbccddeeff0012345678"sv,
@@ -215,7 +215,7 @@ namespace cov::testing {
 	    },
 	    {
 	        "nothing to judge"sv,
-	        "%hr%d %pC/%pR %pP (%pr) - from [%hc] %s <%an>"sv,
+	        "%hR%d %pVL/%pTL %pPL (%prL) - from [%hG] %s <%an>"sv,
 	        "442211335 0/0   0% (fail) - from [36109a1c3] Subject, isn't it? "
 	        "<Johnny Appleseed>"sv,
 	        {.report = "442211335566778899aabbccddeeff0012345678"sv,
@@ -223,7 +223,7 @@ namespace cov::testing {
 	    },
 	    {
 	        "broken rating (bad passing)"sv,
-	        "%hr%d %pC/%pR %pP (%pr) - from [%hc] %s <%an>"sv,
+	        "%hR%d %pVL/%pTL %pPL (%prL) - from [%hG] %s <%an>"sv,
 	        "442211335 300/300 100% (fail) - from [36109a1c3] Subject, isn't "
 	        "it? <Johnny Appleseed>"sv,
 	        {.report = "442211335566778899aabbccddeeff0012345678"sv,
@@ -232,7 +232,7 @@ namespace cov::testing {
 	    },
 	    {
 	        "broken rating (bad incomplete)"sv,
-	        "%hr%d %pC/%pR %pP (%pr) - from [%hc] %s <%an>"sv,
+	        "%hR%d %pVL/%pTL %pPL (%prL) - from [%hG] %s <%an>"sv,
 	        "442211335 300/300 100% (fail) - from [36109a1c3] Subject, isn't "
 	        "it? <Johnny Appleseed>"sv,
 	        {.report = "442211335566778899aabbccddeeff0012345678"sv,
@@ -241,14 +241,14 @@ namespace cov::testing {
 	    },
 	    {
 	        "HEAD (unwrapped)"sv,
-	        "%hr [%D] %pC/%pR %pP (%pr) - from [%hc] %s <%an>"sv,
+	        "%hR [%D] %pVL/%pTL %pPL (%prL) - from [%hG] %s <%an>"sv,
 	        "112233445 [HEAD -> feat/task-1, tag: v1.0.1] 299/300 100% (pass) "
 	        "- from [36109a1c3] Subject, isn't it? <Johnny Appleseed>"sv,
 	        {.report = "112233445566778899aabbccddeeff0012345678"sv},
 	    },
 	    {
 	        "detached HEAD (unwrapped)"sv,
-	        "%hr [%D] %pC/%pR %pP (%pr) - from [%hc] %s <%an>"sv,
+	        "%hR [%D] %pVL/%pTL %pPL (%prL) - from [%hG] %s <%an>"sv,
 	        "112233445 [HEAD, tag: v1.0.1, feat/task-1] 299/300 100% (pass) - "
 	        "from [36109a1c3] Subject, isn't it? <Johnny Appleseed>"sv,
 	        {.report = "112233445566778899aabbccddeeff0012345678"sv,
@@ -256,7 +256,7 @@ namespace cov::testing {
 	    },
 	    {
 	        "main (unwrapped)"sv,
-	        "%hr [%D] %pC/%pR %pP (%pr) - from [%hc] %s <%an>"sv,
+	        "%hR [%D] %pVL/%pTL %pPL (%prL) - from [%hG] %s <%an>"sv,
 	        "221144335 [main] 226/300  75% (incomplete) - from [36109a1c3] "
 	        "Subject, isn't it? <Johnny Appleseed>"sv,
 	        {.report = "221144335566778899aabbccddeeff0012345678"sv,
@@ -264,7 +264,7 @@ namespace cov::testing {
 	    },
 	    {
 	        "no refs (unwrapped)"sv,
-	        "%hr [%D] %pC/%pR %pP (%pr) - from [%hc] %s <%an>"sv,
+	        "%hR [%D] %pVL/%pTL %pPL (%prL) - from [%hG] %s <%an>"sv,
 	        "442211335 [] 100/300  33% (fail) - from [36109a1c3] Subject, "
 	        "isn't "
 	        "it? <Johnny Appleseed>"sv,
@@ -273,17 +273,17 @@ namespace cov::testing {
 	    },
 	    {
 	        "file list (long and short)"sv,
-	        "%rF %rf"sv,
+	        "%HF %hF"sv,
 	        "7698a173c0f8b9c38bd853ba767c71df40b9f669 7698a173c"sv,
 	    },
 	    {
 	        "export name"sv,
-	        "0001-%hr-%f.xml"sv,
+	        "0001-%hR-%f.xml"sv,
 	        "0001-112233445-Subject-isn-t-it.xml"sv,
 	    },
 	    {
 	        "full body"sv,
-	        "%Hr%d %pC/%pR %pP (%pr) - from [%Hc] %s <%an %al %ae>%n%B"sv,
+	        "%HR%d %pVL/%pTL %pPL (%prL) - from [%HG] %s <%an %al %ae>%n%B"sv,
 	        "112233445566778899aabbccddeeff0012345678 (HEAD -> feat/task-1, "
 	        "tag: v1.0.1) 299/300 100% (pass) - from "
 	        "[36109a1c35e0d5cf3e5e68d896c8b1b4be565525] Subject, isn't it? "
@@ -311,10 +311,10 @@ namespace cov::testing {
 	    },
 	    {
 	        "full printout"sv,
-	        "report %Hr%n"
-	        "parent: %rP [%rp]%n"
-	        "stats: %pC/%pR (%pT) %pP (%pr)%n"
-	        "commit: %hc%n"
+	        "report %HR%n"
+	        "parent: %HP [%hP]%n"
+	        "stats: %pVL/%pTL (%pL) %pPL (%prL)%n"
+	        "commit: %hG%n"
 	        "  branch: %rD%n"
 	        "  author: %an <%ae> %at (%as)%n"
 	        "  committer: %cn <%ce> %ct (%cs)%n"
@@ -355,7 +355,7 @@ namespace cov::testing {
 	    },
 	    {
 	        "mid printout"sv,
-	        "%hr %pP (%pr) - [%rD] %an <%ae>%n%n%w(54,5,8)%B"sv,
+	        "%hR %pPL (%prL) - [%rD] %an <%ae>%n%n%w(54,5,8)%B"sv,
 	        "112233445 100% (pass) - [develop] Johnny Appleseed "
 	        "<johnny@appleseed.com>\n\n     Subject, isn't it?\n\n        "
 	        "Lorem ipsum dolor sit amet, consectetur\n        adipiscing elit. "
@@ -395,7 +395,7 @@ namespace cov::testing {
 	TEST_F(format, long_line) {
 		auto fmt = formatter::from("%w(30)%b"sv);
 
-		ph::context ctx = context({}, false);
+		ph::environment env = environment({}, false);
 		git_oid id{};
 		git_oid_fromstr(&id, "112233445566778899aabbccddeeff0012345678");
 		auto report = make_report(id,
@@ -409,15 +409,15 @@ This-line-is-too-long-to-be-properly-wrapped. However, this line is perfectly wr
       However, this line is
       perfectly wrappable)"sv;
 
-		auto view = ph::report_view::from(*report);
-		auto actual = fmt.format(view, ctx);
+		auto facade = ph::object_facade::present_report(report.get(), nullptr);
+		auto actual = fmt.format(facade.get(), env);
 		ASSERT_EQ(expected, actual);
 	}
 
 	TEST_F(format, starts_excatly_at_limit) {
 		auto fmt = formatter::from("%w(30, 5)%b"sv);
 
-		ph::context ctx = context({}, false);
+		ph::environment env = environment({}, false);
 		git_oid id{};
 		git_oid_fromstr(&id, "112233445566778899aabbccddeeff0012345678");
 		auto report = make_report(id,
@@ -432,8 +432,8 @@ This-line-is-too-long-to-be-properly-wrapped. However, this line is perfectly wr
      1234 56789 1234567890 987
      5643 21.)"sv;
 
-		auto view = ph::report_view::from(*report);
-		auto actual = fmt.format(view, ctx);
+		auto facade = ph::object_facade::present_report(report.get(), nullptr);
+		auto actual = fmt.format(facade.get(), env);
 		ASSERT_EQ(expected, actual);
 	}
 }  // namespace cov::testing

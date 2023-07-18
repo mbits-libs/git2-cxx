@@ -89,7 +89,7 @@ namespace cov::testing {
 	}
 
 	TEST(oom, format) {
-		ph::context ctx = {
+		ph::environment env = {
 		    .now =
 		        std::chrono::floor<seconds>(std::chrono::system_clock::now()),
 		    .hash_length = 9,
@@ -119,9 +119,9 @@ namespace cov::testing {
 		git_oid id{};
 		git_oid_fromstr(&id, "112233445566778899aabbccddeeff0012345678");
 		auto const report =
-		    make_report(id, {message.data(), message.size()}, ctx.now, ctx.now);
+		    make_report(id, {message.data(), message.size()}, env.now, env.now);
 
-		auto view = ph::report_view::from(*report);
+		auto facade = ph::object_facade::present_report(report.get(), nullptr);
 		auto fmt = formatter::from(
 		    "%Hr%d %pC/%pR %pP (%pr) - from [%Hc] %s <%an %al %ae>%n%B"sv);
 
@@ -129,7 +129,7 @@ namespace cov::testing {
 		date::current_zone();
 
 		OOM_BEGIN(1024);
-		fmt.format(view, ctx);
+		fmt.format(facade.get(), env);
 		OOM_END;
 	}
 

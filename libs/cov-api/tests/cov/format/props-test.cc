@@ -40,16 +40,14 @@ namespace cov::testing {
 			auto const builds =
 			    cov::report::builder{}.add_nfo({.props = props}).release();
 
-			cov::placeholder::report_view view{
-			    .properties = builds.front()->properties(),
-			    .has_properties{true},
-			};
-			cov::placeholder::context ctx{
+			auto facade = cov::placeholder::object_facade::present_build(
+			    builds.front().get(), nullptr);
+			cov::placeholder::environment env{
 			    .colorize{use_color ? formatter::shell_colorize : nullptr},
 			    .decorate{flags.decorate},
 			    .prop_names{flags.labels},
 			};
-			auto const actual = formatter.format(view, ctx);
+			auto const actual = formatter.format(facade.get(), env);
 
 			EXPECT_EQ(expected, actual) << actual;
 		}

@@ -12,6 +12,7 @@
 namespace cov::testing {
 	namespace {
 		using namespace std::literals;
+		using namespace git::literals;
 		class test_stream final : public write_stream {
 		public:
 			static constexpr size_t infinite =
@@ -54,13 +55,6 @@ namespace cov::testing {
 				return nullptr;
 			}
 		};
-
-		git::oid operator""_oid(const char* str, size_t len) {
-			git_oid result{};
-			if (len == GIT_OID_HEXSZ) git_oid_fromstr(&result, str);
-			return git::oid{result};
-		}
-
 	}  // namespace
 
 	TEST(files, load) {
