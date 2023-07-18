@@ -60,7 +60,7 @@ If there is an ✔ beside a color, it means this color could be prefixed with ei
 
 ### Git commit information
 
-Below, "person" is either author or committer. 
+Below, "person" is either author or committer.
 
 |Placeholder|Meaning|
 |-|-|
@@ -150,7 +150,7 @@ There is possibility of moving away from current context. This will change meani
 
 Each context change starts with `%{<name>[` and ends with `%]}`. The `<name>` is a name of new context and may be empty. For example `%hR:%{B[ %hR%]}` in context of a report would print a short hash of the report, then  a space-separated short hash of each attached build.
 
-```
+```text
 7ea9628cf: 94b3a3180 e9274a33f
 ```
 
@@ -164,7 +164,7 @@ Each context change starts with `%{<name>[` and ends with `%]}`. The `<name>` is
 
 Optional output uses context change to loop over zero or one element, when the name starts with a question mark (`?`). For example `%{?prop[build %hR - %mD%n%]}` in context of a build would output anything only, if there are any properties attached to a build.
 
-```
+```text
 build c5d8aeaa6 - javac, debug=true, qnx
 ```
 
