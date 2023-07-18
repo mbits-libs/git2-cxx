@@ -21,6 +21,8 @@
 #endif
 #include <cov/format.hh>
 #include <optional>
+#include <string>
+#include <string_view>
 
 namespace cov::placeholder {
 	struct internal_environment {

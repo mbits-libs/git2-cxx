@@ -7,6 +7,7 @@
 #include <cov/reference.hh>
 #include <cov/report.hh>
 #include <map>
+#include <memory>
 #include <string>
 #include <utility>
 #include <variant>
