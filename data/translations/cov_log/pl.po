@@ -15,7 +15,8 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 "
+"|| n%100>14) ? 1 : 2);\n"
 "X-Generator: Poedit 2.4.2\n"
 
 #. Description for --abbrev-hash argument
@@ -36,8 +37,8 @@ msgid ""
 "above, and has %placeholder in it, it acts as if --format=pretty:<format> "
 "were given"
 msgstr ""
-"wyświetla zawartość dzienników raportu w danym formacie, gdzie <format> może"
-" być jednym z „oneline”, „short”, „medium”, „full”, „fuller”, „reference”, "
+"wyświetla zawartość dzienników raportu w danym formacie, gdzie <format> może "
+"być jednym z „oneline”, „short”, „medium”, „full”, „fuller”, „reference”, "
 "„raw” i „pretty:<string>”; gdy <format> nie jest żadnym z powyższych i "
 "zawiera %symbol zastępczy, działa tak, jakby zostało wywołane "
 "--format=pretty:<format>"
@@ -71,6 +72,16 @@ msgctxt "NO_ABBREV_HASH_DESCRIPTION"
 msgid "shows the full 40-byte hexadecimal report object name"
 msgstr "pokazuje pełną 40-bajtową szesnastkową nazwę obiektu raportu"
 
+#. Description for --no-prop-names argument
+msgctxt "NO_PROP_NAMES_DESCRIPTION"
+msgid ""
+"shows string build properties without property names; since boolean flags "
+"and numbers do not convey meaning, they are still shown with property names"
+msgstr ""
+"pokazuje właściwości kompilacji, które są ciągami znaków, bez nazw "
+"właściwości; ponieważ flagi logiczne i liczby nie przekazują znaczenia, są "
+"nadal wyświetlane z nazwami właściwości"
+
 #. Name of a number argument
 msgctxt "NUMBER_META"
 msgid "<number>"
@@ -80,6 +91,11 @@ msgstr "<liczba>"
 msgctxt "ONELINE_DESCRIPTION"
 msgid "a shorthand for \"--format=oneline --abbrev-hash\" used together"
 msgstr "skrót  użytych jednocześnie \"--format=oneline --abbrev-hash\""
+
+#. Description for --prop-names argument
+msgctxt "PROP_NAMES_DESCRIPTION"
+msgid "shows all build properties with property names"
+msgstr "pokazuje wszystkie właściwości kompilacji z nazwami właściwości"
 
 #. Description for log and show target argument
 msgctxt "REV_RANGE_DESCRIPTION"

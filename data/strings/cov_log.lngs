@@ -28,6 +28,12 @@
     ABBREV_HASH_DESCRIPTION = "instead of showing the full 40-byte hexadecimal report object name, shows a prefix that names the objects uniquely";
     [help("Description for --no-abbrev-hash argument"), id(-1)]
     NO_ABBREV_HASH_DESCRIPTION = "shows the full 40-byte hexadecimal report object name";
+    [help("Description for --prop-names argument"), id(-1)]
+    PROP_NAMES_DESCRIPTION = "shows all build properties with property names";
+    [help("Description for --no-prop-names argument"), id(-1)]
+    NO_PROP_NAMES_DESCRIPTION =
+        "shows string build properties without property names; "
+        "since boolean flags and numbers do not convey meaning, they are still shown with property names";
     [help("Description for --oneline argument"), id(-1)]
     ONELINE_DESCRIPTION = "a shorthand for \"--format=oneline --abbrev-hash\" used together";
 }

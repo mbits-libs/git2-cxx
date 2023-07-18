@@ -45,7 +45,7 @@ namespace cov::app::show {
 		show_range show{};
 	};
 
-	struct context {
+	struct environment {
 		enum class row_type : bool { footer = false, data = true };
 		std::string (*colorizer)(placeholder::color, void*) = nullptr;
 		void* app = nullptr;
@@ -66,7 +66,7 @@ namespace cov::app::show {
 		}
 
 		std::string apply_mark(std::string_view label,
-		                       io::v1::coverage_stats const& stats) const {
+		                       io::v1::stats const& stats) const {
 			return fmt::format(
 			    "{}{}{}", color_for(placeholder::color::bold_rating, &stats),
 			    label, color_for(placeholder::color::reset));
@@ -89,9 +89,8 @@ namespace cov::app::show {
 			                   color_for(color::reset));
 		}
 
-		std::string color_for(
-		    placeholder::color clr,
-		    io::v1::coverage_stats const* stats = nullptr) const;
+		std::string color_for(placeholder::color clr,
+		                      io::v1::stats const* stats = nullptr) const;
 		void add(data_table& table,
 		         char type,
 		         projection::entry_stats const& stats,

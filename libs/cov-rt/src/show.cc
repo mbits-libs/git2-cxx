@@ -58,18 +58,18 @@ namespace cov::app::show {
 		           : +[](placeholder::color, void*) { return std::string{}; };
 	}
 
-	std::string context::color_for(placeholder::color clr,
-	                               io::v1::coverage_stats const* stats) const {
+	std::string environment::color_for(placeholder::color clr,
+	                                   io::v1::stats const* stats) const {
 		if (!colorizer) return {};
 		if (stats) clr = formatter::apply_mark(clr, *stats, marks);
 		return colorizer(clr, app);
 	}
 
-	void context::add(data_table& table,
-	                  char type,
-	                  entry_stats const& stats,
-	                  std::string_view label,
-	                  row_type row) const {
+	void environment::add(data_table& table,
+	                      char type,
+	                      entry_stats const& stats,
+	                      std::string_view label,
+	                      row_type row) const {
 		using placeholder::color;
 
 		auto change = stats.diff();
@@ -78,7 +78,7 @@ namespace cov::app::show {
 		        {type},
 		        {label.data(), label.size()},
 		        apply_mark(val(change.coverage.current, "%"sv),
-		                   change.stats.current),
+		                   change.stats.current.lines),
 		        val_sign(change.coverage.diff, color::faint_green, "%"sv),
 		        val(change.stats.current.lines.visited),
 		        val_sign(change.stats.diff.lines.visited),
@@ -97,7 +97,7 @@ namespace cov::app::show {
 		    row == row_type::data);
 	}
 
-	void context::print_table(std::vector<entry> const& entries) const {
+	void environment::print_table(std::vector<entry> const& entries) const {
 		entry_stats total{};
 		data_table table{.header = {
 		                     {"NAME"s, '<'},  // GCOV_EXCL_LINE[GCC]
