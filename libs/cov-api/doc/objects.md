@@ -80,6 +80,13 @@ After un-gzipping, each file start with a file header, consisting of magic and v
 |9|2|functions|stats|
 |11|2|branches|stats|
 
+### email_ref
+
+|Offset|Size|Value|Type|
+|-----:|---:|-----|----|
+|0|1|name|str|
+|1|1|email|str|
+
 
 ## BUILD
 
@@ -100,13 +107,6 @@ After un-gzipping, each file start with a file header, consisting of magic and v
 |16|2|branches|stats|
 ||||**_strings_**|
 |`SO`|`SIZE`|bytes|UTF8Z|
-
-### Email ref
-
-|Offset|Size|Value|Type|
-|-----:|---:|-----|----|
-|0|1|name|str|
-|1|1|email|str|
 
 
 ## FILES

@@ -443,10 +443,10 @@ namespace cov {
 		return escape_dict(node);
 	}
 
-	std::map<std::string, report::property> report::build::properties() const {
+	std::map<std::string, report::property> report::build::properties(
+	    std::string_view props) {
 		std::map<std::string, property> result{};
 
-		auto props = props_json();
 		if (props.empty()) return result;
 
 		std::string text{};
@@ -473,5 +473,4 @@ namespace cov {
 		}
 		return result;
 	}
-
 }  // namespace cov

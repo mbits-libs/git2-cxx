@@ -27,8 +27,9 @@ namespace cov {
 			virtual ~build();
 			virtual git::oid const& build_id() const noexcept = 0;
 			virtual std::string_view props_json() const noexcept = 0;
-			virtual std::map<std::string, property> properties() const;
 			virtual io::v1::coverage_stats const& stats() const noexcept = 0;
+			static std::map<std::string, property> properties(
+			    std::string_view props);
 		};
 
 		obj_type type() const noexcept override { return obj_report; };

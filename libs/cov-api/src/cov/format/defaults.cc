@@ -140,9 +140,9 @@ namespace cov {
 			}
 		}  // namespace
 
-		context context::from(cov::repository const& repo,
-		                      color_feature clr,
-		                      decorate_feature decorate) {
+		environment environment::from(cov::repository const& repo,
+		                              color_feature clr,
+		                              decorate_feature decorate) {
 			if (clr == use_feature::automatic) {
 				clr = platform::is_terminal(stdout) ? use_feature::yes
 				                                    : use_feature::no;
@@ -164,7 +164,7 @@ namespace cov {
 			        .decorate = decorate == use_feature::yes};
 		}
 
-		rating context::rating_from(cov::repository const& repo) {
+		rating environment::rating_from(cov::repository const& repo) {
 			auto const value = repo.config().get_string("core.rating");
 			if (value) {
 				auto const view = std::string_view{*value};
@@ -216,6 +216,12 @@ namespace cov {
 			}
 			bool operator()(auto) { return false; }
 			bool operator()(placeholder::width const&) { return false; }
+			bool operator()(placeholder::block const& b) {
+				auto needs_timezones = false;
+				for (auto const& op : b.opcodes)
+					needs_timezones |= std::visit(tz_visitor{}, op);
+				return needs_timezones;
+			}
 		};
 
 		std::string default_tr(long long count,
@@ -226,7 +232,7 @@ namespace cov {
 		}
 	}  // namespace
 
-	formatter::formatter(std::vector<placeholder::format>&& format)
+	formatter::formatter(std::vector<placeholder::printable>&& format)
 	    : format_{std::move(format)} {
 		needs_timezones_ = false;
 		for (auto const& fmt : format_)

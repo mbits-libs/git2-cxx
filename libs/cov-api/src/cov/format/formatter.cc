@@ -1,48 +1,15 @@
 // Copyright (c) 2022 Marcin Zdun
 // This code is licensed under MIT license (see LICENSE for details)
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4189)
-#endif
-#include <fmt/format.h>
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-
-#if defined(__GNUC__) && !defined(__clang__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuseless-cast"
-#endif
-#include <date/tz.h>
-#if defined(__GNUC__) && !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif
 #include <fmt/chrono.h>
 #include <charconv>
-#include <cov/format.hh>
+#include <cov/repository.hh>
 #include <ctime>
 #include <iostream>
 #include "../path-utils.hh"
+#include "internal_environment.hh"
 
 namespace cov::placeholder {
-	struct internal_context {
-		context const* client;
-		void* app;
-		std::string (*tr)(long long count, translatable scale, void* app);
-		date::time_zone const* tz;
-		iterator formatted_output(iterator out, std::string_view view);
-		std::optional<width> current_witdh{};
-
-		std::string translate(long long count, translatable scale) const {
-			return tr(count, scale, app);
-		}
-
-		std::string translate(translatable scale) const {
-			return tr(0, scale, app);
-		}
-	};
-
 	namespace {
 		struct leaky_iterator : iterator {
 			auto cont() { return container; }
@@ -54,12 +21,12 @@ namespace cov::placeholder {
 		}
 	}  // namespace
 
-	iterator internal_context::formatted_output(iterator out,
-	                                            std::string_view view) {
-		if (!current_witdh) return format_str(out, view);
+	iterator internal_environment::formatted_output(iterator out,
+	                                                std::string_view view) {
+		if (!current_width) return format_str(out, view);
 		view = strip(view);
 		auto first = true;
-		unsigned indent = current_witdh->indent1;
+		unsigned indent = current_width->indent1;
 		while (!view.empty()) {
 			if (first)
 				first = false;
@@ -69,7 +36,7 @@ namespace cov::placeholder {
 			auto const pos = view.find("\n\n"sv);
 			auto chunk = view.substr(0, pos);
 
-			size_t index{}, length{current_witdh->total - indent};
+			size_t index{}, length{current_width->total - indent};
 			auto const indent_str = std::string(indent, ' ');
 			while (!chunk.empty()) {
 				size_t word_len{};
@@ -94,7 +61,7 @@ namespace cov::placeholder {
 			}
 			view = pos == std::string_view::npos ? std::string_view{}
 			                                     : lstrip(view.substr(pos));
-			indent = current_witdh->indent2;
+			indent = current_width->indent2;
 		}
 
 		return out;
@@ -134,111 +101,24 @@ namespace cov::placeholder {
 		}
 
 		iterator format_hash(iterator out,
-		                     git_oid const* id,
+		                     git::oid const* id,
 		                     unsigned length = GIT_OID_HEXSZ) {
-			char str[GIT_OID_HEXSZ + 1];
-			git_oid_nfmt(str, length, id);
-			str[length] = 0;
-			return format_str(out, std::string_view{str, length});
+			return format_str(out, id->str(length));
 		}
 
-		iterator format_percentage(iterator out,
-		                           io::v1::coverage_stats const& stats) {
-			return fmt::format_to(out, "{:>3}%", stats.lines.calc(0).whole);
+		iterator format_percentage(iterator out, io::v1::stats const& stats) {
+			return fmt::format_to(out, "{:>3}%", stats.calc(0).whole);
 		}
 
 		iterator format_rating(iterator out,
-		                       io::v1::coverage_stats const& stats,
-		                       internal_context const& ctx) {
-			auto mark = formatter::apply_mark(stats, ctx.client->marks);
-			return format_str(out, ctx.translate(mark));
+		                       io::v1::stats const& stats,
+		                       internal_environment const& env) {
+			auto mark = formatter::apply_mark(stats, env.client->marks);
+			return format_str(out, env.translate(mark));
 		}
 
 		iterator format_num(iterator out, auto value) {
 			return fmt::format_to(out, "{}", value);
-		}
-
-		struct property_visitor {
-			iterator out;
-			bool magic_colors;
-			report_view const& view;
-			internal_context& ctx;
-			std::string const* key{};
-			std::string_view prefix{};
-
-			iterator color_str(iterator out_iter,
-			                   color clr,
-			                   std::string_view str) const {
-				if (magic_colors) out_iter = view.format(out_iter, ctx, clr);
-				out_iter = format_str(out_iter, str);
-				if (magic_colors)
-					out_iter = view.format(out_iter, ctx, color::reset);
-				return out_iter;
-			}
-
-			void color_str(color clr, std::string_view str) {
-				out = color_str(out, clr, str);
-			}
-
-			void color_key(bool force) {
-				if (force || ctx.client->prop_names) {
-					color_str(color::faint_yellow,
-					          fmt::format("{}{}: ", prefix, *key));
-				} else if (!prefix.empty()) {
-					color_str(color::faint_yellow, prefix);
-				}
-			}
-
-			void operator()(std::string_view str) {
-				color_key(false);
-				color_str(color::yellow, str);
-			}
-
-			void operator()(long long val) {
-				color_key(true);
-				color_str(color::green, fmt::format("{}", val));
-			}
-
-			void operator()(bool val) {
-				color_key(true);
-				color_str(color::blue, val ? "on"sv : "off"sv);
-			}
-		};
-
-		iterator format_properties(iterator out,
-		                           bool wrapped,
-		                           bool magic_colors,
-		                           report_view const& view,
-		                           internal_context& ctx) {
-			if (view.properties.empty() || !ctx.client->decorate) return out;
-
-			property_visitor painter{out, magic_colors, view, ctx};
-
-			bool first = true;
-			for (auto const& [key, value] : view.properties) {
-				painter.key = &key;
-				painter.prefix = {};
-				if (first) {
-					first = false;
-					if (wrapped) painter.prefix = " ("sv;
-				} else {
-					painter.prefix = ", "sv;
-				}
-				std::visit(painter, value);
-			}
-			out = painter.out;
-
-			if (!first && wrapped) {
-				if (magic_colors) {
-					out = view.format(out, ctx, color::faint_yellow);
-					*out++ = ')';
-					out = view.format(out, ctx, color::reset);
-				} else {
-					*out++ = ')';
-				}
-			}
-
-			return out;
 		}
 
 		enum class Z { none, ISO, ISO_colon };
@@ -339,31 +219,31 @@ namespace cov::placeholder {
 		}
 
 		std::string relative_date(sys_seconds then,
-		                          internal_context const& ctx) {
+		                          internal_environment const& env) {
 			using namespace std::chrono;
-			if (ctx.client->now < then)
-				return ctx.translate(translatable::in_the_future);
+			if (env.client->now < then)
+				return env.translate(translatable::in_the_future);
 
-			auto const secs = ctx.client->now - then;
+			auto const secs = env.client->now - then;
 			if (secs < 90s)
-				return ctx.translate(secs.count(), translatable::seconds_ago);
+				return env.translate(secs.count(), translatable::seconds_ago);
 
 			auto const mins = duration_cast<minutes>(secs + 30s);
 			if (mins < 90min)
-				return ctx.translate(mins.count(), translatable::minutes_ago);
+				return env.translate(mins.count(), translatable::minutes_ago);
 
 			auto const hrs = duration_cast<hours>(mins + 30min);
 			if (hrs < 36h)
-				return ctx.translate(hrs.count(), translatable::hours_ago);
+				return env.translate(hrs.count(), translatable::hours_ago);
 
 			auto const days = duration_cast<cov::placeholder::days>(hrs + 12h);
 			if (days < 14_d)
-				return ctx.translate(days.count(), translatable::days_ago);
+				return env.translate(days.count(), translatable::days_ago);
 			if (days < 70_d)
-				return ctx.translate((days + 3_d) / 7_d,
+				return env.translate((days + 3_d) / 7_d,
 				                     translatable::weeks_ago);
 			if (days < 365_d)
-				return ctx.translate((days + 15_d) / 30_d,
+				return env.translate((days + 15_d) / 30_d,
 				                     translatable::months_ago);
 
 			if (days < 1825_d) {
@@ -372,23 +252,23 @@ namespace cov::placeholder {
 				auto const months = totalmonths % 12;
 				if (months) {
 					auto yrs =
-					    ctx.translate(years, translatable::years_months_ago)
+					    env.translate(years, translatable::years_months_ago)
 					        .append(" ")
-					        .append(ctx.translate(months,
+					        .append(env.translate(months,
 					                              translatable::months_ago));
 					return yrs;
 				} else {  // GCOV_EXCL_LINE[WIN32]
-					return ctx.translate(years, translatable::years_ago);
+					return env.translate(years, translatable::years_ago);
 				}
 			}
-			return ctx.translate((days + 183_d) / 365_d,
+			return env.translate((days + 183_d) / 365_d,
 			                     translatable::years_ago);
 		}
 
-		struct visitor {
-			report_view const& view;
+		struct context_visitor {
+			context const& ctx;
 			iterator out;
-			internal_context& ctx;
+			internal_environment& env;
 
 			iterator operator()(char c) {
 				*out++ = c;
@@ -400,35 +280,104 @@ namespace cov::placeholder {
 			}
 
 			iterator operator()(person_info const& pair) {
-				return view.format(out, ctx, pair);
+				return ctx.format(out, env, pair);
 			}
-			iterator operator()(auto fld) { return view.format(out, ctx, fld); }
+			iterator operator()(auto fld) { return ctx.format(out, env, fld); }
 			iterator operator()(width const& w) {
-				ctx.current_witdh = w;
+				env.current_width = w;
 				return out;
+			}
+
+			iterator operator()(block const& b) {
+				if (!ctx.facade) return out;
+
+				if (b.type == block_type::if_start) {
+					if (!ctx.facade->condition(b.ref)) {
+						return out;
+					}
+					return ctx.format_all(out, env, b.opcodes);
+				}
+
+				// fmt::print(stderr, "entering facade loop for {}\n", b.ref);
+
+				auto iter = ctx.facade->loop(b.ref);
+
+				if (iter) {
+					do {
+						auto const next = iter->next();
+						if (!next) break;
+						out =
+						    context{next.get()}.format_all(out, env, b.opcodes);
+					} while (true);
+				}
+
+				return out;
+			}
+		};
+
+		struct property_visitor {
+			iterator out;
+			bool magic_colors;
+			context const& ctx;
+			internal_environment& env;
+			std::string const* key{};
+			std::string_view prefix{};
+
+			iterator color_str(iterator out_iter,
+			                   color clr,
+			                   std::string_view str) const {
+				if (magic_colors) out_iter = ctx.format(out_iter, env, clr);
+				out_iter = format_str(out_iter, str);
+				if (magic_colors)
+					out_iter = ctx.format(out_iter, env, color::reset);
+				return out_iter;
+			}
+
+			void color_str(color clr, std::string_view str) {
+				out = color_str(out, clr, str);
+			}
+
+			void color_key(bool force) {
+				if (force || env.client->prop_names) {
+					color_str(color::faint_yellow,
+					          fmt::format("{}{}: ", prefix, *key));
+				} else if (!prefix.empty()) {
+					color_str(color::faint_yellow, prefix);
+				}
+			}
+
+			void operator()(std::string_view str) {
+				color_key(false);
+				color_str(color::yellow, str);
+			}
+
+			void operator()(long long val) {
+				color_key(true);
+				color_str(color::green, fmt::format("{}", val));
+			}
+
+			void operator()(bool val) {
+				color_key(true);
+				color_str(color::blue, val ? "on"sv : "off"sv);
 			}
 		};
 	}  // namespace
 
 	iterator refs::format(iterator out,
-	                      git_oid const* id,
+	                      git::oid const* id,
 	                      bool wrapped,
 	                      bool magic_colors,
-	                      struct report_view const& view,
-	                      internal_context& ctx) const {
-		if (!id || !ctx.client->decorate) return out;
+	                      context const& ctx,
+	                      internal_environment& env) const {
+		if (!id || !env.client->decorate) return out;
 
-		char buffer[GIT_OID_HEXSZ + 1];
-		buffer[GIT_OID_HEXSZ] = 0;
-		git_oid_fmt(buffer, id);
-		auto const hash = std::string_view{buffer, GIT_OID_HEXSZ};
-
+		auto const hash = id->str();
 		auto const color_str = [&](iterator out_iter, color clr,
 		                           std::string_view str) {
-			if (magic_colors) out_iter = view.format(out_iter, ctx, clr);
+			if (magic_colors) out_iter = ctx.format(out_iter, env, clr);
 			out_iter = format_str(out_iter, str);
 			if (magic_colors)
-				out_iter = view.format(out_iter, ctx, color::reset);
+				out_iter = ctx.format(out_iter, env, color::reset);
 			return out_iter;
 		};
 
@@ -452,10 +401,10 @@ namespace cov::placeholder {
 			} else {
 				out = color_str(out, color::yellow, ", "sv);
 			}
-			if (magic_colors) out = view.format(out, ctx, color::bold_yellow);
+			if (magic_colors) out = ctx.format(out, env, color::bold_yellow);
 			out = format_str(out, "tag: "sv);
 			out = format_str(out, key);
-			if (magic_colors) out = view.format(out, ctx, color::reset);
+			if (magic_colors) out = ctx.format(out, env, color::reset);
 		}
 
 		for (auto const& [key, value] : heads) {
@@ -472,9 +421,9 @@ namespace cov::placeholder {
 
 		if (!first && wrapped) {
 			if (magic_colors) {
-				out = view.format(out, ctx, color::yellow);
+				out = ctx.format(out, env, color::yellow);
 				*out++ = ')';
-				out = view.format(out, ctx, color::reset);
+				out = ctx.format(out, env, color::reset);
 			} else {
 				*out++ = ')';
 			}
@@ -484,7 +433,7 @@ namespace cov::placeholder {
 	}
 
 	iterator git_person::format(iterator out,
-	                            internal_context& ctx,
+	                            internal_environment& env,
 	                            person fld) const {
 		switch (fld) {
 			case person::name:
@@ -494,95 +443,37 @@ namespace cov::placeholder {
 			case person::email_local:
 				return format_str(out, email.substr(0, email.find('@')));
 			case person::date:
-				return format_date(out, date, ctx.tz, ctx.client->locale,
+				return format_date(out, date, env.tz, env.client->locale,
 				                   "{:%c}"sv);
 			case person::date_relative:
-				return format_str(out, relative_date(date, ctx));
+				return format_str(out, relative_date(date, env));
 			case person::date_timestamp:
 				return format_num(out, date.time_since_epoch().count());
 			case person::date_iso_like:
-				return format_date(out, date, ctx.tz, ctx.client->locale,
+				return format_date(out, date, env.tz, env.client->locale,
 				                   "{:%F %T }"sv, Z::ISO_colon);
 			case person::date_iso_strict:
-				return format_date(out, date, ctx.tz, ctx.client->locale,
+				return format_date(out, date, env.tz, env.client->locale,
 				                   "{:%FT%T}"sv, Z::ISO);
 			case person::date_short:
-				return format_date(out, date, ctx.tz, ctx.client->locale,
+				return format_date(out, date, env.tz, env.client->locale,
 				                   "{:%F}"sv);
 		}
 		return out;  // GCOV_EXCL_LINE - all enums are handled above
 	}
 
 	iterator git_commit_view::format(iterator out,
-	                                 internal_context& ctx,
+	                                 internal_environment& env,
 	                                 commit fld) const {
 		switch (fld) {
-			case commit::hash:
-				return format_hash(out, id);
-			case commit::hash_abbr:
-				return format_hash(out, id, ctx.client->hash_length);
 			case commit::subject:
-				return ctx.formatted_output(out, subject_from(message));
+				return env.formatted_output(out, subject_from(message));
 			case commit::subject_sanitized:
 				return sanitized_subject(out, subject_from(message));
 			case commit::body:
-				return ctx.formatted_output(out, body_from(message));
+				return env.formatted_output(out, body_from(message));
 			case commit::body_raw:
-				return ctx.formatted_output(out, strip(message));
-		}
-		return out;  // GCOV_EXCL_LINE - all enums are handled above
-	}
-
-	iterator report_view::format(iterator out,
-	                             internal_context& ctx,
-	                             report fld) const {
-		width_cleaner clean{ctx};
-
-		switch (fld) {
-			case report::hash:
-				return format_hash(out, id);
-			case report::hash_abbr:
-				return format_hash(out, id, ctx.client->hash_length);
-			case report::parent_hash:
-				return format_hash(out, parent);
-			case report::parent_hash_abbr:
-				return format_hash(out, parent, ctx.client->hash_length);
-			case report::file_list_hash:
-				return format_hash(out, file_list);
-			case report::file_list_hash_abbr:
-				return format_hash(out, file_list, ctx.client->hash_length);
-			case report::ref_names:
-				if (has_properties)
-					return format_properties(out, true, false, *this, ctx);
-				return ctx.client->names.format(out, id, true, false, *this,
-				                                ctx);
-			case report::ref_names_unwrapped:
-				if (has_properties)
-					return format_properties(out, false, false, *this, ctx);
-				return ctx.client->names.format(out, id, false, false, *this,
-				                                ctx);
-			case report::magic_ref_names:
-				if (has_properties)
-					return format_properties(out, true, true, *this, ctx);
-				return ctx.client->names.format(out, id, true, true, *this,
-				                                ctx);
-			case report::magic_ref_names_unwrapped:
-				if (has_properties)
-					return format_properties(out, false, true, *this, ctx);
-				return ctx.client->names.format(out, id, false, true, *this,
-				                                ctx);
-			case report::branch:
-				return format_str(out, git.branch);
-			case report::lines_percent:
-				return !stats ? out : format_percentage(out, *stats);
-			case report::lines_total:
-				return !stats ? out : format_num(out, stats->lines_total);
-			case report::lines_relevant:
-				return !stats ? out : format_num(out, stats->lines.relevant);
-			case report::lines_covered:
-				return !stats ? out : format_num(out, stats->lines.visited);
-			case report::lines_rating:
-				return !stats ? out : format_rating(out, *stats, ctx);
+				return env.formatted_output(out, strip(message));
 		}
 		return out;  // GCOV_EXCL_LINE - all enums are handled above
 	}
@@ -596,63 +487,250 @@ namespace cov::placeholder {
 		                                                    : pass;
 	}
 
-	iterator report_view::format(iterator out,
-	                             internal_context& ctx,
-	                             color clr) const {
-		width_cleaner clean{ctx};
-		if (ctx.client->colorize) {
+	object_list::~object_list() = default;
+	object_facade::~object_facade() = default;
+	bool object_facade::condition(std::string_view tag) {
+		auto const list = loop(tag);
+		return list && list->next();
+	}
+
+	iterator context::format(iterator out,
+	                         internal_environment& env,
+	                         color clr) const {
+		width_cleaner clean{env};
+		if (env.client->colorize) {
 			if (clr == color::rating || clr == color::bold_rating ||
 			    clr == color::faint_rating || clr == color::bg_rating) {
-				clr = formatter::apply_mark(clr, *stats, ctx.client->marks);
+				io::v1::coverage_stats const* stats =
+				    facade ? facade->stats() : nullptr;
+				clr = formatter::apply_mark(
+				    clr, stats ? stats->lines : io::v1::stats{0, 0},
+				    env.client->marks);
 			}
 			out = format_str(
 			    out,
-			    ctx.client->colorize(
-			        clr, ctx.client->app));  // don't count towards width...
+			    env.client->colorize(
+			        clr, env.client->app));  // don't count towards width...
 		}
 		return out;
 	}
 
-	iterator report_view::format_with(iterator out,
-	                                  internal_context& ctx,
-	                                  placeholder::format const& fmt) const {
-		return std::visit(visitor{*this, out, ctx}, fmt);
+	iterator context::format(iterator out,
+	                         internal_environment& env,
+	                         self fld) const {
+		width_cleaner clean{env};
+		if (!facade) return out;
+
+		git::oid const* id{};
+		bool abbr{false};
+
+		switch (fld) {
+			case self::primary_hash_abbr:
+				abbr = true;
+				[[fallthrough]];
+			case self::primary_hash:
+				id = facade->primary_id();
+				break;
+
+			case self::secondary_hash_abbr:
+				abbr = true;
+				[[fallthrough]];
+			case self::secondary_hash:
+				id = facade->secondary_id();
+				break;
+
+			case self::tertiary_hash_abbr:
+				abbr = true;
+				[[fallthrough]];
+			case self::tertiary_hash:
+				id = facade->tertiary_id();
+				break;
+
+			case self::quaternary_hash_abbr:
+				abbr = true;
+				[[fallthrough]];
+			case self::quaternary_hash:
+				id = facade->quaternary_id();
+				break;
+		}
+
+		if (!id) {
+			return out;
+		}
+
+		if (abbr) {
+			return format_hash(out, id, env.client->hash_length);
+		}
+
+		return format_hash(out, id);
 	}
 
-	report_view::width_cleaner::~width_cleaner() noexcept {
-		ctx.current_witdh = std::nullopt;
+	iterator context::format(iterator out,
+	                         internal_environment& env,
+	                         placeholder::stats fld) const {
+		width_cleaner clean{env};
+		io::v1::coverage_stats const* stats =
+		    facade ? facade->stats() : nullptr;
+
+		switch (fld) {
+			case stats::lines:
+				return !stats ? out : format_num(out, stats->lines_total);
+			case stats::lines_total:
+				return !stats ? out : format_num(out, stats->lines.relevant);
+			case stats::lines_visited:
+				return !stats ? out : format_num(out, stats->lines.visited);
+			case stats::lines_rating:
+				return !stats ? out : format_rating(out, stats->lines, env);
+			case stats::lines_percent:
+				return !stats ? out : format_percentage(out, stats->lines);
+			case stats::functions_total:
+				return !stats ? out
+				              : format_num(out, stats->functions.relevant);
+			case stats::functions_visited:
+				return !stats ? out : format_num(out, stats->functions.visited);
+			case stats::functions_rating:
+				return !stats ? out : format_rating(out, stats->functions, env);
+			case stats::functions_percent:
+				return !stats ? out : format_percentage(out, stats->functions);
+			case stats::branches_total:
+				return !stats ? out : format_num(out, stats->branches.relevant);
+			case stats::branches_visited:
+				return !stats ? out : format_num(out, stats->branches.visited);
+			case stats::branches_rating:
+				return !stats ? out : format_rating(out, stats->branches, env);
+			case stats::branches_percent:
+				return !stats ? out : format_percentage(out, stats->branches);
+		}
+		return out;
 	}
+
+	iterator context::format(iterator out,
+	                         internal_environment& env,
+	                         report fld) const {
+		width_cleaner clean{env};
+
+		switch (fld) {
+			case report::ref_names:
+				return facade ? facade->prop(out, true, false, env) : out;
+			case report::ref_names_unwrapped:
+				return facade ? facade->prop(out, false, false, env) : out;
+			case report::magic_ref_names:
+				return facade ? facade->prop(out, true, true, env) : out;
+			case report::magic_ref_names_unwrapped:
+				return facade ? facade->prop(out, false, true, env) : out;
+			case report::branch: {
+				git_commit_view const* git = facade ? facade->git() : nullptr;
+				return git ? format_str(out, git->branch) : out;
+			}
+		}
+		return out;  // GCOV_EXCL_LINE - all enums are handled above
+	}
+
+	iterator context::format(iterator out,
+	                         internal_environment& env,
+	                         commit fld) const {
+		git_commit_view const* git = facade ? facade->git() : nullptr;
+		return git ? git->format(out, env, fld) : out;
+	}
+
+	iterator context::format(iterator out,
+	                         internal_environment& env,
+	                         person_info const& pair) const {
+		auto const [who, person] = pair;
+		if (who == placeholder::who::reporter) {
+			return facade ? git_person{{}, {}, facade->added()}.format(out, env,
+			                                                           person)
+			              : out;
+		}
+
+		git_commit_view const* git = facade ? facade->git() : nullptr;
+		return git ? git->format(out, env, pair) : out;
+	}
+
+	iterator context::format_with(iterator out,
+	                              internal_environment& env,
+	                              placeholder::printable const& op) const {
+		return std::visit(context_visitor{*this, out, env}, op);
+	}
+
+	iterator context::format_all(
+	    iterator out,
+	    internal_environment& env,
+	    std::vector<placeholder::printable> const& opcodes) const {
+		for (auto const& op : opcodes)
+			out = format_with(out, env, op);
+		return out;
+	}
+
+	iterator context::format_properties(
+	    iterator out,
+	    internal_environment& env,
+	    bool wrapped,
+	    bool magic_colors,
+	    std::map<std::string, cov::report::property> const& properties) const {
+		if (properties.empty() || !env.client->decorate) return out;
+
+		property_visitor painter{out, magic_colors, *this, env};
+
+		bool first = true;
+		for (auto const& [key, value] : properties) {
+			painter.key = &key;
+			painter.prefix = {};
+			if (first) {
+				first = false;
+				if (wrapped) painter.prefix = " ("sv;
+			} else {
+				painter.prefix = ", "sv;
+			}
+			std::visit(painter, value);
+		}
+		out = painter.out;
+
+		if (!first && wrapped) {
+			if (magic_colors) {
+				out = format(out, env, color::faint_yellow);
+				*out++ = ')';
+				out = format(out, env, color::reset);
+			} else {
+				*out++ = ')';
+			}
+		}
+
+		return out;
+	}
+
+	context::width_cleaner::~width_cleaner() noexcept {
+		env.current_width = std::nullopt;
+	}
+
 }  // namespace cov::placeholder
 
 namespace cov {
-	std::string formatter::format(placeholder::report_view const& report,
-	                              placeholder::context const& ctx) const {
+	std::string formatter::format(placeholder::context const& ctx,
+	                              placeholder::environment const& env) const {
 		std::string result{};
 
-		placeholder::internal_context int_ctx{
-		    .client = &ctx,
-		    .app = ctx.app,
-		    .tr = ctx.translate ? ctx.translate : no_translation,
-		    .tz = needs_timezones_ ? ctx.time_zone.empty()
+		placeholder::internal_environment int_ctx{
+		    .client = &env,
+		    .app = env.app,
+		    .tr = env.translate ? env.translate : no_translation,
+		    .tz = needs_timezones_ ? env.time_zone.empty()
 		                                 ? date::current_zone()
-		                                 : date::locate_zone(ctx.time_zone)
+		                                 : date::locate_zone(env.time_zone)
 		                           : nullptr,
 		};
 
-		for (auto const& fmt : format_)
-			report.format_with(std::back_inserter(result), int_ctx, fmt);
-
+		ctx.format_all(std::back_inserter(result), int_ctx, format_);
 		return result;
 	}
 
-	translatable formatter::apply_mark(io::v1::coverage_stats const& stats,
+	translatable formatter::apply_mark(io::v1::stats const& stats,
 	                                   placeholder::rating const& marks) {
-		if (!stats.lines.relevant || !marks.incomplete.den ||
-		    !marks.passing.den)
+		if (!stats.relevant || !marks.incomplete.den || !marks.passing.den)
 			return translatable::mark_failing;
-		auto const gcd_1 = std::gcd(stats.lines.relevant, stats.lines.visited);
-		auto const cov = stats.lines.visited / gcd_1;
-		auto const rel = stats.lines.relevant / gcd_1;
+		auto const gcd_1 = std::gcd(stats.relevant, stats.visited);
+		auto const cov = stats.visited / gcd_1;
+		auto const rel = stats.relevant / gcd_1;
 
 		auto const incomplete = marks.incomplete.gcd();
 		auto const lhs = cov * incomplete.den;
@@ -672,10 +750,9 @@ namespace cov {
 		                  color::__VA_ARGS__##yellow,      \
 		                  color::__VA_ARGS__##red);
 
-	placeholder::color formatter::apply_mark(
-	    placeholder::color clr,
-	    io::v1::coverage_stats const& stats,
-	    placeholder::rating const& marks) {
+	placeholder::color formatter::apply_mark(placeholder::color clr,
+	                                         io::v1::stats const& stats,
+	                                         placeholder::rating const& marks) {
 		using placeholder::color;
 		if (clr == color::rating || clr == color::bold_rating ||
 		    clr == color::faint_rating || clr == color::bg_rating) {

@@ -38,6 +38,8 @@ set(COV_SOURCES
   src/cov/discover.cc
   src/cov/error.cc
   src/cov/format/defaults.cc
+  src/cov/format/facades.cc
+  src/cov/format/internal_environment.hh
   src/cov/format/formatter.cc
   src/cov/format/parser.cc
   src/cov/format/tabular.cc
