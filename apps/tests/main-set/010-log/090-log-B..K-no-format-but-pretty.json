@@ -1,5 +1,5 @@
 {
-    "args": "log '--format=%C(yellow)%hr%Creset (%s, %rs) %C(red)%hc@%rD%Creset' --color always --decorate short Q..M",
+    "args": "log '--format=%C(yellow)%hR%Creset (%s, %rs) %C(red)%hG@%rD%Creset' --color always --decorate short Q..M",
     "check": {
         "stderr": "begin"
     },

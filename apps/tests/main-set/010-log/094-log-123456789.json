@@ -4,7 +4,7 @@
         2,
         "",
         [
-            "usage: cov log [-h] [<revision-range>] [-n <number>] [--oneline] [--format <format>] [--abbrev-hash] [--no-abbrev-hash] [--color <when>] [--decorate <how>]",
+            "usage: cov log [-h] [<revision-range>] [-n <number>] [--oneline] [--format <format>] [--abbrev-hash] [--no-abbrev-hash] [--prop-names] [--no-prop-names] [--color <when>] [--decorate <how>]",
             "cov log: error: requested object could not be found\n"
         ]
     ],

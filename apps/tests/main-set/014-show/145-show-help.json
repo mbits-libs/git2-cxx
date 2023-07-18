@@ -3,7 +3,7 @@
     "expected": [
         0,
         [
-            "usage: cov show [-h] [<report>] [-m <module>] [--format <format>] [--abbrev-hash] [--no-abbrev-hash] [--color <when>] [--decorate <how>]",
+            "usage: cov show [-h] [<report>] [-m <module>] [--format <format>] [--abbrev-hash] [--no-abbrev-hash] [--prop-names] [--no-prop-names] [--color <when>] [--decorate <how>]",
             "",
             "positional arguments:",
             " <report>              shows either changes between given report and the report directly preceeding (if only one reference is given), or between two reports (when there are two refs separated by a '..'); shows results for a file, if proceeded by a colon and file name, for example, with 'cov show HEAD:src/main.cpp'; shows results for a directory, if proceeded by a colon and directory name; for example, to see changes in 'src/' directory since a report marked as 'tag-name', call with 'cov show tag-name..:src'; defaults to HEAD if missing",
@@ -14,6 +14,8 @@
             " --format <format>     pretty-prints the contents of the report logs in a given format, where <format> can be one of 'oneline', 'short', 'medium', 'full', 'fuller', 'reference', 'raw' and 'pretty:<string>'; when <format> is none of the above, and has %placeholder in it, it acts as if --format=pretty:<format> were given",
             " --abbrev-hash         instead of showing the full 40-byte hexadecimal report object name, shows a prefix that names the objects uniquely",
             " --no-abbrev-hash      shows the full 40-byte hexadecimal report object name",
+            " --prop-names          shows all build properties with property names",
+            " --no-prop-names       shows string build properties without property names; since boolean flags and numbers do not convey meaning, they are still shown with property names",
             " --color <when>        uses color in output; <when> is 'never', 'always', or 'auto'",
             " --decorate <how>      prints out ref names of any reports that are shown; <how> is 'short', 'auto', or 'no'\n"
         ],

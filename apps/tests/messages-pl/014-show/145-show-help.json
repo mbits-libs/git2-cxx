@@ -4,7 +4,7 @@
     "expected": [
         0,
         [
-            "użycie: cov show [-h] [<raport>] [-m <moduł>] [--format <format>] [--abbrev-hash] [--no-abbrev-hash] [--color <kiedy>] [--decorate <jak>]",
+            "użycie: cov show [-h] [<raport>] [-m <moduł>] [--format <format>] [--abbrev-hash] [--no-abbrev-hash] [--prop-names] [--no-prop-names] [--color <kiedy>] [--decorate <jak>]",
             "",
             "argumenty pozycyjne:",
             " <raport>             pokazuje albo zmiany między danym raportem a raportem bezpośrednio poprzedzającym (jeżeli podano tylko jedno odwołanie), albo między dwoma raportami (gdy istnieją dwa odwołania oddzielone za pomocą „..”); pokazuje wyniki dla pliku, jeśli po nazwie zakresu występuje dwukropek i nazwa pliku, na przykład „cov show HEAD:src/main.cpp”; pokazuje wyniki dla katalogu, jeśli po nazwie zakresu występuje dwukropek i nazwa katalogu; na przykład, aby zobaczyć zmiany w katalogu „src/” od czasu raportu oznaczonego jako „nazwa-taga”, wywołaj „cov show nazwa-taga..:src”; domyślnie wybiera HEAD, jeśli nie został podany",
@@ -15,6 +15,8 @@
             " --format <format>    wyświetla zawartość dzienników raportu w danym formacie, gdzie <format> może być jednym z „oneline”, „short”, „medium”, „full”, „fuller”, „reference”, „raw” i „pretty:<string>”; gdy <format> nie jest żadnym z powyższych i zawiera %symbol zastępczy, działa tak, jakby zostało wywołane --format=pretty:<format>",
             " --abbrev-hash        zamiast wyświetlać pełną 40-bajtową szesnastkową nazwę obiektu raportu, pokazuje prefiks, który nazywa obiekty jednoznacznie",
             " --no-abbrev-hash     pokazuje pełną 40-bajtową szesnastkową nazwę obiektu raportu",
+            " --prop-names         pokazuje wszystkie właściwości kompilacji z nazwami właściwości",
+            " --no-prop-names      pokazuje właściwości kompilacji, które są ciągami znaków, bez nazw właściwości; ponieważ flagi logiczne i liczby nie przekazują znaczenia, są nadal wyświetlane z nazwami właściwości",
             " --color <kiedy>      używa koloru na wyjściu; <kiedy> jest jednym z „never” (nigdy), „always” (zawsze) lub „auto”",
             " --decorate <jak>     drukuje referencje wyświetlanych raportów; <jak> jest jednym z „short” (krótkie), „auto” lub „no” (nie)\n"
         ],

@@ -9,7 +9,7 @@
         2,
         "branch-name\n",
         [
-            "użycie: cov log [-h] [<zakres-rewizji>] [-n <liczba>] [--oneline] [--format <format>] [--abbrev-hash] [--no-abbrev-hash] [--color <kiedy>] [--decorate <jak>]",
+            "użycie: cov log [-h] [<zakres-rewizji>] [-n <liczba>] [--oneline] [--format <format>] [--abbrev-hash] [--no-abbrev-hash] [--prop-names] [--no-prop-names] [--color <kiedy>] [--decorate <jak>]",
             "cov log: błąd: HEAD odnosi się do gałęzi bez raportów\n"
         ]
     ],
