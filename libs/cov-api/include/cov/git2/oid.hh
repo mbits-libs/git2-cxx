@@ -17,6 +17,12 @@ namespace git {
 			return {buffer, buffer + GIT_OID_HEXSZ};
 		}
 
+		std::string str(unsigned length) const {
+			char buffer[GIT_OID_HEXSZ];
+			git_oid_nfmt(buffer, length, id_());
+			return {buffer, buffer + length};
+		}
+
 		std::string path() const {
 			char buffer[GIT_OID_HEXSZ + 1];
 			git_oid_pathfmt(buffer, id_());
@@ -50,6 +56,14 @@ namespace git {
 
 		inline bool operator==(git_oid const& rhs) const noexcept;
 	};
+
+	inline namespace literals {
+		inline git::oid operator""_oid(const char* str, size_t len) {
+			git_oid result{};
+			if (len == GIT_OID_HEXSZ) git_oid_fromstr(&result, str);
+			return git::oid{result};
+		}
+	}  // namespace literals
 
 	struct oid_view : basic_oid<oid_view> {
 		git_oid const* ref{};

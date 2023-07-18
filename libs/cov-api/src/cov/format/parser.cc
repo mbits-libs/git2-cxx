@@ -28,23 +28,45 @@
 namespace cov {
 	namespace parser {
 		using placeholder::color;
-		using placeholder::format;
+		using placeholder::token;
+
+#define DEBUG_PARSER 0
+
+#if DEBUG_PARSER
+#define DBG(MSG) fmt::print(stderr, "{}\n", MSG)
+#else
+#define DBG(MSG)
+#endif
 
 #define SIMPLEST_FORMAT(CHAR, RESULT) \
 	case CHAR:                        \
 		++cur;                        \
+		DBG("<< " #RESULT);           \
 		return RESULT
 #define SIMPLE_FORMAT(CHAR, RESULT) \
 	case CHAR:                      \
 		++cur;                      \
-		return format { RESULT }
+		DBG("<< " #RESULT);         \
+		return token { RESULT }
+#define HASH_FORMAT(CHAR, RESULT)        \
+	case CHAR:                           \
+		++cur;                           \
+		if (abbr) {                      \
+			DBG("<< " #RESULT "_abbr");  \
+			return token{RESULT##_abbr}; \
+		} else {                         \
+			DBG("<< " #RESULT);          \
+			return token{RESULT};        \
+		}
 #define DEEPER_FORMAT(CHAR, CB) \
 	case CHAR:                  \
 		++cur;                  \
+		DBG("-> " #CB "()");    \
 		return CB(cur, end)
 #define DEEPER_FORMAT1(CHAR, CB, ARG) \
 	case CHAR:                        \
 		++cur;                        \
+		DBG("->" #CB "(" #ARG ")");   \
 		return CB(cur, end, ARG)
 
 		unsigned hex(char c) {
@@ -91,7 +113,7 @@ namespace cov {
 		}
 
 		template <typename It>
-		std::optional<format> parse_hex(It& cur, It end) {
+		std::optional<token> parse_hex(It& cur, It end) {
 			if (cur == end) return std::nullopt;
 			auto const hi_nybble = hex(*cur);
 			if (hi_nybble > 15) return std::nullopt;
@@ -101,7 +123,7 @@ namespace cov {
 			if (lo_nybble > 15) return std::nullopt;
 			++cur;
 
-			return format{static_cast<char>(lo_nybble | (hi_nybble << 4))};
+			return token{static_cast<char>(lo_nybble | (hi_nybble << 4))};
 		}
 
 		template <typename Item, size_t Length>
@@ -170,10 +192,10 @@ namespace cov {
 		}
 
 		template <typename It>
-		std::optional<format> is_it(std::string_view name,
-		                            placeholder::color response,
-		                            It& cur,
-		                            It end) {
+		std::optional<token> is_it(std::string_view name,
+		                           placeholder::color response,
+		                           It& cur,
+		                           It end) {
 			auto sv_cur = name.begin();
 			auto sv_end = name.end();
 			while (cur != end && sv_cur != sv_end && *cur == *sv_cur) {
@@ -185,7 +207,7 @@ namespace cov {
 		}
 
 		template <typename It>
-		std::optional<format> parse_color(It& cur, It end) {
+		std::optional<token> parse_color(It& cur, It end) {
 			if (cur == end) return std::nullopt;
 			if (*cur == '(') {
 				++cur;
@@ -217,7 +239,7 @@ namespace cov {
 			return std::nullopt;
 		}
 		template <typename It>
-		std::optional<format> parse_width(It& cur, It end) {
+		std::optional<token> parse_width(It& cur, It end) {
 			static constexpr auto default_total = 76u;
 			static constexpr auto default_indent1 = 6u;
 			static constexpr auto default_indent2 = 9u;
@@ -264,7 +286,7 @@ namespace cov {
 			return placeholder::width{*total, *indent1, *indent2};
 		}
 		template <typename It>
-		std::optional<format> parse_magic(It& cur, It end) {
+		std::optional<token> parse_magic(It& cur, It end) {
 			if (cur == end) return std::nullopt;
 
 			switch (*cur) {
@@ -275,22 +297,22 @@ namespace cov {
 			return std::nullopt;
 		}
 		template <typename It>
-		std::optional<format> parse_hash(It& cur, It end) {
+		std::optional<token> parse_hash(It& cur, It end, bool abbr) {
 			if (cur == end) return std::nullopt;
 
 			switch (*cur) {
-				SIMPLE_FORMAT('r', placeholder::report::hash);
-				SIMPLE_FORMAT('c', placeholder::commit::hash);
-			}
-			return std::nullopt;
-		}
-		template <typename It>
-		std::optional<format> parse_hash_abbr(It& cur, It end) {
-			if (cur == end) return std::nullopt;
-
-			switch (*cur) {
-				SIMPLE_FORMAT('r', placeholder::report::hash_abbr);
-				SIMPLE_FORMAT('c', placeholder::commit::hash_abbr);
+				HASH_FORMAT('R', placeholder::self::primary_hash);
+				HASH_FORMAT('C', placeholder::self::primary_hash);
+				HASH_FORMAT('1', placeholder::self::primary_hash);
+				HASH_FORMAT('F', placeholder::self::secondary_hash);
+				HASH_FORMAT('L', placeholder::self::secondary_hash);
+				HASH_FORMAT('2', placeholder::self::secondary_hash);
+				HASH_FORMAT('P', placeholder::self::tertiary_hash);
+				HASH_FORMAT('f', placeholder::self::tertiary_hash);
+				HASH_FORMAT('3', placeholder::self::tertiary_hash);
+				HASH_FORMAT('G', placeholder::self::quaternary_hash);
+				HASH_FORMAT('B', placeholder::self::quaternary_hash);
+				HASH_FORMAT('4', placeholder::self::quaternary_hash);
 			}
 			return std::nullopt;
 		}
@@ -309,47 +331,69 @@ namespace cov {
 			return std::nullopt;
 		}
 		template <typename It>
-		std::optional<format> parse_report(It& cur, It end) {
+		std::optional<token> parse_report(It& cur, It end) {
 			using placeholder::person_info;
 			if (cur == end) return std::nullopt;
 
 			switch (*cur) {
-				SIMPLE_FORMAT('P', placeholder::report::parent_hash);
-				SIMPLE_FORMAT('p', placeholder::report::parent_hash_abbr);
-				SIMPLE_FORMAT('F', placeholder::report::file_list_hash);
-				SIMPLE_FORMAT('f', placeholder::report::file_list_hash_abbr);
 				SIMPLE_FORMAT('D', placeholder::report::branch);
 				default: {
 					auto const person = parse_date(cur, end);
 					if (!person) break;
-					return format{
+					return token{
 					    person_info{placeholder::who::reporter, *person}};
 				}
 			}
 			return std::nullopt;
 		}
-		template <typename It>
-		std::optional<format> parse_stats(It& cur, It end) {
+		template <placeholder::stats Lines,
+		          placeholder::stats Functions,
+		          placeholder::stats Branches,
+		          typename It>
+		std::optional<token> parse_stats_impl(It& cur, It end) {
 			if (cur == end) return std::nullopt;
 
 			switch (*cur) {
-				SIMPLE_FORMAT('P', placeholder::report::lines_percent);
-				SIMPLE_FORMAT('T', placeholder::report::lines_total);
-				SIMPLE_FORMAT('R', placeholder::report::lines_relevant);
-				SIMPLE_FORMAT('C', placeholder::report::lines_covered);
-				SIMPLE_FORMAT('r', placeholder::report::lines_rating);
+				SIMPLE_FORMAT('L', Lines);
+				SIMPLE_FORMAT('F', Functions);
+				SIMPLE_FORMAT('B', Branches);
+			}
+			return std::nullopt;
+		}
+#define PARSE_STATE(attr)                                                  \
+	template <typename It>                                                 \
+	std::optional<token> parse_##attr(It& cur, It end) {                   \
+		return parse_stats_impl<placeholder::stats::lines_##attr,          \
+		                        placeholder::stats::functions_##attr,      \
+		                        placeholder::stats::branches_##attr>(cur,  \
+		                                                             end); \
+	}
+		PARSE_STATE(percent)
+		PARSE_STATE(total)
+		PARSE_STATE(visited)
+		PARSE_STATE(rating)
+
+		template <typename It>
+		std::optional<token> parse_stats(It& cur, It end) {
+			if (cur == end) return std::nullopt;
+
+			switch (*cur) {
+				SIMPLE_FORMAT('L', placeholder::stats::lines);
+				DEEPER_FORMAT('P', parse_percent);
+				DEEPER_FORMAT('T', parse_total);
+				DEEPER_FORMAT('V', parse_visited);
+				DEEPER_FORMAT('r', parse_rating);
 			}
 			return std::nullopt;
 		}
 		template <typename It>
-		std::optional<format> parse_person(It& cur,
-		                                   It end,
-		                                   placeholder::who who) {
+		std::optional<token> parse_person(It& cur,
+		                                  It end,
+		                                  placeholder::who who) {
 			if (cur == end) return std::nullopt;
 
 			using placeholder::person;
 			using placeholder::person_info;
-			// person_info{who, person::}
 
 			switch (*cur) {
 				SIMPLE_FORMAT('n', (person_info{who, person::name}));
@@ -358,18 +402,57 @@ namespace cov {
 				default: {
 					auto const person = parse_date(cur, end);
 					if (!person) break;
-					return format{person_info{who, *person}};
+					return token{person_info{who, *person}};
 				}
 			}
 			return std::nullopt;
 		}
+
 		template <typename It>
-		std::optional<format> parse(It& cur, It end) {
+		std::optional<token> start_block(It& cur, It end) {
+			if (cur == end) return std::nullopt;
+			auto type = placeholder::block_type::loop_start;
+			if (*cur == '?') {
+				type = placeholder::block_type::if_start;
+				++cur;
+			}
+			auto ref_begin = cur;
+			while (cur != end && *cur != '[')
+				++cur;
+			auto ref_end = cur;
+			if (cur == end) return std::nullopt;
+			++cur;
+
+#if DEBUG_PARSER
+			fmt::print(
+			    stderr, "<< placeholder::block_token{{{}, \"{}\"}}\n",
+			    type == placeholder::block_type::if_start ? "if"sv : "loop"sv,
+			    std::string{ref_begin, ref_end});
+#endif
+			return placeholder::block_token{type, {ref_begin, ref_end}};
+		}
+
+		template <typename It>
+		std::optional<token> end_block(It& cur, It end) {
+			if (cur == end) return std::nullopt;
+			if (*cur == '}') {
+				++cur;
+				DBG("<< placeholder::block_token{end}");
+				return placeholder::block_token{placeholder::block_type::end,
+				                                {}};
+			}
+			return std::nullopt;
+		}
+
+		template <typename It>
+		std::optional<token> parse(It& cur, It end) {
 			if (cur == end) return std::nullopt;
 
 			switch (*cur) {
 				SIMPLE_FORMAT('%', '%');
 				SIMPLE_FORMAT('n', '\n');
+				DEEPER_FORMAT('{', start_block);
+				DEEPER_FORMAT(']', end_block);
 				DEEPER_FORMAT('x', parse_hex);
 				DEEPER_FORMAT('C', parse_color);
 				DEEPER_FORMAT('w', parse_width);
@@ -380,8 +463,8 @@ namespace cov {
 				SIMPLE_FORMAT('f', placeholder::commit::subject_sanitized);
 				SIMPLE_FORMAT('b', placeholder::commit::body);
 				SIMPLE_FORMAT('B', placeholder::commit::body_raw);
-				DEEPER_FORMAT('H', parse_hash);
-				DEEPER_FORMAT('h', parse_hash_abbr);
+				DEEPER_FORMAT1('H', parse_hash, false);
+				DEEPER_FORMAT1('h', parse_hash, true);
 				DEEPER_FORMAT('r', parse_report);
 				DEEPER_FORMAT('p', parse_stats);
 				DEEPER_FORMAT1('a', parse_person, placeholder::who::author);
@@ -391,8 +474,57 @@ namespace cov {
 		}
 	}  // namespace parser
 
+	namespace {
+		template <typename E>
+		concept Enum = std::is_enum_v<E>;
+		class token_visitor {
+			std::vector<placeholder::printable>& dst;
+
+			token_visitor(std::vector<placeholder::printable>& dst)
+			    : dst{dst} {}
+
+		public:
+			placeholder::block_token* operator()(Enum auto enum_like) {
+				dst.push_back(enum_like);
+				return nullptr;
+			}
+
+			placeholder::block_token* operator()(char c) {
+				dst.push_back(c);
+				return nullptr;
+			}
+
+			placeholder::block_token* operator()(
+			    placeholder::person_info const& person) {
+				dst.push_back(person);
+				return nullptr;
+			}
+
+			placeholder::block_token* operator()(placeholder::width const& w) {
+				dst.push_back(w);
+				return nullptr;
+			}
+
+			placeholder::block_token* operator()(std::string& terminal) {
+				dst.push_back(std::move(terminal));
+				return nullptr;
+			}
+
+			placeholder::block_token* operator()(
+			    placeholder::block_token& block) const {
+				return &block;
+			}
+
+			static placeholder::block_token* visit(
+			    std::vector<placeholder::printable>& dst,
+			    placeholder::token& tok) {
+				return std::visit(token_visitor{dst}, tok);
+			}
+		};
+	}  // namespace
+
 	formatter formatter::from(std::string_view input) {
-		std::vector<placeholder::format> fmts{};
+		std::vector<placeholder::token> tokens{};
 		auto cur = input.begin();
 		auto end = input.end();
 		auto prev = cur;
@@ -404,11 +536,46 @@ namespace cov {
 			++cur;
 			auto arg = parser::parse(cur, end);
 			if (!arg) continue;
-			if (prev != text_end) fmts.push_back(std::string{prev, text_end});
-			fmts.push_back(std::move(*arg));
+			if (prev != text_end) tokens.push_back(std::string{prev, text_end});
+			tokens.push_back(std::move(*arg));
 			prev = cur;
 		}
-		if (prev != end) fmts.push_back(std::string{prev, end});
-		return formatter{std::move(fmts)};
+		if (prev != end) tokens.push_back(std::string{prev, end});
+
+		std::vector<std::vector<placeholder::printable>> stack{{}};
+		auto const pop = [&stack]() {
+			if (stack.size() >= 2) {
+				auto copy = std::move(stack.back());
+				stack.pop_back();
+				auto& current = stack.back();
+				if (current.empty() ||
+				    !std::holds_alternative<placeholder::block>(
+				        current.back())) {
+					current.insert(current.end(),
+					               std::move_iterator(copy.begin()),
+					               std::move_iterator(copy.end()));
+					return;
+				}
+				std::get<placeholder::block>(current.back()).opcodes =
+				    std::move(copy);
+			}
+		};
+		for (auto& tok : tokens) {
+			auto const block = token_visitor::visit(stack.back(), tok);
+			if (!block) continue;
+			auto& [type, ref] = *block;
+			if (type == placeholder::block_type::end) {
+				pop();
+				continue;
+			}
+			stack.back().push_back(
+			    placeholder::block{.type = type, .ref = ref, .opcodes = {}});
+			stack.push_back({});
+		}
+		while (stack.size() > 1)
+			pop();
+		if (stack.empty()) stack.push_back({});
+		return formatter{std::move(stack.front())};
+		// std::move(tokens)
 	}
 }  // namespace cov

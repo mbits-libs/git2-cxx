@@ -2,6 +2,7 @@
 // This code is licensed under MIT license (see LICENSE for details)
 
 #pragma once
+#include <chrono>
 #include <cov/format_args.hh>
 #include <cov/reference.hh>
 #include <cov/report.hh>
@@ -77,28 +78,42 @@ namespace cov::placeholder {
 		constexpr auto operator<=>(width const&) const noexcept = default;
 	};
 
+	enum class self {
+		primary_hash,
+		secondary_hash,
+		tertiary_hash,
+		quaternary_hash,
+		primary_hash_abbr,
+		secondary_hash_abbr,
+		tertiary_hash_abbr,
+		quaternary_hash_abbr,
+	};
+
+	enum class stats {
+		lines,
+		lines_percent,
+		lines_total,
+		lines_visited,
+		lines_rating,
+		functions_percent,
+		functions_total,
+		functions_visited,
+		functions_rating,
+		branches_percent,
+		branches_total,
+		branches_visited,
+		branches_rating,
+	};
+
 	enum class report {
-		hash,
-		hash_abbr,
-		parent_hash,
-		parent_hash_abbr,
-		file_list_hash,
-		file_list_hash_abbr,
 		ref_names,
 		ref_names_unwrapped,
 		magic_ref_names,
 		magic_ref_names_unwrapped,
 		branch,
-		lines_percent,
-		lines_total,
-		lines_relevant,
-		lines_covered,
-		lines_rating,
 	};
 
 	enum class commit {
-		hash,
-		hash_abbr,
 		subject,
 		subject_sanitized,
 		body,
@@ -119,11 +134,46 @@ namespace cov::placeholder {
 	enum class who { author, committer, reporter };
 	using person_info = std::pair<who, person>;
 
-	using format = std::
-	    variant<std::string, char, color, width, report, commit, person_info>;
+	template <typename Variant, typename Append>
+	struct extend;
+	template <typename... Variant, typename Append>
+	struct extend<std::variant<Variant...>, Append> {
+		using type = std::variant<Variant..., Append>;
+	};
+
+	using common = std::variant<std::string,
+	                            char,
+	                            color,
+	                            width,
+	                            self,
+	                            stats,
+	                            report,
+	                            commit,
+	                            person_info>;
+
+	enum class block_type { loop_start, if_start, end };
+	using block_token = std::pair<block_type, std::string>;
+
+	using token = extend<common, block_token>::type;
+
+	template <typename Variant>
+	struct block_t {
+		block_type type{};
+		std::string ref{};
+		std::vector<Variant> opcodes{};
+
+		bool operator==(block_t const&) const noexcept = default;
+	};
+
+	struct printable : extend<common, block_t<printable>>::type {
+		using base_type = extend<common, block_t<printable>>::type;
+		using base_type::base_type;
+	};
+
+	using block = block_t<printable>;
 
 	using iterator = std::back_insert_iterator<std::string>;
-	struct internal_context;
+	struct internal_environment;
 
 	struct refs {
 		std::string HEAD{};
@@ -131,11 +181,11 @@ namespace cov::placeholder {
 		std::string HEAD_ref{};
 		bool operator==(refs const&) const noexcept = default;
 		iterator format(iterator out,
-		                git_oid const* id,
+		                git::oid const* id,
 		                bool wrapped,
 		                bool magic_colors,
-		                struct report_view const&,
-		                internal_context&) const;
+		                struct context const&,
+		                internal_environment&) const;
 	};
 
 	struct ratio {
@@ -155,7 +205,7 @@ namespace cov::placeholder {
 		bool operator==(rating const&) const noexcept = default;
 	};
 
-	struct context {
+	struct environment {
 		sys_seconds now{};
 		unsigned hash_length{};
 		refs names{};
@@ -170,10 +220,10 @@ namespace cov::placeholder {
 		bool decorate{false};
 		bool prop_names{true};
 
-		bool operator==(context const&) const noexcept = default;
-		static context from(cov::repository const&,
-		                    color_feature clr,
-		                    decorate_feature decorate);
+		bool operator==(environment const&) const noexcept = default;
+		static environment from(cov::repository const&,
+		                        color_feature clr,
+		                        decorate_feature decorate);
 		static rating rating_from(cov::repository const&);
 	};
 
@@ -182,7 +232,9 @@ namespace cov::placeholder {
 		std::string_view email;
 		sys_seconds date;
 
-		iterator format(iterator out, internal_context& ctx, person fld) const;
+		iterator format(iterator out,
+		                internal_environment& env,
+		                person fld) const;
 		static git_person from(cov::report const& report, who type) noexcept {
 			if (type == who::author) {
 				return {
@@ -201,22 +253,22 @@ namespace cov::placeholder {
 	};
 
 	struct git_commit_view {
-		git_oid const* id{};
 		std::string_view branch{};
 		std::string_view message{};
 		git_person author{}, committer{};
 
-		iterator format(iterator out, internal_context& ctx, commit fld) const;
 		iterator format(iterator out,
-		                internal_context& ctx,
+		                internal_environment& env,
+		                commit fld) const;
+		iterator format(iterator out,
+		                internal_environment& env,
 		                person_info const& pair) const {
 			if (std::get<0>(pair) == who::author)
-				return author.format(out, ctx, std::get<1>(pair));
-			return committer.format(out, ctx, std::get<1>(pair));
+				return author.format(out, env, std::get<1>(pair));
+			return committer.format(out, env, std::get<1>(pair));
 		}
 		static git_commit_view from(cov::report const& report) noexcept {
 			return {
-			    .id = &report.commit_id().id,
 			    .branch = report.branch(),
 			    .message = report.message(),
 			    .author = git_person::from(report, who::author),
@@ -225,95 +277,118 @@ namespace cov::placeholder {
 		}
 	};
 
-	struct report_view {
-		git_oid const* id{};
-		git_oid const* parent{};
-		git_oid const* file_list{};
-		sys_seconds date{};
-		git_commit_view git{};
-		io::v1::coverage_stats const* stats{};
-		std::map<std::string, cov::report::property> properties{};
-		bool has_properties{false};
+	struct object_list {
+		virtual ~object_list();
 
-		iterator format(iterator out, internal_context& ctx, report fld) const;
-		iterator format(iterator out, internal_context& ctx, color fld) const;
-		iterator format(iterator out, internal_context& ctx, commit fld) const {
-			width_cleaner clean{ctx};
-			return git.format(out, ctx, fld);
-		}
+		virtual std::unique_ptr<struct object_facade> next() = 0;
+		virtual void reset() noexcept = 0;
+	};
+
+	struct object_facade {
+		virtual ~object_facade();
+
+		virtual std::unique_ptr<object_list> loop(std::string_view) = 0;
+		virtual bool condition(std::string_view tag);
+		virtual iterator prop(iterator,
+		                      bool wrapped,
+		                      bool magic_colors,
+		                      internal_environment&) = 0;
+		virtual git::oid const* primary_id() noexcept = 0;
+		virtual git::oid const* secondary_id() noexcept = 0;
+		virtual git::oid const* tertiary_id() noexcept = 0;
+		virtual git::oid const* quaternary_id() noexcept = 0;
+		virtual std::chrono::sys_seconds added() noexcept = 0;
+		virtual io::v1::coverage_stats const* stats() noexcept = 0;
+		virtual git_commit_view const* git() noexcept = 0;
+
+		static std::unique_ptr<object_facade> present_report(
+		    cov::report const*,
+		    cov::repository const*);
+		static std::unique_ptr<object_facade> present_build(
+		    cov::report::build const*,
+		    cov::repository const*);
+		static std::unique_ptr<object_facade> present_build(
+		    cov::build*,
+		    cov::repository const*);
+	};
+
+	struct context {
+		object_facade* facade{};
+
+		context() = default;
+		context(object_facade* facade) : facade{facade} {}
+
 		iterator format(iterator out,
-		                internal_context& ctx,
-		                person_info const& pair) const {
-			width_cleaner clean{ctx};
-			if (std::get<0>(pair) == who::reporter)
-				return git_person{{}, {}, date}.format(out, ctx,
-				                                       std::get<1>(pair));
-			return git.format(out, ctx, pair);
-		}
+		                internal_environment& env,
+		                color fld) const;
+		iterator format(iterator out,
+		                internal_environment& env,
+		                self fld) const;
+		iterator format(iterator out,
+		                internal_environment& env,
+		                placeholder::stats fld) const;
+		iterator format(iterator out,
+		                internal_environment& env,
+		                report fld) const;
+		iterator format(iterator out,
+		                internal_environment& env,
+		                commit fld) const;
+		iterator format(iterator out,
+		                internal_environment& env,
+		                person_info const& pair) const;
 		iterator format_with(iterator out,
-		                     internal_context& ctx,
-		                     placeholder::format const& fmt) const;
-		static report_view from(cov::report const& report) noexcept {
-			return {
-			    .id = &report.oid().id,
-			    .parent = &report.parent_id().id,
-			    .file_list = &report.file_list_id().id,
-			    .date = report.add_time_utc(),
-			    .git = git_commit_view::from(report),
-			    .stats = &report.stats(),
-			};
-		}
-		static report_view from(cov::report const& report,
-		                        cov::report::build const& entry) noexcept {
-			return {
-			    .id = &entry.build_id().id,
-			    .parent = &report.parent_id().id,
-			    .file_list = &report.file_list_id().id,
-			    .date = report.add_time_utc(),
-			    .git = git_commit_view::from(report),
-			    .stats = &entry.stats(),
-			    .properties = entry.properties(),
-			    .has_properties = true,
-			};
-		}
+		                     internal_environment& env,
+		                     placeholder::printable const& fmt) const;
+		iterator format_all(
+		    iterator out,
+		    internal_environment& env,
+		    std::vector<placeholder::printable> const& opcodes) const;
+
+		iterator format_properties(
+		    iterator out,
+		    internal_environment& env,
+		    bool wrapped,
+		    bool magic_colors,
+		    std::map<std::string, cov::report::property> const& properties)
+		    const;
 
 	private:
 		struct width_cleaner {
-			internal_context& ctx;
+			internal_environment& env;
 			~width_cleaner() noexcept;
 		};
 	};
+
 }  // namespace cov::placeholder
 
 namespace cov {
 	class formatter {
 	public:
-		explicit formatter(std::vector<placeholder::format>&& format);
+		explicit formatter(std::vector<placeholder::printable>&& format);
 
 		static formatter from(std::string_view input);
 		static std::string shell_colorize(placeholder::color, void*);
 
-		std::string format(placeholder::report_view const&,
-		                   placeholder::context const&) const;
+		std::string format(placeholder::context const&,
+		                   placeholder::environment const&) const;
 
-		std::vector<placeholder::format> const& parsed() const noexcept {
+		std::vector<placeholder::printable> const& parsed() const noexcept {
 			return format_;
 		}
 
-		static translatable apply_mark(io::v1::coverage_stats const& stats,
+		static translatable apply_mark(io::v1::stats const& stats,
 		                               placeholder::rating const& marks);
 
-		static placeholder::color apply_mark(
-		    placeholder::color color,
-		    io::v1::coverage_stats const& stats,
-		    placeholder::rating const& marks);
+		static placeholder::color apply_mark(placeholder::color color,
+		                                     io::v1::stats const& stats,
+		                                     placeholder::rating const& marks);
 
 	private:
 		static std::string no_translation(long long count,
 		                                  translatable scale,
 		                                  void*);
 
-		std::vector<placeholder::format> format_{};
+		std::vector<placeholder::printable> format_{};
 		bool needs_timezones_{true};
 	};
 }  // namespace cov
