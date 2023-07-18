@@ -219,12 +219,15 @@ namespace cov::app::builtin::report {
 	                          cov::report const& report,
 	                          str::cov_report::Strings const& tr) {
 		static constexpr auto message_chunk1 = "%C(red)["sv;
-		static constexpr auto message_chunk2 = " %hr]%Creset %s%n "sv;
+		static constexpr auto message_chunk2 = " %hR]%Creset %s%n "sv;
 		static constexpr auto message_chunk3 =
-		    ", %C(rating)%pP%Creset (%pC/%pR"sv;
+		    ", %C(rating)%pPL%Creset (%pVL/%pTL"sv;
 		static constexpr auto message_chunk4 = ")%n %C(faint normal)"sv;
 		static constexpr auto message_chunk5 =
-		    "%Creset %C(faint yellow)%hc@%rD%Creset%n"sv;
+		    "%Creset %C(faint yellow)%hG@%rD%Creset%n"sv;
+		static constexpr auto message_chunk6 = "%{B[ %C(faint normal)"sv;
+		static constexpr auto message_chunk7 =
+		    " %hR:%Creset %C(rating)%pPL%Creset%md%n%]}"sv;
 
 		using str::cov_report::counted;
 
@@ -242,7 +245,7 @@ namespace cov::app::builtin::report {
 		}
 
 		if (!report.parent_id().is_zero()) {
-			parent = fmt::format(" {} %rp%n"sv,
+			parent = fmt::format(" {} %hP%n"sv,
 			                     tr(replng::MESSAGE_FIELD_PARENT_REPORT));
 		}
 
@@ -258,6 +261,9 @@ namespace cov::app::builtin::report {
 		    tr(replng::MESSAGE_FIELD_GIT_COMMIT),
 		    message_chunk5,
 		    parent,
+		    message_chunk6,
+		    tr(replng::MESSAGE_FIELD_CONTAINS_BUILD),
+		    message_chunk7,
 		};
 
 		std::string format{};
@@ -270,33 +276,17 @@ namespace cov::app::builtin::report {
 
 		using namespace std::chrono;
 		auto const now = floor<seconds>(system_clock::now());
-		{
-			auto const view = placeholder::report_view::from(report);
-			auto const message = formatter::from(format).format(
-			    view, {.now = now,
-			           .hash_length = 9,
-			           .names = {},
-			           .colorize = formatter::shell_colorize,
-			           .decorate = true});
+		auto facade =
+		    placeholder::object_facade::present_report(&report, nullptr);
+		auto const message = formatter::from(format).format(
+		    facade.get(), {.now = now,
+		                   .hash_length = 9,
+		                   .names = {},
+		                   .colorize = formatter::shell_colorize,
+		                   .decorate = true,
+		                   .prop_names = false});
 
-			std::fputs(message.c_str(), stdout);
-		}
-
-		auto const build_format = formatter::from(
-		    fmt::format(" %C(faint normal){} %hr:%Creset "
-		                "%C(rating)%pP%Creset%md%n",
-		                tr(replng::MESSAGE_FIELD_CONTAINS_BUILD)));
-		for (auto const& build : report.entries()) {
-			auto const view = placeholder::report_view::from(report, *build);
-			auto const message = build_format.format(
-			    view, {.now = now,
-			           .hash_length = 9,
-			           .names = {},
-			           .colorize = formatter::shell_colorize,
-			           .decorate = true});
-
-			std::fputs(message.c_str(), stdout);
-		}
+		std::fputs(message.c_str(), stdout);
 	}
 
 	std::string parser::quoted_list(std::span<std::string_view const> names) {

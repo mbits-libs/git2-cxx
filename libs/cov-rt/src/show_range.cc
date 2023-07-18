@@ -12,23 +12,23 @@ namespace cov::app {
 		std::string_view long_format;
 	};
 
-#define SHORT_HEADER                   \
-	"%C(yellow)report %hr%Creset%md%n" \
-	"commit %hc%n"
-#define LONG_HEADER                    \
-	"%C(yellow)report %Hr%Creset%md%n" \
-	"commit %Hc%n"
+#define HEADER(HASH)          \
+	"%C(yellow)report %" HASH \
+	"R%Creset%md%n"           \
+	"commit %" HASH "G%n"
 #define RAW_PARENT_HEADER              \
-	"%C(yellow)report %Hr%Creset%md%n" \
-	"parent %rP%n"
-#define RAW_HEADER "%C(yellow)report %Hr%Creset%md%n"
+	"%C(yellow)report %HR%Creset%md%n" \
+	"parent %HP%n"
+#define RAW_HEADER "%C(yellow)report %HR%Creset%md%n"
 
-#define SHORT_LOG_(ALIGN)                            \
-	"GitBranch:" ALIGN                               \
-	"%rD%n"                                          \
-	"Coverage: " ALIGN                               \
-	"[%pP] %C(faint normal)%pC/%pR%Creset %C(faint " \
-	"rating)(%pr)%Creset%n"                          \
+#define BUILD_HEADER(HASH) "%{B[build  %" HASH "1 [%pPL]%md%n%]}"
+
+#define SHORT_LOG_(ALIGN)                               \
+	"GitBranch:" ALIGN                                  \
+	"%rD%n"                                             \
+	"Coverage: " ALIGN                                  \
+	"[%pPL] %C(faint normal)%pVL/%pTL%Creset %C(faint " \
+	"rating)(%prL)%Creset%n"                            \
 	"Author:   " ALIGN "%an <%ae>%n"
 #define SHORT_LOG SHORT_LOG_(" ")
 
@@ -40,54 +40,52 @@ namespace cov::app {
 	SHORT_LOG_(" ") \
 	"Commit:    %cn <%ce>%n"
 
+#define FULL_BUILD(HASH)                                            \
+	"%{B["                                                          \
+	"- %C(yellow)build     %" HASH                                  \
+	"1%Creset%n"                                                    \
+	"%{?[  Config:   %mD%n%]}"                                      \
+	"  Coverage: [%pPL] %C(faint normal)%pVL/%pTL%Creset %C(faint " \
+	"rating)(%prL)%Creset%n"                                        \
+	"%]}"
+
 #define FULLER_LOG            \
 	SHORT_LOG_("  ")          \
 	"Commit:     %cn <%ce>%n" \
 	"CommitDate: %cd%n"       \
 	"Added:      %rd%n"
 
-#define RAW_LOG           \
-	"files %rF%n"         \
-	"added %rt%n"         \
-	"stats %pT %pR %pC%n" \
-	"branch %rD%n"        \
-	"commit %Hc%n"        \
-	"author %an <%ae>%n"  \
+#define RAW_LOG             \
+	"files %HF%n"           \
+	"added %rt%n"           \
+	"stats %pL %pTL %pVL%n" \
+	"branch %rD%n"          \
+	"commit %HG%n"          \
+	"author %an <%ae>%n"    \
 	"committer %cn <%ce> %ct%n"
 
 #define MESSAGE "%n%w(76,6,6)%B%n"
 
+#define SHORT_MSG(HASH) HEADER(HASH) BUILD_HEADER(HASH) SHORT_LOG "%n%w()%s%n"sv
+#define MEDIUM_MSG(HASH) HEADER(HASH) BUILD_HEADER(HASH) MEDIUM_LOG MESSAGE ""sv
+#define FULL_MSG(HASH) HEADER(HASH) FULL_LOG FULL_BUILD(HASH) MESSAGE ""sv
+#define FULLER_MSG(HASH) HEADER(HASH) FULLER_LOG FULL_BUILD(HASH) MESSAGE ""sv
+
 	static constexpr format_descr format_descriptions[] = {
 	    {
 	        "oneline"sv,
-	        "%C(yellow)%hr%Creset%md %C(bg rating) %pP %Creset %s %C(red)%hc@%rD%Creset"sv,
-	        "%C(yellow)%Hr%Creset%md %C(bg rating) %pP %Creset %s %C(red)%Hc@%rD%Creset"sv,
+	        "%C(yellow)%hR%Creset%md %C(bg rating) %pPL %Creset %s %C(red)%hG@%rD%Creset"sv,
+	        "%C(yellow)%HR%Creset%md %C(bg rating) %pPL %Creset %s %C(red)%HG@%rD%Creset"sv,
 	    },
-	    {
-	        "short"sv,
-	        SHORT_HEADER SHORT_LOG "%n%w()%s%n"sv,
-	        LONG_HEADER SHORT_LOG "%n%w()%s%n"sv,
-	    },
-	    {
-	        "medium"sv,
-	        SHORT_HEADER MEDIUM_LOG MESSAGE ""sv,
-	        LONG_HEADER MEDIUM_LOG MESSAGE ""sv,
-	    },
-	    {
-	        "full"sv,
-	        SHORT_HEADER FULL_LOG MESSAGE ""sv,
-	        LONG_HEADER FULL_LOG MESSAGE ""sv,
-	    },
-	    {
-	        "fuller"sv,
-	        SHORT_HEADER FULLER_LOG MESSAGE ""sv,
-	        LONG_HEADER FULLER_LOG MESSAGE ""sv,
-	    },
+	    {"short"sv, SHORT_MSG("h"), SHORT_MSG("H")},
+	    {"medium"sv, MEDIUM_MSG("h"), MEDIUM_MSG("H")},
+	    {"full"sv, FULL_MSG("h"), FULL_MSG("H")},
+	    {"fuller"sv, FULLER_MSG("h"), FULLER_MSG("H")},
 	    {
 	        // here, both use abbrev-hash
 	        "reference"sv,
-	        "%C(yellow)%hr%Creset (%s, %rs) %C(red)%hc@%rD%Creset"sv,
-	        "%C(yellow)%hr%Creset (%s, %rs) %C(red)%hc@%rD%Creset"sv,
+	        "%C(yellow)%hR%Creset (%s, %rs) %C(red)%hG@%rD%Creset"sv,
+	        "%C(yellow)%hR%Creset (%s, %rs) %C(red)%hG@%rD%Creset"sv,
 	    },
 	    {
 	        "raw"sv,
@@ -113,6 +111,12 @@ namespace cov::app {
 		    .opt();
 		p.set<std::false_type>(abbrev_hash, "no-abbrev-hash")
 		    .help(tr(loglng::NO_ABBREV_HASH_DESCRIPTION))
+		    .opt();
+		p.set<std::true_type>(show_prop_names, "prop-names")
+		    .help(tr(loglng::PROP_NAMES_DESCRIPTION))
+		    .opt();
+		p.set<std::false_type>(show_prop_names, "no-prop-names")
+		    .help(tr(loglng::NO_PROP_NAMES_DESCRIPTION))
 		    .opt();
 		p.arg(color_type, "color")
 		    .meta(tr(loglng::WHEN_META))
@@ -167,8 +171,9 @@ namespace cov::app {
 	                       cov::revs const& range,
 	                       std::optional<unsigned> max_count) const {
 		using namespace std::chrono;
-		auto ctx =
-		    placeholder::context::from(repo, color_type, selected_decorate());
+		auto env = placeholder::environment::from(repo, color_type,
+		                                          selected_decorate());
+		env.prop_names = show_prop_names;
 
 		auto id = range.to;
 		std::error_code ec{};
@@ -194,8 +199,9 @@ namespace cov::app {
 					    formatter::from(with_parent ? RAW_PARENT : RAW_ROOT);
 				}
 
-				auto const view = placeholder::report_view::from(*report);
-				std::puts(format.format(view, ctx).c_str());
+				auto facade = placeholder::object_facade::present_report(
+				    report.get(), &repo);
+				std::puts(format.format(facade.get(), env).c_str());
 				id = report->parent_id().id;
 			}
 			return;
@@ -212,8 +218,9 @@ namespace cov::app {
 			auto report = repo.lookup<cov::report>(id, ec);
 			if (!report || ec) break;
 
-			auto const view = placeholder::report_view::from(*report);
-			std::puts(format.format(view, ctx).c_str());
+			auto facade =
+			    placeholder::object_facade::present_report(report.get(), &repo);
+			std::puts(format.format(facade.get(), env).c_str());
 			id = report->parent_id().id;
 		}
 	}

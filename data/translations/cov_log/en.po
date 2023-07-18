@@ -71,6 +71,15 @@ msgctxt "NO_ABBREV_HASH_DESCRIPTION"
 msgid "shows the full 40-byte hexadecimal report object name"
 msgstr "shows the full 40-byte hexadecimal report object name"
 
+#. Description for --no-prop-names argument
+msgctxt "NO_PROP_NAMES_DESCRIPTION"
+msgid ""
+"shows string build properties without property names; since boolean flags "
+"and numbers do not convey meaning, they are still shown with property names"
+msgstr ""
+"shows string build properties without property names; since boolean flags "
+"and numbers do not convey meaning, they are still shown with property names"
+
 #. Name of a number argument
 msgctxt "NUMBER_META"
 msgid "<number>"
@@ -80,6 +89,11 @@ msgstr "<number>"
 msgctxt "ONELINE_DESCRIPTION"
 msgid "a shorthand for \"--format=oneline --abbrev-hash\" used together"
 msgstr "a shorthand for \"--format=oneline --abbrev-hash\" used together"
+
+#. Description for --prop-names argument
+msgctxt "PROP_NAMES_DESCRIPTION"
+msgid "shows all build properties with property names"
+msgstr "shows all build properties with property names"
 
 #. Description for log and show target argument
 msgctxt "REV_RANGE_DESCRIPTION"

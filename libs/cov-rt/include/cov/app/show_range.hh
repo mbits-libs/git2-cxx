@@ -26,6 +26,7 @@ namespace cov::app {
 		known_format selected_format{known_format::medium};
 		std::string custom_format{};
 		bool abbrev_hash{false};
+		bool show_prop_names{false};
 
 		void add_args(::args::parser& p,
 		              LogStrings const& tr,

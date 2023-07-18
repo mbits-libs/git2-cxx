@@ -25,9 +25,9 @@ namespace cov::app {
 
 	template <typename Final>
 	struct format_str {
-		void attach_to(cov::placeholder::context& ctx) noexcept {
-			ctx.app = static_cast<Final*>(this);
-			ctx.translate = translate;
+		void attach_to(cov::placeholder::environment& env) noexcept {
+			env.app = static_cast<Final*>(this);
+			env.translate = translate;
 		}
 
 	private:
