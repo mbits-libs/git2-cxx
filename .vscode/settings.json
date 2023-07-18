@@ -122,6 +122,8 @@
         "xutility": "cpp",
         "fstream": "cpp",
         "hash_map": "cpp",
-        "hash_set": "cpp"
+        "hash_set": "cpp",
+        "cfloat": "cpp",
+        "climits": "cpp"
     }
 }

@@ -61,8 +61,7 @@ if (COV_TESTING)
   )
 
   foreach(module
-    libs/git2-c++
-    libs/cov
+    libs/cov-api
     libs/cell
     libs/hilite/hilite
     libs/hilite/lighter
