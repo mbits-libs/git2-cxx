@@ -7,7 +7,7 @@
   - [x] `build`
   - [x] `files`
   - [x] `line_coverage` _(0.18.0)_
-  - [ ] `function_coverage` (issue mzdun/cov#48)
+  - [ ] `function_coverage` (mzdun/cov#48)
   - [ ] `branch_coverage`
 - [x] Wrap I/O in Z streams _(0.2.0-alpha)_
 - [x] Idea of references, tags and "branches" _(0.3.0-alpha)_
@@ -64,8 +64,8 @@
     - [x] `cov report --prop`
     - [x] show propset in `report`
     - [x] show propset in non-`log` `show`s _(0.18.0)_
-    - [ ] show propset in `log` (issue mzdun/cov#46)
-    - [ ] `$COV_FILTER_PATH` (issue mzdun/cov#47)
+    - [ ] show propset in `log` (mzdun/cov#46)
+    - [ ] `$COV_FILTER_PATH` (mzdun/cov#47)
   - [ ] `cov cherry-pick` (?)
   - [ ] Support for `less`
   - [ ] Major release
