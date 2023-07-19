@@ -64,7 +64,8 @@ namespace cov::app {
 			syntax.lines.pop_back();
 		}
 
-		if (chunks.empty()) chunks.push_back({0, static_cast<unsigned>(syntax.lines.size())});
+		if (chunks.empty())
+			chunks.push_back({0, static_cast<unsigned>(syntax.lines.size())});
 	}
 
 	std::optional<unsigned> cvg_info::max_count() const noexcept {

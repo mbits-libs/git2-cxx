@@ -4,13 +4,13 @@
 #include <git2/oid.h>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <array>
 #include <cov/git2/bytes.hh>
 #include <cov/io/db_object.hh>
 #include <cov/io/read_stream.hh>
 #include <cov/io/report.hh>
 #include <ranges>
 #include <span>
-#include <array>
 #include "setup.hh"
 
 namespace cov::testing {
