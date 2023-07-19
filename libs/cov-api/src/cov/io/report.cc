@@ -175,23 +175,29 @@ namespace cov::io::handlers {
 		if (!in.load(header)) return {};
 		auto const entry_size = header.builds.size * sizeof(uint32_t);
 		if (entry_size < sizeof(v1::report::entry) ||
-		    header.strings.offset < sizeof(v1::files) / sizeof(uint32_t) ||
-		    header.builds.offset < header.strings.offset)
+		    header.strings.offset < sizeof(v1::report) / sizeof(uint32_t) ||
+		    header.builds.offset <
+		        (header.strings.offset + header.strings.size)) {
 			return {};
+		}
 
 		if (!in.skip((header.strings.offset * sizeof(uint32_t)) -
-		             sizeof(header)))
+		             sizeof(header))) {
 			return {};
+		}
 		strings_view strings{};
-		if (!strings.load_from(in, header.strings)) return {};
+		if (!strings.load_from(in, header.strings)) {
+			return {};
+		}
 
 		if (!strings.is_valid(header.git.branch) ||
 		    !strings.is_valid(header.git.author.name) ||
 		    !strings.is_valid(header.git.author.email) ||
 		    !strings.is_valid(header.git.committer.name) ||
 		    !strings.is_valid(header.git.committer.email) ||
-		    !strings.is_valid(header.git.message))
+		    !strings.is_valid(header.git.message)) {
 			return {};
+		}
 
 		auto const at = [&](io::str offset) { return strings.at(offset); };
 
@@ -204,14 +210,16 @@ namespace cov::io::handlers {
 
 		if (!in.skip((header.builds.offset -
 		              (header.strings.offset + header.strings.size)) *
-		             sizeof(uint32_t)))
+		             sizeof(uint32_t))) {
 			return {};
+		}
 
 		std::vector<std::unique_ptr<cov::report::build>> builds{};
 		if (!load_resources(builds, in, strings,
 		                    static_cast<uint32_t>(entry_size),
-		                    header.builds.count))
+		                    header.builds.count)) {
 			return {};
+		}
 
 		ec.clear();
 		return cov::report::create(
@@ -266,7 +274,7 @@ namespace cov::io::handlers {
 		    .parent = obj->parent_id().id,
 		    .file_list = obj->file_list_id().id,
 		    .builds = stg.align_array<v1::report, v1::report::entry>(
-		        obj->entries().size()),
+		        obj->entries().size()),  // GCOV_EXCL_LINE[GCC]
 		    .added = time_stamp(obj->add_time_utc()),
 		    .git = {.branch = locate(obj->branch()),
 		            .author = {.name = locate(obj->author_name()),
@@ -347,6 +355,7 @@ namespace cov {
 		}
 
 		std::string escape_dict(json::node const& data) {
+			if (!std::holds_alternative<json::map>(data)) return {};
 			json::string result;
 			json::write_json(result, data, json::concise);
 			auto view = std::basic_string_view{result};
@@ -378,8 +387,8 @@ namespace cov {
 	}
 
 	report::builder& report::builder::add(std::unique_ptr<build>&& entry) {
-		auto const props = normalize(entry->props_json());
-		entries_[props] = std::move(entry);
+		auto props = normalize(entry->props_json());
+		entries_[std::move(props)] = std::move(entry);
 		return *this;
 	}
 

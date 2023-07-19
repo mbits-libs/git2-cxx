@@ -337,16 +337,26 @@ namespace cov::placeholder {
 				out = color_str(out, clr, str);
 			}
 
-			void color_key(bool force) {
+			void color_key(bool force, bool colon = true) {
 				if (force || env.client->prop_names) {
-					color_str(color::faint_yellow,
-					          fmt::format("{}{}: ", prefix, *key));
+					if (colon) {
+						color_str(color::faint_yellow,
+						          fmt::format("{}{}: ", prefix, *key));
+
+					} else {
+						color_str(color::faint_yellow,
+						          fmt::format("{}{}", prefix, *key));
+					}
 				} else if (!prefix.empty()) {
 					color_str(color::faint_yellow, prefix);
 				}
 			}
 
 			void operator()(std::string_view str) {
+				if (str.empty()) {
+					color_key(true, false);
+					return;
+				}
 				color_key(false);
 				color_str(color::yellow, str);
 			}
@@ -487,13 +497,6 @@ namespace cov::placeholder {
 		                                                    : pass;
 	}
 
-	object_list::~object_list() = default;
-	object_facade::~object_facade() = default;
-	bool object_facade::condition(std::string_view tag) {
-		auto const list = loop(tag);
-		return list && list->next();
-	}
-
 	iterator context::format(iterator out,
 	                         internal_environment& env,
 	                         color clr) const {
@@ -601,7 +604,7 @@ namespace cov::placeholder {
 			case stats::branches_percent:
 				return !stats ? out : format_percentage(out, stats->branches);
 		}
-		return out;
+		return out;  // GCOV_EXCL_LINE - all enums are handled above
 	}
 
 	iterator context::format(iterator out,

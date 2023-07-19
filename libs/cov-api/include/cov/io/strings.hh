@@ -72,7 +72,7 @@ namespace cov::io {
 		}
 
 		constexpr bool is_valid(size_t offset) const noexcept {
-			return (offset <= size_) && (!offset || !block_[offset - 1]);
+			return (offset < size_) && (!offset || !block_[offset - 1]);
 		}
 
 		constexpr bool is_valid(io::str offset) const noexcept {

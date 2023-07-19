@@ -420,7 +420,9 @@ namespace cov {
 			while (cur != end && *cur != '[')
 				++cur;
 			auto ref_end = cur;
-			if (cur == end) return std::nullopt;
+			if (cur == end) {
+				return std::nullopt;
+			}
 			++cur;
 
 #if DEBUG_PARSER
@@ -548,16 +550,12 @@ namespace cov {
 				auto copy = std::move(stack.back());
 				stack.pop_back();
 				auto& current = stack.back();
-				if (current.empty() ||
-				    !std::holds_alternative<placeholder::block>(
+				if (!current.empty() &&
+				    std::holds_alternative<placeholder::block>(
 				        current.back())) {
-					current.insert(current.end(),
-					               std::move_iterator(copy.begin()),
-					               std::move_iterator(copy.end()));
-					return;
+					std::get<placeholder::block>(current.back()).opcodes =
+					    std::move(copy);
 				}
-				std::get<placeholder::block>(current.back()).opcodes =
-				    std::move(copy);
 			}
 		};
 		for (auto& tok : tokens) {

@@ -48,7 +48,7 @@ After un-gzipping, each file start with a file header, consisting of magic and v
 |0|1|`"rset"`|magic|
 |1|1|1.0|version|
 ||||**_header_**|
-|2|1|strings|block|
+|2|2|strings|block|
 |4|5|parent|oid|
 |4|5|file_list|oid|
 |9|3|builds|array_ref|

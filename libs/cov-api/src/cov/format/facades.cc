@@ -9,17 +9,11 @@ using namespace std::literals;
 
 namespace cov::placeholder {
 	namespace {
-
 		class build_facade : public object_facade {
 		public:
-			build_facade(ref_ptr<cov::build> const& data,
-			             cov::report::build const* short_view,
+			build_facade(cov::report::build const* short_view,
 			             cov::repository const* repo)
-			    : data_{data}, short_view_{short_view}, repo_{repo} {}
-			build_facade(cov::build* data,
-			             cov::report::build const* short_view,
-			             cov::repository const* repo)
-			    : data_{data}, short_view_{short_view}, repo_{repo} {}
+			    : short_view_{short_view}, repo_{repo} {}
 
 			std::unique_ptr<object_list> loop(std::string_view) override {
 				return {};
@@ -72,14 +66,9 @@ namespace cov::placeholder {
 			void ensure_data() noexcept {
 				if (data_) return;
 				if (!short_view_ || !repo_) return;
-				try {
-					std::error_code ec{};
-					data_ =
-					    repo_->lookup<cov::build>(short_view_->build_id(), ec);
-					if (ec) data_.reset();
-				} catch (...) {
-					data_.reset();
-				}
+				std::error_code ec{};
+				data_ = repo_->lookup<cov::build>(short_view_->build_id(), ec);
+				if (ec) data_.reset();
 			}
 
 			std::string_view props_json() {
@@ -118,7 +107,9 @@ namespace cov::placeholder {
 				return data_ ? &data_->oid() : nullptr;
 			}
 			git::oid const* secondary_id() noexcept override {
-				return data_ ? &data_->file_list_id() : nullptr;
+				return data_ && !data_->file_list_id().is_zero()
+				           ? &data_->file_list_id()
+				           : nullptr;
 			}
 			git::oid const* tertiary_id() noexcept override {
 				return data_ && !data_->parent_id().is_zero()
@@ -126,7 +117,9 @@ namespace cov::placeholder {
 				           : nullptr;
 			}
 			git::oid const* quaternary_id() noexcept override {
-				return data_ ? &data_->commit_id() : nullptr;
+				return data_ && !data_->commit_id().is_zero()
+				           ? &data_->commit_id()
+				           : nullptr;
 			}
 			sys_seconds added() noexcept override {
 				return data_ ? data_->add_time_utc() : sys_seconds{};
@@ -153,10 +146,8 @@ namespace cov::placeholder {
 					if (index_ >= entries.size()) return {};
 					auto const& entry = entries[index_];
 					++index_;
-					return std::make_unique<build_facade>(nullptr, entry.get(),
-					                                      repo_);
+					return std::make_unique<build_facade>(entry.get(), repo_);
 				}
-				void reset() noexcept override { index_ = true; }
 
 			private:
 				size_t index_{0};
@@ -170,6 +161,27 @@ namespace cov::placeholder {
 		};
 	}  // namespace
 
+	object_list::~object_list() = default;
+
+	object_facade::~object_facade() = default;
+
+	bool object_facade::condition(std::string_view ref) {
+#define STATS(REF, OBJ)                        \
+	if (ref == REF) {                          \
+		auto const* info = stats();            \
+		return info && info->OBJ.relevant > 0; \
+	}
+		if (ref == "pL"sv) {
+			auto const* info = stats();
+			return info && info->lines_total > 0;
+		}
+		STATS("pTL"sv, lines);
+		STATS("pTF"sv, functions);
+		STATS("pTB"sv, branches);
+		auto const list = loop(ref);
+		return list && list->next();
+	}
+
 	std::unique_ptr<object_facade> object_facade::present_report(
 	    cov::report const* data,
 	    cov::repository const* repo) {
@@ -179,12 +191,6 @@ namespace cov::placeholder {
 	std::unique_ptr<object_facade> object_facade::present_build(
 	    cov::report::build const* data,
 	    cov::repository const* repo) {
-		return std::make_unique<build_facade>(nullptr, data, repo);
-	}
-
-	std::unique_ptr<object_facade> object_facade::present_build(
-	    cov::build* data,
-	    cov::repository const* repo) {
-		return std::make_unique<build_facade>(data, nullptr, repo);
+		return std::make_unique<build_facade>(data, repo);
 	}
 }  // namespace cov::placeholder
