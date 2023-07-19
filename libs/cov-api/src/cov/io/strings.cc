@@ -94,7 +94,7 @@ namespace cov::io {
 		for (size_t off : offsets_) {
 			if (!is_valid(off)) return false;
 		}
-		return is_valid(size());
+		return true;
 	}
 
 	size_t strings_block::locate(std::string_view str) const noexcept {

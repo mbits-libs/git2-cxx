@@ -101,6 +101,10 @@ namespace cov {
 			}
 			bool remove(std::string_view props);
 			std::vector<std::unique_ptr<build>> release();
+			std::map<std::string, std::unique_ptr<build>> const& debug()
+			    const noexcept {
+				return entries_;
+			}
 
 			static std::string properties(
 			    std::span<std::string const> const& propset);

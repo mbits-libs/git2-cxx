@@ -282,7 +282,6 @@ namespace cov::placeholder {
 		virtual ~object_list();
 
 		virtual std::unique_ptr<struct object_facade> next() = 0;
-		virtual void reset() noexcept = 0;
 	};
 
 	struct object_facade {
@@ -307,9 +306,6 @@ namespace cov::placeholder {
 		    cov::repository const*);
 		static std::unique_ptr<object_facade> present_build(
 		    cov::report::build const*,
-		    cov::repository const*);
-		static std::unique_ptr<object_facade> present_build(
-		    cov::build*,
 		    cov::repository const*);
 	};
 
