@@ -16,6 +16,7 @@ DEF_STEPS = {
     "config": ["Conan", "CMake"],
     "build": ["Build"],
     "verify": ["Build", "Test", "Report", "Pack", "Store", "BinInst", "DevInst"],
+    "report": ["Build", "Test", "Report"],
 }
 cmd = os.path.splitext(os.path.basename(sys.argv[0]))[0]
 
