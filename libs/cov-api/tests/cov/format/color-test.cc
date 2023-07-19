@@ -8,6 +8,7 @@
 
 namespace cov::testing {
 	using namespace ::std::literals;
+	using namespace ::git::literals;
 	using ::testing::TestWithParam;
 	using ::testing::ValuesIn;
 	namespace ph = placeholder;
@@ -39,13 +40,11 @@ namespace cov::testing {
 	class format_color : public TestWithParam<color_test> {
 	protected:
 		ref_ptr<cov::report> make_report(
-		    git_oid const& id,
+		    git::oid_view id,
 		    std::optional<io::v1::coverage_stats> const& stats) const {
-			git_oid parent_id{}, commit_id{}, zero{};
-			git_oid_fromstr(&parent_id,
-			                "8765432100ffeeddccbbaa998877665544332211");
-			git_oid_fromstr(&commit_id,
-			                "36109a1c35e0d5cf3e5e68d896c8b1b4be565525");
+			auto parent_id = "8765432100ffeeddccbbaa998877665544332211"_oid,
+			     commit_id = "36109a1c35e0d5cf3e5e68d896c8b1b4be565525"_oid;
+			git::oid zero{};
 
 			io::v1::coverage_stats const default_stats{
 			    1250, {300, 299}, io::v1::stats::init(), io::v1::stats::init()};
