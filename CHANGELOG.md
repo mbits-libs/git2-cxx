@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) and [COMMITS.md](COMMITS.md) for commit guidelines.
 
+## [0.19.0](https://github.com/mzdun/cov/compare/v0.18.0...v0.19.0) (2023-07-19)
+
+### New Features
+
+- **api**: remodel the log formatter ([615b812](https://github.com/mzdun/cov/commit/615b8128d333c62625c230a8f003f173ee30e7e0)), references [#46](https://github.com/mzdun/cov/issues/46)
+- **core**: update apps and tests ([2448ed4](https://github.com/mzdun/cov/commit/2448ed45ef1c6d1baced2e3d0d186ef1974a57d0)), closes [#46](https://github.com/mzdun/cov/issues/46)
+- **rt**: adapt to new logging ([918792e](https://github.com/mzdun/cov/commit/918792e5b7340b70eec45c6eec0d17f175ba5f75)), references [#46](https://github.com/mzdun/cov/issues/46)
+
+### Bug Fixes
+
+- reorganize the documentation files ([fb8795d](https://github.com/mzdun/cov/commit/fb8795d42b17ac29fdd60a60f65e03d4da36df73))
+- **api**: remove build issue hidden on vs 19.37 ([5a5582d](https://github.com/mzdun/cov/commit/5a5582d006c5a3927937a825609817d0fd3b1692))
+- **api**: changes resulting from new tests ([fd64b2b](https://github.com/mzdun/cov/commit/fd64b2bee2815331c781101e9893efae1a5b7fbc))
+
 ## [0.18.0](https://github.com/mzdun/cov/compare/v0.17.3...v0.18.0) (2023-07-16)
 
 ### New Features
