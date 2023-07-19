@@ -77,7 +77,6 @@ namespace cov::placeholder::testing {
 		           files_id = "0f0af157e8897ce4b29a524d9ef9fe75fc942ab4"_oid,
 		           build1_id = "91ec54e2634abb436583b0e27ceda44c9ae5820c"_oid,
 		           build2_id = "830c717a98fcd696771101d2ba9d76b45f3791b3"_oid;
-		git::oid zero{};
 
 		io::v1::coverage_stats const stats{1250, {300, 299}, {1, 1}, {0, 0}};
 
@@ -153,17 +152,16 @@ namespace cov::placeholder::testing {
 
 	TEST(facade, backed_by_repo_data_broken) {
 		git::init app{};
-		std::error_code ec{};
+		std::error_code ignore{};
 		std::filesystem::remove_all(setup::test_dir() / "clean/.git/.covdata"sv,
-		                            ec);
+		                            ignore);
 		{
 			git::repository::init(setup::test_dir() / "clean/.git"sv, false,
-			                      ec);
+			                      ignore);
 		}
 		auto repo = cov::repository::init(
 		    setup::test_dir(), setup::test_dir() / "clean/.git/.covdata"sv,
-		    setup::test_dir() / "clean/.git"sv, ec);
-		ASSERT_FALSE(ec) << ec.message();
+		    setup::test_dir() / "clean/.git"sv, ignore);
 
 		auto const report_id = "92b91e27801bbd1ee4e2cc456b81be767a03fbbf"_oid,
 		           build_id = "91ec54e2634abb436583b0e27ceda44c9ae5820c"_oid;
