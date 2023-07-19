@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) and [COMMITS.md](COMMITS.md) for commit guidelines.
 
+## [0.19.1](https://github.com/mzdun/cov/compare/v0.19.0...v0.19.1) (2023-07-19)
+
+### Bug Fixes
+
+- **ci**: copy test results on non-release builds ([c66e1a4](https://github.com/mzdun/cov/commit/c66e1a45ddf44cdb409593ae7698b127d3e11a68))
+- **ci**: mark the release as latest ([8db978b](https://github.com/mzdun/cov/commit/8db978bcbab5661ccbeb2bae8cccf90a6c28bc7e))
+
 ## [0.19.0](https://github.com/mzdun/cov/compare/v0.18.0...v0.19.0) (2023-07-19)
 
 ### New Features
