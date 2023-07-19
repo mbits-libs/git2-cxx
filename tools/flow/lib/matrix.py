@@ -363,6 +363,21 @@ class steps:
     @staticmethod
     @step_call("Store")
     def store(config: dict):
+        steps._store_packages(config)
+        steps._store_tests(config)
+
+    @staticmethod
+    @step_call("StorePackages", flags=step_info.VERBOSE)
+    def store_packages(config: dict):
+        steps._store_packages(config)
+
+    @staticmethod
+    @step_call("StoreTests", flags=step_info.VERBOSE)
+    def store_tests(config: dict):
+        steps._store_tests(config)
+
+    @staticmethod
+    def _store_packages(config: dict):
         preset = config["preset"]
         packages_dir = f"build/{preset}/packages"
         if not runner.DRY_RUN:
@@ -393,12 +408,7 @@ class steps:
             "build/artifacts/packages",
             r"^cov-.*$",
         )
-        runner.copy(f"build/{preset}/test-results", "build/artifacts/test-results")
-        if config.get("coverage", False):
-            output = f"build/artifacts/coveralls/{config['report_os']}-{config['report_compiler']}-{config['build_type']}.json"
-            print_args("cp", f"build/{preset}/coveralls.json", output)
-            if not runner.DRY_RUN:
-                copy_file(f"build/{preset}/coveralls.json", output)
+
         if runner.GITHUB_ANNOTATE:
             try:
                 GITHUB_OUTPUT = os.environ["GITHUB_OUTPUT"]
@@ -407,6 +417,17 @@ class steps:
                     print(f"CPACK_GENERATORS={generators}", file=github_output)
             except KeyError:
                 pass
+
+    @staticmethod
+    def _store_tests(config: dict):
+        preset = config["preset"]
+
+        runner.copy(f"build/{preset}/test-results", "build/artifacts/test-results")
+        if config.get("coverage", False):
+            output = f"build/artifacts/coveralls/{config['report_os']}-{config['report_compiler']}-{config['build_type']}.json"
+            print_args("cp", f"build/{preset}/coveralls.json", output)
+            if not runner.DRY_RUN:
+                copy_file(f"build/{preset}/coveralls.json", output)
 
     @staticmethod
     @step_call(
@@ -481,6 +502,8 @@ class steps:
             steps.report,
             steps.pack,
             steps.store,
+            steps.store_packages,
+            steps.store_tests,
             steps.bin_inst,
             steps.dev_inst,
         ]
