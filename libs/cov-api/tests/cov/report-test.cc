@@ -10,6 +10,7 @@
 #include <cov/io/report.hh>
 #include <ranges>
 #include <span>
+#include <array>
 #include "setup.hh"
 
 namespace cov::testing {
