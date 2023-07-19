@@ -249,6 +249,6 @@ class API:
             "-f",
             "draft=false",
             "-F",
-            "latest=legacy",
+            "make_latest=legacy",
             method="PATCH",
         ).get("html_url")
