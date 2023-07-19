@@ -1,0 +1,15 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "cppdbg",
+            "request": "launch",
+            "name": "Launch cov-test",
+            "cwd": "${workspaceFolder}",
+            "program": "${workspaceFolder}/build/debug/bin/cov-test",
+            "args": [
+                "--gtest_filter=*"
+            ]
+        }
+    ]
+}
