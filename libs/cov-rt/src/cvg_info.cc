@@ -29,14 +29,16 @@ namespace cov::app {
 	cvg_info cvg_info::from_coverage(
 	    std::span<io::v1::coverage const> const& lines) {
 		cvg_info result{};
-		unsigned line = 0;
-		for (auto&& cvg : lines) {
-			if (cvg.is_null) {
-				line += cvg.value;
-				continue;
+		{
+			unsigned line = 0;
+			for (auto&& cvg : lines) {
+				if (cvg.is_null) {
+					line += cvg.value;
+					continue;
+				}
+				line++;
+				result.coverage[line] = cvg.value;
 			}
-			line++;
-			result.coverage[line] = cvg.value;
 		}
 
 		for (auto [line, count] : result.coverage) {
@@ -62,7 +64,7 @@ namespace cov::app {
 			syntax.lines.pop_back();
 		}
 
-		if (chunks.empty()) chunks.push_back({0, syntax.lines.size()});
+		if (chunks.empty()) chunks.push_back({0, static_cast<unsigned>(syntax.lines.size())});
 	}
 
 	std::optional<unsigned> cvg_info::max_count() const noexcept {
