@@ -20,19 +20,19 @@ Easiest way to get the binaries is to use flows. They are used as part of GitHub
 ```
 
 ### Commands
-Currently, there are few specialized flows: **config**, **build** and **verify**, plus one general one, named simply **run**. Each performs a predefined set of steps, with `./flow run` being able to specify, which one to actually run.
+Currently, there are few specialized flows: **config**, **build**, **report** and **verify**, plus one general one, named simply **run**. Each performs a predefined set of steps, with `./flow run` being able to specify, which one to actually run.
 
-|Step|Meaning|`run`|`config`|`build`|`verify`|
-|-|-|:-:|:-:|:-:|:-:|
-|**Conan**|Recreates `./build/conan` and puts Conan package references there.|✓|✓|||
-|**CMake**|Recreates `./build/${build_type}` and runs the `cmake` there.|✓|✓|||
-|**Build**|Builds the project.|✓||✓|✓|
-|**Test**|Either directly calls `ctest`, or builds the self-coverage gathering target.|✓|||✓|
-|**Report**|Puts the latest coverage into local instance of **cov**.||||✓|
-|**Pack**|Creates archives and installers|✓|||✓|
-|**Store**|Copies packages from **Pack** to `./build/artifacts`.|✓|||✓|
-|**BinInst**|Extracts the ZIP/TAR.GZ to `./build/.local/`. Adding `./build/.local/bin` to $PATH should help with running latest build from the get-go.||||✓|
-|**DevInst**|Extracts the ZIP/TAR.GZ to `./build/.user/`.||||✓|
+|Step|Meaning|`run`|`config`|`build`|`report`|`verify`|
+|-|-|:-:|:-:|:-:|:-:|:-:|
+|**Conan**|Recreates `./build/conan` and puts Conan package references there.|✓|✓||||
+|**CMake**|Recreates `./build/${build_type}` and runs the `cmake` there.|✓|✓||||
+|**Build**|Builds the project.|✓||✓|✓|✓|
+|**Test**|Either directly calls `ctest`, or builds the self-coverage gathering target.|✓|||✓|✓|
+|**Report**|Puts the latest coverage into local instance of **cov**.||||✓|✓|
+|**Pack**|Creates archives and installers|✓||||✓|
+|**Store**|Copies packages from **Pack** to `./build/artifacts`.|✓||||✓|
+|**BinInst**|Extracts the ZIP/TAR.GZ to `./build/.local/`. Adding `./build/.local/bin` to $PATH should help with running latest build from the get-go.|||||✓|
+|**DevInst**|Extracts the ZIP/TAR.GZ to `./build/.user/`.|||||✓|
 
 ### Config
 

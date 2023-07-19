@@ -442,10 +442,16 @@ class steps:
     )
     def report(config: dict):
         reporter = f"build/{config['preset']}/bin/cov"
-        tag_process = subprocess.run([reporter, "tag"], stdout=subprocess.PIPE)
-        tags = (
-            tag_process.stdout.decode("UTF-8").replace("\r\n", "\n").strip().split("\n")
-        )
+        try:
+            tag_process = subprocess.run([reporter, "tag"], stdout=subprocess.PIPE)
+            tags = (
+                tag_process.stdout.decode("UTF-8")
+                .replace("\r\n", "\n")
+                .strip()
+                .split("\n")
+            )
+        except:
+            tags = ()
         version = get_version()
         legacy_reporter = os.environ.get("LEGACY_COV")
         report = f"build/{config['preset']}/coveralls.json"
