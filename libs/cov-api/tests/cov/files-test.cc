@@ -619,6 +619,68 @@ namespace cov::testing {
 		}
 	}
 
+	TEST(files, store_limited_2) {
+		static constexpr auto expected =
+		    "list\x00\x00\x01\x00"
+
+		    // strings
+		    "\x05\x00\x00\x00"
+		    "\x03\x00\x00\x00"
+		    // entries
+		    "\x08\x00\x00\x00"
+		    "\x1C\x00\x00\x00"
+		    "\x01\x00\x00\x00"
+
+		    "file path\0\0\0"
+
+		    // - path
+		    "\x00\x00\x00\x00"
+		    // - contents
+		    "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+		    "\x00\x00\x00\x00"
+		    // - total
+		    "\xE2\x04\x00\x00"
+
+		    // - lines
+		    "\x2C\x01\x00\x00"
+		    "\x2B\x01\x00\x00"
+		    "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+		    "\x00\x00\x00\x00"
+
+		    // - functions
+		    "\x0F\x00\x00\x00"
+		    "\x0A\x00\x00\x00"
+		    "\x12\x34\x56\x78\x90\x12\x34\x56\x78\x90\x12\x34\x56\x78\x90\x12"
+		    "\x34\x56\x78\x90"
+
+		    // - branches
+		    "\xE6\x00\x00\x00"
+		    "\xDE\x00\x00\x00"
+		    "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+		    "\x00\x00\x00\x00"sv;
+
+		io::db_object dbo{};
+		dbo.add_handler<io::OBJECT::FILES, io::handlers::files>();
+
+		files::builder builder{};
+		builder.add_nfo({.path = "file path"sv,
+		                 .stats = {1250, {300, 299}, {15, 10}, {230, 222}},
+		                 .function_coverage =
+		                     "1234567890123456789012345678901234567890"_oid});
+		auto const obj = make_ref<files_impl>();
+		obj->files = builder.release();
+
+		for (size_t limit = 4 * sizeof(uint32_t); limit < expected.size();
+		     limit += sizeof(uint32_t)) {
+			test_stream stream{};
+			stream.free_size = limit;
+
+			auto const result = dbo.store(obj, stream);
+			ASSERT_FALSE(result);
+			ASSERT_EQ(expected.substr(0, limit), stream.view());
+		}
+	}
+
 	TEST(files, remove) {
 		files::builder builder{};
 		builder.add_nfo({.path = "Alpha"})

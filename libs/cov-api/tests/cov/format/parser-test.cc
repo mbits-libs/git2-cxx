@@ -264,6 +264,16 @@ namespace cov::testing {
 	    MAKE_TEST("width (1 arg)", "%w(60)", (ph::width{60, 6, 9})),
 	    MAKE_TEST("width (indent only)", "%w(0, 6)", (ph::width{0, 6, 6})),
 	    MAKE_TEST("width (full suite)", "%w(60, 6, 8)", (ph::width{60, 6, 8})),
+
+	    {
+	        "unfinished loops"sv,
+	        "pre %{[ post"sv,
+	        {
+	            "pre "s,
+	            ph::block{.type = ph::block_type::loop_start,
+	                      .opcodes = {" post"s}},
+	        },
+	    },
 	};
 
 	INSTANTIATE_TEST_SUITE_P(good, format_parser, ::testing::ValuesIn(tests));
@@ -418,6 +428,21 @@ namespace cov::testing {
 	        "not magic"sv,
 	        "pre %mB post"sv,
 	        {"pre %mB post"s},
+	    },
+	    {
+	        "not loop"sv,
+	        "pre %{ post"sv,
+	        {"pre %{ post"s},
+	    },
+	    {
+	        "not if"sv,
+	        "pre %{? post"sv,
+	        {"pre %{? post"s},
+	    },
+	    {
+	        "not end"sv,
+	        "pre %] post"sv,
+	        {"pre %] post"s},
 	    },
 	};
 
