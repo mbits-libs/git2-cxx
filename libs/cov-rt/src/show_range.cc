@@ -29,6 +29,12 @@ namespace cov::app {
 	"Coverage: " ALIGN                                  \
 	"[%pPL] %C(faint normal)%pVL/%pTL%Creset %C(faint " \
 	"rating)(%prL)%Creset%n"                            \
+	"%{?pTF[Functions:" ALIGN                           \
+	"[%pPF] %C(faint normal)%pVF/%pTF%Creset %C(faint " \
+	"rating)(%prB)%Creset%n%]}"                         \
+	"%{?pTB[Branches: " ALIGN                           \
+	"[%pPB] %C(faint normal)%pVB/%pTB%Creset %C(faint " \
+	"rating)(%prB)%Creset%n%]}"                         \
 	"Author:   " ALIGN "%an <%ae>%n"
 #define SHORT_LOG SHORT_LOG_(" ")
 
@@ -55,13 +61,13 @@ namespace cov::app {
 	"CommitDate: %cd%n"       \
 	"Added:      %rd%n"
 
-#define RAW_LOG             \
-	"files %HF%n"           \
-	"added %rt%n"           \
-	"stats %pL %pTL %pVL%n" \
-	"branch %rD%n"          \
-	"commit %HG%n"          \
-	"author %an <%ae>%n"    \
+#define RAW_LOG                                   \
+	"files %HF%n"                                 \
+	"added %rt%n"                                 \
+	"stats %pL %pTL %pVL, %pTF %pVF, %pTB %pTB%n" \
+	"branch %rD%n"                                \
+	"commit %HG%n"                                \
+	"author %an <%ae>%n"                          \
 	"committer %cn <%ce> %ct%n"
 
 #define MESSAGE "%n%w(76,6,6)%B%n"

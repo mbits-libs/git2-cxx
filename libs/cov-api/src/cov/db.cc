@@ -7,6 +7,7 @@
 #include <cov/io/build.hh>
 #include <cov/io/file.hh>
 #include <cov/io/files.hh>
+#include <cov/io/function_coverage.hh>
 #include <cov/io/line_coverage.hh>
 #include <cov/io/read_stream.hh>
 #include <cov/io/report.hh>
@@ -51,6 +52,8 @@ namespace cov {
 		io_.add_handler<io::OBJECT::BUILD, io::handlers::build>();
 		io_.add_handler<io::OBJECT::FILES, io::handlers::files>();
 		io_.add_handler<io::OBJECT::COVERAGE, io::handlers::line_coverage>();
+		io_.add_handler<io::OBJECT::FUNCTIONS,
+		                io::handlers::function_coverage>();
 	}
 
 	ref_ptr<object> loose_backend::lookup_object(git::oid_view id) const {

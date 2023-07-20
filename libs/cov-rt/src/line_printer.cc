@@ -106,6 +106,12 @@ namespace cov::app::line_printer {
 	            "\033[0;49;31m"sv,
 	            {},
 	        },
+	    "fn"_k +
+	        varying_styles{
+	            "\033[2;49;32m"sv,
+	            "\033[2;49;31m"sv,
+	            {},
+	        },
 	};
 #endif
 
@@ -277,6 +283,31 @@ namespace cov::app::line_printer {
 			ctx.visit_span(items);
 		}
 		ctx.paint_color();  // EOL reset
+
+		return ctx.result;
+	}
+
+	std::string to_string(std::optional<unsigned> const& count,
+	                      std::string_view view,
+	                      bool shortened,
+	                      bool use_color,
+	                      size_t tab_size) {
+		auto mark = !count ? mark::irrelevant : *count ? mark::good : mark::bad;
+
+		std::map<std::uint32_t, std::string> empty{};
+		context ctx{view, empty, mark, tab_size, {use_color}};
+
+		{
+			context::color_stack paint{&ctx, ctx.find_color("fn"sv)};
+			ctx.paint_color();
+			ctx.result.append(view);
+		}
+		ctx.paint_color();  // EOL reset
+		if (shortened) {
+			if (use_color) ctx.result.append("\033[2;49;39m"sv);
+			ctx.result.append("..."sv);
+			if (use_color) ctx.result.append("\033[m"sv);
+		}
 
 		return ctx.result;
 	}

@@ -4,6 +4,7 @@
 #pragma once
 
 #include <cov/io/types.hh>
+#include <cov/report.hh>
 #include <hilite/lighter.hh>
 #include <map>
 #include <optional>
@@ -20,13 +21,32 @@ namespace cov::app {
 	};
 
 	struct cvg_info {
+		struct function_label {
+			unsigned start{};
+			unsigned end{};
+			std::string name{};
+			unsigned count{};
+
+			auto operator<=>(function_label const&) const noexcept = default;
+		};
+		struct function {
+			function_label label{};
+			unsigned count{};
+
+			auto operator<=>(function const&) const noexcept = default;
+		};
+
 		std::map<unsigned, unsigned> coverage{};
+		std::vector<function> functions{};
 		std::vector<std::pair<unsigned, unsigned>> chunks{};
 		std::string_view file_text{};
 		lighter::highlights syntax{};
 
 		static cvg_info from_coverage(
 		    std::span<io::v1::coverage const> const& lines);
+		void add_functions(
+		    std::span<std::unique_ptr<cov::function_coverage::entry> const>
+		        functions);
 		void load_syntax(std::string_view text, std::string_view filename);
 		view_columns column_widths() const noexcept;
 
@@ -36,8 +56,12 @@ namespace cov::app {
 		bool has_line(size_t line_no) const noexcept {
 			return syntax.lines.size() > line_no;
 		}
+		std::string to_string(function const& fn,
+		                      view_columns const& widths,
+		                      bool use_color,
+		                      size_t max_width) const;
 		std::string to_string(size_t line_no,
 		                      view_columns const& widths,
-		                      bool use_color) const noexcept;
+		                      bool use_color) const;
 	};
 }  // namespace cov::app

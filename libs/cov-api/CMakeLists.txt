@@ -51,6 +51,7 @@ set(COV_SOURCES
   src/cov/io/db_object.cc
   src/cov/io/file.cc
   src/cov/io/files.cc
+  src/cov/io/function_coverage.cc
   src/cov/io/line_coverage.cc
   src/cov/io/read_stream.cc
   src/cov/io/report.cc
@@ -84,6 +85,7 @@ set(COV_SOURCES
   include/cov/io/db_object.hh
   include/cov/io/file.hh
   include/cov/io/files.hh
+  include/cov/io/function_coverage.hh
   include/cov/io/line_coverage.hh
   include/cov/io/read_stream.hh
   include/cov/io/report.hh

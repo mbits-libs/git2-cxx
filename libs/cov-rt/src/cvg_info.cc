@@ -56,6 +56,35 @@ namespace cov::app {
 		return result;
 	}  // GCOV_EXCL_LINE[GCC]
 
+	void cvg_info::add_functions(
+	    std::span<std::unique_ptr<cov::function_coverage::entry> const> input) {
+		for (auto const& entry : input) {
+			auto name = entry->demangled_name();
+			if (name.empty()) name = entry->name();
+			functions.push_back({
+			    .label = {.start = entry->start().line,
+			              .end = entry->end().line},
+			    .count = entry->count(),
+			});
+			functions.back().label.name.assign(name);
+		}
+
+		std::sort(functions.begin(), functions.end());
+		auto dst = functions.begin();
+		auto end = functions.end();
+		if (dst == end) return;
+		for (auto src = std::next(dst); src != end;) {
+			if (src->label != dst->label) {
+				++dst;
+				++src;
+				continue;
+			}
+			dst->count += src->count;
+			src = functions.erase(src);
+			end = functions.end();
+		}
+	}
+
 	void cvg_info::load_syntax(std::string_view text,
 	                           std::string_view filename) {
 		file_text = text;
@@ -80,6 +109,10 @@ namespace cov::app {
 			}
 		}
 
+		for (auto const& fun : functions) {
+			result = result ? std::max(*result, fun.count) : fun.count;
+		}
+
 		return result;
 	}
 
@@ -99,9 +132,43 @@ namespace cov::app {
 		return count;
 	}
 
+	std::string cvg_info::to_string(function const& fn,
+	                                view_columns const& widths,
+	                                bool use_color,
+	                                size_t max_width) const {
+		if (max_width < std::numeric_limits<std::size_t>::max()) {
+			static constexpr size_t MAGIC = 40;
+			static constexpr size_t margins = 8;
+			max_width -= std::min(max_width, widths.count_width);
+			max_width -= std::min(max_width, widths.line_no_width);
+			max_width -= std::min(max_width, margins);
+			max_width = std::max(max_width, MAGIC);
+		}
+
+		std::string_view name = fn.label.name;
+		std::string backing{};
+
+		auto const shorten = name.size() > max_width;
+		if (shorten) {
+			backing.assign(name.substr(0, max_width - 3));
+			name = backing;
+		}
+
+		auto const count_column = fmt::format("{}x", fn.count);
+		auto prefix = ""sv, suffix = ""sv;
+		if (use_color) {
+			prefix = "\033[2;49;39m"sv;
+			suffix = "\033[m"sv;
+		}
+		return fmt::format(
+		    "{} {:>{}} |{} {}", prefix, count_column,
+		    widths.line_no_width + 3 + widths.count_width + 1, suffix,
+		    line_printer::to_string(fn.count, name, shorten, use_color));
+	}
+
 	std::string cvg_info::to_string(size_t line_no,
 	                                view_columns const& widths,
-	                                bool use_color) const noexcept {
+	                                bool use_color) const {
 		auto const count = count_for(static_cast<unsigned>(line_no));
 		auto const& line = syntax.lines[line_no];
 		auto const length = length_of(line.contents);

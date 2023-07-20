@@ -63,16 +63,15 @@ namespace cov::io::handlers {
 		};
 
 		struct impl : counted_impl<cov::files> {
-			explicit impl(
-			    std::vector<std::unique_ptr<cov::files::entry>>&& files)
+			explicit impl(std::vector<std::unique_ptr<entry>>&& files)
 			    : files_{std::move(files)} {}
 
-			std::span<std::unique_ptr<cov::files::entry> const> entries()
+			std::span<std::unique_ptr<entry> const> entries()
 			    const noexcept override {
 				return files_;
 			}
 
-			cov::files::entry const* by_path(
+			entry const* by_path(
 			    std::string_view path) const noexcept override {
 				for (auto const& entry : files_) {
 					if (entry->path() == path) return entry.get();
@@ -81,7 +80,7 @@ namespace cov::io::handlers {
 			}
 
 		private:
-			std::vector<std::unique_ptr<cov::files::entry>> files_{};
+			std::vector<std::unique_ptr<entry>> files_{};
 		};
 
 		constexpr uint32_t uint_32(size_t value) {
@@ -106,7 +105,8 @@ namespace cov::io::handlers {
 		auto const entry_size = header.entries.size * sizeof(uint32_t);
 		if (entry_size < sizeof(v1::files::basic) ||
 		    header.strings.offset < sizeof(v1::files) / sizeof(uint32_t) ||
-		    header.entries.offset < header.strings.offset) {
+		    header.entries.offset <
+		        (header.strings.offset + header.strings.size)) {
 			return {};
 		}
 
