@@ -60,9 +60,14 @@ namespace cov::placeholder {
 		return out << '{' << r.num << ',' << r.den << '}';
 	}
 
-	std::ostream& operator<<(std::ostream& out, rating const& r) {
+	std::ostream& operator<<(std::ostream& out, base_rating const& r) {
 		return out << "{.incomplete=" << r.incomplete << ",.passing"
 		           << r.passing << '}';
+	}
+
+	std::ostream& operator<<(std::ostream& out, rating const& r) {
+		return out << "{.lines=" << r.lines << ",.functions" << r.functions
+		           << ",.branches" << r.branches << '}';
 	}
 
 	std::ostream& operator<<(std::ostream& out, environment const& env) {
@@ -161,6 +166,23 @@ namespace cov::testing {
 	           init_repo(DIRNAME "/.git/.covdata"sv, DIRNAME "/.git/"sv),      \
 	           touch(DIRNAME "/.git/.covdata/config"sv,                        \
 	                 "[core]\n  gitdir = ..\n  rating = " RATIO ""sv))
+#define RATIO_CFG_EX(DIRNAME, RATIO)                                           \
+	make_setup(remove_all(DIRNAME ""sv),                                       \
+	           create_directories(DIRNAME "/subdir"sv),                        \
+	           create_directories(DIRNAME "/.git/objects/pack"sv),             \
+	           create_directories(DIRNAME "/.git/objects/info"sv),             \
+	           create_directories(DIRNAME "/.git/refs/tags"sv),                \
+	           touch(DIRNAME "/.git/HEAD"sv), touch(DIRNAME "/.git/config"sv), \
+	           touch(DIRNAME "/.git/refs/heads/main"sv),                       \
+	           init_repo(DIRNAME "/.git/.covdata"sv, DIRNAME "/.git/"sv),      \
+	           touch(DIRNAME "/.git/.covdata/config"sv,                        \
+	                 "[core]\n  gitdir = ..\n" RATIO ""sv))
+
+	static constexpr placeholder::base_rating def_75_90 = {.incomplete = {3, 4},
+	                                                       .passing{9, 10}};
+	static constexpr placeholder::rating rating_75_90 = {.lines = def_75_90,
+	                                                     .functions = def_75_90,
+	                                                     .branches = def_75_90};
 
 	static context_test const tests[] = {
 	    {
@@ -178,7 +200,7 @@ namespace cov::testing {
 	            init_repo("empty-repo/.git/.covdata"sv, "empty-repo/.git/"sv)),
 	        {.hash_length = 9u,
 	         .names = {.HEAD = "main"s},
-	         .marks{.incomplete = {3, 4}, .passing{9, 10}},
+	         .marks = rating_75_90,
 	         .colorize = formatter::shell_colorize,
 	         .decorate = true},
 	    },
@@ -196,7 +218,7 @@ namespace cov::testing {
 	                   init_repo("no-feat/.git/.covdata"sv, "no-feat/.git/"sv)),
 	        {.hash_length = 9u,
 	         .names = {.HEAD = "main"s},
-	         .marks{.incomplete = {3, 4}, .passing{9, 10}}},
+	         .marks = rating_75_90},
 	        {.clr = use_feature::no, .decorate = use_feature::no},
 	    },
 	    {
@@ -223,7 +245,7 @@ namespace cov::testing {
 	                   .heads = {{"main"s,
 	                              "11223344556677889900aabbccddeeff12345678"s}},
 	                   .HEAD_ref = "11223344556677889900aabbccddeeff12345678"s},
-	         .marks{.incomplete = {3, 4}, .passing{9, 10}}},
+	         .marks = rating_75_90},
 	        {.clr = use_feature::automatic, .decorate = use_feature::automatic},
 	    },
 	    {
@@ -259,7 +281,7 @@ namespace cov::testing {
 	                   .heads = {{"main"s,
 	                              "11223344556677889900aabbccddeeff12345678"s}},
 	                   .HEAD_ref = "11223344556677889900aabbccddeeff12345678"s},
-	         .marks{.incomplete = {3, 4}, .passing{9, 10}},
+	         .marks = rating_75_90,
 	         .colorize = formatter::shell_colorize,
 	         .decorate = true},
 	    },
@@ -269,7 +291,11 @@ namespace cov::testing {
 	        RATIO_CFG("ratings-A", "88%, 66%"),
 	        {.hash_length = 9u,
 	         .names = {.HEAD = "main"s},
-	         .marks{.incomplete = {33, 50}, .passing{22, 25}},
+	         .marks{
+	             .lines{.incomplete = {33, 50}, .passing{22, 25}},
+	             .functions{.incomplete = {33, 50}, .passing{22, 25}},
+	             .branches{.incomplete = {33, 50}, .passing{22, 25}},
+	         },
 	         .colorize = formatter::shell_colorize,
 	         .decorate = true},
 	    },
@@ -279,7 +305,11 @@ namespace cov::testing {
 	        RATIO_CFG("ratings-B", "55 / 80, 2345/3060"),
 	        {.hash_length = 9u,
 	         .names = {.HEAD = "main"s},
-	         .marks{.incomplete = {11, 16}, .passing{469, 612}},
+	         .marks{
+	             .lines{.incomplete = {11, 16}, .passing{469, 612}},
+	             .functions{.incomplete = {11, 16}, .passing{469, 612}},
+	             .branches{.incomplete = {11, 16}, .passing{469, 612}},
+	         },
 	         .colorize = formatter::shell_colorize,
 	         .decorate = true},
 	    },
@@ -289,7 +319,7 @@ namespace cov::testing {
 	        RATIO_CFG("ratings-C", "word/3060, 55 / -=+=-"),
 	        {.hash_length = 9u,
 	         .names = {.HEAD = "main"s},
-	         .marks{.incomplete = {3, 4}, .passing{9, 10}},
+	         .marks = rating_75_90,
 	         .colorize = formatter::shell_colorize,
 	         .decorate = true},
 	    },
@@ -299,7 +329,22 @@ namespace cov::testing {
 	        RATIO_CFG("ratings-D", "word%, 95%!"),
 	        {.hash_length = 9u,
 	         .names = {.HEAD = "main"s},
-	         .marks{.incomplete = {3, 4}, .passing{9, 10}},
+	         .marks = rating_75_90,
+	         .colorize = formatter::shell_colorize,
+	         .decorate = true},
+	    },
+	    {
+	        "rating% - varying"sv,
+	        "ratings-E/.git/.covdata"sv,
+	        RATIO_CFG_EX("ratings-E",
+	                     "rating-lines=88%, 66%\n"
+	                     "rating-functions=44%, 33%\n"
+	                     "rating-branches=99%, 98%"),
+	        {.hash_length = 9u,
+	         .names = {.HEAD = "main"s},
+	         .marks{.lines = {.incomplete = {33, 50}, .passing{22, 25}},
+	                .functions{.incomplete = {33, 100}, .passing{11, 25}},
+	                .branches{.incomplete = {49, 50}, .passing{99, 100}}},
 	         .colorize = formatter::shell_colorize,
 	         .decorate = true},
 	    },

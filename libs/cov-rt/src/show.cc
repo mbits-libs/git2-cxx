@@ -78,6 +78,7 @@ namespace cov::app::show {
 		        {type},
 		        {label.data(), label.size()},
 		        apply_mark(val(change.coverage.current, "%"sv),
+		                   placeholder::color::bold_rating_lines,
 		                   change.stats.current.lines),
 		        val_sign(change.coverage.diff, color::faint_green, "%"sv),
 		        val(change.stats.current.lines.visited),

@@ -66,10 +66,18 @@ namespace cov::placeholder {
 		bg_blue,
 		bg_magenta,
 		bg_cyan,
-		rating,
-		bold_rating,
-		faint_rating,
-		bg_rating,
+		rating_lines,
+		bold_rating_lines,
+		faint_rating_lines,
+		bg_rating_lines,
+		rating_functions,
+		bold_rating_functions,
+		faint_rating_functions,
+		bg_rating_functions,
+		rating_branches,
+		bold_rating_branches,
+		faint_rating_branches,
+		bg_rating_branches,
 	};
 
 	struct width {
@@ -200,9 +208,16 @@ namespace cov::placeholder {
 		}
 	};
 
-	struct rating {
+	struct base_rating {
 		ratio incomplete;
 		ratio passing;
+		bool operator==(base_rating const&) const noexcept = default;
+	};
+
+	struct rating {
+		base_rating lines;
+		base_rating functions;
+		base_rating branches;
 		bool operator==(rating const&) const noexcept = default;
 	};
 
@@ -210,7 +225,9 @@ namespace cov::placeholder {
 		sys_seconds now{};
 		unsigned hash_length{};
 		refs names{};
-		rating marks{.incomplete{75, 100}, .passing{9, 10}};
+		rating marks{.lines{.incomplete{75, 100}, .passing{9, 10}},
+		             .functions{.incomplete{75, 100}, .passing{9, 10}},
+		             .branches{.incomplete{75, 100}, .passing{9, 10}}};
 		std::string_view time_zone{};
 		std::string_view locale{};
 		void* app{};
@@ -374,7 +391,7 @@ namespace cov {
 		}
 
 		static translatable apply_mark(io::v1::stats const& stats,
-		                               placeholder::rating const& marks);
+		                               placeholder::base_rating const& marks);
 
 		static placeholder::color apply_mark(placeholder::color color,
 		                                     io::v1::stats const& stats,

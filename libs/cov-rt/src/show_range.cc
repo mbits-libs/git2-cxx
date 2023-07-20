@@ -23,19 +23,19 @@ namespace cov::app {
 
 #define BUILD_HEADER(HASH) "%{B[build  %" HASH "1 [%pPL]%md%n%]}"
 
+#define COVERAGE_(LABEL, CODE)                                 \
+	LABEL "[%pP" CODE "] %C(faint normal)%pV" CODE "/%pT" CODE \
+	      "%Creset %C(faint "                                  \
+	      "rating:" CODE ")(%pr" CODE ")%Creset%n"
+#define HIDDEN_COVERAGE_(LABEL, CODE) \
+	"%{?pT" CODE "[" COVERAGE_(LABEL, CODE) "%]}"
+
 #define SHORT_LOG_(ALIGN)                               \
-	"GitBranch:" ALIGN                                  \
-	"%rD%n"                                             \
-	"Coverage: " ALIGN                                  \
-	"[%pPL] %C(faint normal)%pVL/%pTL%Creset %C(faint " \
-	"rating)(%prL)%Creset%n"                            \
-	"%{?pTF[Functions:" ALIGN                           \
-	"[%pPF] %C(faint normal)%pVF/%pTF%Creset %C(faint " \
-	"rating)(%prB)%Creset%n%]}"                         \
-	"%{?pTB[Branches: " ALIGN                           \
-	"[%pPB] %C(faint normal)%pVB/%pTB%Creset %C(faint " \
-	"rating)(%prB)%Creset%n%]}"                         \
-	"Author:   " ALIGN "%an <%ae>%n"
+	"GitBranch:" ALIGN "%rD%n"                    /* */ \
+	    COVERAGE_("Coverage: " ALIGN, "L")        /* */ \
+	    HIDDEN_COVERAGE_("Functions:" ALIGN, "F") /* */ \
+	    HIDDEN_COVERAGE_("Branches: " ALIGN, "B") /* */ \
+	    "Author:   " ALIGN "%an <%ae>%n"
 #define SHORT_LOG SHORT_LOG_(" ")
 
 #define MEDIUM_LOG  \

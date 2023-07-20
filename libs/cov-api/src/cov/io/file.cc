@@ -99,6 +99,7 @@ namespace cov::io {
 	}
 
 	size_t file::store(const void* buffer, size_t length) const noexcept {
+		if (!length) return 0;
 		return std::fwrite(buffer, 1, length, get());
 	}
 
