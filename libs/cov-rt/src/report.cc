@@ -39,12 +39,14 @@ namespace cov::app::report {
 			return digest::unknown;
 		}
 
-		bool conv(std::u8string_view key, unsigned& out) {
+		bool conv_rebase(std::u8string_view key, unsigned& out) {
 			auto const view = from_json(key);
 			auto const first = view.data();
 			auto const last = first + view.size();
 			auto const [ptr, ec] = std::from_chars(first, last, out);
-			return ptr == last && ec == std::errc{};
+			auto const ok = ptr == last && ec == std::errc{};
+			if (ok && out) --out;
+			return ok;
 		}
 
 		template <typename To, typename From>
@@ -335,7 +337,7 @@ namespace cov::app::report {
 				auto const hits = cast<long long>(node_value);
 
 				unsigned line{};
-				if (!hits || !conv(node_key, line)) {
+				if (!hits || !conv_rebase(node_key, line)) {
 					[[unlikely]];
 					files.clear();
 					return false;
@@ -376,6 +378,10 @@ namespace cov::app::report {
 					    u32_from(start_column ? *start_column : 0);
 					nfo.end.line = u32_from(end_line ? *end_line : *start_line);
 					nfo.end.column = u32_from(end_column ? *end_column : 0);
+
+					// rebase line indexes
+					if (nfo.start.line > 0) --nfo.start.line;
+					if (nfo.end.line > 0) --nfo.end.line;
 				}
 
 				std::sort(cvg.begin(), cvg.end());

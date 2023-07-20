@@ -1,6 +1,6 @@
 {
     "$schema": "https://json-schema.org/draft/2019-09/schema",
-    "$id": "https://raw.githubusercontent.com/mzdun/cov/v0.12.4-beta/apps/report-schema.json",
+    "$id": "https://raw.githubusercontent.com/mzdun/cov/v0.20.0/apps/report-schema.json",
     "type": "object",
     "default": {},
     "title": "Root Schema",
@@ -94,11 +94,11 @@
                         "patternProperties": {
                             "^[1-9][0-9]*$": {
                                 "type": "integer",
-                                "minimum": 0
+                                "minimum": 1
                             },
                             "^0[0-9]+$": {
                                 "type": "integer",
-                                "minimum": 0
+                                "minimum": 1
                             },
                             "^0$": {
                                 "title": "line numbers should start from 1",
