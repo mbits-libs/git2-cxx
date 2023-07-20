@@ -73,7 +73,7 @@ namespace cov::app::builtin::report {
 			p.data_error(replng::ERROR_CANNOT_READ_FROM_DB);
 		}  // GCOV_EXCL_STOP
 
-		p.print_report(branch, files.size(), *resulting);
+		p.print_report(branch, files.size(), *resulting, repo);
 
 		return 0;
 	}

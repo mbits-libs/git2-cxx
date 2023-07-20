@@ -217,12 +217,18 @@ namespace cov::app::builtin::report {
 	void parser::print_report(std::string_view local_branch,
 	                          size_t files,
 	                          cov::report const& report,
-	                          str::cov_report::Strings const& tr) {
+	                          str::cov_report::Strings const& tr,
+	                          repository const& repo) {
 		static constexpr auto message_chunk1 = "%C(red)["sv;
 		static constexpr auto message_chunk2 = " %hR]%Creset %s%n "sv;
 		static constexpr auto message_chunk3 =
-		    ", %C(rating)%pPL%Creset (%pVL/%pTL"sv;
-		static constexpr auto message_chunk4 = ")%n %C(faint normal)"sv;
+		    ", %C(rating:L)%pPL%Creset (%pVL/%pTL"sv;
+		static constexpr auto message_chunk4 =
+		    ")"
+		    "%{?pTF[, Fn%C(rating:F)%pPF%Creset (%pVF/%pTF)%]}"
+		    "%{?pTB[, Br%C(rating:B)%pPB%Creset (%pVB/%pTB)%]}"
+		    "%n"
+		    " %C(faint normal)"sv;
 		static constexpr auto message_chunk5 =
 		    "%Creset %C(faint yellow)%hG@%rD%Creset%n"sv;
 		static constexpr auto message_chunk6 = "%{B[ %C(faint normal)"sv;
@@ -274,17 +280,12 @@ namespace cov::app::builtin::report {
 		for (auto chunk : chunks)
 			format.append(chunk);
 
-		using namespace std::chrono;
-		auto const now = floor<seconds>(system_clock::now());
 		auto facade =
 		    placeholder::object_facade::present_report(&report, nullptr);
-		auto const message = formatter::from(format).format(
-		    facade.get(), {.now = now,
-		                   .hash_length = 9,
-		                   .names = {},
-		                   .colorize = formatter::shell_colorize,
-		                   .decorate = true,
-		                   .prop_names = false});
+		auto env = placeholder::environment::from(repo, use_feature::yes,
+		                                          use_feature::yes);
+		env.prop_names = false;
+		auto const message = formatter::from(format).format(facade.get(), env);
 
 		std::fputs(message.c_str(), stdout);
 	}

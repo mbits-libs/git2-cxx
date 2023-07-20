@@ -72,7 +72,7 @@ namespace cov::app::builtin::reset {
 				auto const file_count =
 				    files && !ec ? files->entries().size() : 0u;
 				builtin::report::parser::print_report(head.branch, file_count,
-				                                      *report, p.tr());
+				                                      *report, p.tr(), repo);
 			}
 		}
 
