@@ -10,7 +10,7 @@ def lines_from(lines: List[Optional[int]]) -> Dict[int, int]:
     for index in range(len(lines)):
         count = lines[index]
         if count is not None:
-            result[index] = count
+            result[index + 1] = count
     return result
 
 
@@ -31,7 +31,7 @@ git = data["git"]
 git_head = git["head"]
 json.dump(
     {
-        "$schema": "https://raw.githubusercontent.com/mzdun/cov/v0.18.0/apps/report-schema.json",
+        "$schema": "https://raw.githubusercontent.com/mzdun/cov/v0.20.0/apps/report-schema.json",
         "git": {"branch": git["branch"], "head": git_head["id"]},
         "files": [cov_from(source_file) for source_file in data["source_files"]],
     },

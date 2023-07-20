@@ -325,10 +325,10 @@ namespace cov::app::testing {
 			"name": "A",
 			"digest": "sha:value",
 			"line_coverage": {
-				"15": 156,
-				"16": -5,
-				"17": 0,
-				"18": )"sv;
+				"16": 156,
+				"17": -5,
+				"18": 0,
+				"19": )"sv;
 		static constexpr auto json_suffix = R"(
 			}
 		}
