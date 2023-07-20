@@ -258,7 +258,7 @@ namespace cov::io::handlers {
 
 		auto const locate = [&, size = stg.size()](std::string_view value) {
 			auto const offset = stg.locate_or(value, size + 1);
-			auto const offset32 = static_cast<uint32_t>(offset);
+			auto const offset32 = uint_32(offset);
 			if (offset != offset32) throw false;
 			return static_cast<io::str>(offset32);
 		};

@@ -151,6 +151,7 @@
                                 },
                                 "start_column": {
                                     "type": "integer",
+                                    "title": "probably the column of the function name; the highlight, if any, should start before this character; if missing or 0, means the start of line",
                                     "minimum": 1
                                 },
                                 "end_line": {
@@ -159,6 +160,7 @@
                                 },
                                 "end_column": {
                                     "type": "integer",
+                                    "title": "probably the column of the function closing bracket; the highlight, if any, should end after this character; if missing or 0, means the end of line",
                                     "minimum": 1
                                 }
                             },

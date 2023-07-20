@@ -1,6 +1,6 @@
 # Objects internal structure
 
-Each structure consists of 32 unsigned int numbers. They are stored and loaded in memory order, which means they follow current architecture endiannes. In tables below, each offset and size is in 4-byte increments (so offset 10 means 40 bytes from beginning of the file).
+Each structure consists of 32-bit unsigned int numbers. They are stored and loaded in memory order, which means they follow current architecture endiannes. In tables below, each offset and size is in 4-byte increments (so offset 10 means 40 bytes from beginning of the file).
 
 After un-gzipping, each file start with a file header, consisting of magic and version.
 
@@ -45,7 +45,7 @@ After un-gzipping, each file start with a file header, consisting of magic and v
 |Offset|Size|Value|Type|
 |-----:|---:|-----|----|
 ||||**_file header_**|
-|0|1|`"rset"`|magic|
+|0|1|`"rprt"`|magic|
 |1|1|1.0|version|
 ||||**_header_**|
 |2|2|strings|block|
@@ -93,7 +93,7 @@ After un-gzipping, each file start with a file header, consisting of magic and v
 |Offset|Size|Value|Type|
 |-----:|---:|-----|----|
 ||||**_file header_**|
-|0|1|`"rprt"`|magic|
+|0|1|`"bld "`|magic|
 |1|1|1.0|version|
 ||||**_report_header_**|
 |2|1|strings|block|

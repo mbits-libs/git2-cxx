@@ -67,6 +67,16 @@ namespace cov::app::report {
 			return unsigned_cast<unsigned>(u_hits);
 		}
 
+		inline uint32_t u32_from(long long value) {
+			if (value < 0) return 0;
+			static constexpr auto max_value =
+			    std::numeric_limits<uint32_t>::max();
+			auto const u_hits =
+			    std::min(unsigned_cast<unsigned long long>(value),
+			             unsigned_cast<unsigned long long>(max_value));
+			return unsigned_cast<uint32_t>(u_hits);
+		}
+
 		inline std::string stored(std::string_view view) {
 			return {view.data(), view.size()};
 		}
@@ -260,6 +270,12 @@ namespace cov::app::report {
 				            if (count) ++stats.lines.visited;
 			            }
 		            });
+
+		for (auto const& fun : function_coverage) {
+			++stats.functions.relevant;
+			if (fun.count) ++stats.functions.visited;
+		}
+
 		return result;
 	}  // GCOV_EXCL_LINE[GCC]
 
@@ -288,6 +304,8 @@ namespace cov::app::report {
 			    cast_from_json<json::string>(file_node, u8"digest"sv);
 			auto const json_file_line_coverage =
 			    cast_from_json<json::map>(file_node, u8"line_coverage"sv);
+			auto const json_file_functions_coverage =
+			    cast_from_json<json::array>(file_node, u8"functions"sv);
 
 			if (!json_file_name || !json_file_digest ||
 			    !json_file_line_coverage) {
@@ -323,6 +341,44 @@ namespace cov::app::report {
 					return false;
 				}
 				dst.line_coverage[line] = unsigned_from(*hits);
+			}
+
+			if (json_file_functions_coverage) {
+				auto& cvg = dst.function_coverage;
+				cvg.reserve(json_file_functions_coverage->size());
+				for (auto const& node : *json_file_functions_coverage) {
+					auto const name =
+					    cast_from_json<json::string>(node, u8"name"sv);
+					auto const count =
+					    cast_from_json<long long>(node, u8"count"sv);
+					auto const start_line =
+					    cast_from_json<long long>(node, u8"start_line"sv);
+
+					if (!name || !count || !start_line) continue;
+
+					auto const demangled =
+					    cast_from_json<json::string>(node, u8"demangled"sv);
+					auto const start_column =
+					    cast_from_json<long long>(node, u8"start_column"sv);
+					auto const end_line =
+					    cast_from_json<long long>(node, u8"end_line"sv);
+					auto const end_column =
+					    cast_from_json<long long>(node, u8"end_column"sv);
+
+					cvg.push_back({});
+					auto& nfo = cvg.back();
+					nfo.name.assign(from_json(*name));
+					if (demangled)
+						nfo.demangled_name.assign(from_json(*demangled));
+					nfo.count = u32_from(*count);
+					nfo.start.line = u32_from(*start_line);
+					nfo.start.column =
+					    u32_from(start_column ? *start_column : 0);
+					nfo.end.line = u32_from(end_line ? *end_line : *start_line);
+					nfo.end.column = u32_from(end_column ? *end_column : 0);
+				}
+
+				std::sort(cvg.begin(), cvg.end());
 			}
 		}
 

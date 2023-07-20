@@ -198,4 +198,52 @@ namespace cov {
 		static ref_ptr<line_coverage> create(std::vector<io::v1::coverage>&&);
 	};
 
+	struct function_coverage : object {
+		struct entry {
+			virtual ~entry();
+			virtual std::string_view name() const noexcept = 0;
+			virtual std::string_view demangled_name() const noexcept = 0;
+			virtual uint32_t count() const noexcept = 0;
+			virtual io::v1::text_pos const& start() const noexcept = 0;
+			virtual io::v1::text_pos const& end() const noexcept = 0;
+		};
+
+		obj_type type() const noexcept override {
+			return obj_function_coverage;
+		};
+		bool is_function_coverage() const noexcept final { return true; }
+		virtual std::span<std::unique_ptr<entry> const> entries()
+		    const noexcept = 0;
+
+		static ref_ptr<function_coverage> create(
+		    std::vector<std::unique_ptr<entry>>&&);
+
+		class builder {
+		public:
+			struct info {
+				std::string_view name{};
+				std::string_view demangled_name{};
+				uint32_t count{};
+				io::v1::text_pos start{};
+				io::v1::text_pos end{};
+			};
+			builder& add(std::unique_ptr<entry>&&);
+			builder& add(std::string_view name,
+			             std::string_view demangled_name,
+			             uint32_t count,
+			             io::v1::text_pos const& start,
+			             io::v1::text_pos const& end);
+			builder& add_nfo(info const& nfo) {
+				return add(nfo.name, nfo.demangled_name, nfo.count, nfo.start,
+				           nfo.end);
+			}
+			ref_ptr<function_coverage> extract();
+			std::vector<std::unique_ptr<entry>> release();
+
+			void reserve(size_t count) { entries_.reserve(count); }
+
+		private:
+			std::vector<std::unique_ptr<entry>> entries_{};
+		};
+	};
 }  // namespace cov

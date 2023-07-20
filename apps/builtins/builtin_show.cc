@@ -25,9 +25,37 @@
 
 #ifdef _WIN32
 #include <Windows.h>
+#include <io.h>
+#else
+#include <errno.h>
+#include <sys/ioctl.h>
+#include <unistd.h>
+#define _isatty(FD) isatty(FD)
+#define _fileno(OBJ) fileno(OBJ)
 #endif
 
 namespace cov::app::builtin::show {
+	namespace {
+		size_t terminal_width(FILE* out) noexcept {
+#ifdef _WIN32
+			CONSOLE_SCREEN_BUFFER_INFO buffer = {};
+			auto handle =
+			    reinterpret_cast<HANDLE>(_get_osfhandle(_fileno(out)));
+			if (handle == INVALID_HANDLE_VALUE ||
+			    !GetConsoleScreenBufferInfo(handle, &buffer))
+				return 0;
+			return buffer.dwSize.X < 0 ? 0u
+			                           : static_cast<size_t>(buffer.dwSize.X);
+#else
+			winsize w;
+			while (ioctl(fileno(out), TIOCGWINSZ, &w) == -1) {
+				if (errno != EINTR) return 0;
+			}
+			return w.ws_col;
+#endif
+		}
+	}  // namespace
+
 	std::vector<file_stats> report_diff(app::show::parser::response const& info,
 	                                    std::error_code& ec) {
 		auto const newer = info.repo.lookup<cov::report>(info.range.to, ec);
@@ -142,12 +170,23 @@ namespace cov::app::builtin::show {
 		if (!file_entry || file_entry->contents().is_zero()) return 1;
 
 		cvg_info cvg{};
+		bool with_functions{true};
+
+		auto const display_width = cov::platform::is_terminal(stdout)
+		                               ? terminal_width(stdout)
+		                               : std::numeric_limits<size_t>::max();
 
 		if (!file_entry->line_coverage().is_zero()) {
 			auto const file_cvg = info.repo.lookup<cov::line_coverage>(
 			    file_entry->line_coverage(), ec);
 			if (file_cvg && !ec)
 				cvg = cvg_info::from_coverage(file_cvg->coverage());
+		}
+
+		if (with_functions && !file_entry->function_coverage().is_zero()) {
+			auto const file_cvg = info.repo.lookup<cov::function_coverage>(
+			    file_entry->function_coverage(), ec);
+			if (file_cvg && !ec) cvg.add_functions(file_cvg->entries());
 		}
 
 		auto const data = file_entry->get_contents(info.repo, ec);
@@ -164,6 +203,10 @@ namespace cov::app::builtin::show {
 		}
 
 		auto const widths = cvg.column_widths();
+		auto fn_it = cvg.functions.begin();
+		auto const fn_end = cvg.functions.end();
+
+		std::vector<cvg_info::function> active_functions{};
 
 		bool first = true;
 		for (auto const& [start, stop] : cvg.chunks) {
@@ -178,6 +221,14 @@ namespace cov::app::builtin::show {
 				if (!cvg.has_line(line_no)) {
 					ran_out_of_lines = true;
 					break;
+				}
+				while (fn_it != fn_end && fn_it->label.start < line_no)
+					++fn_it;
+				while (fn_it != fn_end && fn_it->label.start == line_no) {
+					auto const& function = *fn_it++;
+					fmt::print("{}\n", cvg.to_string(function, widths,
+					                                 clr == use_feature::yes,
+					                                 display_width));
 				}
 				fmt::print("{}\n", cvg.to_string(line_no, widths,
 				                                 clr == use_feature::yes));

@@ -10,6 +10,7 @@ namespace cov {
 	X(build)             \
 	X(files)             \
 	X(line_coverage)     \
+	X(function_coverage) \
 	X(blob)              \
 	X(reference)         \
 	X(reference_list)    \

@@ -471,22 +471,23 @@ namespace cov::io {
 			                       coverage_stats::init());
 		}
 
-		struct function_files {
-			block strings;
-			array_ref entries;
-		};
-
 		struct text_pos {
 			uint32_t line;
 			uint32_t column;
+			bool operator==(text_pos const&) const noexcept = default;
 		};
 
-		struct function_entry {
-			str name;
-			str demangled_name;
-			uint32_t count;
-			text_pos start;
-			text_pos end;
+		struct function_coverage {
+			block strings;
+			array_ref entries;
+
+			struct entry {
+				str name;
+				str demangled_name;
+				uint32_t count;
+				text_pos start;
+				text_pos end;
+			};
 		};
 	};  // namespace v1
 }  // namespace cov::io

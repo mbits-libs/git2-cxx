@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <compare>
 #include <cov/git2/repository.hh>
 #include <cov/git2/tree.hh>
 #include <cov/io/report.hh>
@@ -21,10 +22,37 @@ namespace cov::app::report {
 	struct file_info {
 		using coverage_info =
 		    std::tuple<std::vector<io::v1::coverage>, io::v1::coverage_stats>;
+
+		struct function {
+			std::string name{};
+			std::string demangled_name{};
+			uint32_t count{};
+			io::v1::text_pos start{0, 0};
+			io::v1::text_pos end{0, 0};
+
+			bool operator==(function const&) const noexcept = default;
+
+			auto operator<=>(function const& rhs) const noexcept {
+				// 1. by position in file (ignore columns)
+				// 2. by demangled
+				// 3. by name
+
+				if (auto const cmp = start.line <=> rhs.start.line; cmp != 0)
+					return cmp;
+				if (auto const cmp = end.line <=> rhs.end.line; cmp != 0)
+					return cmp;
+				if (auto const cmp = demangled_name <=> rhs.demangled_name;
+				    cmp != 0)
+					return cmp;
+				return name <=> rhs.name;
+			}
+		};
+
 		std::string name{};
 		report::digest algorithm{digest::unknown};
 		std::string digest{};
 		std::map<unsigned, unsigned> line_coverage{};
+		std::vector<function> function_coverage{};
 		auto operator<=>(file_info const&) const noexcept = default;
 		coverage_info expand_coverage(size_t line_count) const;
 	};
