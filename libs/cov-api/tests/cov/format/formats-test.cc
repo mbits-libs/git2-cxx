@@ -275,11 +275,15 @@ namespace cov::testing {
 	                    "Subject, isn't "
 	                    "it? <Johnny Appleseed>"sv,
 	        .no_facade = " /  () - from []  <>"sv,
-	        .tweaks =
-	            {.report = "442211335566778899aabbccddeeff0012345678"sv,
-	             .stats =
-	                 io::v1::coverage_stats{1250, {300, 300}, {0, 0}, {0, 0}},
-	             .marks{ph::rating{.incomplete{75, 100}, .passing{90, 0}}}},
+	        .tweaks = {.report = "442211335566778899aabbccddeeff0012345678"sv,
+	                   .stats = io::v1::coverage_stats{1250,
+	                                                   {300, 300},
+	                                                   {0, 0},
+	                                                   {0, 0}},
+	                   .marks{ph::rating{
+	                       .lines{.incomplete{75, 100}, .passing{90, 0}},
+	                       .functions{.incomplete{75, 100}, .passing{90, 0}},
+	                       .branches{.incomplete{75, 100}, .passing{90, 0}}}}},
 	    },
 	    {
 	        .name = "broken rating (bad incomplete)"sv,
@@ -293,7 +297,10 @@ namespace cov::testing {
 	                                                   {300, 300},
 	                                                   {0, 0},
 	                                                   {0, 0}},
-	                   .marks{ph::rating{.incomplete{75, 0}, .passing{9, 10}}}},
+	                   .marks{ph::rating{
+	                       .lines{.incomplete{75, 100}, .passing{90, 0}},
+	                       .functions{.incomplete{75, 100}, .passing{90, 0}},
+	                       .branches{.incomplete{75, 100}, .passing{90, 0}}}}},
 	    },
 	    {
 	        .name = "HEAD (unwrapped)"sv,

@@ -119,7 +119,11 @@ namespace cov::testing {
 
 	TEST(format_color, apply_mark) {
 		using placeholder::color;
-		placeholder::rating rating{.incomplete{75, 100}, .passing{9, 10}};
+		static constexpr placeholder::base_rating def_rating{
+		    .incomplete{75, 100}, .passing{9, 10}};
+		placeholder::rating rating{.lines = def_rating,
+		                           .functions = def_rating,
+		                           .branches = def_rating};
 		struct mark_info {
 			color clr, expected;
 			io::v1::coverage_stats stats;
@@ -127,7 +131,7 @@ namespace cov::testing {
 
 		static constexpr mark_info marks[] = {
 		    {
-		        .clr = color::rating,
+		        .clr = color::rating_lines,
 		        .expected = color::green,
 		        .stats{.lines_total{},
 		               .lines{.relevant{100}, .visited{100}},
@@ -135,7 +139,7 @@ namespace cov::testing {
 		               .branches = io::v1::stats::init()},
 		    },
 		    {
-		        .clr = color::bg_rating,
+		        .clr = color::bg_rating_lines,
 		        .expected = color::bg_yellow,
 		        .stats{.lines_total{},
 		               .lines{.relevant{100}, .visited{89}},
@@ -143,12 +147,60 @@ namespace cov::testing {
 		               .branches = io::v1::stats::init()},
 		    },
 		    {
-		        .clr = color::faint_rating,
+		        .clr = color::faint_rating_lines,
 		        .expected = color::faint_red,
 		        .stats{.lines_total{},
 		               .lines{.relevant{100}, .visited{70}},
 		               .functions = io::v1::stats::init(),
 		               .branches = io::v1::stats::init()},
+		    },
+		    {
+		        .clr = color::rating_functions,
+		        .expected = color::green,
+		        .stats{.lines_total{},
+		               .lines = io::v1::stats::init(),
+		               .functions{.relevant{100}, .visited{100}},
+		               .branches = io::v1::stats::init()},
+		    },
+		    {
+		        .clr = color::bg_rating_functions,
+		        .expected = color::bg_yellow,
+		        .stats{.lines_total{},
+		               .lines = io::v1::stats::init(),
+		               .functions{.relevant{100}, .visited{89}},
+		               .branches = io::v1::stats::init()},
+		    },
+		    {
+		        .clr = color::faint_rating_functions,
+		        .expected = color::faint_red,
+		        .stats{.lines_total{},
+		               .lines = io::v1::stats::init(),
+		               .functions{.relevant{100}, .visited{70}},
+		               .branches = io::v1::stats::init()},
+		    },
+		    {
+		        .clr = color::rating_branches,
+		        .expected = color::green,
+		        .stats{.lines_total{},
+		               .lines = io::v1::stats::init(),
+		               .functions = io::v1::stats::init(),
+		               .branches{.relevant{100}, .visited{100}}},
+		    },
+		    {
+		        .clr = color::bg_rating_branches,
+		        .expected = color::bg_yellow,
+		        .stats{.lines_total{},
+		               .lines = io::v1::stats::init(),
+		               .functions = io::v1::stats::init(),
+		               .branches{.relevant{100}, .visited{89}}},
+		    },
+		    {
+		        .clr = color::faint_rating_branches,
+		        .expected = color::faint_red,
+		        .stats{.lines_total{},
+		               .lines = io::v1::stats::init(),
+		               .functions = io::v1::stats::init(),
+		               .branches{.relevant{100}, .visited{70}}},
 		    },
 		    {
 		        .clr = color::blue,
@@ -159,9 +211,16 @@ namespace cov::testing {
 		               .branches = io::v1::stats::init()},
 		    }};
 
+		size_t index{};
 		for (auto const [clr, expected, stats] : marks) {
-			auto const actual = formatter::apply_mark(clr, stats.lines, rating);
-			EXPECT_EQ(expected, actual);
+			auto const actual =
+			    stats.lines.relevant
+			        ? formatter::apply_mark(clr, stats.lines, rating)
+			    : stats.functions.relevant
+			        ? formatter::apply_mark(clr, stats.functions, rating)
+			        : formatter::apply_mark(clr, stats.branches, rating);
+			EXPECT_EQ(expected, actual) << "index: " << index;
+			++index;
 		}
 	}
 

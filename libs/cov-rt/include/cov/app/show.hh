@@ -66,10 +66,10 @@ namespace cov::app::show {
 		}
 
 		std::string apply_mark(std::string_view label,
+		                       placeholder::color color,
 		                       io::v1::stats const& stats) const {
-			return fmt::format(
-			    "{}{}{}", color_for(placeholder::color::bold_rating, &stats),
-			    label, color_for(placeholder::color::reset));
+			return fmt::format("{}{}{}", color_for(color, &stats), label,
+			                   color_for(placeholder::color::reset));
 		}
 
 		std::string val_sign(

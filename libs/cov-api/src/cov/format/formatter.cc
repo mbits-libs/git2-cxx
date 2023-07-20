@@ -112,8 +112,13 @@ namespace cov::placeholder {
 
 		iterator format_rating(iterator out,
 		                       io::v1::stats const& stats,
-		                       internal_environment const& env) {
-			auto mark = formatter::apply_mark(stats, env.client->marks);
+		                       internal_environment const& env,
+		                       placeholder::stats fld) {
+			using enum placeholder::stats;
+			auto mark = formatter::apply_mark(
+			    stats, fld == lines_rating       ? env.client->marks.lines
+			           : fld == functions_rating ? env.client->marks.functions
+			                                     : env.client->marks.branches);
 			return format_str(out, env.translate(mark));
 		}
 
@@ -502,13 +507,29 @@ namespace cov::placeholder {
 	                         color clr) const {
 		width_cleaner clean{env};
 		if (env.client->colorize) {
-			if (clr == color::rating || clr == color::bold_rating ||
-			    clr == color::faint_rating || clr == color::bg_rating) {
-				io::v1::coverage_stats const* stats =
-				    facade ? facade->stats() : nullptr;
-				clr = formatter::apply_mark(
-				    clr, stats ? stats->lines : io::v1::stats{0, 0},
-				    env.client->marks);
+			switch (clr) {
+				case color::rating_lines:
+				case color::bold_rating_lines:
+				case color::faint_rating_lines:
+				case color::bg_rating_lines:
+
+				case color::rating_functions:
+				case color::bold_rating_functions:
+				case color::faint_rating_functions:
+				case color::bg_rating_functions:
+
+				case color::rating_branches:
+				case color::bold_rating_branches:
+				case color::faint_rating_branches:
+				case color::bg_rating_branches: {
+					io::v1::coverage_stats const* stats =
+					    facade ? facade->stats() : nullptr;
+					clr = formatter::apply_mark(
+					    clr, stats ? stats->lines : io::v1::stats{0, 0},
+					    env.client->marks);
+				}
+				default:
+					break;
 			}
 			out = format_str(
 			    out,
@@ -583,7 +604,8 @@ namespace cov::placeholder {
 			case stats::lines_visited:
 				return !stats ? out : format_num(out, stats->lines.visited);
 			case stats::lines_rating:
-				return !stats ? out : format_rating(out, stats->lines, env);
+				return !stats ? out
+				              : format_rating(out, stats->lines, env, fld);
 			case stats::lines_percent:
 				return !stats ? out : format_percentage(out, stats->lines);
 			case stats::functions_total:
@@ -592,7 +614,8 @@ namespace cov::placeholder {
 			case stats::functions_visited:
 				return !stats ? out : format_num(out, stats->functions.visited);
 			case stats::functions_rating:
-				return !stats ? out : format_rating(out, stats->functions, env);
+				return !stats ? out
+				              : format_rating(out, stats->functions, env, fld);
 			case stats::functions_percent:
 				return !stats ? out : format_percentage(out, stats->functions);
 			case stats::branches_total:
@@ -600,7 +623,8 @@ namespace cov::placeholder {
 			case stats::branches_visited:
 				return !stats ? out : format_num(out, stats->branches.visited);
 			case stats::branches_rating:
-				return !stats ? out : format_rating(out, stats->branches, env);
+				return !stats ? out
+				              : format_rating(out, stats->branches, env, fld);
 			case stats::branches_percent:
 				return !stats ? out : format_percentage(out, stats->branches);
 		}
@@ -728,7 +752,7 @@ namespace cov {
 	}
 
 	translatable formatter::apply_mark(io::v1::stats const& stats,
-	                                   placeholder::rating const& marks) {
+	                                   placeholder::base_rating const& marks) {
 		if (!stats.relevant || !marks.incomplete.den || !marks.passing.den)
 			return translatable::mark_failing;
 		auto const gcd_1 = std::gcd(stats.relevant, stats.visited);
@@ -747,28 +771,27 @@ namespace cov {
 		return translatable::mark_passing;
 	}
 
-#define MARK_COLOR(...)                                    \
-	case color::__VA_ARGS__##rating:                       \
-		return mark_color(mark, color::__VA_ARGS__##green, \
-		                  color::__VA_ARGS__##yellow,      \
-		                  color::__VA_ARGS__##red);
+#define MARK_COLOR_(DOMAIN, ...)                                        \
+	case color::__VA_ARGS__##rating_##DOMAIN:                           \
+		return mark_color(                                              \
+		    apply_mark(stats, marks.DOMAIN), color::__VA_ARGS__##green, \
+		    color::__VA_ARGS__##yellow, color::__VA_ARGS__##red);
+#define MARK_COLOR(...)                 \
+	MARK_COLOR_(lines, __VA_ARGS__)     \
+	MARK_COLOR_(functions, __VA_ARGS__) \
+	MARK_COLOR_(branches, __VA_ARGS__)
 
 	placeholder::color formatter::apply_mark(placeholder::color clr,
 	                                         io::v1::stats const& stats,
 	                                         placeholder::rating const& marks) {
 		using placeholder::color;
-		if (clr == color::rating || clr == color::bold_rating ||
-		    clr == color::faint_rating || clr == color::bg_rating) {
-			auto const mark = apply_mark(stats, marks);
-			switch (clr) {
-				MARK_COLOR()
-				MARK_COLOR(bold_)
-				MARK_COLOR(faint_)
-				MARK_COLOR(bg_)
-				default:    // GCOV_EXCL_LINE
-					break;  // GCOV_EXCL_LINE
-			}
+		switch (clr) {
+			MARK_COLOR()
+			MARK_COLOR(bold_)
+			MARK_COLOR(faint_)
+			MARK_COLOR(bg_)
+			default:
+				return clr;
 		}
-		return clr;
 	}
 }  // namespace cov
