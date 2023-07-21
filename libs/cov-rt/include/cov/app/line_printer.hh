@@ -17,7 +17,8 @@ namespace cov::app::line_printer {
 	                      bool use_color,
 	                      size_t tab_size = 4);
 	std::string to_string(std::optional<unsigned> const& count,
-	                      std::string_view view, bool shortened,
+	                      std::string_view view,
+	                      bool shortened,
 	                      bool use_color,
 	                      size_t tab_size = 4);
 }  // namespace cov::app::line_printer
