@@ -360,6 +360,7 @@ Diff:
                 *expanded,
             ]
         )
+        result += f"\n{self.filename}"
 
         return result
 

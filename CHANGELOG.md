@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) and [COMMITS.md](COMMITS.md) for commit guidelines.
 
+## [0.20.0](https://github.com/mzdun/cov/compare/v0.19.1...v0.20.0) (2023-07-21)
+
+### New Features
+
+- **api**: split rating colors into kinds ([75efad8](https://github.com/mzdun/cov/commit/75efad895446a8b2d8687e37458de77a5e810f30)), references [#48](https://github.com/mzdun/cov/issues/48)
+- **rt**: add new columns to `cov show` table ([61d5a39](https://github.com/mzdun/cov/commit/61d5a3996fbc432fc3949b20e9bbf14968df288b)), references [#48](https://github.com/mzdun/cov/issues/48)
+- **rt**: show more ratings in `cov report`/`reset` ([7c7af1a](https://github.com/mzdun/cov/commit/7c7af1aa361ea24b47bd93d344afee847864acf0)), references [#48](https://github.com/mzdun/cov/issues/48)
+- **runtime, core**: show functions in file view ([31851f2](https://github.com/mzdun/cov/commit/31851f27d807b1f1bc5d2f8a6f34a8b757d3ecf3)), references [#48](https://github.com/mzdun/cov/issues/48)
+
+### Bug Fixes
+
+- apply linter comments ([112409b](https://github.com/mzdun/cov/commit/112409b249ddbce31624e1aac7a433d36ccf947c))
+- **api, rt**: cleanup table code ([b553362](https://github.com/mzdun/cov/commit/b553362572d0f027c0631c23ac1ccb32a555c1fe))
+- **rt**: recalculate coverage for function aliases ([e484dad](https://github.com/mzdun/cov/commit/e484dadc62ee4da7c5a1669a343ef42b6d9cb9f0)), closes [#48](https://github.com/mzdun/cov/issues/48)
+- **rt**: calc chunks using function counts ([5ee14de](https://github.com/mzdun/cov/commit/5ee14de23b0f74de48a1c9f1c1e02f7a5a2702d6)), references [#48](https://github.com/mzdun/cov/issues/48)
+- **runtime**: expect lines to be 1-based, but keep them 0-based ([6126026](https://github.com/mzdun/cov/commit/61260265c473a7da0a0a6859fe522067ab927c91))
+
 ## [0.19.1](https://github.com/mzdun/cov/compare/v0.19.0...v0.19.1) (2023-07-19)
 
 ### Bug Fixes

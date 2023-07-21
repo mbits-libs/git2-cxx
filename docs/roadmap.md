@@ -7,7 +7,7 @@
   - [x] `build`
   - [x] `files`
   - [x] `line_coverage` _(0.18.0)_
-  - [ ] `function_coverage` (mzdun/cov#48)
+  - [x] `function_coverage` (_0.20.0_, mzdun/cov#48)
   - [ ] `branch_coverage`
 - [x] Wrap I/O in Z streams _(0.2.0-alpha)_
 - [x] Idea of references, tags and "branches" _(0.3.0-alpha)_
@@ -36,7 +36,7 @@
     _name=..._\
     _dir=..._\
     _dir=..._
-    - [ ] rename `.covmodule` to `.covmodules` **\[breaking, must be done pre-release]**
+    - [ ] rename `.covmodule` to `.covmodules` (mzdun/cov#54)
   - [x] Patch-worth:
     - [x] add win32 RC file _(0.12.1-beta)_
     - [x] merge/split .po files _(0.12.2-beta)_
@@ -64,7 +64,7 @@
     - [x] `cov report --prop`
     - [x] show propset in `report`
     - [x] show propset in non-`log` `show`s _(0.18.0)_
-    - [ ] show propset in `log` (_0.19.0_, mzdun/cov#46)
+    - [x] show propset in `log` (_0.19.0_, mzdun/cov#46)
     - [ ] `$COV_FILTER_PATH` (mzdun/cov#47)
   - [ ] `cov cherry-pick` (?)
   - [ ] Support for `less`
