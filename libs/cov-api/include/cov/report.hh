@@ -203,7 +203,7 @@ namespace cov {
 			virtual ~entry();
 			virtual std::string_view name() const noexcept = 0;
 			virtual std::string_view demangled_name() const noexcept = 0;
-			virtual uint32_t count() const noexcept = 0;
+			virtual std::uint32_t count() const noexcept = 0;
 			virtual io::v1::text_pos const& start() const noexcept = 0;
 			virtual io::v1::text_pos const& end() const noexcept = 0;
 		};
@@ -228,7 +228,7 @@ namespace cov {
 			    : it_{functions.begin()}, end_{functions.end()} {}
 
 			template <typename Callback>
-			void at(uint32_t line, Callback&& cb) {
+			void at(std::uint32_t line, Callback&& cb) {
 				while (it_ != end_ && it_->label.start.line < line)
 					++it_;
 				while (it_ != end_ && it_->label.start.line == line) {
@@ -257,14 +257,14 @@ namespace cov {
 			struct info {
 				std::string_view name{};
 				std::string_view demangled_name{};
-				uint32_t count{};
+				std::uint32_t count{};
 				io::v1::text_pos start{};
 				io::v1::text_pos end{};
 			};
 			builder& add(std::unique_ptr<entry>&&);
 			builder& add(std::string_view name,
 			             std::string_view demangled_name,
-			             uint32_t count,
+			             std::uint32_t count,
 			             io::v1::text_pos const& start,
 			             io::v1::text_pos const& end);
 			builder& add_nfo(info const& nfo) {

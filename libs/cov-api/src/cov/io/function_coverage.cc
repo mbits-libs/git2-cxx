@@ -79,12 +79,8 @@ namespace cov::io::handlers {
 		if (!in.load(header)) {
 			return {};
 		}
-		auto const entry_size = header.entries.size * sizeof(uint32_t);
-		if (entry_size < sizeof(v1::function_coverage::entry) ||
-		    header.strings.offset <
-		        sizeof(v1::function_coverage) / sizeof(uint32_t) ||
-		    header.entries.offset <
-		        (header.strings.offset + header.strings.size)) {
+
+		if (!io::header_valid(header)) {
 			return {};
 		}
 
@@ -106,6 +102,7 @@ namespace cov::io::handlers {
 		cov::function_coverage::builder builder{};
 		std::vector<std::byte> buffer{};
 
+		auto const entry_size = header.entries.size * sizeof(uint32_t);
 		for (uint32_t index = 0; index < header.entries.count; ++index) {
 			if (!in.load(buffer, entry_size)) {
 				return {};
@@ -115,7 +112,10 @@ namespace cov::io::handlers {
 			        buffer.data());
 
 			if (!strings.is_valid(entry.name) ||
-			    !strings.is_valid(entry.demangled_name)) {
+			    !strings.is_valid(entry.demangled_name) ||
+			    (entry.start.line > entry.end.line) ||
+			    ((entry.start.line == entry.end.line) &&
+			     (entry.start.column > entry.end.column))) {
 				return {};
 			}
 

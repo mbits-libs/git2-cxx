@@ -240,7 +240,7 @@ namespace cov {
 			}
 
 			return result;
-		}
+		}  // GCOV_EXCL_LINE[GCC]
 
 		void apply(std::span<std::unique_ptr<cov::files::entry> const> const&
 		               new_entries,
@@ -311,7 +311,7 @@ namespace cov {
 			}
 			get_prev(result, kind);
 			return result;
-		}
+		}  // GCOV_EXCL_LINE[GCC]
 	};
 
 	std::vector<file_stats> repository::diff_betwen_reports(

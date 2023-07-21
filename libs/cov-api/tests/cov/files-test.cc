@@ -8,36 +8,12 @@
 #include <cov/io/files.hh>
 #include <cov/io/read_stream.hh>
 #include "setup.hh"
+#include "test_stream.hh"
 
 namespace cov::testing {
 	namespace {
 		using namespace std::literals;
 		using namespace git::literals;
-		class test_stream final : public write_stream {
-		public:
-			static constexpr size_t infinite =
-			    std::numeric_limits<size_t>::max();
-			std::vector<std::byte> data{};
-			size_t free_size{infinite};
-
-			bool opened() const noexcept final { return true; }
-			size_t write(git::bytes block) final {
-				if (free_size != infinite) {
-					auto chunk = block.size();
-					if (chunk > free_size) chunk = free_size;
-					free_size -= chunk;
-					block = block.subview(0, chunk);
-				}
-				auto const size = data.size();
-				data.insert(data.end(), block.begin(), block.end());
-				return data.size() - size;
-			}
-
-			std::string_view view() const noexcept {
-				return {reinterpret_cast<char const*>(data.data()),
-				        data.size()};
-			}
-		};
 
 		struct files_impl : counted_impl<cov::files> {
 			std::vector<std::unique_ptr<cov::files::entry>> files{};
