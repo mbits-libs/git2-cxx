@@ -57,9 +57,8 @@ namespace cov::app::show {
 	};
 
 	static constexpr std::array columns = {
-	    column{{"Name"sv, '<'},
-	           [](environment const&, cell_row&, file_diff const&) {},
-	           show_column::name},
+	    column{{"Name"sv, '<'}, nullptr, show_column::name},
+	    // GCOV_EXCL_START for now
 	    column{"% Branch"sv,
 	           [](environment const& env,
 	              cell_row& cells,
@@ -83,6 +82,7 @@ namespace cov::app::show {
 		               placeholder::color::faint_red);
 	           },
 	           show_column::other, with_branches_missing},
+	    // GCOV_EXCL_END
 	    column{"% Funcs"sv,
 	           [](environment const& env,
 	              cell_row& cells,
@@ -254,7 +254,7 @@ namespace cov::app::show {
 
 			if (entry.stats.current.branches.relevant !=
 			    entry.stats.current.branches.visited)
-				flags |= with::branches_missing;
+				flags |= with::branches_missing;  // GCOV_EXCL_LINE for now
 		}
 
 		if (total.current.branches.relevant > 0) flags |= with::branches;

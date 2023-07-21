@@ -208,6 +208,29 @@ namespace cov::app::testing {
 		ASSERT_EQ(expected_status, actual_status);
 	}
 
+	TEST(report, function) {
+		app::report::file_info::function f1{};
+		app::report::file_info::function f2{.name{"name A"s},
+		                                    .demangled_name{"name.A()"s},
+		                                    .count = 0,
+		                                    .start = {.line = 2, .column = 0},
+		                                    .end = {.line = 5, .column = 0}};
+		app::report::file_info::function f3{.name{"name B"s},
+		                                    .demangled_name{"name.B()"s},
+		                                    .count = 0,
+		                                    .start = {.line = 2, .column = 0},
+		                                    .end = {.line = 4, .column = 0}};
+		app::report::file_info::function f4{.name{"name C"s},
+		                                    .demangled_name{"name.C()"s},
+		                                    .count = 0,
+		                                    .start = {.line = 2, .column = 0},
+		                                    .end = {.line = 4, .column = 0}};
+		EXPECT_EQ(f1, app::report::file_info::function{});
+		EXPECT_NE(f2, f3);
+		EXPECT_GT(f2, f3);
+		EXPECT_LT(f3, f4);
+	}
+
 	using app::report::text;
 	struct verify_test {
 		std::string_view title;

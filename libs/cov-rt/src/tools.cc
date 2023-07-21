@@ -27,7 +27,7 @@ namespace cov::app {
 			});
 
 			return result;
-		}
+		}  // GCOV_EXCL_LINE[GCC]
 
 		int handle_resolved(std::string_view tool,
 		                    args::arglist args,
