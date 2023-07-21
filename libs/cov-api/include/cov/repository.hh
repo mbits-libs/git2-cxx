@@ -37,12 +37,38 @@ namespace cov {
 		static ref_ptr<blob> wrap(git::blob&& ref, cov::origin);
 	};
 
+	template <typename Int = unsigned>
+	struct multi_ratio {
+		io::v1::stats::ratio<Int> lines{};
+		io::v1::stats::ratio<Int> functions{};
+		io::v1::stats::ratio<Int> branches{};
+
+		static multi_ratio<Int> calc(io::v1::coverage_stats const& stats,
+		                             unsigned char digits) {
+			return {
+			    .lines = stats.lines.calc(digits),
+			    .functions = stats.functions.calc(digits),
+			    .branches = stats.branches.calc(digits),
+			};
+		}
+
+		static multi_ratio<int> diff(multi_ratio<> const& newer,
+		                             multi_ratio<> const& older) {
+			return {
+			    .lines = io::v1::diff(newer.lines, older.lines),
+			    .functions = io::v1::diff(newer.functions, older.functions),
+			    .branches = io::v1::diff(newer.branches, older.branches),
+			};
+		}
+	};
+
 	struct file_diff {
 		enum kind { normal, renamed, copied, added, deleted };
 		enum initial { initial_add_all, initial_with_self };
+
 		struct {
-			io::v1::stats::ratio<> current{};
-			io::v1::stats::ratio<int> diff{};
+			multi_ratio<> current{};
+			multi_ratio<int> diff{};
 		} coverage;
 		struct {
 			io::v1::coverage_stats current{};
@@ -60,10 +86,11 @@ namespace cov {
 		bool operator==(file_stats const&) const noexcept = default;
 
 		file_diff diff(unsigned char digits = 2) const noexcept {
-			auto const curr = current.lines.calc(digits);
-			auto const prev = previous.lines.calc(digits);
+			auto const curr = multi_ratio<>::calc(current, digits);
+			auto const prev = multi_ratio<>::calc(previous, digits);
 			return {
-			    .coverage = {.current = curr, .diff = io::v1::diff(curr, prev)},
+			    .coverage = {.current = curr,
+			                 .diff = multi_ratio<>::diff(curr, prev)},
 			    .stats = {.current = current,
 			              .diff = io::v1::diff(current, previous)},
 			};

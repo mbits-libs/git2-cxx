@@ -30,10 +30,11 @@ namespace cov::projection {
 		}
 
 		file_diff diff(unsigned char digits = 2) const noexcept {
-			auto const curr = current.lines.calc(digits);
-			auto const prev = previous.lines.calc(digits);
+			auto const curr = multi_ratio<>::calc(current, digits);
+			auto const prev = multi_ratio<>::calc(previous, digits);
 			return {
-			    .coverage = {.current = curr, .diff = io::v1::diff(curr, prev)},
+			    .coverage = {.current = curr,
+			                 .diff = multi_ratio<>::diff(curr, prev)},
 			    .stats = {.current = current,
 			              .diff = io::v1::diff(current, previous)},
 			};

@@ -7,6 +7,146 @@
 namespace cov::app::show {
 	using namespace projection;
 
+	enum class show_column { name, other };
+
+	using vis_callback = bool (*)(bool, bool);
+	bool always(bool, bool) { return true; };
+	bool with_branches(bool value, bool) { return value; };
+	bool with_funcs(bool, bool value) { return value; };
+
+	using cell_row = std::vector<std::string>;
+	using data_append = void (*)(environment const&,
+	                             cell_row&,
+	                             file_diff const&);
+
+	struct column {
+		struct label_t {
+			std::string_view text;
+			char align;
+			constexpr label_t() = delete;
+			constexpr label_t(std::string_view text, char align = '^')
+			    : text{text}, align{align} {}
+		} label;
+		data_append append;
+		show_column id{show_column::other};
+		vis_callback vis{always};
+
+		void header(std::vector<table_column>& hdr,
+		            bool with_branches,
+		            bool with_funcs) const {
+			if (!vis(with_branches, with_funcs)) return;
+			hdr.push_back(
+			    {{label.text.data(), label.text.size()}, label.align});
+		}
+
+		void data(environment const& env,
+		          std::vector<std::string>& cells,
+		          file_diff const& change,
+		          bool with_branches,
+		          bool with_funcs) const {
+			if (!vis(with_branches, with_funcs)) return;
+			append(env, cells, change);
+		}
+	};
+
+	static constexpr std::array columns = {
+	    column{{"Name"sv, '<'},
+	           [](environment const&, cell_row&, file_diff const&) {},
+	           show_column::name},
+	    column{"% Branch"sv,
+	           [](environment const& env,
+	              cell_row& cells,
+	              file_diff const& change) {
+		           env.percentage(
+		               cells, change,
+		               [](auto const& stats) { return stats.branches; },
+		               placeholder::color::bold_rating_branches);
+	           },
+	           show_column::other, with_branches},
+	    column{"Missing"sv,
+	           [](environment const& env,
+	              cell_row& cells,
+	              file_diff const& change) {
+		           env.count(
+		               cells, change,
+		               [](auto const& stats) {
+			               return stats.branches.relevant -
+			                      stats.branches.visited;
+		               },
+		               placeholder::color::faint_red);
+	           },
+	           show_column::other, with_branches},
+	    column{"% Funcs"sv,
+	           [](environment const& env,
+	              cell_row& cells,
+	              file_diff const& change) {
+		           env.percentage(
+		               cells, change,
+		               [](auto const& stats) { return stats.functions; },
+		               placeholder::color::bold_rating_functions);
+	           },
+	           show_column::other, with_funcs},
+	    column{"Missing"sv,
+	           [](environment const& env,
+	              cell_row& cells,
+	              file_diff const& change) {
+		           env.count(
+		               cells, change,
+		               [](auto const& stats) {
+			               return stats.functions.relevant -
+			                      stats.functions.visited;
+		               },
+		               placeholder::color::faint_red);
+	           },
+	           show_column::other, with_funcs},
+	    column{"% Lines"sv,
+	           [](environment const& env,
+	              cell_row& cells,
+	              file_diff const& change) {
+		           env.percentage(
+		               cells, change,
+		               [](auto const& stats) { return stats.lines; },
+		               placeholder::color::bold_rating_lines);
+	           }},
+	    column{"Visited"sv,
+	           [](environment const& env,
+	              cell_row& cells,
+	              file_diff const& change) {
+		           env.count(cells, change, [](auto const& stats) {
+			           return stats.lines.visited;
+		           });
+	           }},
+	    column{"Relevant"sv,
+	           [](environment const& env,
+	              cell_row& cells,
+	              file_diff const& change) {
+		           env.count(
+		               cells, change,
+		               [](auto const& stats) { return stats.lines.relevant; },
+		               placeholder::color::faint_normal);
+	           }},
+	    column{"Missing"sv,
+	           [](environment const& env,
+	              cell_row& cells,
+	              file_diff const& change) {
+		           env.count(
+		               cells, change,
+		               [](auto const& stats) {
+			               return stats.lines.relevant - stats.lines.visited;
+		               },
+		               placeholder::color::faint_red);
+	           }},
+	    column{"Line count"sv,
+	           [](environment const& env,
+	              cell_row& cells,
+	              file_diff const& change) {
+		           env.count(
+		               cells, change,
+		               [](auto const& stats) { return stats.lines_total; },
+		               placeholder::color::faint_normal);
+	           }},
+	};
+
 	parser::parser(::args::args_view const& arguments,
 	               str::translator_open_info const& langs)
 	    : base_parser<covlng, loglng, errlng, showlng>{langs, arguments} {
@@ -69,45 +209,44 @@ namespace cov::app::show {
 	                      char type,
 	                      entry_stats const& stats,
 	                      std::string_view label,
+	                      bool with_branches,
+	                      bool with_funcs,
 	                      row_type row) const {
 		using placeholder::color;
 
 		auto change = stats.diff();
-		table.emplace(
-		    {
-		        {type},
-		        {label.data(), label.size()},
-		        apply_mark(val(change.coverage.current, "%"sv),
-		                   placeholder::color::bold_rating_lines,
-		                   change.stats.current.lines),
-		        val_sign(change.coverage.diff, color::faint_green, "%"sv),
-		        val(change.stats.current.lines.visited),
-		        val_sign(change.stats.diff.lines.visited),
-		        val(change.stats.current.lines.relevant),
-		        val_sign(change.stats.diff.lines.relevant, color::faint_normal),
-		        // GCOV_EXCL_START[GCC]
-		        val(change.stats.current.lines.relevant -
-		            change.stats.current.lines.visited),
-		        val_sign(change.stats.diff.lines.relevant -
-		                     change.stats.diff.lines.visited,
-		                 color::faint_red),
-		        // GCOV_EXCL_STOP
-		        val(change.stats.current.lines_total),
-		        val_sign(change.stats.diff.lines_total, color::faint_normal),
-		    },
-		    row == row_type::data);
+		std::vector<std::string> cells{};
+		cells.reserve(columns.size() * 2);
+		for (auto const& col : columns) {
+			if (col.id == show_column::name) {
+				cells.push_back({type});
+				cells.push_back({label.data(), label.size()});
+				continue;
+			}
+			col.data(*this, cells, change, with_branches, with_funcs);
+		}
+
+		table.emplace(std::move(cells), row == row_type::data);
 	}
 
 	void environment::print_table(std::vector<entry> const& entries) const {
 		entry_stats total{};
-		data_table table{.header = {
-		                     {"NAME"s, '<'},  // GCOV_EXCL_LINE[GCC]
-		                     "COVERAGE"s,
-		                     "COVERED"s,
-		                     "RELEVANT"s,
-		                     "MISSING"s,
-		                     "TOTAL"s,
-		                 }};
+
+		for (auto const& entry : entries) {
+			total.extend(entry.stats);
+		}
+
+		auto with_branches = total.current.branches.relevant > 0;
+		auto with_funcs = total.current.functions.relevant > 0;
+
+		std::vector<table_column> header{};
+		header.reserve(columns.size());
+		for (auto const& col : columns) {
+			col.header(header, with_branches, with_funcs);
+		}
+
+		data_table table{.header = std::move(header)};
+
 		for (auto const& entry : entries) {
 			auto entry_flag = '?';
 			switch (entry.type) {
@@ -123,12 +262,14 @@ namespace cov::app::show {
 					break;
 			}
 
-			add(table, entry_flag, entry.stats, entry.name.display);
-			total.extend(entry.stats);
+			add(table, entry_flag, entry.stats, entry.name.display,
+			    with_branches, with_funcs);
 		}
 
-		if (entries.size() > 1)
-			add(table, '>', total, "TOTAL"sv, row_type::footer);
+		if (entries.size() > 1) {
+			add(table, '>', total, "TOTAL"sv, with_branches, with_funcs,
+			    row_type::footer);
+		}
 
 		table.print();
 	}

@@ -61,9 +61,7 @@ namespace cov::app::show {
 			return val.whole == 0 && val.fraction == 0;
 		}
 
-		std::string val(auto const& V, std::string_view suffix = {}) const {
-			return fmt::format("{}{}", V, suffix);
-		}
+		std::string val(auto const& V) const { return fmt::format("{}", V); }
 
 		std::string apply_mark(std::string_view label,
 		                       placeholder::color color,
@@ -74,8 +72,7 @@ namespace cov::app::show {
 
 		std::string val_sign(
 		    auto const& V,
-		    placeholder::color base = placeholder::color::faint_green,
-		    std::string_view suffix = {}) const {
+		    placeholder::color base = placeholder::color::faint_green) const {
 			using color = placeholder::color;
 			using T = std::remove_cvref_t<decltype(V)>;
 			if (is_zero(V)) return {};
@@ -85,8 +82,30 @@ namespace cov::app::show {
 				else if (base == color::faint_red)
 					base = color::faint_green;
 			}
-			return fmt::format("{}{:+}{}{}", color_for(base), V, suffix,
+			return fmt::format("{}{:+}{}", color_for(base), V,
 			                   color_for(color::reset));
+		}
+
+		template <typename Getter>
+		void percentage(std::vector<std::string>& cells,
+		                file_diff const& change,
+		                Getter const& getter,
+		                placeholder::color rating_color) const {
+			cells.push_back(apply_mark(val(getter(change.coverage.current)),
+			                           rating_color,
+			                           getter(change.stats.current)));
+			cells.push_back(val_sign(getter(change.coverage.diff),
+			                         placeholder::color::faint_green));
+		}
+
+		template <typename Getter>
+		void count(
+		    std::vector<std::string>& cells,
+		    file_diff const& change,
+		    Getter const& getter,
+		    placeholder::color base = placeholder::color::faint_green) const {
+			cells.push_back(val(getter(change.stats.current)));
+			cells.push_back(val_sign(getter(change.stats.diff), base));
 		}
 
 		std::string color_for(placeholder::color clr,
@@ -95,6 +114,8 @@ namespace cov::app::show {
 		         char type,
 		         projection::entry_stats const& stats,
 		         std::string_view label,
+		         bool with_branches,
+		         bool with_funcs,
 		         row_type row = row_type::data) const;
 		void print_table(std::vector<projection::entry> const& entries) const;
 	};
