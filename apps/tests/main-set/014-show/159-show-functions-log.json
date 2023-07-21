@@ -1,0 +1,42 @@
+{
+    "args": "show --color always",
+    "patches": {
+        "\u001b\\[33mreport [0-9a-f]{40}\u001b\\[m": "\u001b[33mreport $REPORT_HASH\u001b[m",
+        "commit [0-9a-f]{40}": "commit $COMMIT_HASH",
+        "build  [0-9a-f]{40} (.*)": "build  $BUILD_HASH \\1",
+        "Added:     .*": "Added:     $NOW"
+    },
+    "expected": [
+        0,
+        [
+            "\u001b[33mreport $REPORT_HASH\u001b[m",
+            "commit $COMMIT_HASH",
+            "build  $BUILD_HASH [ 67%]",
+            "GitBranch: main",
+            "Coverage:  [ 67%] \u001b[2;37m6/9\u001b[m \u001b[2;31m(fail)\u001b[m",
+            "Functions: [ 33%] \u001b[2;37m1/3\u001b[m \u001b[2;31m(fail)\u001b[m",
+            "Author:    Johnny Appleseed <johnny@appleseed.com>",
+            "Added:     $NOW",
+            "",
+            "      function coverage (1)",
+            "",
+            "+-------+--------------+---------+---------+---------+----------+---------+------------+",
+            "| Name  |   % Funcs    | Missing | % Lines | Visited | Relevant | Missing | Line count |",
+            "+-------+--------------+---------+---------+---------+----------+---------+------------+",
+            "| D src | \u001b[1;31m50.00\u001b[m \u001b[2;31m-50.00\u001b[m |    1 \u001b[2;31m+1\u001b[m |   \u001b[1;31m66.67\u001b[m |       6 |        9 |       3 |         17 |",
+            "+-------+--------------+---------+---------+---------+----------+---------+------------+\n"
+        ],
+        ""
+    ],
+    "prepare": [
+        "unpack $DATA/repo.git.tar $TMP",
+        "cd '$TMP'",
+        "git clone repo.git",
+        "cd '$TMP/repo'",
+        "git config --local user.name 'Johnny Appleseed'",
+        "git config --local user.email 'johnny@appleseed.com'",
+        "cov init",
+        "cov report $DATA/build-coverage-show-functions-1.json -f create-report",
+        "cov report $DATA/build-coverage-show-functions-2.json -f create-report"
+    ]
+}

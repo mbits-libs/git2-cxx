@@ -1,0 +1,51 @@
+{
+    "args": "show HEAD:src/main.cc",
+    "patches": {
+        "\u001b\\[33mreport [0-9a-f]{40}\u001b\\[m": "\u001b[33mreport $REPORT_HASH\u001b[m",
+        "commit [0-9a-f]{40}": "commit $COMMIT_HASH",
+        "build  [0-9a-f]{40} (.*)": "build  $BUILD_HASH \\1",
+        "Added:     .*": "Added:     $NOW"
+    },
+    "expected": [
+        0,
+        [
+            "file src/main.cc",
+            "",
+            "+-----------+---------+---------+----------+------------+",
+            "| Name      | % Lines | Visited | Relevant | Line count |",
+            "+-----------+---------+---------+----------+------------+",
+            "|   main.cc |  100.00 |       9 |        9 |         17 |",
+            "+-----------+---------+---------+----------+------------+",
+            "",
+            "  1 |  1x | +void foo() {",
+            "  2 |  1x | +    std::cout << \"Hello, \" << name() << \"!\";",
+            "  3 |     |  }",
+            "  4 |     |  ",
+            "  5 | 15x | +void bar() {",
+            "  6 |     |      foo();",
+            "  7 | 10x | +    foo();",
+            "  8 |  8x | +    foo();",
+            "  9 |  6x | +    foo();",
+            " 10 |  4x | +    foo();",
+            " 11 |  2x | +    foo();",
+            " 12 |  1x | +    foo();",
+            " 13 |     |      foo();",
+            " 14 |     |      foo();",
+            " 15 |     |      foo();",
+            " 16 |     |      foo();",
+            " 17 |     |  }",
+            "\n"
+        ],
+        ""
+    ],
+    "prepare": [
+        "unpack $DATA/repo.git.tar $TMP",
+        "cd '$TMP'",
+        "git clone repo.git",
+        "cd '$TMP/repo'",
+        "git config --local user.name 'Johnny Appleseed'",
+        "git config --local user.email 'johnny@appleseed.com'",
+        "cov init",
+        "cov report $DATA/build-coverage-show-no-chunks.json -f create-report"
+    ]
+}

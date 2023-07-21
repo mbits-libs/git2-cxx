@@ -36,6 +36,7 @@
 
 namespace cov::app::builtin::show {
 	namespace {
+		// GCOV_EXCL_START -- TODO: Add pty to test_driver
 		size_t terminal_width(FILE* out) noexcept {
 #ifdef _WIN32
 			CONSOLE_SCREEN_BUFFER_INFO buffer = {};
@@ -54,6 +55,7 @@ namespace cov::app::builtin::show {
 			return w.ws_col;
 #endif
 		}
+		// GCOV_EXCL_END
 	}  // namespace
 
 	std::vector<file_stats> report_diff(app::show::parser::response const& info,
