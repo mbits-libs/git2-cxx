@@ -82,6 +82,8 @@ namespace cov {
 		io::v1::coverage_stats previous{};
 		std::string previous_name{};
 		file_diff::kind diff_kind{};
+		git::oid current_functions{};
+		git::oid previous_functions{};
 
 		bool operator==(file_stats const&) const noexcept = default;
 

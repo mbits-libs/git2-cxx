@@ -90,7 +90,7 @@ namespace cov::app::builtin::show {
 
 		auto view = projection::report_filter{
 		    mods.get(), p.module.value_or(std::string{}), info.path};
-		auto entries = view.project(report_diff(info, ec));
+		auto entries = view.project(report_diff(info, ec), &info.repo);
 		if (ec) p.error(ec, p.tr());
 
 		app::show::environment env{
