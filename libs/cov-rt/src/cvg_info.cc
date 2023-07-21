@@ -59,7 +59,7 @@ namespace cov::app {
 						if (!function.count) {
 							throw false;
 						}
-					});
+					});  // GCOV_EXCL_LINE[GCC]
 					continue;
 				} catch (bool) {
 				}
@@ -128,10 +128,12 @@ namespace cov::app {
 		if (max_width < std::numeric_limits<std::size_t>::max()) {
 			static constexpr size_t MAGIC = 40;
 			static constexpr size_t margins = 8;
+			// GCOV_EXCL_START -- TODO: Add pty to test_driver
 			max_width -= std::min(max_width, widths.count_width);
 			max_width -= std::min(max_width, widths.line_no_width);
 			max_width -= std::min(max_width, margins);
 			max_width = std::max(max_width, MAGIC);
+			// GCOV_EXCL_END
 		}
 
 		std::string_view name = fn.label.name;
@@ -139,8 +141,10 @@ namespace cov::app {
 
 		auto const shorten = name.size() > max_width;
 		if (shorten) {
+			// GCOV_EXCL_START -- TODO: Add pty to test_driver
 			backing.assign(name.substr(0, max_width - 3));
 			name = backing;
+			// GCOV_EXCL_END
 		}
 
 		auto const count_column = fmt::format("{}x", fn.count);
