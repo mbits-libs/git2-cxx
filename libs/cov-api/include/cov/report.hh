@@ -208,12 +208,46 @@ namespace cov {
 			virtual io::v1::text_pos const& end() const noexcept = 0;
 		};
 
+		struct function_label {
+			io::v1::text_pos start{};
+			io::v1::text_pos end{};
+			std::string name{};
+
+			auto operator<=>(function_label const&) const noexcept = default;
+		};
+		struct function {
+			function_label label{};
+			unsigned count{};
+
+			auto operator<=>(function const&) const noexcept = default;
+		};
+
+		struct function_iterator {
+			function_iterator() = delete;
+			function_iterator(std::vector<function> const& functions)
+			    : it_{functions.begin()}, end_{functions.end()} {}
+
+			template <typename Callback>
+			void at(uint32_t line, Callback&& cb) {
+				while (it_ != end_ && it_->label.start.line < line)
+					++it_;
+				while (it_ != end_ && it_->label.start.line == line) {
+					cb(*it_++);
+				}
+			}
+
+		private:
+			std::vector<function>::const_iterator it_;
+			std::vector<function>::const_iterator end_;
+		};
+
 		obj_type type() const noexcept override {
 			return obj_function_coverage;
 		};
 		bool is_function_coverage() const noexcept final { return true; }
 		virtual std::span<std::unique_ptr<entry> const> entries()
 		    const noexcept = 0;
+		std::vector<function> merge_aliases() const;
 
 		static ref_ptr<function_coverage> create(
 		    std::vector<std::unique_ptr<entry>>&&);

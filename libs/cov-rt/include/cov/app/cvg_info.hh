@@ -21,32 +21,19 @@ namespace cov::app {
 	};
 
 	struct cvg_info {
-		struct function_label {
-			unsigned start{};
-			unsigned end{};
-			std::string name{};
-			unsigned count{};
-
-			auto operator<=>(function_label const&) const noexcept = default;
-		};
-		struct function {
-			function_label label{};
-			unsigned count{};
-
-			auto operator<=>(function const&) const noexcept = default;
-		};
-
 		std::map<unsigned, unsigned> coverage{};
-		std::vector<function> functions{};
+		std::vector<cov::function_coverage::function> functions{};
 		std::vector<std::pair<unsigned, unsigned>> chunks{};
 		std::string_view file_text{};
 		lighter::highlights syntax{};
 
+		function_coverage::function_iterator funcs() const noexcept {
+			return {functions};
+		}
+
 		static cvg_info from_coverage(
 		    std::span<io::v1::coverage const> const& lines);
-		void add_functions(
-		    std::span<std::unique_ptr<cov::function_coverage::entry> const>
-		        functions);
+		void add_functions(cov::function_coverage const& functions);
 		void find_chunks();
 		void load_syntax(std::string_view text, std::string_view filename);
 		view_columns column_widths() const noexcept;
@@ -57,7 +44,7 @@ namespace cov::app {
 		bool has_line(size_t line_no) const noexcept {
 			return syntax.lines.size() > line_no;
 		}
-		std::string to_string(function const& fn,
+		std::string to_string(cov::function_coverage::function const& fn,
 		                      view_columns const& widths,
 		                      bool use_color,
 		                      size_t max_width) const;

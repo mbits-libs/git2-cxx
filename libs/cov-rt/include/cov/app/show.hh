@@ -45,6 +45,33 @@ namespace cov::app::show {
 		show_range show{};
 	};
 
+	enum class with : unsigned {
+		branches = 0x0001,
+		functions = 0x0002,
+		branches_missing = 0x0004,
+		functions_missing = 0x0008,
+		lines_missing = 0x0010,
+	};
+
+	inline with operator|(with lhs, with rhs) noexcept {
+		return static_cast<with>(std::to_underlying(lhs) |
+		                         std::to_underlying(rhs));
+	}
+
+	inline with& operator|=(with& lhs, with rhs) noexcept {
+		lhs = lhs | rhs;
+		return lhs;
+	}
+
+	inline with operator~(with lhs) noexcept {
+		return static_cast<with>(~std::to_underlying(lhs));
+	}
+
+	inline with operator&(with lhs, with rhs) noexcept {
+		return static_cast<with>(std::to_underlying(lhs) &
+		                         std::to_underlying(rhs));
+	}
+
 	struct environment {
 		enum class row_type : bool { footer = false, data = true };
 		std::string (*colorizer)(placeholder::color, void*) = nullptr;
@@ -108,14 +135,28 @@ namespace cov::app::show {
 			cells.push_back(val_sign(getter(change.stats.diff), base));
 		}
 
+		template <typename Getter>
+		void dimmed_count(
+		    std::vector<std::string>& cells,
+		    file_diff const& change,
+		    Getter const& getter,
+		    placeholder::color base = placeholder::color::faint_green) const {
+			auto const& value = getter(change.stats.current);
+			std::string str{};
+			if (!is_zero(value)) {
+				str = val(value);
+			}
+			cells.push_back(str);
+			cells.push_back(val_sign(getter(change.stats.diff), base));
+		}
+
 		std::string color_for(placeholder::color clr,
 		                      io::v1::stats const* stats = nullptr) const;
 		void add(data_table& table,
 		         char type,
 		         projection::entry_stats const& stats,
 		         std::string_view label,
-		         bool with_branches,
-		         bool with_funcs,
+		         with flags,
 		         row_type row = row_type::data) const;
 		void print_table(std::vector<projection::entry> const& entries) const;
 	};
