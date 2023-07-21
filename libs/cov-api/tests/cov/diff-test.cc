@@ -237,7 +237,8 @@ namespace cov::testing {
 			auto const diff = file.diff(2);
 			std::vector<std::string> row(row_size + 2);
 			row[id_letter] = fmt::format("{}", letter_for(file.diff_kind));
-			row[id_percent] = format(diff.coverage.current, diff.coverage.diff);
+			row[id_percent] =
+			    format(diff.coverage.current.lines, diff.coverage.diff.lines);
 			row[id_covered] = format(diff.stats.current.lines.visited,
 			                         diff.stats.diff.lines.visited);
 			row[id_relevant] = format(diff.stats.current.lines.relevant,
