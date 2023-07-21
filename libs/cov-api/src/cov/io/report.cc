@@ -172,12 +172,11 @@ namespace cov::io::handlers {
 	                              std::error_code& ec) const {
 		ec = make_error_code(errc::bad_syntax);
 		v1::report header{};
-		if (!in.load(header)) return {};
-		auto const entry_size = header.builds.size * sizeof(uint32_t);
-		if (entry_size < sizeof(v1::report::entry) ||
-		    header.strings.offset < sizeof(v1::report) / sizeof(uint32_t) ||
-		    header.builds.offset <
-		        (header.strings.offset + header.strings.size)) {
+		if (!in.load(header)) {
+			return {};
+		}
+
+		if (!io::header_valid(header)) {
 			return {};
 		}
 
@@ -208,16 +207,17 @@ namespace cov::io::handlers {
 		     committer_email = at(header.git.committer.email),
 		     message = at(header.git.message);
 
-		if (!in.skip((header.builds.offset -
+		if (!in.skip((header.entries.offset -
 		              (header.strings.offset + header.strings.size)) *
 		             sizeof(uint32_t))) {
 			return {};
 		}
 
 		std::vector<std::unique_ptr<cov::report::build>> builds{};
-		if (!load_resources(builds, in, strings,
-		                    static_cast<uint32_t>(entry_size),
-		                    header.builds.count)) {
+		if (!load_resources(
+		        builds, in, strings,
+		        static_cast<uint32_t>(header.entries.size * sizeof(uint32_t)),
+		        header.entries.count)) {
 			return {};
 		}
 
@@ -273,7 +273,7 @@ namespace cov::io::handlers {
 		    .strings = stg.after<v1::report>(),
 		    .parent = obj->parent_id().id,
 		    .file_list = obj->file_list_id().id,
-		    .builds = stg.align_array<v1::report, v1::report::entry>(
+		    .entries = stg.align_array<v1::report, v1::report::entry>(
 		        obj->entries().size()),  // GCOV_EXCL_LINE[GCC]
 		    .added = time_stamp(obj->add_time_utc()),
 		    .git = {.branch = locate(obj->branch()),

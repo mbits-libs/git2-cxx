@@ -27,20 +27,20 @@ namespace cov {
 	using std::uint32_t;
 	using std::chrono::seconds;
 
-	constexpr inline uint32_t MK_TAG(char c1, char c2, char c3, char c4) {
-		return ((static_cast<uint32_t>(c1) & 0xFF)) |
-		       ((static_cast<uint32_t>(c2) & 0xFF) << 8) |
-		       ((static_cast<uint32_t>(c3) & 0xFF) << 16) |
-		       ((static_cast<uint32_t>(c4) & 0xFF) << 24);
+	constexpr inline std::uint32_t MK_TAG(char c1, char c2, char c3, char c4) {
+		return ((static_cast<std::uint32_t>(c1) & 0xFF)) |
+		       ((static_cast<std::uint32_t>(c2) & 0xFF) << 8) |
+		       ((static_cast<std::uint32_t>(c3) & 0xFF) << 16) |
+		       ((static_cast<std::uint32_t>(c4) & 0xFF) << 24);
 	}
-	consteval inline uint32_t operator""_tag(const char* s, size_t len) {
+	consteval inline std::uint32_t operator""_tag(const char* s, size_t len) {
 		return MK_TAG(len > 0 ? s[0] : ' ', len > 1 ? s[1] : ' ',
 		              len > 2 ? s[2] : ' ', len > 3 ? s[3] : ' ');
 	}
 }  // namespace cov
 
 namespace cov::io {
-	enum class OBJECT : uint32_t {
+	enum class OBJECT : std::uint32_t {
 		REPORT = "rprt"_tag,
 		BUILD = "bld"_tag,
 		FILES = "list"_tag,
@@ -49,7 +49,7 @@ namespace cov::io {
 		BRANCHES = "bran"_tag,
 	};
 
-	enum : uint32_t {
+	enum : std::uint32_t {
 		VERSION_MAJOR = 0xFFFF'0000,
 		VERSION_MINOR = 0x0000'FFFF,
 		VERSION_v1_0 = 0x0001'0000,
@@ -57,73 +57,104 @@ namespace cov::io {
 	};
 
 	struct file_header {
-		uint32_t magic;
-		uint32_t version;
+		std::uint32_t magic;
+		std::uint32_t version;
 	};
 
 	struct timestamp {
-		uint32_t hi;
-		uint32_t lo;
+		std::uint32_t hi;
+		std::uint32_t lo;
 		// GCOV_EXCL_START[Clang]
 		[[deprecated("use operator=(sys_seconds)")]] timestamp& operator=(
-		    uint64_t time) noexcept {
-			hi = static_cast<uint32_t>((time >> 32) & 0xFFFF'FFFF);
-			lo = static_cast<uint32_t>((time)&0xFFFF'FFFF);
+		    std::uint64_t time) noexcept {
+			hi = static_cast<std::uint32_t>((time >> 32) & 0xFFFF'FFFF);
+			lo = static_cast<std::uint32_t>((time)&0xFFFF'FFFF);
 			return *this;
 		}
 		// GCOV_EXCL_STOP
 		timestamp& operator=(sys_seconds seconds) noexcept {
 			auto const time =
-			    static_cast<uint64_t>(seconds.time_since_epoch().count());
-			hi = static_cast<uint32_t>((time >> 32) & 0xFFFF'FFFF);
-			lo = static_cast<uint32_t>((time)&0xFFFF'FFFF);
+			    static_cast<std::uint64_t>(seconds.time_since_epoch().count());
+			hi = static_cast<std::uint32_t>((time >> 32) & 0xFFFF'FFFF);
+			lo = static_cast<std::uint32_t>((time)&0xFFFF'FFFF);
 			return *this;
 		}
 		// GCOV_EXCL_START[Clang]
-		[[deprecated("use to_seconds()")]] uint64_t to_time_t() const noexcept {
-			return (static_cast<uint64_t>(hi) << 32) |
-			       static_cast<uint64_t>(lo);
+		[[deprecated("use to_seconds()")]] std::uint64_t to_time_t()
+		    const noexcept {
+			return (static_cast<std::uint64_t>(hi) << 32) |
+			       static_cast<std::uint64_t>(lo);
 		}
 		// GCOV_EXCL_STOP
 		sys_seconds to_seconds() const noexcept {
-			return sys_seconds{seconds{(static_cast<uint64_t>(hi) << 32) |
-			                           static_cast<uint64_t>(lo)}};
+			return sys_seconds{seconds{(static_cast<std::uint64_t>(hi) << 32) |
+			                           static_cast<std::uint64_t>(lo)}};
 		}
 	};
 
-	inline constexpr uint32_t clip_u32(size_t raw) {
-		constexpr size_t max_u32 = std::numeric_limits<uint32_t>::max();
-		return static_cast<uint32_t>(std::min(raw, max_u32));
+	inline constexpr std::uint32_t clip_u32(size_t raw) {
+		constexpr size_t max_u32 = std::numeric_limits<std::uint32_t>::max();
+		return static_cast<std::uint32_t>(std::min(raw, max_u32));
 	}
 
-	inline constexpr uint32_t add_u32(uint32_t lhs, uint32_t rhs) {
-		constexpr auto max_u32 = std::numeric_limits<uint32_t>::max();
+	inline constexpr std::uint32_t add_u32(std::uint32_t lhs,
+	                                       std::uint32_t rhs) {
+		constexpr auto max_u32 = std::numeric_limits<std::uint32_t>::max();
 		auto const rest = max_u32 - lhs;
 		if (rest < rhs) return max_u32;
 		return lhs + rhs;
 	}
 
-	inline constexpr void inc_u32(uint32_t& rhs) {
-		constexpr auto max_u32 = std::numeric_limits<uint32_t>::max();
+	inline constexpr void inc_u32(std::uint32_t& rhs) {
+		constexpr auto max_u32 = std::numeric_limits<std::uint32_t>::max();
 		if (rhs < max_u32) ++rhs;
 	}
 
-	enum class str : uint32_t;
+	enum class str : std::uint32_t;
+
+	template <typename Header>
+	struct entry_t {
+		using type = typename Header::entry;
+	};
+
+	template <typename Entry>
+	struct entry_t_impl {
+		using type = Entry;
+	};
+
+	template <typename Header>
+	using entry = typename entry_t<Header>::type;
+
+#define ENTRY_TYPE(HEADER, ENTRY) \
+	template <>                   \
+	struct entry_t<HEADER> : entry_t_impl<ENTRY> {};
 
 	struct block {
-		uint32_t offset;
-		uint32_t size;
+		std::uint32_t offset;
+		std::uint32_t size;
+
+		template <typename Header>
+		constexpr bool valid() const noexcept {
+			return (offset * sizeof(std::uint32_t)) >= sizeof(Header);
+		}
 	};
 
 	struct array_ref {
-		uint32_t offset;
-		uint32_t size;
-		uint32_t count;
+		std::uint32_t offset;
+		std::uint32_t size;
+		std::uint32_t count;
+
+		template <typename Header>
+		constexpr bool valid(block const& strings) const noexcept {
+			return ((size * sizeof(std::uint32_t)) >= sizeof(entry<Header>)) &&
+			       (offset >= (strings.offset + strings.size));
+		}
 
 		template <typename Entry>
 		static array_ref from(size_t byte_offset, size_t count) noexcept {
 			static const auto u32s = [](size_t bytes) {
-				return static_cast<uint32_t>(bytes / sizeof(uint32_t));
+				return static_cast<std::uint32_t>(bytes /
+				                                  sizeof(std::uint32_t));
 			};
 			return {.offset = u32s(byte_offset),
 			        .size = u32s(sizeof(Entry)),
@@ -131,8 +162,14 @@ namespace cov::io {
 		}
 	};
 
+	template <typename Header>
+	inline bool header_valid(Header const& header) noexcept {
+		return header.strings.template valid<Header>() &&
+		       header.entries.template valid<Header>(header.strings);
+	}
+
 	namespace v1 {
-		enum : uint32_t {
+		enum : std::uint32_t {
 			VERSION = VERSION_v1_0,
 		};
 
@@ -146,8 +183,8 @@ namespace cov::io {
 		};
 
 		struct stats {
-			uint32_t relevant;
-			uint32_t visited;
+			std::uint32_t relevant;
+			std::uint32_t visited;
 
 			static constexpr stats init() noexcept { return {0, 0}; }
 			constexpr bool operator==(stats const&) const noexcept = default;
@@ -253,8 +290,12 @@ namespace cov::io {
 				out += relevant / 2;
 				out /= relevant;
 
+				// GCOV_EXCL_START[GCC]
+				// The "/divider" would love to explode, but the pow10(1, 255)
+				// would not overflow an uintmax...
 				return {static_cast<unsigned>(out / divider),
 				        static_cast<unsigned>(out % divider), digits};
+				// GCOV_EXCL_END
 			}
 		};
 
@@ -268,7 +309,7 @@ namespace cov::io {
 		};
 
 		struct coverage_stats {
-			uint32_t lines_total;
+			std::uint32_t lines_total;
 			stats lines;
 			stats functions;
 			stats branches;
@@ -384,19 +425,19 @@ namespace cov::io {
 			block strings;
 			git_oid parent;
 			git_oid file_list;
-			array_ref builds;
+			array_ref entries;
 			timestamp added;
 			commit git;
 			coverage_stats stats;
 		};
 
-		static_assert(sizeof(report) == sizeof(uint32_t[37]),
+		static_assert(sizeof(report) == sizeof(std::uint32_t[37]),
 		              "report does not pack well here");
 
-		static_assert(sizeof(report::commit) == sizeof(uint32_t[13]),
+		static_assert(sizeof(report::commit) == sizeof(std::uint32_t[13]),
 		              "report::commit does not pack well here");
 
-		static_assert(sizeof(report::entry) == sizeof(uint32_t[13]),
+		static_assert(sizeof(report::entry) == sizeof(std::uint32_t[13]),
 		              "report::entry does not pack well here");
 
 		struct build {
@@ -407,17 +448,17 @@ namespace cov::io {
 			coverage_stats stats;
 		};
 
-		static_assert(sizeof(build) == sizeof(uint32_t[17]),
+		static_assert(sizeof(build) == sizeof(std::uint32_t[17]),
 		              "build does not pack well here");
 
 		struct report_entry_stats {
 			stats summary;
 			git_oid details;
 		};
-#define FILES_ENTRY_BASIC \
-	str path;             \
-	git_oid contents;     \
-	uint32_t lines_total; \
+#define FILES_ENTRY_BASIC      \
+	str path;                  \
+	git_oid contents;          \
+	std::uint32_t lines_total; \
 	report_entry_stats lines
 
 		struct files {
@@ -435,22 +476,22 @@ namespace cov::io {
 			array_ref entries;
 		};
 
-		static_assert(sizeof(files) == sizeof(uint32_t[5]),
+		static_assert(sizeof(files) == sizeof(std::uint32_t[5]),
 		              "files does not pack well here");
 
-		static_assert(sizeof(files::basic) == sizeof(uint32_t[14]),
+		static_assert(sizeof(files::basic) == sizeof(std::uint32_t[14]),
 		              "files::basic does not pack well here");
 
-		static_assert(sizeof(files::ext) == sizeof(uint32_t[28]),
+		static_assert(sizeof(files::ext) == sizeof(std::uint32_t[28]),
 		              "files::ext does not pack well here");
 
 		struct line_coverage {
-			uint32_t line_count;
+			std::uint32_t line_count;
 		};
 
 		struct coverage {
-			uint32_t value : 31;
-			uint32_t is_null : 1;
+			std::uint32_t value : 31;
+			std::uint32_t is_null : 1;
 			bool operator==(coverage const&) const noexcept = default;
 		};
 
@@ -473,8 +514,8 @@ namespace cov::io {
 		}
 
 		struct text_pos {
-			uint32_t line;
-			uint32_t column;
+			std::uint32_t line;
+			std::uint32_t column;
 			auto operator<=>(text_pos const&) const noexcept = default;
 		};
 
@@ -485,12 +526,17 @@ namespace cov::io {
 			struct entry {
 				str name;
 				str demangled_name;
-				uint32_t count;
+				std::uint32_t count;
 				text_pos start;
 				text_pos end;
 			};
 		};
+		static_assert(sizeof(function_coverage) == sizeof(std::uint32_t[5]));
+		static_assert(sizeof(function_coverage::entry) ==
+		              sizeof(std::uint32_t[7]));
 	};  // namespace v1
+
+	ENTRY_TYPE(v1::files, v1::files::basic);
 }  // namespace cov::io
 
 namespace fmt {

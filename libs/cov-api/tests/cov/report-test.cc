@@ -12,6 +12,7 @@
 #include <ranges>
 #include <span>
 #include "setup.hh"
+#include "test_stream.hh"
 
 namespace cov::testing {
 	using namespace std::literals;
@@ -103,32 +104,6 @@ namespace cov::testing {
 		    "\x00\x00\x00\x00"
 
 		    ""sv;
-
-		class test_stream final : public write_stream {
-		public:
-			static constexpr size_t infinite =
-			    std::numeric_limits<size_t>::max();
-			std::vector<std::byte> data{};
-			size_t free_size{infinite};
-
-			bool opened() const noexcept final { return true; }
-			size_t write(git::bytes block) final {
-				if (free_size != infinite) {
-					auto chunk = block.size();
-					if (chunk > free_size) chunk = free_size;
-					free_size -= chunk;
-					block = block.subview(0, chunk);
-				}
-				auto const size = data.size();
-				data.insert(data.end(), block.begin(), block.end());
-				return data.size() - size;
-			}
-
-			std::string_view view() const noexcept {
-				return {reinterpret_cast<char const*>(data.data()),
-				        data.size()};
-			}
-		};
 	}  // namespace
 
 	struct report_impl : counted_impl<cov::report> {
@@ -247,6 +222,20 @@ namespace cov::testing {
 	TEST(report, load_partial) {
 		auto const data = tested_text.substr(
 		    0, sizeof(io::v1::report) + sizeof(io::file_header));
+		io::bytes_read_stream stream{git::bytes{data.data(), data.size()}};
+
+		io::db_object dbo{};
+		dbo.add_handler<io::OBJECT::REPORT, io::handlers::report>();
+
+		std::error_code ec{};
+		auto const result = dbo.load(git::oid{}, stream, ec);
+		ASSERT_TRUE(ec);
+		ASSERT_FALSE(result);
+	}
+
+	TEST(report, load_partial_no_header) {
+		// no file header sizeof means two uints less for report header
+		auto const data = tested_text.substr(0, sizeof(io::v1::report));
 		io::bytes_read_stream stream{git::bytes{data.data(), data.size()}};
 
 		io::db_object dbo{};

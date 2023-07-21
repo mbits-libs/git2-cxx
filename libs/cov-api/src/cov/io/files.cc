@@ -102,11 +102,8 @@ namespace cov::io::handlers {
 		if (!in.load(header)) {
 			return {};
 		}
-		auto const entry_size = header.entries.size * sizeof(uint32_t);
-		if (entry_size < sizeof(v1::files::basic) ||
-		    header.strings.offset < sizeof(v1::files) / sizeof(uint32_t) ||
-		    header.entries.offset <
-		        (header.strings.offset + header.strings.size)) {
+
+		if (!io::header_valid(header)) {
 			return {};
 		}
 
@@ -130,6 +127,7 @@ namespace cov::io::handlers {
 
 		static const git_oid zero_id{};
 
+		auto const entry_size = header.entries.size * sizeof(uint32_t);
 		for (uint32_t index = 0; index < header.entries.count; ++index) {
 			if (!in.load(buffer, entry_size)) {
 				return {};
@@ -258,7 +256,7 @@ namespace cov::io::handlers {
 			auto const path = stg.locate_or(in.path(), stg.size() + 1);
 			auto const path32 = uint_32(path);
 			if (path != path32 || path32 > stg.size()) {
-				return false;
+				return false;  // GCOV_EXCL_LINE
 			}
 			auto const str32 = static_cast<str>(path32);
 
