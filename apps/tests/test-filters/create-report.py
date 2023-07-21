@@ -70,13 +70,14 @@ for filename in data["files"]:
         m.update(hashed)
         hex = m.hexdigest()
         f.write(text)
-        files.append(
-            {
-                "name": filename,
-                "digest": f"sha1:{hex}",
-                "line_coverage": file_info["lines"],
-            }
-        )
+        file = {
+            "name": filename,
+            "digest": f"sha1:{hex}",
+            "line_coverage": file_info["lines"],
+        }
+        if "functions" in file_info:
+            file["functions"] = file_info["functions"]
+        files.append(file)
 
 try:
     commit_list = data["commits"]

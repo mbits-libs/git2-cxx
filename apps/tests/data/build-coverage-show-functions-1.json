@@ -1,0 +1,66 @@
+{
+    "files": {
+        "src/main.cc": {
+            "text": [
+                "void foo() {",
+                "\tstd::cout << \"Hello, \" << name() << \"!\";",
+                "}",
+                "",
+                "void bar() {",
+                "\tfoo();",
+                "\tfoo();",
+                "\tfoo();",
+                "\tfoo();",
+                "\tfoo();",
+                "\tfoo();",
+                "\tfoo();",
+                "\tfoo();",
+                "\tfoo();",
+                "\tfoo();",
+                "\tfoo();",
+                "}"
+            ],
+            "lines": {
+                "1": 0,
+                "2": 0,
+                "5": 15,
+                "7": 10,
+                "8": 8,
+                "9": 6,
+                "10": 4,
+                "11": 2,
+                "12": 0
+            },
+            "functions": [
+                {
+                    "name": "foo1",
+                    "demangled": "foo()",
+                    "count": 0,
+                    "start_line": 0,
+                    "end_line": 2
+                },
+                {
+                    "name": "foo2",
+                    "demangled": "foo()",
+                    "count": 500,
+                    "start_line": 0,
+                    "end_line": 2
+                },
+                {
+                    "name": "_barv",
+                    "demangled": "bar()",
+                    "count": 100,
+                    "start_line": 5
+                }
+            ]
+        }
+    },
+    "commits": [
+        {
+            "message": "function coverage (1)",
+            "files": [
+                "src/main.cc"
+            ]
+        }
+    ]
+}

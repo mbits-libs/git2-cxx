@@ -1,0 +1,35 @@
+{
+    "args": "show --color always HEAD:src",
+    "patches": {
+        "\u001b\\[33mreport [0-9a-f]{40}\u001b\\[m": "\u001b[33mreport $REPORT_HASH\u001b[m",
+        "commit [0-9a-f]{40}": "commit $COMMIT_HASH",
+        "build  [0-9a-f]{40} (.*)": "build  $BUILD_HASH \\1",
+        "Added:     .*": "Added:     $NOW"
+    },
+    "expected": [
+        0,
+        [
+            "\u001b[33mdirectory src/\u001b[m",
+            "",
+            "+----------------+---------+---------+---------+---------+----------+---------+------------+",
+            "| Name           | % Funcs | Missing | % Lines | Visited | Relevant | Missing | Line count |",
+            "+----------------+---------+---------+---------+---------+----------+---------+------------+",
+            "|   greetings.cc |    \u001b[1;31m0.00\u001b[m |         |  \u001b[1;32m100.00\u001b[m |       4 |        4 |         |          6 |",
+            "|   main.cc      |   \u001b[1;31m50.00\u001b[m |       1 |   \u001b[1;31m66.67\u001b[m |       6 |        9 |       3 |         17 |",
+            "+----------------+---------+---------+---------+---------+----------+---------+------------+",
+            "| > TOTAL        |   \u001b[1;31m50.00\u001b[m |       1 |   \u001b[1;33m76.92\u001b[m |      10 |       13 |       3 |         23 |",
+            "+----------------+---------+---------+---------+---------+----------+---------+------------+\n"
+        ],
+        ""
+    ],
+    "prepare": [
+        "unpack $DATA/repo.git.tar $TMP",
+        "cd '$TMP'",
+        "git clone repo.git",
+        "cd '$TMP/repo'",
+        "git config --local user.name 'Johnny Appleseed'",
+        "git config --local user.email 'johnny@appleseed.com'",
+        "cov init",
+        "cov report $DATA/build-coverage-show-functions-3.json -f create-report"
+    ]
+}
