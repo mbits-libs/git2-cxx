@@ -11,18 +11,18 @@ namespace cov::app::show {
 
 	using vis_callback = bool (*)(with);
 	bool has(with flags, with test) { return (flags & test) == test; }
-	bool always(with) { return true; };
-	bool with_branches(with flags) { return has(flags, with::branches); };
-	bool with_funcs(with flags) { return has(flags, with::functions); };
+	bool always(with) { return true; }
+	bool with_branches(with flags) { return has(flags, with::branches); }
+	bool with_funcs(with flags) { return has(flags, with::functions); }
 	bool with_branches_missing(with flags) {
 		return has(flags, with::branches | with::branches_missing);
-	};
+	}
 	bool with_funcs_missing(with flags) {
 		return has(flags, with::functions | with::functions_missing);
-	};
+	}
 	bool with_lines_missing(with flags) {
 		return has(flags, with::lines_missing);
-	};
+	}
 
 	using cell_row = std::vector<std::string>;
 	using data_append = void (*)(environment const&,
