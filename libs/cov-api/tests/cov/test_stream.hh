@@ -3,6 +3,8 @@
 
 #pragma once
 #include <cov/streams.hh>
+#include <limits>
+#include <vector>
 
 namespace cov::testing {
 	class test_stream final : public write_stream {
