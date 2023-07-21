@@ -90,7 +90,8 @@ namespace cov::projection {
 		              std::string const& fname_filter)
 		    : mods{mods}, module{module_filter, sep}, fname{fname_filter} {}
 
-		std::vector<entry> project(std::vector<file_stats> const& report) const;
+		std::vector<entry> project(std::vector<file_stats> const& report,
+		                           cov::repository const* repo = nullptr) const;
 
 	private:
 		std::string_view module_separator() const noexcept;

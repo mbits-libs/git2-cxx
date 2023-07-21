@@ -37,7 +37,9 @@ namespace cov::projection {
 
 		struct dir_entry;
 		dir_entry make_entry(entry_type type, std::string_view display);
-		dir_entry make_file(std::string_view display, file_stats const& file);
+		dir_entry make_file(std::string_view display,
+		                    file_stats const& file,
+		                    repository const* repo);
 		auto find_entry(std::vector<dir_entry>& children,
 		                entry_type type,
 		                std::string_view display) -> decltype(children.begin());
@@ -63,13 +65,14 @@ namespace cov::projection {
 			void add_module(std::string_view module,
 			                std::string_view sep,
 			                std::vector<file_stats const*> const& files,
-			                size_t file_prefix_len) {
+			                size_t file_prefix_len,
+			                repository const* repo) {
 				if (module.empty()) {
 					for (auto file : files) {
 						auto filename = std::string_view{file->filename};
 						if (file_prefix_len < filename.size())
 							filename = filename.substr(file_prefix_len);
-						add_file(filename, *file);
+						add_file(filename, *file, repo);
 					}
 
 					return;
@@ -82,16 +85,19 @@ namespace cov::projection {
 				                      ? std::string_view{}
 				                      : module.substr(pos + sep.size());
 
-				add_level(
-				    entry_type::module, display, [=, &files](dir_entry& child) {
-					    child.add_module(rest, sep, files, file_prefix_len);
-				    });
+				add_level(entry_type::module, display,
+				          [=, &files](dir_entry& child) {
+					          child.add_module(rest, sep, files,
+					                           file_prefix_len, repo);
+				          });
 			}
 
-			void add_file(std::string_view filename, file_stats const& file) {
+			void add_file(std::string_view filename,
+			              file_stats const& file,
+			              repository const* repo) {
 				auto const pos = filename.find('/');
 				if (pos == std::string_view::npos)
-					return children.push_back(make_file(filename, file));
+					return children.push_back(make_file(filename, file, repo));
 
 				auto const display = filename.substr(0, pos);
 				auto const rest = pos == std::string_view::npos
@@ -100,7 +106,7 @@ namespace cov::projection {
 
 				add_level(entry_type::directory, display,
 				          [=, &file](dir_entry& child) {
-					          child.add_file(rest, file);
+					          child.add_file(rest, file, repo);
 				          });
 			}
 
@@ -111,7 +117,8 @@ namespace cov::projection {
 			    std::vector<file_stats const*>& files,
 			    std::string_view mod_sep,
 			    bool mod_filter_empty,
-			    size_t file_prefix_len) {
+			    size_t file_prefix_len,
+			    repository const* repo) {
 				std::map<std::string, std::vector<file_stats const*>>
 				    module_data{};
 
@@ -153,7 +160,8 @@ namespace cov::projection {
 				clean_modules(module_data);
 
 				for (auto const& [modname, mod_files] : module_data)
-					add_module(modname, mod_sep, mod_files, file_prefix_len);
+					add_module(modname, mod_sep, mod_files, file_prefix_len,
+					           repo);
 			}
 
 			void propagate(std::string_view sep) {
@@ -197,12 +205,43 @@ namespace cov::projection {
 			return {.result{.type = type, .name = make_label(display)}};
 		}
 
-		dir_entry make_file(std::string_view display, file_stats const& file) {
+		io::v1::stats recalc_functions(cov::repository const& repo,
+		                               git::oid_view id,
+		                               io::v1::stats fallback) {
+			std::error_code ec{};
+			auto funcs = repo.lookup<cov::function_coverage>(id, ec);
+			if (ec || !funcs) return fallback;
+
+			auto result = io::v1::stats::init();
+			for (auto const& ref : funcs->merge_aliases()) {
+				++result.relevant;
+				if (ref.count) ++result.visited;
+			}
+
+			return result;
+		}
+
+		dir_entry make_file(std::string_view display,
+		                    file_stats const& file,
+		                    repository const* repo) {
+			auto current = file.current;
+			auto previous = file.previous;
+			if (repo) {
+				current.functions = recalc_functions(
+				    *repo, file.current_functions, current.functions);
+				if (!file.previous_functions.is_zero() &&
+				    file.previous_functions == file.current_functions) {
+					previous.functions = current.functions;
+				} else {
+					previous.functions = recalc_functions(
+					    *repo, file.previous_functions, previous.functions);
+				}
+			}
 			return {.result{.type = entry_type::file,
 			                .name = make_label(display),
 			                .stats{
-			                    .current{file.current},
-			                    .previous{file.previous},
+			                    .current{current},
+			                    .previous{previous},
 			                },
 			                .previous_name{file.previous_name},
 			                .diff_kind{file.diff_kind}}};
@@ -221,19 +260,21 @@ namespace cov::projection {
 	}  // namespace
 
 	std::vector<entry> report_filter::project(
-	    std::vector<file_stats> const& report) const {
+	    std::vector<file_stats> const& report,
+	    cov::repository const* repo) const {
 		std::vector<entry> result{};
 		dir_entry root{.result{.type = entry_type::module}};
 
 		auto files = file_projection(report);
+
 		auto const is_standalone =
 		    files.size() == 1 && files.front()->filename == fname.filter;
 		if (is_standalone) {
-			root.add_file(fname.filter, *files.front());
+			root.add_file(fname.filter, *files.front(), repo);
 		} else {
 			auto [modules, filtered_out] = modules_projection();
 			root.add_files(modules, filtered_out, files, sep,
-			               module.filter.empty(), fname.prefix.size());
+			               module.filter.empty(), fname.prefix.size(), repo);
 		}
 
 		root.propagate(sep);
