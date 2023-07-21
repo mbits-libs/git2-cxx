@@ -47,6 +47,7 @@ namespace cov::app {
 		void add_functions(
 		    std::span<std::unique_ptr<cov::function_coverage::entry> const>
 		        functions);
+		void find_chunks();
 		void load_syntax(std::string_view text, std::string_view filename);
 		view_columns column_widths() const noexcept;
 

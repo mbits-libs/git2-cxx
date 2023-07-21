@@ -189,6 +189,8 @@ namespace cov::app::builtin::show {
 			if (file_cvg && !ec) cvg.add_functions(file_cvg->entries());
 		}
 
+		cvg.find_chunks();
+
 		auto const data = file_entry->get_contents(info.repo, ec);
 		if (ec) p.error(ec, p.tr());
 		cvg.load_syntax(

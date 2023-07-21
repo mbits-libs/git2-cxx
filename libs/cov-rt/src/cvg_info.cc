@@ -41,18 +41,6 @@ namespace cov::app {
 			}
 		}
 
-		for (auto [line, count] : result.coverage) {
-			if (count) continue;
-			auto const start = line < 3 ? 0u : line - 3;
-			auto const stop = line + 3;
-			if (result.chunks.empty() ||
-			    result.chunks.back().second + 3 < start) {
-				result.chunks.push_back({start, stop});
-				continue;
-			}
-			result.chunks.back().second = stop;
-		}
-
 		return result;
 	}  // GCOV_EXCL_LINE[GCC]
 
@@ -82,6 +70,37 @@ namespace cov::app {
 			dst->count += src->count;
 			src = functions.erase(src);
 			end = functions.end();
+		}
+	}
+
+	void cvg_info::find_chunks() {
+		chunks.clear();
+
+		auto fn_it = functions.begin();
+		auto const fn_end = functions.end();
+
+		for (auto [line, count] : coverage) {
+			if (count) {
+				bool covered = true;
+
+				while (fn_it != fn_end && fn_it->label.start < line)
+					++fn_it;
+				while (fn_it != fn_end && fn_it->label.start == line) {
+					auto const& function = *fn_it++;
+					if (!function.count) {
+						covered = false;
+						break;
+					}
+				}
+				if (covered) continue;
+			}
+			auto const start = line < 3 ? 0u : line - 3;
+			auto const stop = line + 3;
+			if (chunks.empty() || chunks.back().second + 3 < start) {
+				chunks.push_back({start, stop});
+				continue;
+			}
+			chunks.back().second = stop;
 		}
 	}
 
