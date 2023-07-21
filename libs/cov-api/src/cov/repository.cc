@@ -208,29 +208,6 @@ namespace cov {
 		return result;
 	}
 
-#define PATH_AND_STATS .filename = std::move(path), .current = entry->stats()
-#define RENAMED_PREV(UNUSED) \
-	.previous_name = it->second.previous_name, .diff_kind = it->second.diff_kind
-#define NO_PREV(KIND) .previous_name = {}, .diff_kind = file_diff::KIND
-
-#define FIND_IN_POOL(KEY, GET_PREV)         \
-	auto prev = pool.find(KEY);             \
-	if (prev != pool.end()) {               \
-		prev->second.second = true;         \
-		result.push_back({                  \
-		    PATH_AND_STATS,                 \
-		    .previous = prev->second.first, \
-		    GET_PREV(normal),               \
-		});                                 \
-		continue;                           \
-	}                                       \
-                                            \
-	result.push_back({                      \
-	    PATH_AND_STATS,                     \
-	    .previous = {},                     \
-	    GET_PREV(added),                    \
-	});
-
 	static bool path_sort_less(file_stats const& left,
 	                           file_stats const& right) {
 		if (auto cmp = left.filename <=> right.filename; cmp != 0)
@@ -242,6 +219,100 @@ namespace cov {
 		// equivalent:
 		return false;
 	}  // GCOV_EXCL_STOP
+
+	struct file_pool {
+		struct file_info {
+			io::v1::coverage_stats stats;
+			git::oid functions;
+			bool used;
+		};
+		std::map<std::string, file_info> items{};
+
+		static file_pool from(
+		    std::span<std::unique_ptr<cov::files::entry> const> const&
+		        old_entries) {
+			file_pool result{};
+
+			for (auto const& entry : old_entries) {
+				auto const path = entry->path();
+				result.items[{path.data(), path.size()}] = {
+				    entry->stats(), entry->function_coverage(), false};
+			}
+
+			return result;
+		}
+
+		void apply(std::span<std::unique_ptr<cov::files::entry> const> const&
+		               new_entries,
+		           std::map<std::string, cov::commit_file_diff> const& renames,
+		           std::vector<file_stats>& result) {
+			for (auto const& entry : new_entries) {
+				auto const path_view = entry->path();
+				auto path = std::string{path_view.data(), path_view.size()};
+				auto it = renames.find(path);
+				if (it != renames.end()) {
+					// this is the name and kind to use for pool lookup...
+					result.push_back(match(
+					    it->second.previous_name, std::move(path), entry,
+					    [it](cov::file_stats& next, cov::file_diff::kind) {
+						    next.previous_name = it->second.previous_name;
+						    next.diff_kind = it->second.diff_kind;
+					    }));
+					continue;
+				}
+
+				{
+					auto copy = path;
+					result.push_back(
+					    match(copy, std::move(path), entry,
+					          [](file_stats& info, file_diff::kind kind) {
+						          info.diff_kind = kind;
+					          }));
+				}
+			}
+		}
+
+		void get_deleted(std::vector<file_stats>& result) {
+			for (auto const& [path, info] : items) {
+				auto const& [stats, prev_oid, used] = info;
+				if (used) continue;
+
+				result.push_back({
+				    .filename = path,
+				    .current = {},
+				    .previous = stats,
+				    .previous_name = {},
+				    .diff_kind = file_diff::deleted,
+				});
+			}
+		}
+
+		template <typename Callback>
+		file_stats match(std::string const& key,
+		                 std::string&& path,
+		                 std::unique_ptr<cov::files::entry> const& entry,
+		                 Callback&& get_prev) {
+			file_stats result{
+			    .filename = std::move(path),
+			    .current = entry->stats(),
+			    .previous = {},
+			    .current_functions = entry->function_coverage(),
+			    .previous_functions = {},
+			};
+
+			auto kind = file_diff::added;
+
+			auto prev = items.find(key);
+			if (prev != items.end()) {
+				prev->second.used = true;
+				result.previous = prev->second.stats;
+				result.previous_functions = prev->second.functions;
+				kind = file_diff::normal;
+			}
+			get_prev(result, kind);
+			return result;
+		}
+	};
 
 	std::vector<file_stats> repository::diff_betwen_reports(
 	    ref_ptr<report> const& newer,
@@ -259,42 +330,11 @@ namespace cov {
 		auto const old_files = lookup<cov::files>(older->file_list_id(), ec);
 		if (ec) return {};
 
-		std::map<std::string, std::pair<io::v1::coverage_stats, bool>> pool{};
-
-		for (auto const& entry : old_files->entries()) {
-			auto const path = entry->path();
-			pool[{path.data(), path.size()}] = {entry->stats(), false};
-		}
-
 		std::vector<file_stats> result{};
-		for (auto const& entry : new_files->entries()) {
-			auto const path_view = entry->path();
-			auto path = std::string{path_view.data(), path_view.size()};
-			auto it = renames.find(path);
-			if (it != renames.end()) {
-				// this is the name and kind to use for pool lookup...
-				FIND_IN_POOL(it->second.previous_name, RENAMED_PREV);
-				// GCOV_EXCL_START
-				// It's highly unlikely to have both a rename and old name
-				// missing from the pool
-				[[unlikely]];
-				continue;
-			}  // GCOV_EXCL_STOP
 
-			FIND_IN_POOL(path, NO_PREV);
-		}
-
-		for (auto const& [path, info] : pool) {
-			auto const& [stats, used] = info;
-			if (used) continue;
-
-			result.push_back({
-			    .filename = path,
-			    .current = {},
-			    .previous = stats,
-			    NO_PREV(deleted),
-			});
-		}
+		auto pool = file_pool::from(old_files->entries());
+		pool.apply(new_files->entries(), renames, result);
+		pool.get_deleted(result);
 
 		std::stable_sort(result.begin(), result.end(), path_sort_less);
 		return result;
@@ -328,7 +368,8 @@ namespace cov {
 			    .filename = {path.data(), path.size()},
 			    .current = entry->stats(),
 			    .previous = {},
-			    NO_PREV(added),
+			    .previous_name = {},
+			    .diff_kind = file_diff::added,
 			});
 		}
 

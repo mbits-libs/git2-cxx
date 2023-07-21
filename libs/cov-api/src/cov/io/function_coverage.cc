@@ -189,6 +189,40 @@ namespace cov::io::handlers {
 namespace cov {
 	function_coverage::entry::~entry() {}
 
+	std::vector<function_coverage::function> function_coverage::merge_aliases()
+	    const {
+		std::vector<function> aliases{};
+		aliases.reserve(entries().size());
+
+		for (auto const& entry : entries()) {
+			auto name = entry->demangled_name();
+			if (name.empty()) name = entry->name();
+			aliases.push_back({
+			    .label{.start = entry->start(), .end = entry->end()},
+			    .count = entry->count(),
+			});
+			aliases.back().label.name.assign(name);
+		}
+
+		std::stable_sort(aliases.begin(), aliases.end());
+		auto dst = aliases.begin();
+		auto end = aliases.end();
+		if (dst == end) return aliases;
+		for (auto src = std::next(dst); src != end;) {
+			if (src->label != dst->label) {
+				++dst;
+				++src;
+				continue;
+			}
+			dst->count += src->count;
+			src = aliases.erase(src);
+			end = aliases.end();
+		}
+
+		aliases.shrink_to_fit();
+		return aliases;
+	}
+
 	ref_ptr<function_coverage> function_coverage::create(
 	    std::vector<std::unique_ptr<function_coverage::entry>>&& entries) {
 		return make_ref<io::handlers::impl>(std::move(entries));

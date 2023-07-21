@@ -14,6 +14,7 @@
 #include <fmt/format.h>
 #include <git2/oid.h>
 #include <algorithm>
+#include <compare>
 #include <cstddef>
 #include <cstdint>
 #include <limits>
@@ -474,7 +475,7 @@ namespace cov::io {
 		struct text_pos {
 			uint32_t line;
 			uint32_t column;
-			bool operator==(text_pos const&) const noexcept = default;
+			auto operator<=>(text_pos const&) const noexcept = default;
 		};
 
 		struct function_coverage {

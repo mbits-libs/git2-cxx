@@ -9,10 +9,20 @@ namespace cov::app::show {
 
 	enum class show_column { name, other };
 
-	using vis_callback = bool (*)(bool, bool);
-	bool always(bool, bool) { return true; };
-	bool with_branches(bool value, bool) { return value; };
-	bool with_funcs(bool, bool value) { return value; };
+	using vis_callback = bool (*)(with);
+	bool has(with flags, with test) { return (flags & test) == test; }
+	bool always(with) { return true; };
+	bool with_branches(with flags) { return has(flags, with::branches); };
+	bool with_funcs(with flags) { return has(flags, with::functions); };
+	bool with_branches_missing(with flags) {
+		return has(flags, with::branches | with::branches_missing);
+	};
+	bool with_funcs_missing(with flags) {
+		return has(flags, with::functions | with::functions_missing);
+	};
+	bool with_lines_missing(with flags) {
+		return has(flags, with::lines_missing);
+	};
 
 	using cell_row = std::vector<std::string>;
 	using data_append = void (*)(environment const&,
@@ -31,10 +41,8 @@ namespace cov::app::show {
 		show_column id{show_column::other};
 		vis_callback vis{always};
 
-		void header(std::vector<table_column>& hdr,
-		            bool with_branches,
-		            bool with_funcs) const {
-			if (!vis(with_branches, with_funcs)) return;
+		void header(std::vector<table_column>& hdr, with flags) const {
+			if (!vis(flags)) return;
 			hdr.push_back(
 			    {{label.text.data(), label.text.size()}, label.align});
 		}
@@ -42,9 +50,8 @@ namespace cov::app::show {
 		void data(environment const& env,
 		          std::vector<std::string>& cells,
 		          file_diff const& change,
-		          bool with_branches,
-		          bool with_funcs) const {
-			if (!vis(with_branches, with_funcs)) return;
+		          with flags) const {
+			if (!vis(flags)) return;
 			append(env, cells, change);
 		}
 	};
@@ -67,7 +74,7 @@ namespace cov::app::show {
 	           [](environment const& env,
 	              cell_row& cells,
 	              file_diff const& change) {
-		           env.count(
+		           env.dimmed_count(
 		               cells, change,
 		               [](auto const& stats) {
 			               return stats.branches.relevant -
@@ -75,7 +82,7 @@ namespace cov::app::show {
 		               },
 		               placeholder::color::faint_red);
 	           },
-	           show_column::other, with_branches},
+	           show_column::other, with_branches_missing},
 	    column{"% Funcs"sv,
 	           [](environment const& env,
 	              cell_row& cells,
@@ -90,7 +97,7 @@ namespace cov::app::show {
 	           [](environment const& env,
 	              cell_row& cells,
 	              file_diff const& change) {
-		           env.count(
+		           env.dimmed_count(
 		               cells, change,
 		               [](auto const& stats) {
 			               return stats.functions.relevant -
@@ -98,7 +105,7 @@ namespace cov::app::show {
 		               },
 		               placeholder::color::faint_red);
 	           },
-	           show_column::other, with_funcs},
+	           show_column::other, with_funcs_missing},
 	    column{"% Lines"sv,
 	           [](environment const& env,
 	              cell_row& cells,
@@ -129,13 +136,14 @@ namespace cov::app::show {
 	           [](environment const& env,
 	              cell_row& cells,
 	              file_diff const& change) {
-		           env.count(
+		           env.dimmed_count(
 		               cells, change,
 		               [](auto const& stats) {
 			               return stats.lines.relevant - stats.lines.visited;
 		               },
 		               placeholder::color::faint_red);
-	           }},
+	           },
+	           show_column::other, with_lines_missing},
 	    column{"Line count"sv,
 	           [](environment const& env,
 	              cell_row& cells,
@@ -209,8 +217,7 @@ namespace cov::app::show {
 	                      char type,
 	                      entry_stats const& stats,
 	                      std::string_view label,
-	                      bool with_branches,
-	                      bool with_funcs,
+	                      with flags,
 	                      row_type row) const {
 		using placeholder::color;
 
@@ -223,7 +230,7 @@ namespace cov::app::show {
 				cells.push_back({label.data(), label.size()});
 				continue;
 			}
-			col.data(*this, cells, change, with_branches, with_funcs);
+			col.data(*this, cells, change, flags);
 		}
 
 		table.emplace(std::move(cells), row == row_type::data);
@@ -232,17 +239,31 @@ namespace cov::app::show {
 	void environment::print_table(std::vector<entry> const& entries) const {
 		entry_stats total{};
 
+		with flags{};
+
 		for (auto const& entry : entries) {
 			total.extend(entry.stats);
+
+			if (entry.stats.current.lines.relevant !=
+			    entry.stats.current.lines.visited)
+				flags |= with::lines_missing;
+
+			if (entry.stats.current.functions.relevant !=
+			    entry.stats.current.functions.visited)
+				flags |= with::functions_missing;
+
+			if (entry.stats.current.branches.relevant !=
+			    entry.stats.current.branches.visited)
+				flags |= with::branches_missing;
 		}
 
-		auto with_branches = total.current.branches.relevant > 0;
-		auto with_funcs = total.current.functions.relevant > 0;
+		if (total.current.branches.relevant > 0) flags |= with::branches;
+		if (total.current.functions.relevant > 0) flags |= with::functions;
 
 		std::vector<table_column> header{};
 		header.reserve(columns.size());
 		for (auto const& col : columns) {
-			col.header(header, with_branches, with_funcs);
+			col.header(header, flags);
 		}
 
 		data_table table{.header = std::move(header)};
@@ -262,13 +283,11 @@ namespace cov::app::show {
 					break;
 			}
 
-			add(table, entry_flag, entry.stats, entry.name.display,
-			    with_branches, with_funcs);
+			add(table, entry_flag, entry.stats, entry.name.display, flags);
 		}
 
 		if (entries.size() > 1) {
-			add(table, '>', total, "TOTAL"sv, with_branches, with_funcs,
-			    row_type::footer);
+			add(table, '>', total, "TOTAL"sv, flags, row_type::footer);
 		}
 
 		table.print();

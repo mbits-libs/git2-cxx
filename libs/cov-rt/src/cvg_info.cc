@@ -44,55 +44,25 @@ namespace cov::app {
 		return result;
 	}  // GCOV_EXCL_LINE[GCC]
 
-	void cvg_info::add_functions(
-	    std::span<std::unique_ptr<cov::function_coverage::entry> const> input) {
-		for (auto const& entry : input) {
-			auto name = entry->demangled_name();
-			if (name.empty()) name = entry->name();
-			functions.push_back({
-			    .label = {.start = entry->start().line,
-			              .end = entry->end().line},
-			    .count = entry->count(),
-			});
-			functions.back().label.name.assign(name);
-		}
-
-		std::sort(functions.begin(), functions.end());
-		auto dst = functions.begin();
-		auto end = functions.end();
-		if (dst == end) return;
-		for (auto src = std::next(dst); src != end;) {
-			if (src->label != dst->label) {
-				++dst;
-				++src;
-				continue;
-			}
-			dst->count += src->count;
-			src = functions.erase(src);
-			end = functions.end();
-		}
+	void cvg_info::add_functions(cov::function_coverage const& input) {
+		functions = input.merge_aliases();
 	}
 
 	void cvg_info::find_chunks() {
 		chunks.clear();
-
-		auto fn_it = functions.begin();
-		auto const fn_end = functions.end();
+		auto fn = funcs();
 
 		for (auto [line, count] : coverage) {
 			if (count) {
-				bool covered = true;
-
-				while (fn_it != fn_end && fn_it->label.start < line)
-					++fn_it;
-				while (fn_it != fn_end && fn_it->label.start == line) {
-					auto const& function = *fn_it++;
-					if (!function.count) {
-						covered = false;
-						break;
-					}
+				try {
+					fn.at(line, [](auto const& function) {
+						if (!function.count) {
+							throw false;
+						}
+					});
+					continue;
+				} catch (bool) {
 				}
-				if (covered) continue;
 			}
 			auto const start = line < 3 ? 0u : line - 3;
 			auto const stop = line + 3;
@@ -151,7 +121,7 @@ namespace cov::app {
 		return count;
 	}
 
-	std::string cvg_info::to_string(function const& fn,
+	std::string cvg_info::to_string(cov::function_coverage::function const& fn,
 	                                view_columns const& widths,
 	                                bool use_color,
 	                                size_t max_width) const {

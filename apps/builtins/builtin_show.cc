@@ -186,7 +186,7 @@ namespace cov::app::builtin::show {
 		if (with_functions && !file_entry->function_coverage().is_zero()) {
 			auto const file_cvg = info.repo.lookup<cov::function_coverage>(
 			    file_entry->function_coverage(), ec);
-			if (file_cvg && !ec) cvg.add_functions(file_cvg->entries());
+			if (file_cvg && !ec) cvg.add_functions(*file_cvg);
 		}
 
 		cvg.find_chunks();
@@ -205,10 +205,7 @@ namespace cov::app::builtin::show {
 		}
 
 		auto const widths = cvg.column_widths();
-		auto fn_it = cvg.functions.begin();
-		auto const fn_end = cvg.functions.end();
-
-		std::vector<cvg_info::function> active_functions{};
+		auto fn = cvg.funcs();
 
 		bool first = true;
 		for (auto const& [start, stop] : cvg.chunks) {
@@ -224,14 +221,12 @@ namespace cov::app::builtin::show {
 					ran_out_of_lines = true;
 					break;
 				}
-				while (fn_it != fn_end && fn_it->label.start < line_no)
-					++fn_it;
-				while (fn_it != fn_end && fn_it->label.start == line_no) {
-					auto const& function = *fn_it++;
+				fn.at(line_no, [=, &widths](auto const& function) {
 					fmt::print("{}\n", cvg.to_string(function, widths,
 					                                 clr == use_feature::yes,
 					                                 display_width));
-				}
+				});
+
 				fmt::print("{}\n", cvg.to_string(line_no, widths,
 				                                 clr == use_feature::yes));
 			}
