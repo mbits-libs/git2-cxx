@@ -80,7 +80,7 @@ namespace cov::testing {
 		auto report = make_report(id, tweaks.stats);
 		ASSERT_TRUE(report);
 
-		auto facade = ph::object_facade::present_report(report.get(), nullptr);
+		auto facade = ph::object_facade::present_report(report, nullptr);
 		auto actual = fmt.format(facade.get(), env);
 		std::fputs(actual.c_str(), stdout);
 		std::fputc('\n', stdout);
@@ -110,7 +110,7 @@ namespace cov::testing {
 		auto report = make_report(id, tweaks.stats);
 		ASSERT_TRUE(report);
 
-		auto facade = ph::object_facade::present_report(report.get(), nullptr);
+		auto facade = ph::object_facade::present_report(report, nullptr);
 		auto actual = fmt.format(facade.get(), env);
 		std::fputs(actual.c_str(), stdout);
 		std::fputc('\n', stdout);

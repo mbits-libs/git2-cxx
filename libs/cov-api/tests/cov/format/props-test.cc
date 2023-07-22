@@ -3,6 +3,7 @@
 
 #include <gtest/gtest.h>
 #include <cov/format.hh>
+#include <source_location>
 #include "../path-utils.hh"
 #include "../print-view.hh"
 
@@ -20,6 +21,7 @@ namespace cov::testing {
 			std::string_view wrapped{};
 			std::string_view wrapped_colors{};
 		} expected{};
+		std::source_location loc{std::source_location::current()};
 
 		friend std::ostream& operator<<(std::ostream& out,
 		                                props_test const& test) {
@@ -31,11 +33,14 @@ namespace cov::testing {
 
 	class props : public ::testing::TestWithParam<props_test> {
 	public:
-		void colorize(std::string_view props,
-		              std::string_view format,
-		              std::string_view expected,
-		              bool use_color,
-		              decltype(props_test::flags) const& flags) {
+		void colorize(
+		    std::string_view props,
+		    std::string_view format,
+		    std::string_view expected,
+		    bool use_color,
+		    decltype(props_test::flags) const& flags,
+		    std::source_location const& loc,
+		    std::source_location caller = std::source_location::current()) {
 			auto const formatter = cov::formatter::from(format);
 			auto const builds =
 			    cov::report::builder{}.add_nfo({.props = props}).release();
@@ -49,43 +54,47 @@ namespace cov::testing {
 			};
 			auto const actual = formatter.format(facade.get(), env);
 
-			EXPECT_EQ(expected, actual) << actual;
+			EXPECT_EQ(expected, actual)
+			    << actual << "\n"
+			    << caller.file_name() << ':' << caller.line() << "\n"
+			    << loc.file_name() << ':' << loc.line();
 		}
 	};
 
 	TEST_P(props, normalize) {
-		auto const& [props, flags, expected] = GetParam();
-		EXPECT_EQ(expected.props, cov::report::builder::normalize(props));
+		auto const& [props, flags, expected, loc] = GetParam();
+		EXPECT_EQ(expected.props, cov::report::builder::normalize(props))
+		    << loc.file_name() << ':' << loc.line();
 	}
 
 	TEST_P(props, format) {
-		auto const& [props, flags, expected] = GetParam();
-		colorize(props, "%D", expected.simple, true, flags);
+		auto const& [props, flags, expected, loc] = GetParam();
+		colorize(props, "%Z", expected.simple, true, flags, loc);
 	}
 
 	TEST_P(props, wrapped) {
-		auto const& [props, flags, expected] = GetParam();
-		colorize(props, "%d", expected.wrapped, true, flags);
+		auto const& [props, flags, expected, loc] = GetParam();
+		colorize(props, "%z", expected.wrapped, true, flags, loc);
 	}
 
 	TEST_P(props, colors) {
-		auto const& [props, flags, expected] = GetParam();
-		colorize(props, "%mD", expected.simple_colors, true, flags);
+		auto const& [props, flags, expected, loc] = GetParam();
+		colorize(props, "%mZ", expected.simple_colors, true, flags, loc);
 	}
 
 	TEST_P(props, wrapped_colors) {
-		auto const& [props, flags, expected] = GetParam();
-		colorize(props, "%md", expected.wrapped_colors, true, flags);
+		auto const& [props, flags, expected, loc] = GetParam();
+		colorize(props, "%mz", expected.wrapped_colors, true, flags, loc);
 	}
 
 	TEST_P(props, colors_disabled) {
-		auto const& [props, flags, expected] = GetParam();
-		colorize(props, "%mD", expected.simple, false, flags);
+		auto const& [props, flags, expected, loc] = GetParam();
+		colorize(props, "%mZ", expected.simple, false, flags, loc);
 	}
 
 	TEST_P(props, wrapped_colors_disabled) {
-		auto const& [props, flags, expected] = GetParam();
-		colorize(props, "%md", expected.wrapped, false, flags);
+		auto const& [props, flags, expected, loc] = GetParam();
+		colorize(props, "%mz", expected.wrapped, false, flags, loc);
 	}
 
 	static constexpr props_test tests[] = {

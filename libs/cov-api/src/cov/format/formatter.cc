@@ -292,6 +292,9 @@ namespace cov::placeholder {
 				env.current_width = w;
 				return out;
 			}
+			iterator operator()(names const& name) {
+				return ctx.format(out, env, name);
+			}
 
 			iterator operator()(block const& b) {
 				if (!ctx.facade) return out;
@@ -382,6 +385,7 @@ namespace cov::placeholder {
 	                      git::oid const* id,
 	                      bool wrapped,
 	                      bool magic_colors,
+	                      unsigned indent,
 	                      context const& ctx,
 	                      internal_environment& env) const {
 		if (!id || !env.client->decorate) return out;
@@ -408,13 +412,25 @@ namespace cov::placeholder {
 			}
 		}
 
+		std::string calculated_prefix{};
+		auto inter_prefix = ", "sv;
+		if (indent) {
+			calculated_prefix = std::string(indent + 2, ' ');
+			calculated_prefix[0] = ',';
+			calculated_prefix[1] = '\n';
+			if (env.client->add_align_marks)
+				calculated_prefix.push_back('\xFF');
+			if (wrapped) calculated_prefix += "  "sv;
+			inter_prefix = calculated_prefix;
+		}
+
 		for (auto const& [key, value] : tags) {
 			if (value != hash) continue;
 			if (first) {
 				first = false;
 				if (wrapped) out = color_str(out, color::yellow, " ("sv);
 			} else {
-				out = color_str(out, color::yellow, ", "sv);
+				out = color_str(out, color::yellow, inter_prefix);
 			}
 			if (magic_colors) out = ctx.format(out, env, color::bold_yellow);
 			out = format_str(out, "tag: "sv);
@@ -429,7 +445,7 @@ namespace cov::placeholder {
 				first = false;
 				if (wrapped) out = color_str(out, color::yellow, " ("sv);
 			} else {
-				out = color_str(out, color::yellow, ", "sv);
+				out = color_str(out, color::yellow, inter_prefix);
 			}
 			out = color_str(out, color::bold_green, key);
 		}
@@ -489,6 +505,8 @@ namespace cov::placeholder {
 				return env.formatted_output(out, body_from(message));
 			case commit::body_raw:
 				return env.formatted_output(out, strip(message));
+			case commit::branch:
+				return format_str(out, branch);
 		}
 		return out;  // GCOV_EXCL_LINE - all enums are handled above
 	}
@@ -576,6 +594,15 @@ namespace cov::placeholder {
 			case self::quaternary_hash:
 				id = facade->quaternary_id();
 				break;
+
+			case self::primary_label:
+				return format_str(out, facade->name());
+			case self::secondary_label:
+				return format_str(out, facade->secondary_label());
+			case self::tertiary_label:
+				return format_str(out, facade->tertiary_label());
+			case self::quaternary_label:
+				return format_str(out, facade->quaternary_label());
 		}
 
 		if (!id) {
@@ -633,22 +660,27 @@ namespace cov::placeholder {
 
 	iterator context::format(iterator out,
 	                         internal_environment& env,
-	                         report fld) const {
+	                         placeholder::names const& names) const {
 		width_cleaner clean{env};
-
-		switch (fld) {
-			case report::ref_names:
-				return facade ? facade->prop(out, true, false, env) : out;
-			case report::ref_names_unwrapped:
-				return facade ? facade->prop(out, false, false, env) : out;
-			case report::magic_ref_names:
-				return facade ? facade->prop(out, true, true, env) : out;
-			case report::magic_ref_names_unwrapped:
-				return facade ? facade->prop(out, false, true, env) : out;
-			case report::branch: {
-				git_commit_view const* git = facade ? facade->git() : nullptr;
-				return git ? format_str(out, git->branch) : out;
-			}
+#define CALL(METHOD, W, M) \
+	facade ? facade->METHOD(out, W, M, names.indent, env) : out;
+		switch (names.type) {
+			case name_type::ref_names:
+				return CALL(refs, true, false);
+			case name_type::ref_names_unwrapped:
+				return CALL(refs, false, false);
+			case name_type::magic_ref_names:
+				return CALL(refs, true, true);
+			case name_type::magic_ref_names_unwrapped:
+				return CALL(refs, false, true);
+			case name_type::props:
+				return CALL(props, true, false);
+			case name_type::props_unwrapped:
+				return CALL(props, false, false);
+			case name_type::magic_props:
+				return CALL(props, true, true);
+			case name_type::magic_props_unwrapped:
+				return CALL(props, false, true);
 		}
 		return out;  // GCOV_EXCL_LINE - all enums are handled above
 	}
@@ -694,10 +726,23 @@ namespace cov::placeholder {
 	    internal_environment& env,
 	    bool wrapped,
 	    bool magic_colors,
+	    unsigned indent,
 	    std::map<std::string, cov::report::property> const& properties) const {
 		if (properties.empty() || !env.client->decorate) return out;
 
 		property_visitor painter{out, magic_colors, *this, env};
+
+		std::string calculated_prefix{};
+		auto inter_prefix = ", "sv;
+		if (indent) {
+			calculated_prefix = std::string(indent + 2, ' ');
+			calculated_prefix[0] = ',';
+			calculated_prefix[1] = '\n';
+			if (env.client->add_align_marks)
+				calculated_prefix.push_back('\xFF');
+			if (wrapped) calculated_prefix += "  "sv;
+			inter_prefix = calculated_prefix;
+		}
 
 		bool first = true;
 		for (auto const& [key, value] : properties) {
@@ -707,7 +752,7 @@ namespace cov::placeholder {
 				first = false;
 				if (wrapped) painter.prefix = " ("sv;
 			} else {
-				painter.prefix = ", "sv;
+				painter.prefix = inter_prefix;
 			}
 			std::visit(painter, value);
 		}

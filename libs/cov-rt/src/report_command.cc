@@ -216,7 +216,7 @@ namespace cov::app::builtin::report {
 
 	void parser::print_report(std::string_view local_branch,
 	                          size_t files,
-	                          cov::report const& report,
+	                          ref_ptr<cov::report> const& report,
 	                          str::cov_report::Strings const& tr,
 	                          repository const& repo) {
 		static constexpr auto message_chunk1 = "%C(red)["sv;
@@ -233,11 +233,11 @@ namespace cov::app::builtin::report {
 		    "%Creset %C(faint yellow)%hG@%rD%Creset%n"sv;
 		static constexpr auto message_chunk6 = "%{B[ %C(faint normal)"sv;
 		static constexpr auto message_chunk7 =
-		    " %hR:%Creset %C(rating)%pPL%Creset%md%n%]}"sv;
+		    " %hR:%Creset %C(rating)%pPL%Creset%mz%n%]}"sv;
 
 		using str::cov_report::counted;
 
-		auto const& stats = report.stats();
+		auto const& stats = report->stats();
 
 		std::string change{}, parent{};
 		std::string file_count =
@@ -250,7 +250,7 @@ namespace cov::app::builtin::report {
 			                     stats.lines.relevant - stats.lines.visited);
 		}
 
-		if (!report.parent_id().is_zero()) {
+		if (!report->parent_id().is_zero()) {
 			parent = fmt::format(" {} %hP%n"sv,
 			                     tr(replng::MESSAGE_FIELD_PARENT_REPORT));
 		}
@@ -281,7 +281,7 @@ namespace cov::app::builtin::report {
 			format.append(chunk);
 
 		auto facade =
-		    placeholder::object_facade::present_report(&report, nullptr);
+		    placeholder::object_facade::present_report(report, nullptr);
 		auto env = placeholder::environment::from(repo, use_feature::yes,
 		                                          use_feature::yes);
 		env.prop_names = false;

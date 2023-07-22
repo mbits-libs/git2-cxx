@@ -138,7 +138,7 @@ namespace cov::testing {
 		    commit, add, stats);
 		ASSERT_TRUE(report);
 
-		auto facade = ph::object_facade::present_report(report.get(), nullptr);
+		auto facade = ph::object_facade::present_report(report, nullptr);
 		auto actual = fmt.format(facade.get(), env);
 		ASSERT_EQ(expected, actual);
 	}
@@ -575,7 +575,7 @@ This-line-is-too-long-to-be-properly-wrapped. However, this line is perfectly wr
       However, this line is
       perfectly wrappable)"sv;
 
-		auto facade = ph::object_facade::present_report(report.get(), nullptr);
+		auto facade = ph::object_facade::present_report(report, nullptr);
 		auto actual = fmt.format(facade.get(), env);
 		ASSERT_EQ(expected, actual);
 	}
@@ -598,7 +598,7 @@ This-line-is-too-long-to-be-properly-wrapped. However, this line is perfectly wr
      1234 56789 1234567890 987
      5643 21.)"sv;
 
-		auto facade = ph::object_facade::present_report(report.get(), nullptr);
+		auto facade = ph::object_facade::present_report(report, nullptr);
 		auto actual = fmt.format(facade.get(), env);
 		ASSERT_EQ(expected, actual);
 	}

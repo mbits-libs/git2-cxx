@@ -64,7 +64,7 @@ namespace cov::testing {
 		    {1250, {300, 299}, {0, 0}, {0, 0}}, {});
 		ASSERT_TRUE(report);
 
-		auto facade = ph::object_facade::present_report(report.get(), nullptr);
+		auto facade = ph::object_facade::present_report(report, nullptr);
 		auto actual = fmt.format(facade.get(), env);
 		ASSERT_EQ(expected, actual);
 	}  // namespace cov::testing

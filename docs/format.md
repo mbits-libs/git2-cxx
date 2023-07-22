@@ -41,7 +41,7 @@ If there is an ✔ beside a color, it means this color could be prefixed with ei
 
 |Placeholder|Meaning|
 |-|-|
-|`%HR`, `%H1`|report hash or build hash|
+|`%HR`, `%H1`|report hash, build hash or file list hash|
 |`%hR`, `%h1`|abbreviated report hash|
 |`%HC`, `%H1`|contents hash (inside file object)|
 |`%hC`, `%h1`|abbreviated contents hash (inside file object)|
@@ -57,6 +57,15 @@ If there is an ✔ beside a color, it means this color could be prefixed with ei
 |`%hG`, `%h4`|abbreviated commit hash|
 |`%HB`, `%H4`|branch coverage hash (inside file object)|
 |`%hB`, `%h4`|abbreviated branch coverage hash (inside file object)|
+
+### Labels
+
+|Placeholder|Meaning|
+|-|-|
+|`%Ln`, `%L1`|type of the object|
+|`%L2`|name of secondary hash (e.g. `files` or `lines`)|
+|`%L3`|name of tertiary hash|
+|`%L4`|name of quaternary hash|
 
 ### Git commit information
 
@@ -134,8 +143,9 @@ In context of a build, not only `%HR` changes meaning to "hash of current build"
 
 |Placeholder|Type|REPORT|BUILD|FILES|FILE|
 |-----------|----|------|-----|-----|----|
-|PRIMARY|HASH|report (self)|build (self)||contents|
-|SECONDARY|HASH|file list|file list|file list (self)|lines|
+|NAME|TEXT|report|build|files|file|
+|PRIMARY|HASH|report (self)|build (self)|file list (self)|contents|
+|SECONDARY|HASH|file list|file list||lines|
 |TERTIARY|HASH|parent|||functions|
 |QUATERNARY|HASH|commit|||branches|
 |ADDED|TIME|added|added|||
@@ -171,6 +181,10 @@ build c5d8aeaa6 - javac, debug=true, qnx
 |Name|Context|Query|
 |---|-------|----------|
 |`?`, `?prop`|build|are there any properties attached to the build|
-|`?pTL`|report, build, file|is total number of relevant lines non-zero|
-|`?pTF`|report, build, file|is total number of reported functions non-zero|
-|`?pTB`|report, build, file|is total number of reported branches non-zero|
+|`?pTL`|_any_|is total number of relevant lines non-zero|
+|`?pTF`|_any_|is total number of reported functions non-zero|
+|`?pTB`|_any_|is total number of reported branches non-zero|
+|`?H1`,`?H2`,`?H3`,`?H4`|_any_|is the hash in question available|
+|`?pT`|_any_|does the object support any stats|
+|`?rd`|_any_|does the object support the date of putting into repo|
+|`?git`|_any_|does the object support commit information|
