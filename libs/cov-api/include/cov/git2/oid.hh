@@ -5,6 +5,7 @@
 
 #include <fmt/format.h>
 #include <git2/oid.h>
+#include <algorithm>
 #include <iostream>
 #include <string>
 

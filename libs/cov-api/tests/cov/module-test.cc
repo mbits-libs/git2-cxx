@@ -235,7 +235,7 @@ namespace cov::testing {
 		ec = builder.insert(".covmodule", modules_id, GIT_FILEMODE_BLOB);
 		if (ec) return ec;
 
-		git_oid tree_id{};
+		git::oid tree_id{};
 		ec = builder.write(tree_id);
 		if (ec) return ec;
 

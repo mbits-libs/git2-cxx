@@ -61,7 +61,7 @@ namespace cov::testing {
 
 			std::error_code ignore;
 			auto entry = tree.entry_bypath(path.data(), ignore);
-			if (!ignore && entry) nfo.contents.assign(entry.oid());
+			if (!ignore && entry) nfo.contents = entry.oid().oid();
 
 			auto list_of_one = files::builder{}.add_nfo(nfo).release();
 			return std::move(list_of_one.front());
