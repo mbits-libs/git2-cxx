@@ -76,20 +76,20 @@ namespace cov::testing {
 		}
 
 		ref_ptr<cov::report> make_report(
-		    git_oid const& id,
+		    git::oid_view id,
 		    bool has_parent,
 		    std::string const& message,
 		    sys_seconds commit,
 		    sys_seconds add,
 		    std::optional<io::v1::coverage_stats> const& stats) const {
-			git_oid parent_id{}, commit_id{}, files_id{};
+			git::oid parent_id{};
 			if (has_parent)
-				git_oid_fromstr(&parent_id,
-				                "8765432100ffeeddccbbaa998877665544332211");
-			git_oid_fromstr(&commit_id,
-			                "36109a1c35e0d5cf3e5e68d896c8b1b4be565525");
-			git_oid_fromstr(&files_id,
-			                "7698a173c0f8b9c38bd853ba767c71df40b9f669");
+				parent_id = git::oid::from(
+				    "8765432100ffeeddccbbaa998877665544332211"sv);
+			auto const commit_id =
+			    git::oid::from("36109a1c35e0d5cf3e5e68d896c8b1b4be565525"sv);
+			auto const files_id =
+			    git::oid::from("7698a173c0f8b9c38bd853ba767c71df40b9f669"sv);
 
 			io::v1::coverage_stats const default_stats{
 			    1250, {300, 299}, {0, 0}, {0, 0}};
@@ -109,10 +109,9 @@ namespace cov::testing {
 
 		ph::environment env = environment(head, use_color);
 		if (marks) env.marks = *marks;
-		git_oid id{};
-		git_oid_fromstr(&id, report_id.empty()
-		                         ? "112233445566778899aabbccddeeff0012345678"
-		                         : report_id.data());
+		auto const id = git::oid::from(
+		    report_id.empty() ? "112233445566778899aabbccddeeff0012345678"sv
+		                      : report_id);
 		auto report = make_report(
 		    id, has_parent,
 		    "Subject, isn't it?\n\nLorem ipsum dolor sit amet, consectetur "
@@ -563,8 +562,8 @@ namespace cov::testing {
 		auto fmt = formatter::from("%w(30)%b"sv);
 
 		ph::environment env = environment({}, false);
-		git_oid id{};
-		git_oid_fromstr(&id, "112233445566778899aabbccddeeff0012345678");
+		auto const id =
+		    git::oid::from("112233445566778899aabbccddeeff0012345678"sv);
 		auto report = make_report(id, true,
 		                          R"(Subject line
 
@@ -585,8 +584,8 @@ This-line-is-too-long-to-be-properly-wrapped. However, this line is perfectly wr
 		auto fmt = formatter::from("%w(30, 5)%b"sv);
 
 		ph::environment env = environment({}, false);
-		git_oid id{};
-		git_oid_fromstr(&id, "112233445566778899aabbccddeeff0012345678");
+		auto const id =
+		    git::oid::from("112233445566778899aabbccddeeff0012345678"sv);
 		auto report = make_report(id, true,
 		                          R"(Subject line
 

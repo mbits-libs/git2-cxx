@@ -132,12 +132,6 @@ namespace cov::testing {
 		}
 	};
 
-	std::string to_string(git_oid const& id) {
-		char buffer[40];
-		git_oid_fmt(buffer, &id);
-		return {buffer, 40};
-	}
-
 	std::string fix(std::string_view v) {
 		auto pos = v.find(':');
 		if (pos == std::string_view::npos) return {v.data(), v.size()};
@@ -146,7 +140,7 @@ namespace cov::testing {
 
 		v = v.substr(pos + 1);
 
-		auto result = to_string(*ref->direct_target());
+		auto result = ref->direct_target()->str();
 
 		if (!v.empty()) {
 			auto first = v.data();
@@ -178,9 +172,8 @@ namespace cov::testing {
 		ASSERT_FALSE(ec);
 		ASSERT_TRUE(sanity_check);
 
-		char buffer[40];
-		git_oid_fmt(buffer, ref->direct_target());
-		auto refid = std::string_view{buffer, 40};
+		auto refid_str = ref->direct_target()->str();
+		auto refid = std::string_view{refid_str};
 
 		while (refid.length() > 3) {
 			ASSERT_TRUE(is_a<cov::report>(repo.find_partial(refid)));
@@ -209,14 +202,14 @@ namespace cov::testing {
 			    repo.refs()->dwim(expected_tags.inaccessible);
 			ASSERT_TRUE(inaccessible);
 			ASSERT_TRUE(inaccessible->direct_target());
-			expected.from = to_string(*inaccessible->direct_target());
+			expected.from = inaccessible->direct_target()->str();
 		}
 
 		if (!expected_tags.accessible.empty()) {
 			auto const accessible = repo.refs()->dwim(expected_tags.accessible);
 			ASSERT_TRUE(accessible);
 			ASSERT_TRUE(accessible->direct_target());
-			expected.to = to_string(*accessible->direct_target());
+			expected.to = accessible->direct_target()->str();
 		}
 
 		std::string range = fix_pair(input);

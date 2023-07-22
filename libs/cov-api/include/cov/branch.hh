@@ -15,13 +15,13 @@ namespace cov {
 		bool is_branch() const noexcept final { return true; }
 		static bool is_valid_name(std::string_view);
 		static ref_ptr<branch> create(std::string_view name,
-		                              git_oid const& id,
+		                              git::oid_view id,
 		                              references&);
 		static ref_ptr<branch> lookup(std::string_view name, references&);
 		static ref_ptr<branch> from(ref_ptr<reference>&&);
 		static ref_ptr<branch_list> iterator(references&);
 		virtual std::string_view name() const noexcept = 0;
-		virtual git_oid const* id() const noexcept = 0;
+		virtual git::oid const* id() const noexcept = 0;
 	};
 
 	struct branch_list : object {

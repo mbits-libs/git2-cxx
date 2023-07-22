@@ -144,7 +144,7 @@ namespace cov::testing {
 			auto const oid = out.finish();
 			std::string actual =
 			    std::string(static_cast<size_t>(GIT_OID_HEXSZ), '\0');
-			git_oid_fmt(actual.data(), &oid);
+			git_oid_fmt(actual.data(), &oid.id);
 			ASSERT_EQ(readme_sha, actual);
 		}
 

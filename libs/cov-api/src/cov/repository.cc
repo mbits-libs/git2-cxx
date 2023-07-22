@@ -77,8 +77,8 @@ namespace cov {
 		return {};
 	}
 
-	bool repository::git_repo::write(git_oid& out, git::bytes const& bytes) {
-		return !odb_.write(&out, bytes, GIT_OBJECT_BLOB);
+	bool repository::git_repo::write(git::oid& out, git::bytes const& bytes) {
+		return !odb_.write(out, bytes, GIT_OBJECT_BLOB);
 	}
 
 	repository::repository() = default;
@@ -167,7 +167,7 @@ namespace cov {
 		return {};
 	}
 
-	bool repository::write(git_oid& out, ref_ptr<object> const& obj) {
+	bool repository::write(git::oid& out, ref_ptr<object> const& obj) {
 		if (is_a<blob>(obj)) return false;
 		return db_->write(out, obj);
 	}

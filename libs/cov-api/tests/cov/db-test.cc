@@ -15,7 +15,7 @@ namespace cov::testing {
 	using namespace std::literals;
 
 	TEST(db, full_report) {
-		git_oid report_id{};
+		git::oid report_id{};
 
 		{
 			std::error_code ec{};
@@ -105,7 +105,7 @@ namespace cov::testing {
 			ASSERT_TRUE(backend->write(report_id, cvg_report));
 		}
 		ASSERT_EQ("bd6a8c2bbd43d5f4aa26f20ae1964066015358bc"sv,
-		          setup::get_oid(report_id));
+		          report_id.str());
 
 		// read
 		{

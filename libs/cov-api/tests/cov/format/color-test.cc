@@ -75,8 +75,8 @@ namespace cov::testing {
 		    .decorate = true,
 		};
 
-		git_oid id{};
-		git_oid_fromstr(&id, "112233445566778899aabbccddeeff0012345678");
+		auto const id =
+		    git::oid::from("112233445566778899aabbccddeeff0012345678"sv);
 		auto report = make_report(id, tweaks.stats);
 		ASSERT_TRUE(report);
 
@@ -105,8 +105,8 @@ namespace cov::testing {
 		    .colorize = formatter::shell_colorize,
 		};
 
-		git_oid id{};
-		git_oid_fromstr(&id, "112233445566778899aabbccddeeff0012345678");
+		auto const id =
+		    git::oid::from("112233445566778899aabbccddeeff0012345678"sv);
 		auto report = make_report(id, tweaks.stats);
 		ASSERT_TRUE(report);
 

@@ -55,14 +55,12 @@ namespace cov {
 		namespace {
 			refs names_from(cov::repository const& repo) {
 				refs result{};
-				char buffer[GIT_OID_HEXSZ];
 
 				auto HEAD = repo.current_head();
 				result.HEAD = std::move(HEAD.branch);
 
 				if (HEAD.tip) {
-					git_oid_fmt(buffer, &*HEAD.tip);
-					result.HEAD_ref.assign(buffer, GIT_OID_HEXSZ);
+					result.HEAD_ref = HEAD.tip->str();
 				}
 
 				struct name {
@@ -88,8 +86,7 @@ namespace cov {
 						if (ref->reference_type() != reference_type::direct)
 							continue;
 
-						git_oid_fmt(buffer, ref->direct_target());
-						(*dst)[name].assign(buffer, GIT_OID_HEXSZ);
+						(*dst)[name] = ref->direct_target()->str();
 					}
 				}
 

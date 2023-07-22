@@ -43,9 +43,9 @@ namespace git {
 	};
 
 	struct oid : basic_oid<oid> {
-		git_oid id{};
-		oid() noexcept = default;
-		explicit oid(git_oid const& ref) noexcept : id{ref} {}
+		git_oid id;
+		constexpr oid() noexcept : id{} {}
+		explicit constexpr oid(git_oid const& ref) noexcept : id{ref} {}
 		void assign(git_oid const& ref) noexcept { id = ref; }
 
 		git_oid const* ptr() const noexcept { return &id; }
@@ -55,6 +55,18 @@ namespace git {
 		}
 
 		inline bool operator==(git_oid const& rhs) const noexcept;
+
+		static oid from(std::string_view view) noexcept { return oid{view}; }
+
+	private:
+		explicit oid(std::string_view view) noexcept {
+			auto const len =
+			    std::min(view.length(), static_cast<size_t>(GIT_OID_HEXSZ));
+			if (len < GIT_OID_HEXSZ) {
+				memset(id.id + len / 2, 0, GIT_OID_RAWSZ - len);
+			}
+			git_oid_fromstr(&id, view.data());
+		}
 	};
 
 	inline namespace literals {

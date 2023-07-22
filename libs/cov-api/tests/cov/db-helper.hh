@@ -31,7 +31,7 @@ namespace cov::testing {
 	};
 
 	struct git_commit {
-		git_oid commit{};
+		git::oid commit{};
 		std::string branch{};
 		std::string author_name{};
 		std::string author_email{};
@@ -42,7 +42,7 @@ namespace cov::testing {
 	};
 
 	struct report {
-		git_oid parent{};
+		git::oid parent{};
 		sys_seconds add_time_utc{};
 		git_commit head{};
 		std::vector<file> files{};

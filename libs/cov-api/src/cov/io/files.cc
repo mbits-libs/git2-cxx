@@ -128,7 +128,7 @@ namespace cov::io::handlers {
 		cov::files::builder builder{};
 		std::vector<std::byte> buffer{};
 
-		static const git_oid zero_id{};
+		static const git::oid zero_id{};
 
 		auto const entry_size = header.entries.size * sizeof(uint32_t);
 		for (uint32_t index = 0; index < header.entries.count; ++index) {

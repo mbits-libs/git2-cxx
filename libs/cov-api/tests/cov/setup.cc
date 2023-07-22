@@ -60,8 +60,6 @@ namespace cov::testing::setup {
 		return dirname;
 	}
 
-	std::string get_oid(git::oid_view id) { return id.str(); }
-
 	void test_globals::setup_test_env() {
 		printf("Setting up test environment\n");
 		unpack_files(test_dir(), setup::subdirs, setup::text, setup::binary);

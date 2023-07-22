@@ -31,7 +31,7 @@ namespace cov {
 		virtual std::string_view name() const noexcept = 0;
 		virtual std::string_view shorthand() const noexcept = 0;
 		virtual std::string_view symbolic_target() const noexcept = 0;
-		virtual git_oid const* direct_target() const noexcept = 0;
+		virtual git::oid const* direct_target() const noexcept = 0;
 		virtual ref_ptr<reference> peel_target() noexcept = 0;
 
 		static ref_ptr<reference> direct(reference_name&& name,
@@ -101,8 +101,8 @@ namespace cov {
 		virtual ref_ptr<reference> create(std::string_view name,
 		                                  std::string_view target) = 0;
 		virtual ref_ptr<reference> create_matching(std::string_view name,
-		                                           git_oid const& target,
-		                                           git_oid const& expected,
+		                                           git::oid_view target,
+		                                           git::oid_view expected,
 		                                           bool& modified) = 0;
 		virtual ref_ptr<reference> create_matching(std::string_view name,
 		                                           std::string_view target,

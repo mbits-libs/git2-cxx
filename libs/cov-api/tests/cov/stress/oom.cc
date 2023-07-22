@@ -26,13 +26,15 @@ namespace cov::testing {
 	using namespace ::std::literals;
 	namespace ph = placeholder;
 
-	ref_ptr<cov::report> make_report(git_oid const& id,
+	ref_ptr<cov::report> make_report(git::oid_view id,
 	                                 std::string const& message,
 	                                 sys_seconds commit,
 	                                 sys_seconds add) {
-		git_oid parent_id{}, commit_id{}, zero{};
-		git_oid_fromstr(&parent_id, "8765432100ffeeddccbbaa998877665544332211");
-		git_oid_fromstr(&commit_id, "36109a1c35e0d5cf3e5e68d896c8b1b4be565525");
+		git::oid zero{};
+		auto const parent_id =
+		    git::oid::from("8765432100ffeeddccbbaa998877665544332211"sv);
+		auto const commit_id =
+		    git::oid::from("36109a1c35e0d5cf3e5e68d896c8b1b4be565525"sv);
 
 		io::v1::coverage_stats const default_stats{
 		    1250, {300, 299}, {0, 0}, {0, 0}};
@@ -116,8 +118,8 @@ namespace cov::testing {
 		        },
 		};
 
-		git_oid id{};
-		git_oid_fromstr(&id, "112233445566778899aabbccddeeff0012345678");
+		auto const id =
+		    git::oid::from("112233445566778899aabbccddeeff0012345678"sv);
 		auto const report =
 		    make_report(id, {message.data(), message.size()}, env.now, env.now);
 

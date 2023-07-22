@@ -421,7 +421,7 @@ namespace cov::app::report {
 				return {.flags = result == matching::exactly
 				                     ? text::in_repo
 				                     : text::in_repo | text::different_newline,
-				        .existing = entry.oid(),
+				        .existing = entry.oid().oid(),
 				        .lines = lines_in(bytes)};
 			}
 			flags = text::in_repo;

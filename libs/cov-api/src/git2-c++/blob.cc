@@ -26,7 +26,7 @@ namespace git {
 	}
 
 	blob blob::lookup(repository_handle repo,
-	                  git_oid const& id,
+	                  git::oid_view id,
 	                  std::error_code& ec) noexcept {
 		return repo.lookup<blob>(id, ec);
 	}

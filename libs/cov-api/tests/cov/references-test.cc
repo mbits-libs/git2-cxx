@@ -76,10 +76,7 @@ namespace cov::testing {
 		if (primary->reference_type() == reference_type::direct) {
 			auto const id = primary->direct_target();
 			ASSERT_TRUE(id);
-			char buffer[GIT_OID_HEXSZ];
-			git_oid_fmt(buffer, id);
-			auto const actual = std::string_view{buffer, GIT_OID_HEXSZ};
-			ASSERT_EQ(expected.primary, actual);
+			ASSERT_EQ(expected.primary, id->str());
 			ASSERT_TRUE(primary->symbolic_target().empty());
 		} else {
 			ASSERT_EQ(expected.primary, primary->symbolic_target());
@@ -103,10 +100,7 @@ namespace cov::testing {
 		if (secondary->reference_type() == reference_type::direct) {
 			auto const id = secondary->direct_target();
 			ASSERT_TRUE(id);
-			char buffer[GIT_OID_HEXSZ];
-			git_oid_fmt(buffer, id);
-			auto const actual = std::string_view{buffer, GIT_OID_HEXSZ};
-			ASSERT_EQ(expected.secondary, actual);
+			ASSERT_EQ(expected.secondary, id->str());
 			ASSERT_TRUE(secondary->symbolic_target().empty());
 		} else {
 			ASSERT_EQ(expected.secondary, secondary->symbolic_target());

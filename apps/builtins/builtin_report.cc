@@ -36,7 +36,7 @@ namespace cov::app::builtin::report {
 			compiled.store(repo, file, p);
 		}
 
-		git_oid file_coverage{};
+		git::oid file_coverage{};
 		if (!stored_file::store_tree(file_coverage, repo, report.files,
 		                             files)) {
 			// GCOV_EXCL_START

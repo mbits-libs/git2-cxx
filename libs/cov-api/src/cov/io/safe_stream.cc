@@ -95,22 +95,18 @@ namespace cov::io {
 
 	bool safe_z_stream::opened() const noexcept { return out_.opened(); }
 
-	git_oid safe_z_stream::finish() {
+	git::oid safe_z_stream::finish() {
 		out_.close();
 
 		auto const sha_id = id_.finalize();
-		git_oid out;
+		git::oid out{};
 
-		static_assert(sizeof(sha_id.data) == sizeof(out.id),
-		              "git_oid and sha1 digest sizes are mismatched");
+		static_assert(sizeof(sha_id.data) == sizeof(out.id.id),
+		              "git::oid and sha1 digest sizes are mismatched");
 
-		memcpy(&out.id, sha_id.data, sizeof(sha_id.data));
+		memcpy(&out.id.id, sha_id.data, sizeof(sha_id.data));
 
-		auto const filename = [&] {  // GCOV_EXCL_LINE[GCC]
-			char buffer[2 * decltype(sha_id)::digest_length + 2];
-			git_oid_pathfmt(buffer, &out);
-			return path_ / std::string_view{buffer, std::size(buffer) - 1};
-		}();
+		auto const filename = path_ / out.path();
 
 		create_directories(filename.parent_path());
 		rename(tmp_filename_, filename);

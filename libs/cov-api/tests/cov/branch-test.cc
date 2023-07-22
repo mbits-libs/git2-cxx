@@ -51,7 +51,7 @@ namespace cov::testing {
 		ASSERT_TRUE(is_a<cov::branch>(static_cast<object*>(branch.get())));
 		ASSERT_TRUE(!is_a<cov::tag>(static_cast<object*>(branch.get())));
 		ASSERT_TRUE(branch->id());
-		ASSERT_EQ(0, git_oid_cmp(&id, branch->id()));
+		ASSERT_EQ(id, *branch->id());
 		ASSERT_EQ("feat/task-1"sv, branch->name());
 	}
 
@@ -116,7 +116,7 @@ namespace cov::testing {
 		auto branch = cov::branch::create("feat/task-1"sv, id, *refs);
 		ASSERT_TRUE(branch);
 		ASSERT_TRUE(branch->id());
-		ASSERT_EQ(0, git_oid_cmp(&id, branch->id()));
+		ASSERT_EQ(id, *branch->id());
 		ASSERT_EQ("feat/task-1"sv, branch->name());
 
 		auto in = io::fopen(setup::test_dir() /

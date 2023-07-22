@@ -106,13 +106,13 @@ namespace cov {
 
 	struct current_head_type {
 		std::string branch{};
-		std::optional<git_oid> tip{};
+		std::optional<git::oid> tip{};
 		ref_ptr<cov::reference> ref{};
 
 		bool operator==(current_head_type const& other) const noexcept {
 			return branch == other.branch &&
 			       tip.has_value() == other.tip.has_value() &&
-			       (!tip.has_value() || git_oid_cmp(&*tip, &*other.tip) == 0);
+			       (!tip.has_value() || *tip == *other.tip);
 		}
 	};
 
@@ -175,15 +175,9 @@ namespace cov {
 			auto object = lookup_object(id, ec);
 			return as_a<Object>(std::move(object), ec);
 		}
-		bool write(git_oid&, ref_ptr<object> const&);
-		bool write(git_oid& out, git::bytes const& bytes) {
-			return git_.write(out, bytes);
-		}
-		bool write(git::oid& out, ref_ptr<object> const& obj) {
-			return write(out.id, obj);
-		}
+		bool write(git::oid&, ref_ptr<object> const&);
 		bool write(git::oid& out, git::bytes const& bytes) {
-			return write(out.id, bytes);
+			return git_.write(out, bytes);
 		}
 
 		std::map<std::string, commit_file_diff> diff_betwen_commits(
@@ -219,7 +213,7 @@ namespace cov {
 			          git::config const& cfg,
 			          std::error_code&);
 			ref_ptr<blob> lookup(git::oid_view id, std::error_code&) const;
-			bool write(git_oid&, git::bytes const&);
+			bool write(git::oid&, git::bytes const&);
 
 			git::repository_handle repo() const noexcept { return git_; }
 

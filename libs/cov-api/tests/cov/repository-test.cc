@@ -16,7 +16,7 @@
 namespace cov::testing {
 	using namespace std::literals;
 
-	static constexpr git_oid zero_id{};
+	static constexpr git::oid zero_id{};
 
 	class repository : public ::testing::Test {
 	public:
@@ -222,7 +222,7 @@ namespace cov::testing {
 		auto const head = repo.current_head();
 		ASSERT_TRUE(head.branch.empty());
 		ASSERT_TRUE(head.tip);
-		ASSERT_EQ(0, git_oid_cmp(&f8e21b273, &*head.tip));
+		ASSERT_EQ(f8e21b273, head.tip);
 	}
 
 	TEST_F(repository, empty_HEAD) {
@@ -288,7 +288,7 @@ namespace cov::testing {
 		auto const head = repo.current_head();
 		ASSERT_TRUE(head.branch.empty());
 		ASSERT_TRUE(head.tip);
-		ASSERT_EQ(0, git_oid_cmp(&f8e21b273, &*head.tip));
+		ASSERT_EQ(f8e21b273, head.tip);
 	}
 
 	TEST_F(repository, detached_to_dangling_tag) {
@@ -350,7 +350,8 @@ namespace cov::testing {
 		ASSERT_TRUE(repo.update_current_head(f8e21b273, {{}, {}}));
 
 		repo.refs()->create("HEAD"sv, "refs/heads/main"sv);
-		ASSERT_FALSE(repo.update_current_head(f8e21b273, {{}, {f8e21b273}}));
+		ASSERT_FALSE(
+		    repo.update_current_head(f8e21b273, {{}, git::oid{f8e21b273}}));
 		ASSERT_TRUE(repo.update_current_head(f8e21b273, {"main"s, {}}));
 	}
 
@@ -400,12 +401,12 @@ namespace cov::testing {
 		auto const head = repo.current_head();
 		ASSERT_EQ("main"sv, head.branch);
 		ASSERT_TRUE(head.tip);
-		ASSERT_EQ(0, git_oid_cmp(&f8e21b273, &*head.tip));
+		ASSERT_EQ(f8e21b273, head.tip);
 	}
 
 	TEST_F(repository, lookup_report) {
 		git::init init{};
-		git_oid report_id{};
+		git::oid report_id{};
 
 		run_setup(make_setup(
 		    remove_all("repository"sv), init_git_workspace("repository"sv),
@@ -452,7 +453,7 @@ namespace cov::testing {
 			for (auto const& file : rprt.files) {
 				auto cvg_object = from_lines(file.lines, file.finish);
 				ASSERT_TRUE(cvg_object);
-				git_oid line_cvg_id{};
+				git::oid line_cvg_id{};
 				ASSERT_TRUE(backend->write(line_cvg_id, cvg_object));
 
 				auto file_stats = stats(cvg_object->coverage());
@@ -463,7 +464,7 @@ namespace cov::testing {
 
 			auto cvg_files = builder.extract(git::oid{});
 			ASSERT_TRUE(cvg_files);
-			git_oid files_id{};
+			git::oid files_id{};
 			ASSERT_TRUE(backend->write(files_id, cvg_files));
 
 			auto cvg_report = cov::report::create(
@@ -476,7 +477,7 @@ namespace cov::testing {
 			ASSERT_TRUE(backend->write(report_id, cvg_report));
 		}
 		ASSERT_EQ("eeba446d6981e087402dc05001186169c286e605"sv,
-		          setup::get_oid(report_id));
+		          report_id.str());
 
 		// read
 		std::error_code ec{};
@@ -522,7 +523,7 @@ namespace cov::testing {
 
 	TEST_F(repository, write_report) {
 		git::init init{};
-		git_oid report_id{};
+		git::oid report_id{};
 
 		run_setup(make_setup(
 		    remove_all("repository"sv), init_git_workspace("repository"sv),
@@ -571,7 +572,7 @@ namespace cov::testing {
 			for (auto const& file : rprt.files) {
 				auto cvg_object = from_lines(file.lines, file.finish);
 				ASSERT_TRUE(cvg_object);
-				git_oid line_cvg_id{};
+				git::oid line_cvg_id{};
 				ASSERT_TRUE(repo.write(line_cvg_id, cvg_object));
 
 				auto file_stats = stats(cvg_object->coverage());
@@ -582,7 +583,7 @@ namespace cov::testing {
 
 			auto cvg_files = builder.extract(git::oid{});
 			ASSERT_TRUE(cvg_files);
-			git_oid files_id{};
+			git::oid files_id{};
 			ASSERT_TRUE(repo.write(files_id, cvg_files));
 
 			auto cvg_report = cov::report::create(
@@ -595,7 +596,7 @@ namespace cov::testing {
 			ASSERT_TRUE(repo.write(report_id, cvg_report));
 		}
 		ASSERT_EQ("eeba446d6981e087402dc05001186169c286e605"sv,
-		          setup::get_oid(report_id));
+		          report_id.str());
 
 		// read
 		auto cvg_report = repo.lookup<cov::report>(report_id, ec);
@@ -635,7 +636,7 @@ namespace cov::testing {
 
 	TEST_F(repository, blob) {
 		git::init init{};
-		git_oid file_id{};
+		git::oid file_id{};
 
 		run_setup(make_setup(
 		    remove_all("repository"sv), init_git_workspace("repository"sv),
@@ -651,8 +652,7 @@ namespace cov::testing {
 It has two lines.
 )"sv;
 		ASSERT_TRUE(repo.write(file_id, {text.data(), text.size()}));
-		ASSERT_EQ("750229e9588ba0f8a2d4c15d64bb089fe135734d"sv,
-		          setup::get_oid(file_id));
+		ASSERT_EQ("750229e9588ba0f8a2d4c15d64bb089fe135734d"sv, file_id.str());
 
 		auto blob_obj = repo.lookup<cov::object>(file_id, ec);
 		ASSERT_FALSE(ec);
@@ -669,7 +669,7 @@ It has two lines.
 		                             data.size()};
 		ASSERT_EQ(text, view);
 
-		git_oid new_one{};
+		git::oid new_one{};
 		ASSERT_FALSE(repo.write(new_one, blob));
 
 		auto unlinked = blob->peel_and_unlink();
@@ -679,7 +679,7 @@ It has two lines.
 
 	TEST_F(repository, blob_in_git) {
 		git::init init{};
-		git_oid file_id{};
+		git::oid file_id{};
 
 		run_setup(make_setup(
 		    remove_all("repository"sv), init_git_workspace("repository"sv),
@@ -695,10 +695,10 @@ It has two lines.
 			    setup::test_dir() / "repository/.git/objects"sv, ec);
 			ASSERT_FALSE(ec);
 			ASSERT_TRUE(odb);
-			ec = odb.write(&file_id, {text.data(), text.size()},
-			               GIT_OBJECT_BLOB);
+			ec =
+			    odb.write(file_id, {text.data(), text.size()}, GIT_OBJECT_BLOB);
 			ASSERT_EQ("750229e9588ba0f8a2d4c15d64bb089fe135734d"sv,
-			          setup::get_oid(file_id));
+			          file_id.str());
 		}
 
 		auto repo = cov::repository::open(
@@ -720,8 +720,8 @@ It has two lines.
 
 	TEST_F(repository, nonexistent_blob) {
 		git::init init{};
-		git_oid file_id{};
-		git_oid_fromstr(&file_id, "750229e9588ba0f8a2d4c15d64bb089fe135734d");
+		auto const file_id =
+		    git::oid::from("750229e9588ba0f8a2d4c15d64bb089fe135734d"sv);
 
 		run_setup(make_setup(
 		    remove_all("repository"sv), init_git_workspace("repository"sv),
