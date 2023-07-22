@@ -50,12 +50,12 @@ namespace cov {
 	template <typename Object>
 	inline raw_pointer<Object, borrow_tag> borrow(Object* ptr) {
 		return {.ptr = ptr};
-	};
+	}
 
 	template <typename Object>
 	inline raw_pointer<Object, take_tag> take(Object* ptr) {
 		return {.ptr = ptr};
-	};
+	}
 
 	template <typename Object>
 	class ref_ptr {

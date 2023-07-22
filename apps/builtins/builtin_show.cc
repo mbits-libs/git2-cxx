@@ -60,6 +60,34 @@ namespace cov::app::builtin::show {
 
 	std::vector<file_stats> report_diff(app::show::parser::response const& info,
 	                                    std::error_code& ec) {
+		if (info.range.single) {
+			std::error_code ec1{}, ec2{};
+			auto const build = info.repo.lookup<cov::build>(info.range.to, ec1);
+			auto files = info.repo.lookup<cov::files>(info.range.to, ec2);
+			if (!ec1 && build) {
+				ec2.clear();
+				files =
+				    info.repo.lookup<cov::files>(build->file_list_id(), ec2);
+			}
+			if (!ec2 && files) {
+				std::vector<file_stats> result{};
+				result.reserve(files->entries().size());
+				for (auto const& entry : files->entries()) {
+					auto const path_view = entry->path();
+					auto path = std::string{path_view.data(), path_view.size()};
+					result.push_back({
+					    .filename = std::move(path),
+					    .current = entry->stats(),
+					    .previous = entry->stats(),
+					    .diff_kind = file_diff::normal,
+					    .current_functions = entry->function_coverage(),
+					    .previous_functions = entry->function_coverage(),
+					});
+				}
+				return result;
+			}
+		}
+
 		auto const newer = info.repo.lookup<cov::report>(info.range.to, ec);
 		if (ec) return {};
 
@@ -73,6 +101,32 @@ namespace cov::app::builtin::show {
 		return info.repo.diff_betwen_reports(newer, older, ec);
 	}
 
+	ref_ptr<cov::files> get_files(git::oid_view id,
+	                              cov::repository const& repo) {
+		git::oid ref{};
+		std::error_code ec{};
+		auto generic = repo.lookup<cov::object>(id, ec);
+		if (!generic || ec) return {};
+
+		if (auto report = as_a<cov::report>(generic); report) {
+			auto files = repo.lookup<cov::files>(report->file_list_id(), ec);
+			if (ec) files.reset();
+			return files;
+		}
+
+		if (auto build = as_a<cov::build>(generic); build) {
+			auto files = repo.lookup<cov::files>(build->file_list_id(), ec);
+			if (ec) files.reset();
+			return files;
+		}
+
+		if (auto files = as_a<cov::files>(generic); files) {
+			return files;
+		}
+
+		return {};
+	}
+
 	int handle(std::string_view tool, args::arglist args) {
 		using namespace str;
 		using placeholder::color;
@@ -84,10 +138,14 @@ namespace cov::app::builtin::show {
 
 		auto mods = cov::modules::from_report(info.range.to, info.repo, ec);
 		if (ec) {
-			if (ec == git::errc::notfound)
+			if (ec == git::errc::notfound) {
 				ec = {};
-			else                      // GCOV_EXCL_LINE
+			} else if (ec == cov::errc::wrong_object_type) {
+				ec.clear();
+				mods = cov::modules::make_modules("/"s, {});
+			} else {                  // GCOV_EXCL_LINE
 				p.error(ec, p.tr());  // GCOV_EXCL_LINE
+			}                         // GCOV_EXCL_LINE
 		}
 
 		auto view = projection::report_filter{
@@ -106,15 +164,19 @@ namespace cov::app::builtin::show {
 		auto const is_root = !is_standalone && view.module.filter.empty() &&
 		                     view.fname.prefix.empty();
 
-		auto const build_printer = [repo = &info.repo](
-		                               app::show::parser const& p,
-		                               cov::report const* report) {
+		auto const print_build_props = [&repo = info.repo, &range = info.range,
+		                                &ec = ec, &p = p]() {
 			using namespace std::chrono;
 			auto const now = floor<seconds>(system_clock::now());
-			auto const build_format =
-			    formatter::from("%{B[%{?[%C(yellow)build%Creset %mD%n%]}%]}");
-			auto facade =
-			    placeholder::object_facade::present_report(report, repo);
+
+			auto const facade =
+			    placeholder::object_facade::present_oid(range.to, repo);
+			if (!facade) return;
+#define BUILDS "%{?prop[%C(yellow)build%Creset %mZ%n%]}"
+			auto const format = facade->name() == "report"sv
+			                        ? ("%{B[" BUILDS "%]}"sv)
+			                        : BUILDS ""sv;
+			auto const build_format = formatter::from(format);
 			fmt::print("{}", build_format.format(facade.get(),
 			                                     {.now = now,
 			                                      .hash_length = 9,
@@ -136,9 +198,20 @@ namespace cov::app::builtin::show {
 			           entries.front().name.expanded,
 			           env.color_for(color::reset));
 
-			auto const report =
-			    info.repo.lookup<cov::report>(info.range.to, ec);
-			if (!ec && report) build_printer(p, report.get());
+			auto files = get_files(info.range.to, info.repo);
+			if (files) {
+				auto const entry =
+				    files->by_path(entries.front().name.expanded);
+				if (entry) {
+					auto const facade =
+					    placeholder::object_facade::present_file(entry,
+					                                             &info.repo);
+					p.show.selected_format = known_format::raw;
+					p.show.print(info.repo, *facade, true);
+				}
+			}
+
+			print_build_props();
 			fmt::print("\n");
 		} else {
 			if (!view.module.filter.empty()) {
@@ -150,9 +223,7 @@ namespace cov::app::builtin::show {
 				           view.fname.prefix, env.color_for(color::reset));
 			}
 
-			auto const report =
-			    info.repo.lookup<cov::report>(info.range.to, ec);
-			if (!ec && report) build_printer(p, report.get());
+			print_build_props();
 			fmt::print("\n");
 		}
 

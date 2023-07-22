@@ -8,6 +8,10 @@
 #include <cov/revparse.hh>
 #include <string>
 
+namespace cov::placeholder {
+	struct object_facade;
+}
+
 namespace cov::app {
 	enum class known_format : unsigned {
 		oneline,
@@ -49,6 +53,10 @@ namespace cov::app {
 
 		void print(cov::repository const& repo,
 		           cov::revs const& range,
-		           std::optional<unsigned> max_count) const;
+		           std::optional<unsigned> max_count,
+		           bool rstrip = false) const;
+		void print(cov::repository const& repo,
+		           cov::placeholder::object_facade& facade,
+		           bool rstrip = false) const;
 	};
 }  // namespace cov::app

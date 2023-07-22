@@ -60,6 +60,7 @@
   - [x] `cov show` _(0.17.0)_
     - [x] Report / component / directory view
     - [x] File view
+    - [ ] Show builds and files from hash, add file info to file view (mzdun/cov#51)
   - [x] `cov report` reprise
     - [x] `cov report --prop`
     - [x] show propset in `report`
