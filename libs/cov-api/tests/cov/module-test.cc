@@ -362,7 +362,7 @@ namespace cov::testing {
 				builder.add_nfo({.path = file});
 			}
 
-			file_list = builder.extract();
+			file_list = builder.extract(git::oid{});
 			ASSERT_TRUE(file_list);
 
 			auto const cfg = git::config::create();

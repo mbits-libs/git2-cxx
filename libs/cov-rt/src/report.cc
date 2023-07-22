@@ -348,24 +348,24 @@ namespace cov::app::report {
 			if (json_file_functions_coverage) {
 				auto& cvg = dst.function_coverage;
 				cvg.reserve(json_file_functions_coverage->size());
-				for (auto const& node : *json_file_functions_coverage) {
+				for (auto const& node_file : *json_file_functions_coverage) {
 					auto const name =
-					    cast_from_json<json::string>(node, u8"name"sv);
+					    cast_from_json<json::string>(node_file, u8"name"sv);
 					auto const count =
-					    cast_from_json<long long>(node, u8"count"sv);
+					    cast_from_json<long long>(node_file, u8"count"sv);
 					auto const start_line =
-					    cast_from_json<long long>(node, u8"start_line"sv);
+					    cast_from_json<long long>(node_file, u8"start_line"sv);
 
 					if (!name || !count || !start_line) continue;
 
-					auto const demangled =
-					    cast_from_json<json::string>(node, u8"demangled"sv);
-					auto const start_column =
-					    cast_from_json<long long>(node, u8"start_column"sv);
+					auto const demangled = cast_from_json<json::string>(
+					    node_file, u8"demangled"sv);
+					auto const start_column = cast_from_json<long long>(
+					    node_file, u8"start_column"sv);
 					auto const end_line =
-					    cast_from_json<long long>(node, u8"end_line"sv);
+					    cast_from_json<long long>(node_file, u8"end_line"sv);
 					auto const end_column =
-					    cast_from_json<long long>(node, u8"end_column"sv);
+					    cast_from_json<long long>(node_file, u8"end_column"sv);
 
 					cvg.push_back({});
 					auto& nfo = cvg.back();

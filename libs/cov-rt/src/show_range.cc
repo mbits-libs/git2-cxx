@@ -191,7 +191,7 @@ namespace cov::app {
 			auto format = formatter::from(RAW_PARENT);
 			bool with_parent = true;
 
-			while (!git_oid_is_zero(&id) && git_oid_cmp(&id, &range.from) &&
+			while (!id.is_zero() && id != range.from &&
 			       (!max_count || *max_count)) {
 				if (max_count) --*max_count;
 
@@ -208,7 +208,7 @@ namespace cov::app {
 				auto facade = placeholder::object_facade::present_report(
 				    report.get(), &repo);
 				std::puts(format.format(facade.get(), env).c_str());
-				id = report->parent_id().id;
+				id = report->parent_id();
 			}
 			return;
 #undef RAW_PARENT
@@ -217,7 +217,7 @@ namespace cov::app {
 
 		auto format = formatter::from(format_str());
 
-		while (!git_oid_is_zero(&id) && git_oid_cmp(&id, &range.from) &&
+		while (!id.is_zero() && id != range.from &&
 		       (!max_count || *max_count)) {
 			if (max_count) --*max_count;
 
@@ -227,7 +227,7 @@ namespace cov::app {
 			auto facade =
 			    placeholder::object_facade::present_report(report.get(), &repo);
 			std::puts(format.format(facade.get(), env).c_str());
-			id = report->parent_id().id;
+			id = report->parent_id();
 		}
 	}
 }  // namespace cov::app
