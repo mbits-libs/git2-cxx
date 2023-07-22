@@ -49,6 +49,11 @@ namespace cov {
 	inline bool object::is_a<object_with_id>() const noexcept {
 		return is_object_with_id();
 	}
+
+	template <>
+	inline bool object::is_a<object>() const noexcept {
+		return true;
+	}
 #define IS_A(NAME)                                    \
 	template <>                                       \
 	inline bool object::is_a<NAME>() const noexcept { \

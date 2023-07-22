@@ -52,8 +52,7 @@ namespace cov {
 		using reference = void;
 		using iterator_category = std::input_iterator_tag;
 
-		iterator_t(ListType* parent = nullptr) : parent_{parent} {
-			if (parent) parent->acquire();
+		iterator_t(ListType* parent = nullptr) : parent_{borrow(parent)} {
 			next();
 		}
 

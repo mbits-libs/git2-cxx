@@ -65,7 +65,7 @@ namespace cov {
 		auto result = io_.load(id, stream, ec);
 		if (!result || ec || !result->is_object()) return {};
 
-		return ref_ptr{static_cast<cov::object*>(result.unlink())};
+		return ref_ptr{take(static_cast<cov::object*>(result.unlink()))};
 	}
 
 	ref_ptr<object> loose_backend::lookup_object(git::oid_view id_,
@@ -104,7 +104,7 @@ namespace cov {
 		auto result = io_.load(id, stream, ec);
 		if (!result || ec || !result->is_object()) return {};
 
-		return ref_ptr{static_cast<cov::object*>(result.unlink())};
+		return ref_ptr{take(static_cast<cov::object*>(result.unlink()))};
 	}
 
 	bool loose_backend::write(git::oid& id, ref_ptr<object> const& obj) {

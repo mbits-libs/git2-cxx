@@ -39,6 +39,24 @@ namespace cov {
 		ref.release();
 	};  // NOLINT(readability/braces)
 
+	struct borrow_tag;
+	struct take_tag;
+
+	template <typename Object, typename Tag>
+	struct raw_pointer {
+		Object* ptr;
+	};
+
+	template <typename Object>
+	inline raw_pointer<Object, borrow_tag> borrow(Object* ptr) {
+		return {.ptr = ptr};
+	};
+
+	template <typename Object>
+	inline raw_pointer<Object, take_tag> take(Object* ptr) {
+		return {.ptr = ptr};
+	};
+
 	template <typename Object>
 	class ref_ptr {
 	public:
@@ -47,7 +65,12 @@ namespace cov {
 
 		constexpr ref_ptr() noexcept = default;
 		constexpr ref_ptr(std::nullptr_t) noexcept {}
-		explicit ref_ptr(pointer p) noexcept : ptr_{p} {}
+		explicit ref_ptr(raw_pointer<Object, take_tag> p) noexcept
+		    : ptr_{p.ptr} {}
+		explicit ref_ptr(raw_pointer<Object, borrow_tag> p) noexcept
+		    : ptr_{p.ptr} {
+			acquire();
+		}
 
 		ref_ptr(ref_ptr&& other) noexcept : ptr_{other.ptr_} {
 			other.ptr_ = nullptr;
@@ -87,8 +110,7 @@ namespace cov {
 		element_type& operator*() const noexcept { return *ptr_; }
 		pointer operator->() const noexcept { return ptr_; }
 		ref_ptr<Object> duplicate() const noexcept {
-			acquire();
-			return ref_ptr{ptr_};
+			return ref_ptr{borrow(ptr_)};
 		}
 		pointer unlink() noexcept {
 			auto tmp = ptr_;
@@ -136,36 +158,28 @@ namespace cov {
 	template <Counted derived, Counted base>
 	inline ref_ptr<derived> as_a(ref_ptr<base> const& var) {
 		auto ptr = as_a<derived>(var.get());
-		if (ptr) ptr->acquire();
-		return ref_ptr{ptr};
+		return ref_ptr{borrow(ptr)};
 	}
 
 	template <Counted derived, Counted base>
 	inline ref_ptr<derived> as_a(ref_ptr<base> const& var,
 	                             std::error_code& ec) {
 		auto ptr = as_a<derived>(var.get());
-		if (ptr)
-			ptr->acquire();
-		else if (!ec)
-			ec = make_error_code(errc::wrong_object_type);
-		return ref_ptr{ptr};
+		if (!ptr && !ec) ec = make_error_code(errc::wrong_object_type);
+		return ref_ptr{borrow(ptr)};
 	}
 
 	template <Counted derived, Counted base>
 	inline ref_ptr<derived> as_a(ref_ptr<base>& var) {
 		auto ptr = as_a<derived>(var.get());
-		if (ptr) ptr->acquire();
-		return ref_ptr{ptr};
+		return ref_ptr{borrow(ptr)};
 	}
 
 	template <Counted derived, Counted base>
 	inline ref_ptr<derived> as_a(ref_ptr<base>& var, std::error_code& ec) {
 		auto ptr = as_a<derived>(var.get());
-		if (ptr)
-			ptr->acquire();
-		else if (!ec)
-			ec = make_error_code(errc::wrong_object_type);
-		return ref_ptr{ptr};
+		if (!ptr && !ec) ec = make_error_code(errc::wrong_object_type);
+		return ref_ptr{borrow(ptr)};
 	}
 
 	template <Counted same>
@@ -180,15 +194,14 @@ namespace cov {
 
 	template <Counted Object, typename... Args>
 	inline ref_ptr<Object> make_ref(Args&&... args) {
-		return ref_ptr<Object>{new Object(std::forward<Args>(args)...)};
+		return ref_ptr<Object>{take(new Object(std::forward<Args>(args)...))};
 	}
 
 	template <class Counted, class Intermediate>
 	struct enable_ref_from_this {
 		ref_ptr<Counted> ref_from_this() {
 			auto self = static_cast<Counted*>(static_cast<Intermediate*>(this));
-			self->acquire();
-			return ref_ptr{self};
+			return ref_ptr{borrow(self)};
 		}
 	};
 }  // namespace cov
