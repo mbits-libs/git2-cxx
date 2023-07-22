@@ -55,7 +55,7 @@ namespace cov::app::builtin::show {
 			return w.ws_col;
 #endif
 		}
-		// GCOV_EXCL_END
+		// GCOV_EXCL_STOP
 	}  // namespace
 
 	std::vector<file_stats> report_diff(app::show::parser::response const& info,

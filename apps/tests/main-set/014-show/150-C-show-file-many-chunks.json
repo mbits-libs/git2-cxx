@@ -4,6 +4,10 @@
         0,
         [
             "\u001b[33mfile src/main.cc\u001b[m",
+            "\u001b[33mblob d07753a5e8b4288620503b87170e8245281b2342\u001b[m",
+            "functions 649634a28b7bab7dc0f28c1f8c27a02515a75fc7",
+            "lines d3b9fe2ed816f528c23b083dd4aee6d74e8beb62",
+            "stats 17 9 6, 0 0, 0 0",
             "",
             "+-----------+---------+---------+----------+---------+------------+",
             "| Name      | % Lines | Visited | Relevant | Missing | Line count |",
