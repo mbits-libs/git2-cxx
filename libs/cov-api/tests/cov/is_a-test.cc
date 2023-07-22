@@ -110,7 +110,7 @@ namespace cov::testing {
 
 		template <typename Orig, typename Casted>
 		void smart() {
-			ref_ptr<Orig> orig{new Orig};
+			ref_ptr<Orig> orig{take(new Orig)};
 			ref_ptr<classes::base> b{orig};
 
 			std::error_code ec{};
@@ -128,7 +128,7 @@ namespace cov::testing {
 
 		template <typename Orig, typename Casted>
 		void csmart() {
-			ref_ptr<Orig> orig{new Orig};
+			ref_ptr<Orig> orig{take(new Orig)};
 			ref_ptr<classes::base> const b{orig};
 
 			std::error_code ec{};
