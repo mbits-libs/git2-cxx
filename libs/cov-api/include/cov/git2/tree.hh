@@ -42,7 +42,7 @@ namespace git {
 	struct basic_tree_entry : Holder {
 		using Holder::Holder;  // GCOV_EXCL_LINE - ctor seems to be inlined away
 
-		git_oid const& oid() const noexcept {
+		git::oid_view oid() const noexcept {
 			return *git_tree_entry_id(this->get());
 		}
 
@@ -115,14 +115,14 @@ namespace git {
 		}
 
 		std::error_code insert(char const* filename,
-		                       git_oid const& id,
+		                       git::oid_view id,
 		                       git_filemode_t filemode) {
 			return as_error(git_treebuilder_insert(nullptr, get(), filename,
-			                                       &id, filemode));
+			                                       id.ref, filemode));
 		}
 
-		std::error_code write(git_oid& id) {
-			return as_error(git_treebuilder_write(&id, get()));
+		std::error_code write(git::oid& id) {
+			return as_error(git_treebuilder_write(&id.id, get()));
 		}
 	};
 }  // namespace git
