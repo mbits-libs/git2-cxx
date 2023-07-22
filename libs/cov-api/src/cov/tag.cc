@@ -35,7 +35,7 @@ namespace cov {
 	}
 
 	ref_ptr<tag> tag::create(std::string_view name,
-	                         git_oid const& id,
+	                         git::oid_view id,
 	                         references& refs) {
 		return tag_impl::create(name, id, refs);
 	}

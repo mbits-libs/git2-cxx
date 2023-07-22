@@ -75,7 +75,7 @@ namespace git {
 		                   std::string_view id,
 		                   std::error_code& ec) noexcept;
 		static tree lookup(repository_handle repo,
-		                   git_oid const& id,
+		                   git::oid_view id,
 		                   std::error_code& ec) noexcept;
 
 		size_t count() const noexcept;

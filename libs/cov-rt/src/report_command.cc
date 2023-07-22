@@ -155,7 +155,7 @@ namespace cov::app::builtin::report {
 		while (true) {
 			std::error_code ec{};
 			auto const HEAD = repo.current_head();
-			git_oid parent_id{};
+			git::oid parent_id{};
 			if (HEAD.tip) parent_id = *HEAD.tip;
 			if (amend_) {
 				auto current = HEAD.tip
@@ -165,7 +165,7 @@ namespace cov::app::builtin::report {
 					auto const msg = tr_(replng::ERROR_AMEND_IN_FRESH_REPO);
 					error({msg.data(), msg.size()});
 				}
-				parent_id = current->parent_id().id;
+				parent_id = current->parent_id();
 			}
 
 			auto parent = repo.lookup<cov::report>(parent_id, ec);
@@ -178,7 +178,7 @@ namespace cov::app::builtin::report {
 				if (hard_equiv && loose_equiv) {
 					auto HEAD_2 = repo.current_head();
 					result.branch = std::move(HEAD_2.branch);
-					if (HEAD_2.tip) result.tip.assign(*HEAD_2.tip);
+					if (HEAD_2.tip) result.tip = *HEAD_2.tip;
 					result.same_report = true;
 					break;
 				}  // GCOV_EXCL_LINE[WIN32]
@@ -392,7 +392,7 @@ namespace cov::app::builtin::report {
 		return repo.write(stg.existing, contents);
 	}
 
-	bool stored_file::store_tree(git_oid& id,
+	bool stored_file::store_tree(git::oid& id,
 	                             cov::repository& repo,
 	                             std::vector<file_info> const& file_infos,
 	                             std::vector<stored_file> const& files) {

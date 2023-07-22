@@ -20,5 +20,4 @@ namespace cov::testing::setup {
 	static test_initializer initializer{};
 
 	std::filesystem::path test_dir();
-	std::string get_oid(git::oid_view id);
 }  // namespace cov::testing::setup

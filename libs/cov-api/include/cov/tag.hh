@@ -14,13 +14,13 @@ namespace cov {
 		bool is_tag() const noexcept final { return true; }
 		static bool is_valid_name(std::string_view);
 		static ref_ptr<tag> create(std::string_view name,
-		                           git_oid const& id,
+		                           git::oid_view id,
 		                           references&);
 		static ref_ptr<tag> lookup(std::string_view name, references&);
 		static ref_ptr<tag> from(ref_ptr<reference>&&);
 		static ref_ptr<tag_list> iterator(references&);
 		virtual std::string_view name() const noexcept = 0;
-		virtual git_oid const* id() const noexcept = 0;
+		virtual git::oid const* id() const noexcept = 0;
 	};
 
 	struct tag_list : object {

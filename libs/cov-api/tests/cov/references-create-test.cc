@@ -7,6 +7,8 @@
 #include "path-utils.hh"
 #include "setup.hh"
 
+using namespace git::literals;
+
 namespace cov::testing {
 	using namespace std::literals;
 	using ::testing::TestWithParam;
@@ -18,8 +20,8 @@ namespace cov::testing {
 		std::string_view name;
 		std::string_view ref_name;
 		std::string_view prev_content;
-		std::variant<git_oid, std::string_view> target;
-		std::variant<git_oid, std::string_view> expectation;
+		std::variant<git::oid, std::string_view> target;
+		std::variant<git::oid, std::string_view> expectation;
 		std::string_view expected{};
 		std::string_view expected_matching{};
 
@@ -116,12 +118,13 @@ namespace cov::testing {
 		ASSERT_EQ(expected, actual);
 	}
 
-	static constexpr auto ID_1 = git_oid{
+	static constexpr auto ID_1 = git::oid{git_oid{
 	    "\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff\x12\x34"
-	    "\x56\x78"};
-	static constexpr auto ID_2 = git_oid{
-	    "\x22\x11\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff\x12\x34"
-	    "\x56\x78"};
+	    "\x56\x78"}};
+	static constexpr auto ID_2 = git::oid{git_oid{
+	    "\x22\x11\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff\x12"
+	    "\x34"
+	    "\x56\x78"}};
 	static constexpr auto ID_text =
 	    "112233445566778899aabbccddeeff1234567800\n"sv;
 	static constexpr auto ID_exp = "112233445566778899aabbccddeeff1234567800"sv;

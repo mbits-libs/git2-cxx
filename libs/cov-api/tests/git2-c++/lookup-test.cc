@@ -13,8 +13,7 @@ namespace git::testing {
 
 	template <typename ObjectType>
 	void do_lookup(std::string_view hash) {
-		git_oid oid;
-		git_oid_fromstrn(&oid, hash.data(), hash.length());
+		auto id = oid::from(hash);
 
 		std::error_code ec{};
 		auto const repo = setup::open_repo(ec);
@@ -22,7 +21,7 @@ namespace git::testing {
 		ASSERT_TRUE(repo);
 
 		{
-			auto const raw = ObjectType::lookup(repo, oid, ec);
+			auto const raw = ObjectType::lookup(repo, id, ec);
 			ASSERT_FALSE(ec);
 			ASSERT_TRUE(raw);
 			ASSERT_EQ(hash, raw.strid());
@@ -33,7 +32,7 @@ namespace git::testing {
 		ASSERT_TRUE(obj);
 		ASSERT_EQ(hash, obj.strid());
 
-		{ ASSERT_EQ(0, git_oid_cmp(&oid, &obj.oid())); }
+		ASSERT_EQ(id, obj.oid());
 	}
 
 	TEST(lookup, HEAD_by_string) {

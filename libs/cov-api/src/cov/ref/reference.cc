@@ -85,7 +85,7 @@ namespace cov {
 		std::string_view symbolic_target() const noexcept override {
 			return {};
 		}
-		git_oid const* direct_target() const noexcept override {
+		git::oid const* direct_target() const noexcept override {
 			return nullptr;
 		}
 
@@ -102,8 +102,8 @@ namespace cov {
 		cov::reference_type reference_type() const noexcept override {
 			return cov::reference_type::direct;
 		}
-		git_oid const* direct_target() const noexcept override {
-			return &target_.id;
+		git::oid const* direct_target() const noexcept override {
+			return &target_;
 		}
 		ref_ptr<reference> peel_target() noexcept override {
 			return ref_from_this();

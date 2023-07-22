@@ -22,11 +22,11 @@ namespace cov {
 		template <typename Policy>
 		struct link : counted_impl<typename Policy::type> {
 			using type = typename Policy::type;
-			link(std::string const& name, git_oid const& id)
-			    : name_{name}, id_{id}, null_{!!git_oid_is_zero(&id)} {}
+			link(std::string const& name, git::oid_view id)
+			    : name_{name}, id_{id.oid()}, null_{!!id.is_zero()} {}
 			link(std::string const& name) : name_{name}, id_{}, null_{true} {}
 			std::string_view name() const noexcept override { return name_; }
-			git_oid const* id() const noexcept override {
+			git::oid const* id() const noexcept override {
 				return null_ ? nullptr : &id_;
 			}
 
@@ -39,7 +39,7 @@ namespace cov {
 			}
 
 			static ref_ptr<type> create(std::string_view name,
-			                            git_oid const& id,
+			                            git::oid_view id,
 			                            references& refs) {
 				return from(refs.create(full_name(name), id));
 			}
@@ -69,7 +69,7 @@ namespace cov {
 
 		private:
 			std::string name_;
-			git_oid id_;
+			git::oid id_;
 			bool null_;
 		};
 

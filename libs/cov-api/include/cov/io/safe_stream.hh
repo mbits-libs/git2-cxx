@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <cov/git2/oid.hh>
 #include <cov/hash/sha1.hh>
 #include <cov/io/file.hh>
 #include <cov/streams.hh>
@@ -51,7 +52,7 @@ namespace cov::io {
 
 		size_t write(git::bytes data) override;
 		bool opened() const noexcept override;
-		git_oid finish() override;
+		git::oid finish() override;
 		void rollback() override;
 
 	private:

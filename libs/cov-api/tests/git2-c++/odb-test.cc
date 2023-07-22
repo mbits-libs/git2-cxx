@@ -57,8 +57,6 @@ namespace git::testing {
 			return result;
 		}
 		git::odb const odb = create();
-		std::string actual =
-		    std::string(static_cast<size_t>(GIT_OID_HEXSZ), '\0');
 	};
 
 	TEST_P(hasher, write) {
@@ -69,20 +67,18 @@ namespace git::testing {
 		std::error_code ec{};
 		auto local_odb = git::odb::open(path, ec);
 		ASSERT_FALSE(ec);
-		git_oid oid;
+		git::oid oid;
 		auto const result = local_odb.write(
-		    &oid, git::bytes{bytes.data(), bytes.size()}, GIT_OBJECT_BLOB);
-		git_oid_fmt(actual.data(), &oid);
-		ASSERT_EQ(expected, actual);
+		    oid, git::bytes{bytes.data(), bytes.size()}, GIT_OBJECT_BLOB);
+		ASSERT_EQ(expected, oid.str());
 		ASSERT_FALSE(result);
 	}
 
 	TEST_P(hasher, hash) {
 		auto [expected, bytes] = GetParam();
-		git_oid oid;
-		odb.hash(&oid, git::bytes{bytes.data(), bytes.size()}, GIT_OBJECT_BLOB);
-		git_oid_fmt(actual.data(), &oid);
-		ASSERT_EQ(expected, actual);
+		git::oid oid;
+		odb.hash(oid, git::bytes{bytes.data(), bytes.size()}, GIT_OBJECT_BLOB);
+		ASSERT_EQ(expected, oid.str());
 	}
 
 	constexpr hasher_param hashes[] = {

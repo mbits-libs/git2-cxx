@@ -48,7 +48,7 @@ namespace cov {
 
 namespace cov::testing {
 
-#if 0
+#if 1
 	struct quick_stat {
 		std::string_view path;
 		io::v1::coverage_stats stats{};
@@ -94,12 +94,12 @@ namespace cov::testing {
 			entries.emplace_back(file.with(tree));
 		}
 
-		git_oid peeled_id{};
-		auto peeled = files::create(std::move(entries));
+		git::oid peeled_id{};
+		auto peeled = files::create(git::oid{}, std::move(entries));
 		if (!repo.write(peeled_id, peeled)) {
 			return git::make_error_code(git::errc::error);
 		}
-		std::cout << "files " << setup::get_oid(peeled_id) << '\n';
+		std::cout << "files " << peeled_id.str() << '\n';
 
 		cov::report::builder builds{};
 		{

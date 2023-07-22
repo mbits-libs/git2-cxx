@@ -240,7 +240,7 @@ namespace cov {
 				return git::make_error_code(git::errc::notfound);
 			}
 
-			out.assign(*ref->direct_target());
+			out= *ref->direct_target();
 		} else {
 			auto obj = as_a<cov::object_with_id>(repo.find_partial(base_rev));
 			if (!obj) {

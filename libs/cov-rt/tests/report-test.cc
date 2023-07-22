@@ -284,11 +284,9 @@ namespace cov::app::testing {
 			ASSERT_EQ(expected.result, blob.flags)
 			    << "Message: "sv << commit.message;
 			if ((expected.result & text::in_repo) == text::in_repo) {
-				git_oid id{};
-				git_oid_fromstrn(&id, expected.oid.data(), expected.oid.size());
-				ASSERT_EQ(0, git_oid_cmp(&id, &blob.existing));
+				ASSERT_EQ(git::oid::from(expected.oid), blob.existing);
 			} else {
-				ASSERT_TRUE(git_oid_is_zero(&blob.existing));
+				ASSERT_TRUE(blob.existing.is_zero());
 			}
 			ASSERT_EQ(expected.lines, blob.lines);
 		}

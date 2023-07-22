@@ -51,7 +51,7 @@ namespace cov::testing {
 		ASSERT_TRUE(is_a<cov::tag>(static_cast<object*>(tag.get())));
 		ASSERT_TRUE(!is_a<cov::branch>(static_cast<object*>(tag.get())));
 		ASSERT_TRUE(tag->id());
-		ASSERT_EQ(0, git_oid_cmp(&id, tag->id()));
+		ASSERT_EQ(id, *tag->id());
 		ASSERT_EQ("moving"sv, tag->name());
 	}
 
@@ -71,7 +71,7 @@ namespace cov::testing {
 
 		auto tag = cov::tag::create("release/v1.2.3"sv, id, *refs);
 		ASSERT_TRUE(tag);
-		ASSERT_EQ(0, git_oid_cmp(&id, tag->id()));
+		ASSERT_EQ(id, *tag->id());
 		ASSERT_EQ("release/v1.2.3"sv, tag->name());
 
 		auto in = io::fopen(setup::test_dir() /

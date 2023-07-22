@@ -19,7 +19,7 @@ namespace git {
 		                   std::string_view id,
 		                   std::error_code& ec) noexcept;
 		static blob lookup(repository_handle repo,
-		                   git_oid const& id,
+		                   git::oid_view id,
 		                   std::error_code& ec) noexcept;
 		bytes raw() const noexcept;
 		git_buf filtered(char const* as_path,

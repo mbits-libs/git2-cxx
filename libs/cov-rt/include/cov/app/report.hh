@@ -98,7 +98,7 @@ namespace cov::app::report {
 
 	struct blob_info {
 		text flags{text::missing};
-		git_oid existing{};
+		git::oid existing{};
 		size_t lines{};
 	};
 

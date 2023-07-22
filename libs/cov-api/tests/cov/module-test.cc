@@ -217,8 +217,8 @@ namespace cov::testing {
 	    "libs/hilite/lighter/src/lighter.cc"sv,
 	    "libs/hilite/lighter/src/hilite/lighter.hh"sv};
 
-	std::error_code commit_dot_modules(git_oid& commit_id,
-	                                   git_oid const* parent_id,
+	std::error_code commit_dot_modules(git::oid& commit_id,
+	                                   git::oid const* parent_id,
 	                                   git::repository_handle const& repo,
 	                                   std::string_view file_text,
 	                                   const char* message) {
@@ -253,7 +253,7 @@ namespace cov::testing {
 		git_commit const* parents[] = {prev_commit.raw()};
 
 		return git::as_error(git_commit_create(
-		    &commit_id, repo.get(), "HEAD", johny_appleseed.raw(),
+		    &commit_id.id, repo.get(), "HEAD", johny_appleseed.raw(),
 		    johny_appleseed.raw(), "UTF-8", message, tree.raw(),
 		    prev_commit ? 1 : 0, parents));
 	}
@@ -475,7 +475,7 @@ namespace cov::testing {
 		                                  true, ec);
 		ASSERT_FALSE(ec) << message{ec};
 
-		git_oid commit_id{};
+		git::oid commit_id{};
 		ec = commit_dot_modules(commit_id, nullptr, repo, this_project,
 		                        "Add the cov modules");
 
@@ -502,12 +502,12 @@ namespace cov::testing {
 		    setup::test_dir() / "modules-at-HEAD/.git"sv, ec);
 		ASSERT_FALSE(ec) << message{ec};
 
-		git_oid commit_id{};
+		git::oid commit_id{};
 		ec = commit_dot_modules(commit_id, nullptr, repo, this_project,
 		                        "Add the cov modules");
 		ASSERT_FALSE(ec) << message{ec};
 
-		git_oid report_id{};
+		git::oid report_id{};
 		{
 			auto report = cov::report::create(git::oid{}, git::oid{}, commit_id,
 			                                  {}, {}, {}, {}, {}, {}, {}, {});
@@ -540,12 +540,12 @@ namespace cov::testing {
 		    setup::test_dir() / "modules-at-HEAD/.git"sv, ec);
 		ASSERT_FALSE(ec) << message{ec};
 
-		git_oid commit_id{};
+		git::oid commit_id{};
 		ec = commit_dot_modules(commit_id, nullptr, repo, this_project,
 		                        "Add the cov modules");
 		ASSERT_FALSE(ec) << message{ec};
 
-		git_oid report_id{};
+		git::oid report_id{};
 		{
 			auto report = cov::report::create(git::oid{}, git::oid{}, commit_id,
 			                                  {}, {}, {}, {}, {}, {}, {}, {});
@@ -574,12 +574,12 @@ namespace cov::testing {
 		    setup::test_dir() / "modules-in-commit/.git"sv, ec);
 		ASSERT_FALSE(ec) << message{ec};
 
-		git_oid commit_id{};
+		git::oid commit_id{};
 		ec = commit_dot_modules(commit_id, nullptr, repo, this_project,
 		                        "Add the cov modules");
 		ASSERT_FALSE(ec) << message{ec};
 
-		git_oid report_id{};
+		git::oid report_id{};
 		{
 			auto report = cov::report::create(git::oid{}, git::oid{}, commit_id,
 			                                  {}, {}, {}, {}, {}, {}, {}, {});
@@ -588,7 +588,7 @@ namespace cov::testing {
 
 		std::ofstream{setup::test_dir() / "modules-in-commit/.covmodule"sv}
 		    << modified_project;
-		git_oid current;
+		git::oid current;
 		ec = commit_dot_modules(current, &commit_id, repo, modified_project,
 		                        "Update .covmodule filters");
 		ASSERT_FALSE(ec) << message{ec};

@@ -24,20 +24,20 @@ namespace git {
 		return create_handle<odb>(ec, git_odb_open, get_path(path).c_str());
 	}
 
-	void odb::hash(git_oid* out,
+	void odb::hash(git::oid& out,
 	               bytes const& data,
 	               git_object_t type) noexcept {
-		git_odb_hash(out, data.data(), data.size(), type);
+		git_odb_hash(&out.id, data.data(), data.size(), type);
 	}
 
-	bool odb::exists(git_oid const& id) const noexcept {
-		return !!git_odb_exists(get(), &id);
+	bool odb::exists(git::oid_view id) const noexcept {
+		return !!git_odb_exists(get(), id.ref);
 	}
 
-	std::error_code odb::write(git_oid* out,
+	std::error_code odb::write(git::oid& out,
 	                           bytes const& data,
 	                           git_object_t type) const noexcept {
 		return as_error(
-		    git_odb_write(out, get(), data.data(), data.size(), type));
+		    git_odb_write(&out.id, get(), data.data(), data.size(), type));
 	}
 }  // namespace git

@@ -59,12 +59,6 @@ namespace cov::app::testing::setup {
 		return dirname;
 	}
 
-	std::string get_oid(git_oid const& id) {
-		char buffer[42] = "";
-		git_oid_fmt(buffer, &id);
-		return buffer;
-	}
-
 	git::repository open_verify_repo() {
 		std::error_code ec{};
 		return git::repository::open(test_dir() / "verify"sv, ec);

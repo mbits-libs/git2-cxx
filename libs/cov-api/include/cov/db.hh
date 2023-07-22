@@ -17,10 +17,7 @@ namespace cov {
 		ref_ptr<Object> lookup(git::oid_view id, size_t character_count) {
 			return as_a<Object>(lookup_object(id, character_count));
 		}
-		virtual bool write(git_oid&, ref_ptr<object> const&) = 0;
-		bool write(git::oid& id, ref_ptr<object> const& obj) {
-			return write(id.id, obj);
-		}
+		virtual bool write(git::oid&, ref_ptr<object> const&) = 0;
 
 		static ref_ptr<backend> loose_backend(std::filesystem::path const&);
 

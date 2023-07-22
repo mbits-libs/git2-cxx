@@ -3,9 +3,9 @@
 
 #pragma once
 
-#include <git2/oid.h>
 #include <concepts>
 #include <cov/git2/bytes.hh>
+#include <cov/git2/oid.hh>
 #include <filesystem>
 #include <span>
 #include <system_error>
@@ -53,7 +53,7 @@ namespace cov {
 
 	struct z_write_stream : write_stream {
 		virtual void rollback() = 0;
-		virtual git_oid finish() = 0;
+		virtual git::oid finish() = 0;
 	};
 
 	struct tmp_write_stream : write_stream {

@@ -21,6 +21,5 @@ namespace cov::app::testing::setup {
 	static test_initializer initializer{};
 
 	std::filesystem::path test_dir();
-	std::string get_oid(git_oid const& id);
 	git::repository open_verify_repo();
 }  // namespace cov::app::testing::setup

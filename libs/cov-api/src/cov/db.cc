@@ -39,7 +39,7 @@ namespace cov {
 		ref_ptr<object> lookup_object(git::oid_view id) const override;
 		ref_ptr<object> lookup_object(git::oid_view id,
 		                              size_t character_count) const override;
-		bool write(git_oid& id, ref_ptr<object> const& obj) override;
+		bool write(git::oid& id, ref_ptr<object> const& obj) override;
 
 	private:
 		std::filesystem::path root_{};
@@ -86,14 +86,14 @@ namespace cov {
 		if (ec) return {};
 
 		std::vector<std::filesystem::path> paths{};
-		git_oid id{*id_.ref};
+		git::oid id{*id_.ref};
 		for (auto const& entry : it) {
 			auto filename = get_path(entry.path().filename());
 			if (!filename.starts_with(match)) continue;
 			if (!paths.empty()) return {};
 			paths.push_back(entry.path());
 			auto const str = fmt::format("{}{}", dir, filename);
-			git_oid_fromstr(&id, str.c_str());
+			id = git::oid::from(str);
 		}
 		if (paths.empty()) return {};
 
@@ -107,7 +107,7 @@ namespace cov {
 		return ref_ptr{static_cast<cov::object*>(result.unlink())};
 	}
 
-	bool loose_backend::write(git_oid& id, ref_ptr<object> const& obj) {
+	bool loose_backend::write(git::oid& id, ref_ptr<object> const& obj) {
 		io::safe_z_stream output{root_, "object"sv};
 		if (!output.opened()) return false;
 

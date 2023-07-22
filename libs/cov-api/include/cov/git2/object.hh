@@ -2,6 +2,7 @@
 // This code is licensed under MIT license (see LICENSE for details)
 
 #pragma once
+#include <cov/git2/oid.hh>
 #include <cov/git2/repository.hh>
 
 #include <string>
@@ -30,9 +31,7 @@ namespace git {
 			                                  Peeled::OBJECT_TYPE);
 		}
 
-		git_oid const& oid() const noexcept {
-			return *git_object_id(get_object());
-		}
+		oid_view oid() const noexcept { return *git_object_id(get_object()); }
 
 		std::string strid() const noexcept {
 			try {

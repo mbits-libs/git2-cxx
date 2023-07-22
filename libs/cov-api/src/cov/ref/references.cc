@@ -48,14 +48,14 @@ namespace cov {
 		}
 
 		ref_ptr<reference> create_matching(std::string_view name,
-		                                   git_oid const& target,
-		                                   git_oid const& expected,
+		                                   git::oid_view target,
+		                                   git::oid_view expected,
 		                                   bool& modified) override {
 			modified = false;
 			auto prev = lookup(name);
 			if (prev) {
 				if (prev->reference_type() != cov::reference_type::direct ||
-				    git_oid_cmp(prev->direct_target(), &expected) != 0) {
+				    *prev->direct_target() != expected) {
 					modified = true;
 					return {};
 				}
@@ -129,12 +129,10 @@ namespace cov {
 
 			view = strip(view);
 			if (view.length() == GIT_OID_HEXSZ && onlyhex(view)) {
-				auto self = ref_from_this();
+				auto self = ref_from_this();  // TODO: ?
 
-				git_oid target{};
-				if (git_oid_fromstr(&target, view.data())) return {};
-
-				return reference::direct(prefix_info(name), target);
+				return reference::direct(prefix_info(name),
+				                         git::oid::from(view));
 			}
 
 			return {};
@@ -176,7 +174,7 @@ namespace cov {
 			}
 
 			if (type == reference_type::direct &&
-			    git_oid_cmp(curr->direct_target(), ref->direct_target())) {
+			    *curr->direct_target() != *ref->direct_target()) {
 				return git::make_error_code(git::errc::modified);
 			}
 
