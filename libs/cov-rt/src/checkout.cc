@@ -124,7 +124,7 @@ namespace cov::app::checkout {
 		std::error_code detach_ref(parser const& p,
 		                           repository const& repo,
 		                           std::string_view name) {
-			git_oid oid{};
+			git::oid oid{};
 			auto const ec = revs::parse_single(repo, name, oid);
 			if (ec) return ec;
 
@@ -146,7 +146,7 @@ namespace cov::app::checkout {
 		                                    repository const& repo,
 		                                    std::string_view name,
 		                                    std::string_view start_point) {
-			git_oid oid{};
+			git::oid oid{};
 			auto ec = revs::parse_single(repo, start_point, oid);
 			if (ec) return ec;
 			auto ref = reference::direct(references::prefix_info(""), oid);

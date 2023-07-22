@@ -2,7 +2,7 @@
 // This code is licensed under MIT license (see LICENSE for details)
 
 #pragma once
-#include <git2/oid.h>
+#include <cov/git2/oid.hh>
 #include <cov/object.hh>
 #include <filesystem>
 #include <string>
@@ -35,7 +35,7 @@ namespace cov {
 		virtual ref_ptr<reference> peel_target() noexcept = 0;
 
 		static ref_ptr<reference> direct(reference_name&& name,
-		                                 git_oid const& target);
+		                                 git::oid_view target);
 		static ref_ptr<reference> symbolic(
 		    reference_name&& name,
 		    std::string const& target,
@@ -97,7 +97,7 @@ namespace cov {
 		obj_type type() const noexcept override { return obj_references; };
 		bool is_references() const noexcept final { return true; }
 		virtual ref_ptr<reference> create(std::string_view name,
-		                                  git_oid const& target) = 0;
+		                                  git::oid_view target) = 0;
 		virtual ref_ptr<reference> create(std::string_view name,
 		                                  std::string_view target) = 0;
 		virtual ref_ptr<reference> create_matching(std::string_view name,

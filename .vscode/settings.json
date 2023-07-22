@@ -124,6 +124,7 @@
         "hash_map": "cpp",
         "hash_set": "cpp",
         "cfloat": "cpp",
-        "climits": "cpp"
+        "climits": "cpp",
+        "queue": "cpp"
     }
 }

@@ -125,8 +125,7 @@ namespace cov::app::builtin::show {
 		};
 
 		if (is_root) {
-			if (!info.range.single &&
-			    git_oid_equal(&info.range.from, &info.range.to)) {
+			if (!info.range.single && info.range.from == info.range.to) {
 				info.range.single = true;
 				info.range.from = {};
 			}

@@ -461,7 +461,7 @@ namespace cov::testing {
 				file.add_to(builder, file_stats, line_cvg_id, zero_id, zero_id);
 			}
 
-			auto cvg_files = builder.extract();
+			auto cvg_files = builder.extract(git::oid{});
 			ASSERT_TRUE(cvg_files);
 			git_oid files_id{};
 			ASSERT_TRUE(backend->write(files_id, cvg_files));
@@ -580,7 +580,7 @@ namespace cov::testing {
 				file.add_to(builder, file_stats, line_cvg_id, zero_id, zero_id);
 			}
 
-			auto cvg_files = builder.extract();
+			auto cvg_files = builder.extract(git::oid{});
 			ASSERT_TRUE(cvg_files);
 			git_oid files_id{};
 			ASSERT_TRUE(repo.write(files_id, cvg_files));

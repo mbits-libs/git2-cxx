@@ -15,8 +15,8 @@ namespace cov::testing {
 	using namespace ::std::literals;
 	static cov::repository repo{};
 
-	bool report(git_oid& object_id,
-	            git_oid const& parent,
+	bool report(git::oid& object_id,
+	            git::oid_view parent,
 	            std::string_view tag) {
 		using namespace std::chrono;
 		auto const johnny = cov::report::signature_view{
@@ -100,7 +100,7 @@ namespace cov::testing {
 			              |            |
 			              H            S
 			*/
-			git_oid prev{}, F{}, D{};
+			git::oid prev{}, F{}, D{};
 			ASSERT_TRUE(report(prev, prev, "H"sv));
 			ASSERT_TRUE(report(prev, prev, "G"sv));
 			ASSERT_TRUE(report(F, prev, "F"sv));
@@ -121,7 +121,7 @@ namespace cov::testing {
 			ASSERT_TRUE(report(prev, prev, "B"sv));
 			ASSERT_TRUE(report(prev, prev, "A"sv));
 
-			ASSERT_TRUE(report(prev, {}, "S"sv));
+			ASSERT_TRUE(report(prev, git::oid{}, "S"sv));
 			ASSERT_TRUE(report(prev, prev, "R"sv));
 			ASSERT_TRUE(report(prev, prev, "Q"sv));
 			ASSERT_TRUE(report(prev, prev, "P"sv));
@@ -223,9 +223,8 @@ namespace cov::testing {
 		revs result{};
 		revs::parse(repo, range, result);
 
-		if (!git_oid_is_zero(&result.from))
-			actual.from = to_string(result.from);
-		if (!git_oid_is_zero(&result.to)) actual.to = to_string(result.to);
+		if (!result.from.is_zero()) actual.from = result.from.str();
+		if (!result.to.is_zero()) actual.to = result.to.str();
 		actual.single = result.single;
 
 		ASSERT_EQ(expected, actual) << "Used range: " << range;

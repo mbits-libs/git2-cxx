@@ -24,13 +24,9 @@ namespace cov {
 		references_impl(std::filesystem::path const& root) : root_{root} {}
 
 		ref_ptr<reference> create(std::string_view name,
-		                          git_oid const& target) override {
+		                          git::oid_view target) override {
 			if (!reference::is_valid_name(name)) return {};
-
-			char buffer[GIT_OID_HEXSZ];
-			git_oid_fmt(buffer, &target);
-
-			if (!print(name, {buffer, GIT_OID_HEXSZ})) return {};
+			if (!print(name, target.str())) return {};
 			return reference::direct(prefix_info(name), target);
 		}
 

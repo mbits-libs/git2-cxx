@@ -18,6 +18,7 @@ namespace cov {
 	struct repository;
 
 	struct object_with_id : object {
+		bool is_object_with_id() const noexcept final { return true; }
 		virtual git::oid const& oid() const noexcept = 0;
 	};
 
@@ -138,7 +139,7 @@ namespace cov {
 		                             io::v1::coverage_stats const& stats);
 	};
 
-	struct files : object {
+	struct files : object_with_id {
 		struct entry {
 			virtual ~entry();
 			virtual std::string_view path() const noexcept = 0;
@@ -158,7 +159,8 @@ namespace cov {
 		    const noexcept = 0;
 		virtual entry const* by_path(std::string_view path) const noexcept = 0;
 
-		static ref_ptr<files> create(std::vector<std::unique_ptr<entry>>&&);
+		static ref_ptr<files> create(git::oid_view oid,
+		                             std::vector<std::unique_ptr<entry>>&&);
 
 		class builder {
 		public:
@@ -182,7 +184,7 @@ namespace cov {
 				           nfo.function_coverage, nfo.branch_coverage);
 			}
 			bool remove(std::string_view path);
-			ref_ptr<files> extract();
+			ref_ptr<files> extract(git::oid_view oid);
 			std::vector<std::unique_ptr<entry>> release();
 
 		private:

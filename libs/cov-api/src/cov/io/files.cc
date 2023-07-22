@@ -63,9 +63,11 @@ namespace cov::io::handlers {
 		};
 
 		struct impl : counted_impl<cov::files> {
-			explicit impl(std::vector<std::unique_ptr<entry>>&& files)
-			    : files_{std::move(files)} {}
+			explicit impl(git::oid_view id,
+			              std::vector<std::unique_ptr<entry>>&& files)
+			    : id_{id.oid()}, files_{std::move(files)} {}
 
+			git::oid const& oid() const noexcept override { return id_; };
 			std::span<std::unique_ptr<entry> const> entries()
 			    const noexcept override {
 				return files_;
@@ -80,6 +82,7 @@ namespace cov::io::handlers {
 			}
 
 		private:
+			git::oid id_{};
 			std::vector<std::unique_ptr<entry>> files_{};
 		};
 
@@ -94,7 +97,7 @@ namespace cov::io::handlers {
 
 	ref_ptr<counted> files::load(uint32_t,
 	                             uint32_t,
-	                             git::oid_view,
+	                             git::oid_view oid,
 	                             read_stream& in,
 	                             std::error_code& ec) const {
 		ec = make_error_code(errc::bad_syntax);
@@ -158,7 +161,7 @@ namespace cov::io::handlers {
 		}
 
 		ec.clear();
-		return builder.extract();
+		return builder.extract(oid);
 	}
 
 #if defined(__GNUC__)
@@ -282,8 +285,9 @@ namespace cov {
 	files::entry::~entry() {}
 
 	ref_ptr<files> files::create(
+	    git::oid_view oid,
 	    std::vector<std::unique_ptr<files::entry>>&& entries) {
-		return make_ref<io::handlers::impl>(std::move(entries));
+		return make_ref<io::handlers::impl>(oid, std::move(entries));
 	}
 
 	files::builder& files::builder::add(std::unique_ptr<entry>&& entry) {
@@ -310,8 +314,8 @@ namespace cov {
 		return true;
 	}
 
-	ref_ptr<files> files::builder::extract() {
-		return files::create(release());
+	ref_ptr<files> files::builder::extract(git::oid_view oid) {
+		return files::create(oid, release());
 	}
 
 	std::vector<std::unique_ptr<files::entry>> files::builder::release() {

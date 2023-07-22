@@ -80,7 +80,7 @@ namespace cov::testing {
 				file.add_to(files, file_stats, line_cvg_id, zero_id, zero_id);
 			}
 
-			auto cvg_files = files.extract();
+			auto cvg_files = files.extract(git::oid{});
 			ASSERT_TRUE(cvg_files);
 			git::oid files_id{};
 			ASSERT_TRUE(backend->write(files_id, cvg_files));

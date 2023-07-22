@@ -100,7 +100,7 @@ namespace cov {
 	        B -> C -> D -> E -> F
 	*/
 	void revs::locate_range(cov::repository const& repo) {
-		if (git_oid_is_zero(&from) || git_oid_is_zero(&to)) {
+		if (from.is_zero() || to.is_zero()) {
 			return;
 		}
 
@@ -110,13 +110,13 @@ namespace cov {
 		// from is inaccessible start
 		// to is accessible start
 
-		ref top{git::oid{to}, true};
-		ref bottom{git::oid{from}, true};
+		ref top{to, true};
+		ref bottom{from, true};
 
 		while (top || bottom) {
 			if (top) {
 				if (unallowed.contains(top)) {
-					from = top.sha.id;
+					from = top.sha;
 					return;
 				}
 				allowed.insert(top);
@@ -124,7 +124,7 @@ namespace cov {
 			}
 			if (bottom) {
 				if (allowed.contains(bottom)) {
-					from = bottom.sha.id;
+					from = bottom.sha;
 					return;
 				}
 				unallowed.insert(bottom);
@@ -132,7 +132,7 @@ namespace cov {
 			}
 		}
 		// by now, top.id is zero -- so everything will be included
-		from = top.sha.id;
+		from = top.sha;
 	}
 
 	std::error_code revs::parse(cov::repository const& repo,
@@ -159,7 +159,7 @@ namespace cov {
 			return git::make_error_code(git::errc::invalidspec);
 		}
 
-		git_oid HEAD{};
+		git::oid HEAD{};
 		if (from_rev.empty() || to_rev.empty()) {
 			auto const ec = parse_single(repo, "HEAD", HEAD);
 			if (ec) return ec;
@@ -188,7 +188,7 @@ namespace cov {
 
 	std::error_code revs::parse_single(cov::repository const& repo,
 	                                   std::string_view rev,
-	                                   git_oid& out) {
+	                                   git::oid& out) {
 		size_t parent_count = 0;
 
 		auto it = rev.begin();
@@ -207,7 +207,7 @@ namespace cov {
 					if (count > 1) {
 						// at any point, looking into more, than first parent
 						// will jump outside of the tree
-						memset(out.id, 0, sizeof(out.id));
+						out = {};
 						return git::make_error_code(git::errc::notfound);
 					}
 					parent_count += count;
@@ -232,7 +232,7 @@ namespace cov {
 			}
 
 			if (ref->reference_type() != reference_type::direct) {
-				memset(out.id, 0, sizeof(out.id));
+				out = {};
 				auto const HEAD = repo.current_head();
 				if ((base_rev == "HEAD"sv || base_rev == HEAD.branch) &&
 				    !HEAD.tip)
@@ -240,24 +240,24 @@ namespace cov {
 				return git::make_error_code(git::errc::notfound);
 			}
 
-			out = *ref->direct_target();
+			out.assign(*ref->direct_target());
 		} else {
-			auto report = as_a<cov::report>(repo.find_partial(base_rev));
-			if (!report) {
-				memset(out.id, 0, sizeof(out.id));
+			auto obj = as_a<cov::object_with_id>(repo.find_partial(base_rev));
+			if (!obj) {
+				out = {};
 				return git::make_error_code(git::errc::notfound);
 			}
 
-			out = report->oid().id;
+			out = obj->oid();
 		}
 
 		if (parent_count) {
-			auto node = cov::ref{git::oid{out}, true};
+			auto node = cov::ref{out, true};
 			while (node && parent_count) {
 				--parent_count;
 				node = node.next(repo);
 			}
-			out = node.sha.id;
+			out = node.sha;
 		}
 
 		return {};

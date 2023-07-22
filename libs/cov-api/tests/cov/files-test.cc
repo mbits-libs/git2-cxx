@@ -16,8 +16,10 @@ namespace cov::testing {
 		using namespace git::literals;
 
 		struct files_impl : counted_impl<cov::files> {
+			git::oid id{};
 			std::vector<std::unique_ptr<cov::files::entry>> files{};
 
+			git::oid const& oid() const noexcept override { return id; }
 			std::span<std::unique_ptr<cov::files::entry> const> entries()
 			    const noexcept override {
 				return files;

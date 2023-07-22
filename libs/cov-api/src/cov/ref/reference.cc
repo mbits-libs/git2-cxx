@@ -97,24 +97,24 @@ namespace cov {
 	    : public reference_base,
 	      public enable_ref_from_this<reference, direct_reference> {
 	public:
-		direct_reference(reference_name&& name, git_oid const& target)
-		    : reference_base{std::move(name)}, target_{target} {}
+		direct_reference(reference_name&& name, git::oid_view target)
+		    : reference_base{std::move(name)}, target_{target.oid()} {}
 		cov::reference_type reference_type() const noexcept override {
 			return cov::reference_type::direct;
 		}
 		git_oid const* direct_target() const noexcept override {
-			return &target_;
+			return &target_.id;
 		}
 		ref_ptr<reference> peel_target() noexcept override {
 			return ref_from_this();
 		}
 
 	private:
-		git_oid target_;
+		git::oid target_;
 	};
 
 	ref_ptr<reference> reference::direct(reference_name&& name,
-	                                     git_oid const& target) {
+	                                     git::oid_view target) {
 		return make_ref<direct_reference>(std::move(name), target);
 	}
 

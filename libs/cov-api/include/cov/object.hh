@@ -28,12 +28,14 @@ namespace cov {
 #undef OBJECT_TYPE
 	};
 
+	struct object_with_id;
 #define FORWARD(name) struct name;
 	KNOWN_OBJECTS(FORWARD)
 #undef FORWARD
 
 	struct object : counted {
 		bool is_object() const noexcept override { return true; }
+		virtual bool is_object_with_id() const noexcept { return false; }
 		virtual obj_type type() const noexcept = 0;
 		template <typename Derived>
 		inline bool is_a() const noexcept;
@@ -43,6 +45,10 @@ namespace cov {
 #undef IS_A
 	};
 
+	template <>
+	inline bool object::is_a<object_with_id>() const noexcept {
+		return is_object_with_id();
+	}
 #define IS_A(NAME)                                    \
 	template <>                                       \
 	inline bool object::is_a<NAME>() const noexcept { \

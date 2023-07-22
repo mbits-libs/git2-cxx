@@ -230,7 +230,7 @@ namespace cov::app {
 	}
 
 	std::error_code params::create(cov::repository const& repo) const {
-		git_oid oid{};
+		git::oid oid{};
 		auto result = revs::parse_single(
 		    repo, names.size() < 2 ? "HEAD"sv : names[1], oid);
 		if (result) return result;

@@ -405,7 +405,7 @@ namespace cov::app::builtin::report {
 			            compiled.branches_id);
 		}
 
-		auto const obj = builder.extract();
+		auto const obj = builder.extract(git::oid{});
 		return repo.write(id, obj);
 	}
 
