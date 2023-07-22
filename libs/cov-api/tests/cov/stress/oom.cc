@@ -123,7 +123,7 @@ namespace cov::testing {
 		auto const report =
 		    make_report(id, {message.data(), message.size()}, env.now, env.now);
 
-		auto facade = ph::object_facade::present_report(report.get(), nullptr);
+		auto facade = ph::object_facade::present_report(report, nullptr);
 		auto fmt = formatter::from(
 		    "%Hr%d %pC/%pR %pP (%pr) - from [%Hc] %s <%an %al %ae>%n%B"sv);
 

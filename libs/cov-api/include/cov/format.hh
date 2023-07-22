@@ -96,6 +96,10 @@ namespace cov::placeholder {
 		secondary_hash_abbr,
 		tertiary_hash_abbr,
 		quaternary_hash_abbr,
+		primary_label,
+		secondary_label,
+		tertiary_label,
+		quaternary_label,
 	};
 
 	enum class stats {
@@ -114,12 +118,21 @@ namespace cov::placeholder {
 		branches_rating,
 	};
 
-	enum class report {
+	enum class name_type {
 		ref_names,
 		ref_names_unwrapped,
 		magic_ref_names,
 		magic_ref_names_unwrapped,
-		branch,
+		props,
+		props_unwrapped,
+		magic_props,
+		magic_props_unwrapped,
+	};
+
+	struct names {
+		name_type type;
+		unsigned indent;
+		constexpr auto operator<=>(names const&) const noexcept = default;
 	};
 
 	enum class commit {
@@ -127,6 +140,7 @@ namespace cov::placeholder {
 		subject_sanitized,
 		body,
 		body_raw,
+		branch,
 	};
 
 	enum class person {
@@ -156,7 +170,7 @@ namespace cov::placeholder {
 	                            width,
 	                            self,
 	                            stats,
-	                            report,
+	                            names,
 	                            commit,
 	                            person_info>;
 
@@ -193,6 +207,7 @@ namespace cov::placeholder {
 		                git::oid const* id,
 		                bool wrapped,
 		                bool magic_colors,
+		                unsigned indent,
 		                struct context const&,
 		                internal_environment&) const;
 	};
@@ -237,6 +252,7 @@ namespace cov::placeholder {
 		std::string (*colorize)(color, void* app) = {};
 		bool decorate{false};
 		bool prop_names{true};
+		bool add_align_marks{false};
 
 		bool operator==(environment const&) const noexcept = default;
 		static environment from(cov::repository const&,
@@ -304,25 +320,48 @@ namespace cov::placeholder {
 	struct object_facade {
 		virtual ~object_facade();
 
-		virtual std::unique_ptr<object_list> loop(std::string_view) = 0;
+		virtual std::string_view name() const noexcept = 0;
+		virtual std::string_view secondary_label() const noexcept;
+		virtual std::string_view tertiary_label() const noexcept;
+		virtual std::string_view quaternary_label() const noexcept;
+		virtual std::unique_ptr<object_list> loop(std::string_view);
 		virtual bool condition(std::string_view tag);
-		virtual iterator prop(iterator,
+		virtual iterator refs(iterator,
 		                      bool wrapped,
 		                      bool magic_colors,
-		                      internal_environment&) = 0;
+		                      unsigned indent,
+		                      internal_environment&);
+		virtual iterator props(iterator,
+		                       bool wrapped,
+		                       bool magic_colors,
+		                       unsigned indent,
+		                       internal_environment&);
 		virtual git::oid const* primary_id() noexcept = 0;
-		virtual git::oid const* secondary_id() noexcept = 0;
-		virtual git::oid const* tertiary_id() noexcept = 0;
-		virtual git::oid const* quaternary_id() noexcept = 0;
-		virtual std::chrono::sys_seconds added() noexcept = 0;
-		virtual io::v1::coverage_stats const* stats() noexcept = 0;
-		virtual git_commit_view const* git() noexcept = 0;
+		virtual git::oid const* secondary_id() noexcept;
+		virtual git::oid const* tertiary_id() noexcept;
+		virtual git::oid const* quaternary_id() noexcept;
+		virtual git::oid const* parent_id() noexcept;
+		virtual std::chrono::sys_seconds added() noexcept;
+		virtual io::v1::coverage_stats const* stats() noexcept;
+		virtual git_commit_view const* git() noexcept;
 
+		static std::unique_ptr<object_facade> present_oid(
+		    git::oid_view,
+		    cov::repository const&);
 		static std::unique_ptr<object_facade> present_report(
-		    cov::report const*,
+		    ref_ptr<cov::report> const&,
 		    cov::repository const*);
 		static std::unique_ptr<object_facade> present_build(
 		    cov::report::build const*,
+		    cov::repository const*);
+		static std::unique_ptr<object_facade> present_build(
+		    ref_ptr<cov::build> const&,
+		    cov::repository const*);
+		static std::unique_ptr<object_facade> present_files(
+		    ref_ptr<cov::files> const&,
+		    cov::repository const*);
+		static std::unique_ptr<object_facade> present_file(
+		    cov::files::entry const*,
 		    cov::repository const*);
 	};
 
@@ -343,7 +382,7 @@ namespace cov::placeholder {
 		                placeholder::stats fld) const;
 		iterator format(iterator out,
 		                internal_environment& env,
-		                report fld) const;
+		                placeholder::names const& names) const;
 		iterator format(iterator out,
 		                internal_environment& env,
 		                commit fld) const;
@@ -363,6 +402,7 @@ namespace cov::placeholder {
 		    internal_environment& env,
 		    bool wrapped,
 		    bool magic_colors,
+		    unsigned indent,
 		    std::map<std::string, cov::report::property> const& properties)
 		    const;
 

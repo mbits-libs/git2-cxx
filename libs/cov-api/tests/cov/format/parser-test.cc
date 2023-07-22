@@ -3,6 +3,7 @@
 
 #include <gtest/gtest.h>
 #include <cov/format.hh>
+#include <source_location>
 #include "../path-utils.hh"
 #include "../print-view.hh"
 
@@ -16,6 +17,7 @@ namespace cov::testing {
 		std::string_view name;
 		std::string_view tmplt{};
 		std::vector<ph::printable> expected{};
+		std::source_location loc{std::source_location::current()};
 
 		friend std::ostream& operator<<(std::ostream& out,
 		                                parser_test const& param) {
@@ -46,8 +48,9 @@ namespace cov::testing {
 			std::ostream& operator()(ph::stats s) {
 				return out << "%stats{" << static_cast<int>(s) << '}';
 			}
-			std::ostream& operator()(ph::report r) {
-				return out << "%report{" << static_cast<int>(r) << '}';
+			std::ostream& operator()(ph::names r) {
+				return out << "%names{" << static_cast<int>(r.type) << ", "
+				           << r.indent << '}';
 			}
 			std::ostream& operator()(ph::commit c) {
 				return out << "%commit{" << static_cast<int>(c) << '}';
@@ -99,11 +102,12 @@ namespace cov::testing {
 	};
 
 	TEST_P(format_parser, parse) {
-		auto const& [_, tmplt, expected] = GetParam();
+		auto const& [_, tmplt, expected, loc] = GetParam();
 		auto fmt = formatter::from(tmplt);
 		auto const& actual = fmt.parsed();
 		ASSERT_EQ(expected, actual) << "Expected: " << print{expected}
-		                            << "\nActual:   " << print{actual};
+		                            << "\nActual:   " << print{actual} << "\n"
+		                            << loc.file_name() << ":" << loc.line();
 	}
 
 #define MAKE_TEST(NAME, CODE, VALUE) \
@@ -242,17 +246,37 @@ namespace cov::testing {
 	              "%h4",
 	              ph::self::quaternary_hash_abbr),
 
-	    MAKE_TEST("refs", "%d", ph::report::ref_names),
-	    MAKE_TEST("refs unwrapped", "%D", ph::report::ref_names_unwrapped),
-	    MAKE_TEST("magic refs", "%md", ph::report::magic_ref_names),
+	    MAKE_TEST("refs", "%d", (ph::names{ph::name_type::ref_names, 0})),
+	    MAKE_TEST("refs unwrapped",
+	              "%D",
+	              (ph::names{ph::name_type::ref_names_unwrapped, 0})),
+	    MAKE_TEST("magic refs",
+	              "%md",
+	              (ph::names{ph::name_type::magic_ref_names, 0})),
 	    MAKE_TEST("magic refs unwrapped",
 	              "%mD",
-	              ph::report::magic_ref_names_unwrapped),
+	              (ph::names{ph::name_type::magic_ref_names_unwrapped, 0})),
+	    MAKE_TEST("props", "%z", (ph::names{ph::name_type::props, 0})),
+	    MAKE_TEST("props unwrapped",
+	              "%Z",
+	              (ph::names{ph::name_type::props_unwrapped, 0})),
+	    MAKE_TEST("magic props",
+	              "%mz",
+	              (ph::names{ph::name_type::magic_props, 0})),
+	    MAKE_TEST("magic props unwrapped",
+	              "%mZ",
+	              (ph::names{ph::name_type::magic_props_unwrapped, 0})),
+	    MAKE_TEST("magic props empty",
+	              "%mz()",
+	              (ph::names{ph::name_type::magic_props, 0})),
+	    MAKE_TEST("ref names indented",
+	              "%md(20)",
+	              (ph::names{ph::name_type::magic_ref_names, 20})),
 	    MAKE_TEST("subject", "%s", ph::commit::subject),
 	    MAKE_TEST("sanitized subject", "%f", ph::commit::subject_sanitized),
 	    MAKE_TEST("body", "%b", ph::commit::body),
 	    MAKE_TEST("raw body", "%B", ph::commit::body_raw),
-	    MAKE_TEST("branch", "%rD", ph::report::branch),
+	    MAKE_TEST("branch", "%rD", ph::commit::branch),
 
 	    MAKE_TEST("total text lines", "%pL", ph::stats::lines),
 	    MAKE_TEST("lines (percent)", "%pPL", ph::stats::lines_percent),
@@ -293,8 +317,8 @@ namespace cov::testing {
 	static parser_test const errors[] = {
 	    {
 	        "not recognized"sv,
-	        "pre %z post"sv,
-	        {"pre %z post"s},
+	        "pre %o post"sv,
+	        {"pre %o post"s},
 	    },
 	    {
 	        "not hex I"sv,

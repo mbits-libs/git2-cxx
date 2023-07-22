@@ -55,7 +55,8 @@ namespace cov::placeholder::testing {
 		}
 
 		// and now again, with no backing this time:
-		auto const facade = object_facade::present_build(nullptr, nullptr);
+		cov::report::build const* none = nullptr;
+		auto const facade = object_facade::present_build(none, nullptr);
 		ASSERT_FALSE(facade->condition({}));
 		ASSERT_FALSE(facade->condition("prop"sv));
 		ASSERT_FALSE(facade->condition("floaty mcfloat face"sv));
@@ -98,8 +99,7 @@ namespace cov::placeholder::testing {
 		                  .props = R"("name":"build-2")",
 		                  .stats = stats})
 		        .release());
-		auto report_facade =
-		    object_facade::present_report(report.get(), nullptr);
+		auto report_facade = object_facade::present_report(report, nullptr);
 
 		ASSERT_FALSE(report_facade->condition({}));
 		ASSERT_FALSE(report_facade->condition("prop"sv));
@@ -182,7 +182,7 @@ namespace cov::placeholder::testing {
 		    cov::report::builder{}
 		        .add_nfo({.build_id = build_id, .stats = stats})
 		        .release());
-		auto report_facade = object_facade::present_report(report.get(), &repo);
+		auto report_facade = object_facade::present_report(report, &repo);
 
 		ASSERT_TRUE(report_facade->primary_id());
 		ASSERT_FALSE(report_facade->secondary_id());
@@ -242,7 +242,7 @@ namespace cov::placeholder::testing {
 		    cov::report::builder{}
 		        .add_nfo({.build_id = build_id, .stats = stats})
 		        .release());
-		auto report_facade = object_facade::present_report(report.get(), &repo);
+		auto report_facade = object_facade::present_report(report, &repo);
 
 		ASSERT_TRUE(report_facade->primary_id());
 		ASSERT_FALSE(report_facade->secondary_id());

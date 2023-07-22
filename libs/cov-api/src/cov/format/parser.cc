@@ -19,6 +19,7 @@
 #pragma GCC diagnostic pop
 #endif
 #include <fmt/chrono.h>
+#include <cctype>
 #include <charconv>
 #include <cov/format.hh>
 #include <ctime>
@@ -297,14 +298,44 @@ namespace cov {
 			if (*indent1 >= *total || *indent2 >= *total) return std::nullopt;
 			return placeholder::width{*total, *indent1, *indent2};
 		}
+
+		template <typename It>
+		std::optional<token> parse_ref_names(It& cur,
+		                                     It end,
+		                                     placeholder::name_type type) {
+			if (cur == end || *cur != '(')
+				return placeholder::names{.type = type, .indent = 0};
+			unsigned indent = 0;
+			auto save = cur;
+			++cur;
+			while (cur != end &&
+			       std::isdigit(static_cast<unsigned char>(*cur))) {
+				indent *= 10;
+				indent += static_cast<unsigned>(*cur - '0');
+				++cur;
+			}
+			if (cur == end || *cur != ')') {
+				cur = save;
+				return std::nullopt;
+			}
+			++cur;
+			return placeholder::names{.type = type, .indent = indent};
+		}
+
 		template <typename It>
 		std::optional<token> parse_magic(It& cur, It end) {
 			if (cur == end) return std::nullopt;
 
 			switch (*cur) {
-				SIMPLE_FORMAT('d', placeholder::report::magic_ref_names);
-				SIMPLE_FORMAT('D',
-				              placeholder::report::magic_ref_names_unwrapped);
+				DEEPER_FORMAT1(
+				    'D', parse_ref_names,
+				    placeholder::name_type::magic_ref_names_unwrapped);
+				DEEPER_FORMAT1('d', parse_ref_names,
+				               placeholder::name_type::magic_ref_names);
+				DEEPER_FORMAT1('Z', parse_ref_names,
+				               placeholder::name_type::magic_props_unwrapped);
+				DEEPER_FORMAT1('z', parse_ref_names,
+				               placeholder::name_type::magic_props);
 			}
 			return std::nullopt;
 		}
@@ -348,7 +379,7 @@ namespace cov {
 			if (cur == end) return std::nullopt;
 
 			switch (*cur) {
-				SIMPLE_FORMAT('D', placeholder::report::branch);
+				SIMPLE_FORMAT('D', placeholder::commit::branch);
 				default: {
 					auto const person = parse_date(cur, end);
 					if (!person) break;
@@ -459,6 +490,20 @@ namespace cov {
 		}
 
 		template <typename It>
+		std::optional<token> parse_labels(It& cur, It end) {
+			if (cur == end) return std::nullopt;
+
+			switch (*cur) {
+				SIMPLE_FORMAT('n', placeholder::self::primary_label);
+				SIMPLE_FORMAT('1', placeholder::self::primary_label);
+				SIMPLE_FORMAT('2', placeholder::self::secondary_label);
+				SIMPLE_FORMAT('3', placeholder::self::tertiary_label);
+				SIMPLE_FORMAT('4', placeholder::self::quaternary_label);
+			}
+			return std::nullopt;
+		}
+
+		template <typename It>
 		std::optional<token> parse(It& cur, It end) {
 			if (cur == end) return std::nullopt;
 
@@ -471,8 +516,14 @@ namespace cov {
 				DEEPER_FORMAT('C', parse_color);
 				DEEPER_FORMAT('w', parse_width);
 				DEEPER_FORMAT('m', parse_magic);
-				SIMPLE_FORMAT('D', placeholder::report::ref_names_unwrapped);
-				SIMPLE_FORMAT('d', placeholder::report::ref_names);
+				DEEPER_FORMAT1('D', parse_ref_names,
+				               placeholder::name_type::ref_names_unwrapped);
+				DEEPER_FORMAT1('d', parse_ref_names,
+				               placeholder::name_type::ref_names);
+				DEEPER_FORMAT1('Z', parse_ref_names,
+				               placeholder::name_type::props_unwrapped);
+				DEEPER_FORMAT1('z', parse_ref_names,
+				               placeholder::name_type::props);
 				SIMPLE_FORMAT('s', placeholder::commit::subject);
 				SIMPLE_FORMAT('f', placeholder::commit::subject_sanitized);
 				SIMPLE_FORMAT('b', placeholder::commit::body);
@@ -483,6 +534,7 @@ namespace cov {
 				DEEPER_FORMAT('p', parse_stats);
 				DEEPER_FORMAT1('a', parse_person, placeholder::who::author);
 				DEEPER_FORMAT1('c', parse_person, placeholder::who::committer);
+				DEEPER_FORMAT('L', parse_labels);
 			}
 			return std::nullopt;
 		}
@@ -500,6 +552,11 @@ namespace cov {
 		public:
 			placeholder::block_token* operator()(Enum auto enum_like) {
 				dst.push_back(enum_like);
+				return nullptr;
+			}
+
+			placeholder::block_token* operator()(placeholder::names const& n) {
+				dst.push_back(n);
 				return nullptr;
 			}
 
