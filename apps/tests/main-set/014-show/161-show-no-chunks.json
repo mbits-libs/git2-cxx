@@ -10,6 +10,10 @@
         0,
         [
             "file src/main.cc",
+            "blob d07753a5e8b4288620503b87170e8245281b2342",
+            "functions 649634a28b7bab7dc0f28c1f8c27a02515a75fc7",
+            "lines 2f45fc84f73112de384bb94f2603c20d92ee1310",
+            "stats 17 9 9, 0 0, 0 0",
             "",
             "+-----------+---------+---------+----------+------------+",
             "| Name      | % Lines | Visited | Relevant | Line count |",

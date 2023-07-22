@@ -88,7 +88,7 @@ namespace cov::app {
 	"%{?H2[%L2 %H2%n%]}"                                   \
 	"%{B["                                                 \
 	"build %H1 %pL %pTL %pVL, %pTF %pVF, %pTB %pTB%n"      \
-	"      %mZ%n"                                          \
+	"%{?[      %mZ%n%]}"                                   \
 	"%]}"                                                  \
 	"%{?rd[added %rt%n%]}"                                 \
 	"%{?pT[stats %pL %pTL %pVL, %pTF %pVF, %pTB %pTB%n%]}" \
