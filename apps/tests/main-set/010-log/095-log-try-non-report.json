@@ -1,5 +1,5 @@
 {
-    "args": "lg $BUILD --prop-names --decorate short",
+    "args": "log $BUILD --prop-names --decorate short",
     "expected": [
         2,
         "",
