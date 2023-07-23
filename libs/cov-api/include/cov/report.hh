@@ -161,6 +161,10 @@ namespace cov {
 
 		static ref_ptr<files> create(git::oid_view oid,
 		                             std::vector<std::unique_ptr<entry>>&&);
+		static ref_ptr<files> create(
+		    std::vector<std::unique_ptr<entry>>&& entries) {
+			return create(git::oid{}, std::move(entries));
+		}
 
 		class builder {
 		public:

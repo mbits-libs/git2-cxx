@@ -11,7 +11,8 @@ namespace cov::testing {
 		class derived2;
 		class derived3;
 
-		struct base : counted_impl<> {
+		struct base : counted_impl<object> {
+			obj_type type() const noexcept { return obj_unknown; }
 			template <typename Derived>
 			inline bool is_a() const noexcept;
 			virtual bool is_derived1() const noexcept { return false; }
@@ -67,6 +68,7 @@ namespace cov::testing {
 			auto result = as_a<Casted>(b);
 			if constexpr (std::same_as<Orig, Casted>) {
 				ASSERT_EQ(&orig, result);
+				ASSERT_FALSE(result->is_object_with_id());
 			} else {
 				ASSERT_EQ(nullptr, result);
 			}
@@ -79,6 +81,7 @@ namespace cov::testing {
 			auto result = as_a<Casted>(b);
 			if constexpr (std::same_as<Orig, Casted>) {
 				ASSERT_EQ(&orig, result);
+				ASSERT_FALSE(result->is_object_with_id());
 			} else {
 				ASSERT_EQ(nullptr, result);
 			}
@@ -91,6 +94,7 @@ namespace cov::testing {
 			auto result = as_a<Casted>(b);
 			if constexpr (std::same_as<Orig, Casted>) {
 				ASSERT_EQ(&orig, result);
+				ASSERT_FALSE(result->is_object_with_id());
 			} else {
 				ASSERT_EQ(nullptr, result);
 			}
@@ -103,6 +107,7 @@ namespace cov::testing {
 			auto result = as_a<Casted>(b);
 			if constexpr (std::same_as<Orig, Casted>) {
 				ASSERT_EQ(&orig, result);
+				ASSERT_FALSE(result->is_object_with_id());
 			} else {
 				ASSERT_EQ(nullptr, result);
 			}
@@ -119,6 +124,7 @@ namespace cov::testing {
 				EXPECT_FALSE(ec);
 				EXPECT_EQ(3, orig.counter());
 				ASSERT_EQ(orig.get(), result.get());
+				ASSERT_FALSE(result->is_object_with_id());
 			} else {
 				EXPECT_TRUE(ec);
 				EXPECT_EQ(2, orig.counter());
@@ -137,6 +143,7 @@ namespace cov::testing {
 				EXPECT_FALSE(ec);
 				EXPECT_EQ(3, orig.counter());
 				ASSERT_EQ(orig.get(), result.get());
+				ASSERT_FALSE(result->is_object_with_id());
 			} else {
 				EXPECT_TRUE(ec);
 				EXPECT_EQ(2, orig.counter());

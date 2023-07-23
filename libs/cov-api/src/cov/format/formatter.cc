@@ -418,8 +418,7 @@ namespace cov::placeholder {
 			calculated_prefix = std::string(indent + 2, ' ');
 			calculated_prefix[0] = ',';
 			calculated_prefix[1] = '\n';
-			if (env.client->add_align_marks)
-				calculated_prefix.push_back('\xFF');
+			// no predefine format uses align marks for ref names
 			if (wrapped) calculated_prefix += "  "sv;
 			inter_prefix = calculated_prefix;
 		}

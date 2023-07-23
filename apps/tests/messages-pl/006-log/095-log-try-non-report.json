@@ -1,0 +1,21 @@
+{
+    "args": "lg $BUILD --prop-names --decorate short",
+    "expected": [
+        2,
+        "",
+        [
+            "usage: cov log [-h] [<revision-range>] [-n <number>] [--oneline] [--format <format>] [--abbrev-hash] [--no-abbrev-hash] [--prop-names] [--no-prop-names] [--color <when>] [--decorate <how>]",
+            "cov log: cov::category error: Object cannot be cast to required type\n"
+        ]
+    ],
+    "prepare": [
+        "unpack $DATA/repo.git.tar $TMP",
+        "cd '$TMP'",
+        "git clone repo.git",
+        "cd '$TMP/repo'",
+        "cov init",
+        "cov report $DATA/build-coverage.json -f create-report -pos=qnx -pbuild_type=Debug -pflag=true",
+        "cov module --add MAIN src/",
+        "store BUILD cov log -n1 --format '%{B[%H1%n%]}'"
+    ]
+}

@@ -12,6 +12,115 @@ using namespace git::literals;
 
 namespace cov::placeholder::testing {
 	using namespace cov::testing;
+
+	class generic_facade : object_facade {
+	public:
+		object_facade* facade() noexcept { return this; }
+
+	private:
+		std::string_view name() const noexcept override { return {}; }
+		git::oid const* primary_id() noexcept override { return nullptr; }
+	};
+
+	TEST(facade, generic) {
+		generic_facade obj{};
+
+		auto const facade = obj.facade();
+		ASSERT_FALSE(facade->condition({}));
+		ASSERT_FALSE(facade->condition("prop"sv));
+		ASSERT_FALSE(facade->condition("floaty mcfloat face"sv));
+		ASSERT_FALSE(facade->condition("pL"sv));
+		ASSERT_FALSE(facade->condition("pTL"sv));
+		ASSERT_FALSE(facade->condition("pTF"sv));
+		ASSERT_FALSE(facade->condition("pTB"sv));
+		ASSERT_FALSE(facade->primary_id());
+		ASSERT_FALSE(facade->secondary_id());
+		ASSERT_FALSE(facade->tertiary_id());
+		ASSERT_FALSE(facade->quaternary_id());
+		ASSERT_FALSE(facade->git());
+		ASSERT_EQ(std::chrono::sys_seconds{}, facade->added());
+		ASSERT_EQ(""sv, facade->secondary_label());
+		ASSERT_EQ(""sv, facade->tertiary_label());
+		ASSERT_EQ(""sv, facade->quaternary_label());
+
+		ASSERT_EQ(""sv, formatter::from("%d"sv).format(facade, {}));
+		ASSERT_EQ(""sv, formatter::from("%z"sv).format(facade, {}));
+	}
+
+	TEST(facade, files) {
+		auto const files_id = "91ec54e2634abb436583b0e27ceda44c9ae5820c"_oid,
+		           contents_id = "92b91e27801bbd1ee4e2cc456b81be767a03fbbf"_oid,
+		           lines_id = "8765432100ffeeddccbbaa998877665544332211"_oid,
+		           fn_id = "36109a1c35e0d5cf3e5e68d896c8b1b4be565525"_oid,
+		           branches_id = "0f0af157e8897ce4b29a524d9ef9fe75fc942ab4"_oid;
+		auto const files = cov::files::builder{}
+		                       .add_nfo({
+		                           .path = "/src/main.cc"sv,
+		                           .stats{
+		                               .lines_total = 1,
+		                               .lines = {1, 1},
+		                               .functions = {1, 1},
+		                               .branches = {1, 1},
+		                           },
+		                           .contents = contents_id,
+		                           .line_coverage = lines_id,
+		                           .function_coverage = fn_id,
+		                           .branch_coverage = branches_id,
+		                       })
+		                       .extract(files_id);
+		{
+			ASSERT_EQ(1, files->entries().size());
+			auto const& tested = files->entries().front();
+			auto const facade =
+			    object_facade::present_file(tested.get(), nullptr);
+			ASSERT_FALSE(facade->condition({}));
+			ASSERT_FALSE(facade->condition("prop"sv));
+			ASSERT_FALSE(facade->condition("floaty mcfloat face"sv));
+			ASSERT_TRUE(facade->primary_id());
+			ASSERT_TRUE(facade->secondary_id());
+			ASSERT_TRUE(facade->tertiary_id());
+			ASSERT_TRUE(facade->quaternary_id());
+			ASSERT_EQ(contents_id, *facade->primary_id());
+			ASSERT_EQ(lines_id, *facade->secondary_id());
+			ASSERT_EQ(fn_id, *facade->tertiary_id());
+			ASSERT_EQ(branches_id, *facade->quaternary_id());
+			// git commit is only attached to reports:
+			ASSERT_FALSE(facade->git());
+			// no repo behind, no added:
+			ASSERT_EQ(std::chrono::sys_seconds{}, facade->added());
+
+			ASSERT_TRUE(facade->condition("pL"sv));
+			ASSERT_TRUE(facade->condition("pTL"sv));
+			ASSERT_TRUE(facade->condition("pTF"sv));
+			ASSERT_TRUE(facade->condition("pTB"sv));
+
+			ASSERT_EQ("blob"sv, facade->name());
+			ASSERT_EQ("lines"sv, facade->secondary_label());
+			ASSERT_EQ("functions"sv, facade->tertiary_label());
+			ASSERT_EQ("branches"sv, facade->quaternary_label());
+		}
+
+		auto const facade = object_facade::present_files(files, nullptr);
+		ASSERT_FALSE(facade->condition({}));
+		ASSERT_FALSE(facade->condition("prop"sv));
+		ASSERT_FALSE(facade->condition("floaty mcfloat face"sv));
+		ASSERT_FALSE(facade->condition("pL"sv));
+		ASSERT_FALSE(facade->condition("pTL"sv));
+		ASSERT_FALSE(facade->condition("pTF"sv));
+		ASSERT_FALSE(facade->condition("pTB"sv));
+		ASSERT_TRUE(facade->primary_id());
+		ASSERT_EQ(files_id, *facade->primary_id());
+		ASSERT_FALSE(facade->secondary_id());
+		ASSERT_FALSE(facade->tertiary_id());
+		ASSERT_FALSE(facade->quaternary_id());
+		ASSERT_FALSE(facade->git());
+		ASSERT_EQ(std::chrono::sys_seconds{}, facade->added());
+		ASSERT_EQ("files"sv, facade->name());
+		ASSERT_EQ(""sv, facade->secondary_label());
+		ASSERT_EQ(""sv, facade->tertiary_label());
+		ASSERT_EQ(""sv, facade->quaternary_label());
+	}
+
 	TEST(facade, builds) {
 		auto const builds = cov::report::builder{}
 		                        .add_nfo({.props = R"("has_stats":true)",
@@ -52,6 +161,11 @@ namespace cov::placeholder::testing {
 			ASSERT_EQ(has_stats, facade->condition("pTL"sv));
 			ASSERT_EQ(has_stats, facade->condition("pTF"sv));
 			ASSERT_EQ(has_stats, facade->condition("pTB"sv));
+
+			ASSERT_EQ("build"sv, facade->name());
+			ASSERT_EQ("files"sv, facade->secondary_label());
+			ASSERT_EQ(""sv, facade->tertiary_label());
+			ASSERT_EQ(""sv, facade->quaternary_label());
 		}
 
 		// and now again, with no backing this time:
@@ -133,6 +247,10 @@ namespace cov::placeholder::testing {
 		ASSERT_EQ("committer@appleseed.com"sv, git.committer.email);
 		ASSERT_EQ("Johnny Committer"sv, git.committer.name);
 		ASSERT_EQ(feb29, report_facade->added());
+		ASSERT_EQ("report"sv, report_facade->name());
+		ASSERT_EQ("files"sv, report_facade->secondary_label());
+		ASSERT_EQ("parent"sv, report_facade->tertiary_label());
+		ASSERT_EQ("commit"sv, report_facade->quaternary_label());
 
 		auto const loop = report_facade->loop("B"sv);
 		ASSERT_TRUE(loop);
@@ -221,7 +339,7 @@ namespace cov::placeholder::testing {
 		ASSERT_FALSE(ec) << ec.message();
 
 		auto const report_id = "92b91e27801bbd1ee4e2cc456b81be767a03fbbf"_oid;
-		git::oid zero{}, build_id{};
+		git::oid zero{}, build_id{}, files_id{};
 
 		io::v1::coverage_stats const stats{1250, {300, 299}, {1, 1}, {0, 0}};
 
@@ -265,5 +383,63 @@ namespace cov::placeholder::testing {
 			ASSERT_TRUE(next->condition({}));
 		}
 		ASSERT_EQ(1, count);
+	}
+
+	TEST(facade, present_oid) {
+		git::init app{};
+		std::error_code ec{};
+		std::filesystem::remove_all(setup::test_dir() / "clean/.git/.covdata"sv,
+		                            ec);
+		{
+			git::repository::init(setup::test_dir() / "clean/.git"sv, false,
+			                      ec);
+		}
+		auto repo = cov::repository::init(
+		    setup::test_dir(), setup::test_dir() / "clean/.git/.covdata"sv,
+		    setup::test_dir() / "clean/.git"sv, ec);
+		ASSERT_FALSE(ec) << ec.message();
+
+		git::oid zero{}, report_id{}, build_id{}, files_id{},
+		    line_coverage_id{};
+
+		io::v1::coverage_stats const stats{1250, {300, 299}, {1, 1}, {0, 0}};
+
+		using namespace date;
+		static constexpr auto feb29 =
+		    sys_days{2000_y / feb / 29} + 12h + 34min + 56s;
+
+		auto cvg_obj = cov::line_coverage::create({});
+		ASSERT_TRUE(repo.write(line_coverage_id, cvg_obj));
+
+		auto files_obj = cov::files::builder{}
+		                     .add_nfo({.path = "src/main.cc"sv,
+		                               .stats = stats,
+		                               .line_coverage = line_coverage_id})
+		                     .extract(zero);
+		ASSERT_TRUE(repo.write(files_id, files_obj));
+
+		auto build_obj =
+		    cov::build::create(files_id, feb29, R"("has_props": true)", stats);
+		ASSERT_TRUE(repo.write(build_id, build_obj));
+
+		auto report_obj = cov::report::create(
+		    zero, files_id, zero, "develop"sv,
+		    {"Johnny Appleseed"sv, "johnny@appleseed.com"sv},
+		    {"Johnny Committer"sv, "committer@appleseed.com"sv},
+		    "Subject, isn't it?\n\nBody para 1\n\nBody para 2\n"sv, feb29,
+		    feb29, stats,
+		    cov::report::builder{}
+		        .add_nfo({.build_id = build_id, .stats = stats})
+		        .release());
+		ASSERT_TRUE(repo.write(report_id, report_obj));
+
+		auto facade = object_facade::present_oid(report_id, repo);
+		ASSERT_TRUE(facade);
+		facade = object_facade::present_oid(build_id, repo);
+		ASSERT_TRUE(facade);
+		facade = object_facade::present_oid(files_id, repo);
+		ASSERT_TRUE(facade);
+		facade = object_facade::present_oid(line_coverage_id, repo);
+		ASSERT_FALSE(facade);
 	}
 }  // namespace cov::placeholder::testing

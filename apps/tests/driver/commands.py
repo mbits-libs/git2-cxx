@@ -3,6 +3,7 @@
 
 import os
 import stat
+import subprocess
 import sys
 import tarfile
 import zipfile
@@ -85,6 +86,12 @@ def _cat(test: test.Test, args: List[str]):
         sys.stdout.write(f.read())
 
 
+def _shell(test: test.Test, args: List[str]):
+    print("shell!!!")
+    print("cov:", test.current_env.target)
+    subprocess.call("bash", shell=True, cwd=test.cwd)
+
+
 HANDLERS: Dict[str, Tuple[int, Callable]] = {
     "mkdirs": (1, lambda test, args: test.makedirs(args[0])),
     "rm": (1, lambda test, args: test.rmtree(args[0])),
@@ -95,4 +102,6 @@ HANDLERS: Dict[str, Tuple[int, Callable]] = {
     "ls": (1, lambda test, args: test.ls(args[0])),
     "unpack": (2, _unpack),
     "cat": (1, _cat),
+    "store": (2, lambda test, args: test.store_output(args[0], args[1:])),
+    "shell": (0, _shell),
 }

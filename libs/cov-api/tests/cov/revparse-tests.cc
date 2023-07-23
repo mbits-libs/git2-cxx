@@ -23,8 +23,21 @@ namespace cov::testing {
 		    .name = "Johnny Appleseed"sv,
 		    .email = "johnny.applessed@example.com"sv};
 		auto const now = floor<seconds>(system_clock::now());
-		auto obj = cov::report::create(parent, git::oid{}, git::oid{}, "main"sv,
-		                               johnny, johnny, tag, now, now, {}, {});
+
+		auto const empty_stats = io::v1::coverage_stats::init();
+
+		auto files = cov::files::create({});
+		git::oid files_id{};
+		if (!repo.write(files_id, files)) return false;
+
+		auto build = cov::build::create(files_id, now, {}, empty_stats);
+		git::oid build_id{};
+		if (!repo.write(build_id, build)) return false;
+
+		auto obj = cov::report::create(
+		    parent, files_id, git::oid{}, "main"sv, johnny, johnny, tag, now,
+		    now, empty_stats,
+		    cov::report::builder{}.add(build_id, {}, empty_stats).release());
 		if (!repo.write(object_id, obj)) return false;
 
 		repo.refs()->create(fmt::format("refs/tags/{}"sv, tag), object_id);
@@ -180,6 +193,39 @@ namespace cov::testing {
 			refid = refid.substr(0, refid.size() - 1);
 		}
 		ASSERT_FALSE(is_a<cov::report>(repo.find_partial(refid)));
+	}
+
+	TEST_F(revparse, non_report_lookup) {
+		auto ref = repo.refs()->dwim("A"sv);
+		ASSERT_TRUE(ref);
+		ASSERT_TRUE(ref->direct_target());
+
+		std::error_code ec{};
+		auto const report = repo.lookup<cov::report>(*ref->direct_target(), ec);
+		ASSERT_FALSE(ec);
+		ASSERT_TRUE(report);
+		ASSERT_FALSE(report->entries().empty());
+
+		auto const build_id = report->entries().front()->build_id();
+
+		revs result{};
+		ec = revs::parse(repo, report->file_list_id().str(), result);
+		ASSERT_FALSE(ec);
+		ASSERT_TRUE(result.single);
+		ASSERT_EQ(result.to, report->file_list_id());
+
+		ec = revs::parse(repo, build_id.str(), result);
+		ASSERT_FALSE(ec);
+		ASSERT_TRUE(result.single);
+		ASSERT_EQ(result.to, build_id);
+		ec = revs::parse(repo, fmt::format("..{}", build_id), result);
+		ASSERT_TRUE(ec);
+		ec = revs::parse(repo, fmt::format("{}..", build_id), result);
+		ASSERT_TRUE(ec);
+		ec = revs::parse(repo, fmt::format("{}~", build_id), result);
+		ASSERT_TRUE(ec);
+		ec = revs::parse(repo, fmt::format("{}^", build_id), result);
+		ASSERT_TRUE(ec);
 	}
 
 	struct pair {

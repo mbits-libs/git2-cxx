@@ -265,7 +265,8 @@ namespace cov {
 					auto copy = path;
 					result.push_back(
 					    match(copy, std::move(path), entry,
-					          [](file_stats& info, file_diff::kind kind) {
+					          [](file_stats& info,        // GCOV_EXCL_LINE
+					             file_diff::kind kind) {  // GCOV_EXCL_LINE
 						          info.diff_kind = kind;
 					          }));
 				}

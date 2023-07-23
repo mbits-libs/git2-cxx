@@ -11,7 +11,7 @@ __dir__ = os.path.dirname(__file__)
 parser = argparse.ArgumentParser()
 parser.add_argument("--bin", required=True, metavar="BINDIR")
 parser.add_argument("--tests", required=True, metavar="DIR")
-parser.add_argument("--version", required=True, metavar="SEMVER")
+parser.add_argument("--version", metavar="SEMVER")
 parser.add_argument(
     "--run",
     metavar="TEST[,...]",
@@ -21,6 +21,23 @@ parser.add_argument(
 args = parser.parse_args()
 
 ext = ".exe" if sys.platform == "win32" else ""
+
+if not os.path.isdir(args.bin) and os.path.isdir(f"./build/{args.bin}"):
+    args.bin = f"./build/{args.bin}"
+
+if not os.path.isdir(f"{__dir__}/{args.tests}") and os.path.isdir(
+    f"{__dir__}/main-set/{args.tests}"
+):
+    args.tests = f"main-set/{args.tests}"
+
+if args.version is None:
+    tools = os.path.join(os.path.dirname(os.path.dirname(__dir__)), "tools")
+    print(tools)
+    sys.path.append(tools)
+    from github.cmake import get_version
+
+    project = get_version()
+    args.version = project.ver()
 
 new_args = [
     (f"--{key}", value)

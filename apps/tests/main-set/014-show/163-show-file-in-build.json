@@ -1,0 +1,51 @@
+{
+    "args": "show $BUILD:src/main.cc",
+    "expected": [
+        0,
+        [
+            "file src/main.cc",
+            "blob d07753a5e8b4288620503b87170e8245281b2342",
+            "functions a31bc21c9db0c9d4d08c20b38e4fc9b21eb5db8b",
+            "lines d3b9fe2ed816f528c23b083dd4aee6d74e8beb62",
+            "stats 17 9 6, 2 1, 0 0",
+            "",
+            "+-----------+---------+---------+---------+---------+----------+---------+------------+",
+            "| Name      | % Funcs | Missing | % Lines | Visited | Relevant | Missing | Line count |",
+            "+-----------+---------+---------+---------+---------+----------+---------+------------+",
+            "|   main.cc |   50.00 |       1 |   66.67 |       6 |        9 |       3 |         17 |",
+            "+-----------+---------+---------+---------+---------+----------+---------+------------+",
+            "",
+            "      500x | foo()",
+            "  1 |   0x | -void foo() {",
+            "  2 |   0x | -    std::cout << \"Hello, \" << name() << \"!\";",
+            "  3 |      |  }",
+            "  4 |      |  ",
+            "        0x | bar()",
+            "  5 |  15x | +void bar() {",
+            "  6 |      |      foo();",
+            "  7 |  10x | +    foo();",
+            "  8 |   8x | +    foo();",
+            "  9 |   6x | +    foo();",
+            " 10 |   4x | +    foo();",
+            " 11 |   2x | +    foo();",
+            " 12 |   0x | -    foo();",
+            " 13 |      |      foo();",
+            " 14 |      |      foo();",
+            " 15 |      |      foo();",
+            "\n"
+        ],
+        ""
+    ],
+    "prepare": [
+        "unpack $DATA/repo.git.tar $TMP",
+        "cd '$TMP'",
+        "git clone repo.git",
+        "cd '$TMP/repo'",
+        "git config --local user.name 'Johnny Appleseed'",
+        "git config --local user.email 'johnny@appleseed.com'",
+        "cov init",
+        "cov report $DATA/build-coverage-show-functions-1.json -f create-report",
+        "cov report $DATA/build-coverage-show-functions-2.json -f create-report",
+        "store BUILD cov log -n1 --format '%{B[%H1%n%]}'"
+    ]
+}
