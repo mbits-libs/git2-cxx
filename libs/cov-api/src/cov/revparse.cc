@@ -169,7 +169,7 @@ namespace cov {
 			out.from = HEAD;
 		} else {
 			auto ec = parse_single(repo, from_rev, out.from);
-			if (!ec && !is_report(repo, out.from)) {
+			if (!ec && !out.from.is_zero() && !is_report(repo, out.from)) {
 				ec = cov::make_error_code(cov::errc::wrong_object_type);
 			}
 			if (ec) return ec;
@@ -179,7 +179,7 @@ namespace cov {
 			out.to = HEAD;
 		} else {
 			auto ec = parse_single(repo, to_rev, out.to);
-			if (!ec && !is_report(repo, out.from)) {
+			if (!ec && !out.from.is_zero() && !is_report(repo, out.from)) {
 				ec = cov::make_error_code(cov::errc::wrong_object_type);
 			}
 			if (ec) {
