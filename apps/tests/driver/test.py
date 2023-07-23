@@ -423,7 +423,7 @@ Diff:
     def store_output(self, name: str, args: List[str]):
         env = self.current_env
 
-        if args[0] == "cov":
+        if args[0] == "cov" and env is not None:
             args[0] = env.target
 
         proc = subprocess.run(args, shell=False, capture_output=True, cwd=self.cwd)

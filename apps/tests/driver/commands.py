@@ -88,7 +88,7 @@ def _cat(test: test.Test, args: List[str]):
 
 def _shell(test: test.Test, args: List[str]):
     print("shell!!!")
-    print("cov:", test.current_env.target)
+    print("cov:", test.current_env.target if test.current_env is not None else "?")
     subprocess.call("bash", shell=True, cwd=test.cwd)
 
 
