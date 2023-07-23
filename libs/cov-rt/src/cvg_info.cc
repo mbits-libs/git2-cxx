@@ -52,26 +52,30 @@ namespace cov::app {
 		chunks.clear();
 		auto fn = funcs();
 
-		for (auto [line, count] : coverage) {
-			if (count) {
-				try {
-					fn.at(line, [](auto const& function) {
-						if (!function.count) {
-							throw false;
-						}
-					});  // GCOV_EXCL_LINE[GCC]
-					continue;
-				} catch (bool) {
-				}
-			}
+		auto const mark_line = [&chunks = this->chunks](unsigned line) {
 			auto const start = line < 3 ? 0u : line - 3;
 			auto const stop = line + 3;
 			if (chunks.empty() || chunks.back().second + 3 < start) {
 				chunks.push_back({start, stop});
-				continue;
+			} else {
+				chunks.back().second = stop;
 			}
-			chunks.back().second = stop;
+		};
+
+		auto const mark_functions = [&mark_line](auto const& function) {
+			if (!function.count) {
+				mark_line(function.label.start.line);
+			}
+		};
+
+		for (auto [line, count] : coverage) {
+			fn.before(line, mark_functions);
+			fn.at(line, mark_functions);
+			if (!count) {
+				mark_line(line);
+			}
 		}
+		fn.rest(mark_functions);
 	}
 
 	void cvg_info::load_syntax(std::string_view text,
