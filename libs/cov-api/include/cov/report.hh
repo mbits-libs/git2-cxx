@@ -230,12 +230,24 @@ namespace cov {
 			    : it_{functions.begin()}, end_{functions.end()} {}
 
 			template <typename Callback>
+			void before(std::uint32_t line, Callback&& cb) {
+				while (it_ != end_ && it_->label.start.line < line)
+					cb(*it_++);
+			}
+
+			template <typename Callback>
 			void at(std::uint32_t line, Callback&& cb) {
 				while (it_ != end_ && it_->label.start.line < line)
 					++it_;
 				while (it_ != end_ && it_->label.start.line == line) {
 					cb(*it_++);
 				}
+			}
+
+			template <typename Callback>
+			void rest(Callback&& cb) {
+				while (it_ != end_)
+					cb(*it_++);
 			}
 
 		private:
