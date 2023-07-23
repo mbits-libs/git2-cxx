@@ -8,7 +8,7 @@
   - [x] `files`
   - [x] `line_coverage` _(0.18.0)_
   - [x] `function_coverage` (_0.20.0_, mzdun/cov#48)
-  - [ ] `branch_coverage`
+  - [ ] `branch_coverage` (mzdun/cov#61)
 - [x] Wrap I/O in Z streams _(0.2.0-alpha)_
 - [x] Idea of references, tags and "branches" _(0.3.0-alpha)_
 - [x] Report format for `log` _(0.4.1-alpha)_
@@ -68,14 +68,17 @@
     - [x] show propset in `log` (_0.19.0_, mzdun/cov#46)
     - [x] fully alias co-existing function in report stats (_0.21.0_, mzdun/cov#55)
     - [ ] `$COV_FILTER_PATH` (mzdun/cov#47)
-  - [ ] `cov export` (from report, build and files)
+  - [ ] `cov export` from report, build and files (mzdun/cov#58)
     - [ ] `--json`
     - [ ] `--html`
-  - [ ] `cov cherry-pick` (?)
-  - [ ] Support for `less`
-  - [ ] Major release
-    - [ ] Freeze translation IDs
-    - Update schema id and references in filters
+  - [ ] `cov report` (mzdun/cov#59)
+    - [ ] build set manipulation (adding, removing from HEAD)
+    - [ ] `cov show` changes: take a list of properties to select only some builds
+- [ ] Support for `less` (mzdun/cov#60)
+- [ ] Look into tortoise and a hare (mzdun/cov#62)
+- [ ] Major release
+  - Update schema id and references in filters
+  - [ ] Freeze translation IDs (mzdun/cov#63)
 - [ ] `cov serve`
   - [ ] Boost.Beast WS
   - [ ] React frontend
@@ -94,13 +97,13 @@
   - [x] build with clang
   - [x] gcc
   - [x] clang?
-  - [ ] ~~msvc~~
+  - [x] msvc
 - [ ] Multi-platform reports
   - [ ] External build id / tag?
   - [ ] `cov report` taking more, than one report
     - with single filter?
     - with filter per input?
-    - build set manipulation (adding, removing from HEAD)?
+    - [ ] build set manipulation (adding, removing from HEAD)?
 - [ ] Direct `gcov` JSON.GZ filter
 - [ ] Direct `llvm-cov` filter
 - [ ] Add report object cache
@@ -110,3 +113,14 @@
 - [ ] 💸 Cleanup initalization for `data-tz`
   - [ ] Properly setup `access_install` directory
   - [ ] Work with 7zip binary
+
+## Next steps:
+
+1. mzdun/cov#47 `$COV_FILTER_PATH`
+1. mzdun/cov#61 `branch_coverage`/`"bran"`
+1. mzdun/cov#59 build set manipulation (adding, removing from HEAD)
+1. mzdun/cov#58 `cov export (--json | --html)` 
+1. mzdun/cov#60 support for a pager
+1. mzdun/cov#62 look into tortoise and a hare
+1. mzdun/cov#63 freeze strings
+1. ??? major release
