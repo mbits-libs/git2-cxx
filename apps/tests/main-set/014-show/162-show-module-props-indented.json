@@ -1,0 +1,36 @@
+{
+    "args": "show $BUILD --format=fuller --prop-names --decorate short",
+    "patches": {
+        "build [0-9a-f]{40}": "build $BUILD_HASH",
+        "Added:    .*": "Added:    $NOW"
+    },
+    "expected": [
+        0,
+        [
+            "build $BUILD_HASH",
+            "Coverage: [ 67%] 2/3 (fail)",
+            "Added:    $NOW",
+            "Config:   build_type: Debug,",
+            "          flag: on,",
+            "          os: qnx",
+            "",
+            "+-------+---------+---------+----------+---------+------------+",
+            "| Name  | % Lines | Visited | Relevant | Missing | Line count |",
+            "+-------+---------+---------+----------+---------+------------+",
+            "| D src |   66.67 |       2 |        3 |       1 |          5 |",
+            "+-------+---------+---------+----------+---------+------------+\n"
+        ],
+        ""
+    ],
+    "prepare": [
+        "unpack $DATA/repo.git.tar $TMP",
+        "cd '$TMP'",
+        "git clone repo.git",
+        "cd '$TMP/repo'",
+        "cov init",
+        "cov report $DATA/build-coverage.json -f create-report -pos=qnx -pbuild_type=Debug -pflag=true",
+        "cov module --add MAIN src/",
+        "store BUILD cov log -n1 --format '%{B[%H1%n%]}'",
+        "cov log -n1 --format raw"
+    ]
+}

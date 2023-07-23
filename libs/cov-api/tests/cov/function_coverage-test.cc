@@ -671,4 +671,67 @@ namespace cov::testing {
 			    << "Index: " << index;
 		}
 	}
+	TEST(function_coverage, aliases_iterator) {
+		auto const obj = cov::function_coverage::builder{}
+		                     .add_nfo({
+		                         .name = "name_vA"sv,
+		                         .demangled_name = "name()"sv,
+		                         .count{0},
+		                         .start{.line = 5, .column = 0},
+		                         .end{.line = 15, .column = 0},
+		                     })
+		                     .add_nfo({
+		                         .name = "name_v2"sv,
+		                         .demangled_name = "name()"sv,
+		                         .count{50},
+		                         .start{.line = 5, .column = 0},
+		                         .end{.line = 15, .column = 0},
+		                     })
+		                     .add_nfo({
+		                         .name = "name_v1"sv,
+		                         .demangled_name = ""sv,
+		                         .count{100},
+		                         .start{.line = 2, .column = 0},
+		                         .end{.line = 2, .column = 0},
+		                     })
+		                     .extract();
+		auto const merged = obj->merge_aliases();
+		auto const check_iterator =
+		    [](cov::function_coverage::function_iterator fn, unsigned line1,
+		       unsigned line2 = 0) {
+			    unsigned before{}, at{}, after{};
+			    fn.before(line1, [&before](auto const&) { ++before; });
+			    fn.at(line2 ? line2 : line1, [&at](auto const&) { ++at; });
+			    fn.rest([&after](auto const&) { ++after; });
+			    return std::tuple{before, at, after};
+		    };
+
+		{
+			auto const [before, at, after] = check_iterator(merged, 2);
+			ASSERT_EQ(0, before);
+			ASSERT_EQ(1, at);
+			ASSERT_EQ(1, after);
+		}
+
+		{
+			auto const [before, at, after] = check_iterator(merged, 10);
+			ASSERT_EQ(2, before);
+			ASSERT_EQ(0, at);
+			ASSERT_EQ(0, after);
+		}
+
+		{
+			auto const [before, at, after] = check_iterator(merged, 1, 5);
+			ASSERT_EQ(0, before);
+			ASSERT_EQ(1, at);
+			ASSERT_EQ(0, after);
+		}
+
+		{
+			auto const [before, at, after] = check_iterator(merged, 1);
+			ASSERT_EQ(0, before);
+			ASSERT_EQ(0, at);
+			ASSERT_EQ(2, after);
+		}
+	}
 }  // namespace cov::testing

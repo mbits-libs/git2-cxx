@@ -234,13 +234,19 @@ namespace cov::app {
 			return;
 		}
 
-		std::vector<std::pair<size_t, size_t>> inserts;
+#if 0
+		while (pos != std::string::npos) {
+			msg[pos] = '*';
+			pos = msg.find('\xFF', pos + 1);
+		}
+		std::puts(msg.c_str());
+#else
+		std::vector<std::pair<size_t, size_t> > inserts;
 
 		while (pos != std::string::npos) {
 			auto const new_line = msg.rfind('\n', pos);
 			inserts.emplace_back(
 			    new_line == std::string::npos ? 0 : new_line + 1, pos);
-			msg[pos] = '*';
 			pos = msg.find('\xFF', pos + 1);
 		}
 
@@ -268,6 +274,7 @@ namespace cov::app {
 		aligned.append(std::string_view{msg}.substr(pos));
 
 		std::puts(aligned.c_str());
+#endif
 	}
 
 	void show_range::print(cov::repository const& repo,

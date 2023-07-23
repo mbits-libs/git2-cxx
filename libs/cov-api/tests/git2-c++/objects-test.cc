@@ -4,6 +4,7 @@
 #include <gtest/gtest.h>
 #include <cov/git2/blob.hh>
 #include <cov/git2/commit.hh>
+#include <cov/git2/oid.hh>
 #include <cov/git2/tree.hh>
 #include <cstdio>
 #include "setup.hh"
@@ -55,6 +56,14 @@ namespace git::testing {
 		auto const subdir = dir.tree_bypath("subdir", ec);
 		ASSERT_TRUE(ec);
 		ASSERT_FALSE(subdir);
+	}
+
+	TEST(objects, oids) {
+		git_oid id{{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
+		            0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee,
+		            0xff, 0x12, 0x34, 0x56, 0x78, 0xab}};
+		auto str = fmt::format("X{:this will be ignored}Y", git::oid_view{id});
+		ASSERT_EQ("X112233445566778899aabbccddeeff12345678abY"sv, str);
 	}
 
 	TEST(objects, blob) {

@@ -141,7 +141,7 @@ namespace cov::app {
 			}
 		}
 		return result;
-	}
+	}  // GCOV_EXCL_LINE[GCC]
 
 	std::string cvg_info::to_string(aliased_name const& fn,
 	                                view_columns const& widths,

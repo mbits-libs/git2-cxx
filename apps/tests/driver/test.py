@@ -67,12 +67,15 @@ class Env:
     data_dir_alt: Optional[str] = None
     tempdir_alt: Optional[str] = None
 
-    def expand(self, input: str, tempdir: str):
-        return (
+    def expand(self, input: str, tempdir: str, additional: Dict[str, str] = {}):
+        input = (
             input.replace("$TMP", tempdir)
             .replace("$DATA", self.data_dir)
             .replace("$VERSION", self.version)
         )
+        for key, value in additional.items():
+            input = input.replace(f"${key}", value)
+        return input
 
     def fix(self, raw_input: bytes, patches: Dict[str, str]):
         if os.name == "nt":
@@ -109,6 +112,8 @@ class Test:
         self.post_args = []
         self.linear = data.get("linear", False)
         self.disabled = data.get("disabled")
+        self.current_env: Optional[Env] = None
+        self.additional_env: Dict[str, str] = {}
 
         if isinstance(self.disabled, bool):
             self.ok = not self.disabled
@@ -215,29 +220,34 @@ class Test:
                 print(file=f)
 
     def run_cmds(self, env: Env, ops: List[Union[str, List[str]]], tempdir: str):
-        for op in ops:
-            orig = op
-            if isinstance(op, str):
-                op = shlex.split(op)
-            is_safe = False
-            try:
-                name = op[0]
-                if name[:5] == "safe-":
-                    name = name[5:]
-                    is_safe = True
-                min_args, cb = env.handlers[name]
-                op = op[1:]
-                if len(op) < min_args:
+        saved = self.current_env
+        self.current_env = env
+        try:
+            for op in ops:
+                orig = op
+                if isinstance(op, str):
+                    op = shlex.split(op)
+                is_safe = False
+                try:
+                    name = op[0]
+                    if name[:5] == "safe-":
+                        name = name[5:]
+                        is_safe = True
+                    min_args, cb = env.handlers[name]
+                    op = op[1:]
+                    if len(op) < min_args:
+                        return None
+                    cb(self, [env.expand(o, tempdir) for o in op])
+                except Exception as ex:
+                    if op[0] != "safe-rm":
+                        print("Problem while handling", orig)
+                        print(ex)
+                        raise
+                    if is_safe:
+                        continue
                     return None
-                cb(self, [env.expand(o, tempdir) for o in op])
-            except Exception as ex:
-                if op[0] != "safe-rm":
-                    print("Problem while handling", orig)
-                    print(ex)
-                    raise
-                if is_safe:
-                    continue
-                return None
+        finally:
+            self.current_env = saved
         return True
 
     def run(self, environment: Env):
@@ -253,9 +263,15 @@ class Test:
         if prep is None:
             return None
 
-        expanded = [environment.expand(arg, environment.tempdir) for arg in self.args]
+        expanded = [
+            environment.expand(arg, environment.tempdir, self.additional_env)
+            for arg in self.args
+        ]
         post_expanded = [
-            [environment.expand(arg, environment.tempdir) for arg in cmd]
+            [
+                environment.expand(arg, environment.tempdir, self.additional_env)
+                for arg in cmd
+            ]
             for cmd in self.post_args
         ]
 
@@ -403,6 +419,16 @@ Diff:
 
     def makedirs(self, sub):
         os.makedirs(self.path(sub), exist_ok=True)
+
+    def store_output(self, name: str, args: List[str]):
+        env = self.current_env
+
+        if args[0] == "cov":
+            args[0] = env.target
+
+        proc = subprocess.run(args, shell=False, capture_output=True, cwd=self.cwd)
+        self.additional_env[name] = proc.stdout.decode("UTF-8").strip()
+        print(f"export {name}={self.additional_env[name]}")
 
     @staticmethod
     def load(filename, count):

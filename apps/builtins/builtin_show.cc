@@ -124,7 +124,9 @@ namespace cov::app::builtin::show {
 			return files;
 		}
 
-		return {};
+		// The only objects coming here are those above...
+		[[unlikely]];  // GCOV_EXCL_LINE
+		return {};     // GCOV_EXCL_LINE
 	}
 
 	int handle(std::string_view tool, args::arglist args) {
@@ -231,12 +233,8 @@ namespace cov::app::builtin::show {
 
 		if (!is_standalone) return 0;
 
-		auto const report = info.repo.lookup<cov::report>(info.range.to, ec);
-
-		if (report->file_list_id().is_zero()) return 1;
-		auto const files =
-		    info.repo.lookup<cov::files>(report->file_list_id(), ec);
-		if (ec) p.error(ec, p.tr());
+		auto const files = get_files(info.range.to, info.repo);
+		if (!files) return 1;
 
 		auto const* file_entry = files->by_path(entries.front().name.expanded);
 		if (!file_entry || file_entry->contents().is_zero()) return 1;

@@ -236,6 +236,12 @@ namespace cov::testing {
 	    MAKE_TEST("functions hash (abbr)", "%hf", ph::self::tertiary_hash_abbr),
 	    MAKE_TEST("tertiary hash (abbr)", "%h3", ph::self::tertiary_hash_abbr),
 
+	    MAKE_TEST("object name", "%Ln", ph::self::primary_label),
+	    MAKE_TEST("primary label", "%L1", ph::self::primary_label),
+	    MAKE_TEST("secondary label", "%L2", ph::self::secondary_label),
+	    MAKE_TEST("tertiary label", "%L3", ph::self::tertiary_label),
+	    MAKE_TEST("quaternary label", "%L4", ph::self::quaternary_label),
+
 	    MAKE_TEST("git commit hash (abbr)",
 	              "%hG",
 	              ph::self::quaternary_hash_abbr),
@@ -479,6 +485,21 @@ namespace cov::testing {
 	        "not end"sv,
 	        "pre %] post"sv,
 	        {"pre %] post"s},
+	    },
+	    {
+	        "unfinished prop alignment"sv,
+	        "pre %mZ(12 post"sv,
+	        {"pre %mZ(12 post"s},
+	    },
+	    {
+	        "unfinished prop alignment - edge"sv,
+	        "pre %mZ(12"sv,
+	        {"pre %mZ(12"s},
+	    },
+	    {
+	        "not a label"sv,
+	        "pre %L5 post"sv,
+	        {"pre %L5 post"s},
 	    },
 	};
 

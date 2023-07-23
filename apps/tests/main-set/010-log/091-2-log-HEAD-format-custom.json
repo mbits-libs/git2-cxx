@@ -1,0 +1,28 @@
+{
+    "args": "log '--format=  - %mD(4)' --color always --decorate short",
+    "patches": {
+        "Added:     .*": "Added:     $DATE"
+    },
+    "expected": [
+        0,
+        [
+            "  - \u001b[1;36mHEAD -> \u001b[m\u001b[1;32mmain\u001b[m\u001b[33m,",
+            "    \u001b[m\u001b[1;33mtag: D\u001b[m\u001b[33m,",
+            "    \u001b[m\u001b[1;33mtag: everywhere\u001b[m\u001b[33m,",
+            "    \u001b[m\u001b[1;33mtag: here\u001b[m\u001b[33m,",
+            "    \u001b[m\u001b[1;33mtag: there\u001b[m",
+            "  - \u001b[1;33mtag: E\u001b[m",
+            "  - \u001b[1;33mtag: F\u001b[m",
+            "  - \u001b[1;33mtag: G\u001b[m",
+            "  - \u001b[1;33mtag: H\u001b[m\n"
+        ],
+        ""
+    ],
+    "prepare": [
+        "unpack $DATA/revparse.tar $TMP",
+        "cd $TMP/revparse",
+        "cov tag here",
+        "cov tag there",
+        "cov tag everywhere"
+    ]
+}
