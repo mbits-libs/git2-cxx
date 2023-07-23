@@ -210,15 +210,23 @@ namespace cov {
 			virtual io::v1::text_pos const& end() const noexcept = 0;
 		};
 
-		struct function_label {
+		struct function_pos {
 			io::v1::text_pos start{};
 			io::v1::text_pos end{};
-			std::string name{};
 
-			auto operator<=>(function_label const&) const noexcept = default;
+			auto operator<=>(function_pos const&) const noexcept = default;
 		};
+		struct function_name {
+			std::string link{};
+			std::string demangled{};
+			unsigned count{};
+
+			auto operator<=>(function_name const&) const noexcept = default;
+		};
+
 		struct function {
-			function_label label{};
+			function_pos pos{};
+			std::vector<function_name> names{};
 			unsigned count{};
 
 			auto operator<=>(function const&) const noexcept = default;
@@ -231,15 +239,15 @@ namespace cov {
 
 			template <typename Callback>
 			void before(std::uint32_t line, Callback&& cb) {
-				while (it_ != end_ && it_->label.start.line < line)
+				while (it_ != end_ && it_->pos.start.line < line)
 					cb(*it_++);
 			}
 
 			template <typename Callback>
 			void at(std::uint32_t line, Callback&& cb) {
-				while (it_ != end_ && it_->label.start.line < line)
+				while (it_ != end_ && it_->pos.start.line < line)
 					++it_;
-				while (it_ != end_ && it_->label.start.line == line) {
+				while (it_ != end_ && it_->pos.start.line == line) {
 					cb(*it_++);
 				}
 			}

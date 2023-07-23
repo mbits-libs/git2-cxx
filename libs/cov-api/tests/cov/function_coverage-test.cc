@@ -7,8 +7,28 @@
 #include <cov/io/db_object.hh>
 #include <cov/io/function_coverage.hh>
 #include <cov/io/read_stream.hh>
+#include "print-view.hh"
 #include "setup.hh"
 #include "test_stream.hh"
+
+namespace cov {
+	static std::ostream& operator<<(
+	    std::ostream& out,
+	    function_coverage::function_name const& name) {
+		out << '{';
+		if (!name.link.empty()) {
+			testing::print_view(out << " .link = ", name.link) << 's';
+			if (!name.demangled.empty()) out << ',';
+		}
+		if (!name.demangled.empty())
+			testing::print_view(out << " .demangled = ", name.demangled) << 's';
+		if (name.count) {
+			if (!name.link.empty() || !name.demangled.empty()) out << ',';
+			out << " .count = " << name.count;
+		}
+		return out << " }";
+	}
+};  // namespace cov
 
 namespace cov::testing {
 	namespace {
@@ -596,7 +616,7 @@ namespace cov::testing {
 	TEST(function_coverage, merge_aliases) {
 		auto const obj = cov::function_coverage::builder{}
 		                     .add_nfo({
-		                         .name = "name_v1"sv,
+		                         .name = "name_vA"sv,
 		                         .demangled_name = "name()"sv,
 		                         .count{0},
 		                         .start{.line = 5, .column = 0},
@@ -620,15 +640,18 @@ namespace cov::testing {
 		auto const actual = obj->merge_aliases();
 		decltype(actual) expected = {
 		    {
-		        .label = {.start = {.line = 0, .column = 0},
-		                  .end = {.line = 2, .column = 0},
-		                  .name = "name_v1"s},
+		        .pos = {.start = {.line = 0, .column = 0},
+		                .end = {.line = 2, .column = 0}},
+		        .names = {{.link = "name_v1"s, .count = 100}},
 		        .count = 100,
 		    },
 		    {
-		        .label = {.start = {.line = 5, .column = 0},
-		                  .end = {.line = 15, .column = 0},
-		                  .name = "name()"s},
+		        .pos = {.start = {.line = 5, .column = 0},
+		                .end = {.line = 15, .column = 0}},
+		        .names = {{.link = "name_v2"s,
+		                   .demangled = "name()"s,
+		                   .count = 50},
+		                  {.link = "name_vA"s, .demangled = "name()"s}},
 		        .count = 50,
 		    },
 		};
@@ -638,14 +661,13 @@ namespace cov::testing {
 			auto const& exp = expected[index];
 			auto const& act = actual[index];
 			ASSERT_EQ(exp.count, act.count) << "Index: " << index;
-			ASSERT_EQ(exp.label.name, act.label.name) << "Index: " << index;
-			ASSERT_EQ(exp.label.start.line, act.label.start.line)
+			ASSERT_EQ(exp.names, act.names) << "Index: " << index;
+			ASSERT_EQ(exp.pos.start.line, act.pos.start.line)
 			    << "Index: " << index;
-			ASSERT_EQ(exp.label.start.column, act.label.start.column)
+			ASSERT_EQ(exp.pos.start.column, act.pos.start.column)
 			    << "Index: " << index;
-			ASSERT_EQ(exp.label.end.line, act.label.end.line)
-			    << "Index: " << index;
-			ASSERT_EQ(exp.label.end.column, act.label.end.column)
+			ASSERT_EQ(exp.pos.end.line, act.pos.end.line) << "Index: " << index;
+			ASSERT_EQ(exp.pos.end.column, act.pos.end.column)
 			    << "Index: " << index;
 		}
 	}

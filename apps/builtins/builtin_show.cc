@@ -294,9 +294,13 @@ namespace cov::app::builtin::show {
 					break;
 				}
 				fn.at(line_no, [=, &widths](auto const& function) {
-					fmt::print("{}\n", cvg.to_string(function, widths,
-					                                 clr == use_feature::yes,
-					                                 display_width));
+					auto const aliases = cvg_info::soft_alias(function);
+					for (auto const& alias : aliases) {
+						fmt::print("{}\n",
+						           cvg.to_string(
+						               alias, widths, clr == use_feature::yes,
+						               display_width, function.count));
+					}
 				});
 
 				fmt::print("{}\n", cvg.to_string(line_no, widths,

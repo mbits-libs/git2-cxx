@@ -374,7 +374,6 @@ namespace cov::app::builtin::report {
 		std::vector<io::v1::coverage> cvg{};
 		std::tie(cvg, stats) = info.expand_coverage(stg.lines);
 		auto const obj_cvg = cov::line_coverage::create(std::move(cvg));
-		if (!repo.write(lines_id, obj_cvg)) return false;
 
 		cov::function_coverage::builder builder{};
 		builder.reserve(info.function_coverage.size());
@@ -384,7 +383,15 @@ namespace cov::app::builtin::report {
 		}
 
 		auto const obj_functions = builder.extract();
-		return repo.write(functions_id, obj_functions);
+		auto const aliases = obj_functions->merge_aliases();
+
+		for (auto const& fun : aliases) {
+			++stats.functions.relevant;
+			if (fun.count) ++stats.functions.visited;
+		}
+
+		return repo.write(lines_id, obj_cvg) &&
+		       repo.write(functions_id, obj_functions);
 	}
 
 	bool stored_file::store_contents(cov::repository& repo,

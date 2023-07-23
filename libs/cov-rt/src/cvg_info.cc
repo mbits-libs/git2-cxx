@@ -64,7 +64,7 @@ namespace cov::app {
 
 		auto const mark_functions = [&mark_line](auto const& function) {
 			if (!function.count) {
-				mark_line(function.label.start.line);
+				mark_line(function.pos.start.line);
 			}
 		};
 
@@ -103,7 +103,9 @@ namespace cov::app {
 		}
 
 		for (auto const& fun : functions) {
-			result = result ? std::max(*result, fun.count) : fun.count;
+			for (auto const& alias : soft_alias(fun)) {
+				result = result ? std::max(*result, alias.count) : fun.count;
+			}
 		}
 
 		return result;
@@ -125,10 +127,27 @@ namespace cov::app {
 		return count;
 	}
 
-	std::string cvg_info::to_string(cov::function_coverage::function const& fn,
+	std::vector<aliased_name> cvg_info::soft_alias(
+	    cov::function_coverage::function const& fn) {
+		std::vector<aliased_name> result{};
+		for (auto const& name : fn.names) {
+			std::string_view display = name.demangled;
+			if (display.empty()) display = name.link;
+
+			if (result.empty() || result.back().label != display) {
+				result.push_back({display, name.count});
+			} else {
+				result.back().count += name.count;
+			}
+		}
+		return result;
+	}
+
+	std::string cvg_info::to_string(aliased_name const& fn,
 	                                view_columns const& widths,
 	                                bool use_color,
-	                                size_t max_width) const {
+	                                size_t max_width,
+	                                unsigned total_count) const {
 		if (max_width < std::numeric_limits<std::size_t>::max()) {
 			static constexpr size_t MAGIC = 40;
 			static constexpr size_t margins = 8;
@@ -140,7 +159,7 @@ namespace cov::app {
 			// GCOV_EXCL_END
 		}
 
-		std::string_view name = fn.label.name;
+		auto name = fn.label;
 		std::string backing{};
 
 		auto const shorten = name.size() > max_width;
@@ -157,10 +176,11 @@ namespace cov::app {
 			prefix = "\033[2;49;39m"sv;
 			suffix = "\033[m"sv;
 		}
+
 		return fmt::format(
 		    "{} {:>{}} |{} {}", prefix, count_column,
 		    widths.line_no_width + 3 + widths.count_width + 1, suffix,
-		    line_printer::to_string(fn.count, name, shorten, use_color));
+		    line_printer::to_string(total_count, name, shorten, use_color));
 	}
 
 	std::string cvg_info::to_string(size_t line_no,

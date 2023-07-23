@@ -20,6 +20,11 @@ namespace cov::app {
 		size_t count_width;
 	};
 
+	struct aliased_name {
+		std::string_view label;
+		unsigned count{};
+	};
+
 	struct cvg_info {
 		std::map<unsigned, unsigned> coverage{};
 		std::vector<cov::function_coverage::function> functions{};
@@ -44,10 +49,13 @@ namespace cov::app {
 		bool has_line(size_t line_no) const noexcept {
 			return syntax.lines.size() > line_no;
 		}
-		std::string to_string(cov::function_coverage::function const& fn,
+		static std::vector<aliased_name> soft_alias(
+		    cov::function_coverage::function const& fn);
+		std::string to_string(aliased_name const& fn,
 		                      view_columns const& widths,
 		                      bool use_color,
-		                      size_t max_width) const;
+		                      size_t max_width,
+		                      unsigned total_count) const;
 		std::string to_string(size_t line_no,
 		                      view_columns const& widths,
 		                      bool use_color) const;

@@ -6,6 +6,8 @@
 #include <cov/io/strings.hh>
 #include <cov/io/types.hh>
 #include <cov/repository.hh>
+#include <map>
+#include <set>
 
 namespace cov::io::handlers {
 	namespace {
@@ -189,38 +191,41 @@ namespace cov::io::handlers {
 namespace cov {
 	function_coverage::entry::~entry() {}
 
+	struct simple_function_name {
+		std::string_view link{};
+		std::string_view demangled{};
+
+		auto operator<=>(simple_function_name const&) const noexcept = default;
+	};
+
 	std::vector<function_coverage::function> function_coverage::merge_aliases()
 	    const {
-		std::vector<function> aliases{};
-		aliases.reserve(entries().size());
+		std::map<function_pos, std::map<simple_function_name, unsigned>>
+		    aliases{};
 
 		for (auto const& entry : entries()) {
-			auto name = entry->demangled_name();
-			if (name.empty()) name = entry->name();
-			aliases.push_back({
-			    .label{.start = entry->start(), .end = entry->end()},
-			    .count = entry->count(),
-			});
-			aliases.back().label.name.assign(name);
+			function_pos pos{.start = entry->start(), .end = entry->end()};
+			simple_function_name alias_name{
+			    .link = entry->name(), .demangled = entry->demangled_name()};
+			aliases[pos][alias_name] += entry->count();
 		}
 
-		std::stable_sort(aliases.begin(), aliases.end());
-		auto dst = aliases.begin();
-		auto end = aliases.end();
-		if (dst == end) return aliases;
-		for (auto src = std::next(dst); src != end;) {
-			if (src->label != dst->label) {
-				++dst;
-				++src;
-				continue;
+		std::vector<function> result{};
+		result.reserve(aliases.size());
+
+		for (auto const& [pos, names] : aliases) {
+			result.push_back({.pos = pos, .count = 0});
+			auto& call = result.back();
+			call.names.reserve(names.size());
+			for (auto const& [name, count] : names) {
+				call.names.push_back({.count = count});
+				auto& dst = call.names.back();
+				dst.link.assign(name.link);
+				dst.demangled.assign(name.demangled);
+				call.count += count;
 			}
-			dst->count += src->count;
-			src = aliases.erase(src);
-			end = aliases.end();
 		}
-
-		aliases.shrink_to_fit();
-		return aliases;
+		return result;
 	}
 
 	ref_ptr<function_coverage> function_coverage::create(

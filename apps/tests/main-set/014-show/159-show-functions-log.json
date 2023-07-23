@@ -14,7 +14,7 @@
             "build  $BUILD_HASH [ 67%]",
             "GitBranch: main",
             "Coverage:  [ 67%] \u001b[2;37m6/9\u001b[m \u001b[2;31m(fail)\u001b[m",
-            "Functions: [ 33%] \u001b[2;37m1/3\u001b[m \u001b[2;31m(fail)\u001b[m",
+            "Functions: [ 50%] \u001b[2;37m1/2\u001b[m \u001b[2;31m(fail)\u001b[m",
             "Author:    Johnny Appleseed <johnny@appleseed.com>",
             "Added:     $NOW",
             "",
