@@ -11,7 +11,7 @@
     ],
     "prepare": [
         "git init $TMP/repo",
-        "mkdirs $TMP/repo/.covmodule/nope",
+        "mkdirs $TMP/repo/.covmodules/nope",
         "cd $TMP/repo/"
     ]
 }

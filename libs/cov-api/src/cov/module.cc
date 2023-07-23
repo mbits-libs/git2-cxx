@@ -271,7 +271,7 @@ namespace cov {
 	                                      std::error_code& ec) {
 		CHECK_OBJ(commit, repo.lookup<git::commit>(ref, ec));
 		CHECK_OBJ(tree, commit.tree(ec));
-		CHECK_OBJ(entry, tree.entry_bypath(".covmodule", ec));
+		CHECK_OBJ(entry, tree.entry_bypath(".covmodules", ec));
 		CHECK_OBJ(blob, repo.lookup<git::blob>(entry.oid(), ec));
 
 		auto const bytes = blob.raw();
@@ -302,7 +302,7 @@ namespace cov {
 
 		auto cfg = git::config::create();
 		auto const ec =
-		    cfg.add_file_ondisk(make_path(*workdir) / ".covmodule"sv);
+		    cfg.add_file_ondisk(make_path(*workdir) / ".covmodules"sv);
 		UNLIKELY(ec);
 
 		std::error_code secondary{};
