@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) and [COMMITS.md](COMMITS.md) for commit guidelines.
 
+## [0.21.0](https://github.com/mzdun/cov/compare/v0.20.0...v0.21.0) (2023-07-23)
+
+### New Features
+
+- fully alias co-exiting functions ([8e27957](https://github.com/mzdun/cov/commit/8e279572342e160fddd51df303c50a4776c78222)), closes [#55](https://github.com/mzdun/cov/issues/55)
+- **api**: rename `.covmodule` to `.covmodules` ([55d3a3c](https://github.com/mzdun/cov/commit/55d3a3cd7fb76a2259fd2548ffa52bc6cf82a095)), closes [#54](https://github.com/mzdun/cov/issues/54)
+- **api**: prepare log formatter for various objects ([57ba02b](https://github.com/mzdun/cov/commit/57ba02bb3c164c7e25d110d1a5ee26086f83cecb))
+- **api**: take or borrow naked pointers ([e6ea747](https://github.com/mzdun/cov/commit/e6ea7471c35e3a24aa89e5a876bc8961a437b95b))
+- **api**: use git::oid/oid_view ([4e9cb92](https://github.com/mzdun/cov/commit/4e9cb92b4b4aedda839b2e12db4b12f8fa6127a0))
+- **api**: loosen revparse restrictions ([85ec4f2](https://github.com/mzdun/cov/commit/85ec4f21bd25f377d90bd8d62da13354d74c4726)), references [#51](https://github.com/mzdun/cov/issues/51)
+- **core**: allow only reports in `cov log` ([7957fc8](https://github.com/mzdun/cov/commit/7957fc841cf43f5bb32222872e2dbc95bcb90195)), closes [#51](https://github.com/mzdun/cov/issues/51), references [#51](https://github.com/mzdun/cov/issues/51)
+- **rt**: `show` as many kinds of info as possible ([53f5cfe](https://github.com/mzdun/cov/commit/53f5cfe73841d8ccac2c86ab5be4c251abb0d02d)), references [#51](https://github.com/mzdun/cov/issues/51)
+
+### Bug Fixes
+
+- apply changes required/uncovered by tests ([6e00711](https://github.com/mzdun/cov/commit/6e007115239e0d91737bff290339d49bfd30e6b6))
+- **api**: allow zero id to be valid in revparse ([24391e9](https://github.com/mzdun/cov/commit/24391e9fb64e5be136d5929e250ca511d52981b1)), references [#51](https://github.com/mzdun/cov/issues/51)
+- **api**: properly mark uncalled functions ([585c783](https://github.com/mzdun/cov/commit/585c783535f2a2f5f23dfb7eec657192152fbf87))
+- **rt**: adapt tests to new logger ([95c0126](https://github.com/mzdun/cov/commit/95c0126c86876dee8808e8f4d340c8ad4ab5ad95))
+
 ## [0.20.0](https://github.com/mzdun/cov/compare/v0.19.1...v0.20.0) (2023-07-21)
 
 ### New Features

@@ -36,7 +36,7 @@
     _name=..._\
     _dir=..._\
     _dir=..._
-    - [ ] rename `.covmodule` to `.covmodules` (mzdun/cov#54)
+    - [x] rename `.covmodule` to `.covmodules` (_0.21.0_, mzdun/cov#54)
   - [x] Patch-worth:
     - [x] add win32 RC file _(0.12.1-beta)_
     - [x] merge/split .po files _(0.12.2-beta)_
@@ -60,13 +60,13 @@
   - [x] `cov show` _(0.17.0)_
     - [x] Report / component / directory view
     - [x] File view
-    - [ ] Show builds and files from hash, add file info to file view (mzdun/cov#51)
+    - [x] Show builds and files from hash, add file info to file view (_0.21.0_, mzdun/cov#51)
   - [x] `cov report` reprise
     - [x] `cov report --prop`
     - [x] show propset in `report`
     - [x] show propset in non-`log` `show`s _(0.18.0)_
     - [x] show propset in `log` (_0.19.0_, mzdun/cov#46)
-    - [ ] fully alias co-existing function in report stats (mzdun/cov#55)
+    - [x] fully alias co-existing function in report stats (_0.21.0_, mzdun/cov#55)
     - [ ] `$COV_FILTER_PATH` (mzdun/cov#47)
   - [ ] `cov export` (from report, build and files)
     - [ ] `--json`
