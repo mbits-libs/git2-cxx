@@ -20,6 +20,7 @@ namespace cov {
 		static std::error_code parse_single(cov::repository const& repo,
 		                                    std::string_view rev,
 		                                    git::oid& out);
+		static bool is_report(cov::repository const& repo, git::oid_view id);
 
 	private:
 		void locate_range(cov::repository const& repo);

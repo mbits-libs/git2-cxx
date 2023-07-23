@@ -72,6 +72,10 @@ namespace cov::app::builtin::log {
 		         {platform::locale_dir(), ::lngs::system_locales()}};
 		auto const info = p.parse();
 
+		if (!revs::is_report(info.repo, info.range.to)) {
+			p.error(cov::make_error_code(cov::errc::wrong_object_type), p.tr());
+		}
+
 		p.show.print(info.repo, info.range, p.count);
 		return 0;
 	}
