@@ -168,14 +168,20 @@ namespace cov {
 		if (from_rev.empty()) {
 			out.from = HEAD;
 		} else {
-			auto const ec = parse_single(repo, from_rev, out.from);
+			auto ec = parse_single(repo, from_rev, out.from);
+			if (!ec && !is_report(repo, out.from)) {
+				ec = cov::make_error_code(cov::errc::wrong_object_type);
+			}
 			if (ec) return ec;
 		}
 
 		if (to_rev.empty()) {
 			out.to = HEAD;
 		} else {
-			auto const ec = parse_single(repo, to_rev, out.to);
+			auto ec = parse_single(repo, to_rev, out.to);
+			if (!ec && !is_report(repo, out.from)) {
+				ec = cov::make_error_code(cov::errc::wrong_object_type);
+			}
 			if (ec) {
 				out.from = {};
 				return ec;
@@ -252,6 +258,9 @@ namespace cov {
 		}
 
 		if (parent_count) {
+			if (!is_report(repo, out))
+				return cov::make_error_code(cov::errc::wrong_object_type);
+
 			auto node = cov::ref{out, true};
 			while (node && parent_count) {
 				--parent_count;
@@ -261,5 +270,11 @@ namespace cov {
 		}
 
 		return {};
+	}
+
+	bool revs::is_report(cov::repository const& repo, git::oid_view id) {
+		std::error_code ec{};
+		auto const obj = repo.lookup<cov::report>(id, ec);
+		return !ec && obj;
 	}
 }  // namespace cov
