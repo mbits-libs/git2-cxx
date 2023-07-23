@@ -66,7 +66,11 @@
     - [x] show propset in `report`
     - [x] show propset in non-`log` `show`s _(0.18.0)_
     - [x] show propset in `log` (_0.19.0_, mzdun/cov#46)
+    - [ ] fully alias co-existing function in report stats (mzdun/cov#55)
     - [ ] `$COV_FILTER_PATH` (mzdun/cov#47)
+  - [ ] `cov export` (from report, build and files)
+    - [ ] `--json`
+    - [ ] `--html`
   - [ ] `cov cherry-pick` (?)
   - [ ] Support for `less`
   - [ ] Major release

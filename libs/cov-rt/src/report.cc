@@ -273,11 +273,6 @@ namespace cov::app::report {
 			            }
 		            });
 
-		for (auto const& fun : function_coverage) {
-			++stats.functions.relevant;
-			if (fun.count) ++stats.functions.visited;
-		}
-
 		return result;
 	}  // GCOV_EXCL_LINE[GCC]
 
