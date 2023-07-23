@@ -285,6 +285,6 @@ namespace cov::app::module {
 	    git::repository_handle repo) const {
 		auto const workdir = repo.workdir();
 		if (!workdir) error(to_string(tr_(modlng::ERROR_NO_GIT_WORKDIR)));
-		return make_u8path(*workdir) / ".covmodule"sv;
+		return make_u8path(*workdir) / ".covmodules"sv;
 	}
 }  // namespace cov::app::module

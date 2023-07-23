@@ -232,7 +232,7 @@ namespace cov::testing {
 		auto builder = git::treebuilder::create(ec, repo);
 		if (ec) return ec;
 
-		ec = builder.insert(".covmodule", modules_id, GIT_FILEMODE_BLOB);
+		ec = builder.insert(".covmodules", modules_id, GIT_FILEMODE_BLOB);
 		if (ec) return ec;
 
 		git::oid tree_id{};
@@ -514,7 +514,7 @@ namespace cov::testing {
 			ASSERT_TRUE(cov_repo.write(report_id, report));
 		}
 
-		std::ofstream{setup::test_dir() / "modules-at-HEAD/.covmodule"sv}
+		std::ofstream{setup::test_dir() / "modules-at-HEAD/.covmodules"sv}
 		    << modified_project;
 
 		auto const mods = cov::modules::from_report(report_id, cov_repo, ec);
@@ -586,11 +586,11 @@ namespace cov::testing {
 			ASSERT_TRUE(cov_repo.write(report_id, report));
 		}
 
-		std::ofstream{setup::test_dir() / "modules-in-commit/.covmodule"sv}
+		std::ofstream{setup::test_dir() / "modules-in-commit/.covmodules"sv}
 		    << modified_project;
 		git::oid current;
 		ec = commit_dot_modules(current, &commit_id, repo, modified_project,
-		                        "Update .covmodule filters");
+		                        "Update .covmodules filters");
 		ASSERT_FALSE(ec) << message{ec};
 
 		auto const mods = cov::modules::from_report(report_id, cov_repo, ec);

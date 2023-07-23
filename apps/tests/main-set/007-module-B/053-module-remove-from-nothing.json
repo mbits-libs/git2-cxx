@@ -13,7 +13,7 @@
         "mkdirs $TMP/repo.covdata",
         "cd $TMP/repo.covdata",
         "git init $TMP/repo",
-        "touch '$TMP/repo/.covmodule' '[module \"A\"]\npath = dir 1\n'",
+        "touch '$TMP/repo/.covmodules' '[module \"A\"]\npath = dir 1\n'",
         "cov init --git-dir $TMP/repo ."
     ]
 }

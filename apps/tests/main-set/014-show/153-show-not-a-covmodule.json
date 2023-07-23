@@ -40,6 +40,6 @@
         "cov init",
         "cov report $DATA/build-coverage-show-modules.json -f create-report",
         "cov report $DATA/build-coverage-show-modules-2.json -f create-report",
-        "touch .covmodule 'not the file...'"
+        "touch .covmodules 'not the file...'"
     ]
 }
