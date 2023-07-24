@@ -109,9 +109,9 @@ def _test_name(filename: str) -> str:
     dirname = os.path.basename(dirname)
 
     def num(s: str):
-        l = s.split("-")
-        l[0] = f"({l[0]})"
-        return " ".join(l)
+        items = s.split("-")
+        items[0] = f"({items[0]})"
+        return " ".join(items)
 
     return f"{num(dirname)} :: {num(basename)}"
 
