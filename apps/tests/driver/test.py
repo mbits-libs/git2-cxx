@@ -103,17 +103,45 @@ class Env:
         return "\n".join(lines)
 
 
+def _test_name(filename: str) -> str:
+    dirname, basename = os.path.split(filename)
+    basename = os.path.splitext(basename)[0]
+    dirname = os.path.basename(dirname)
+
+    def num(s: str):
+        l = s.split("-")
+        l[0] = f"({l[0]})"
+        return " ".join(l)
+
+    return f"{num(dirname)} :: {num(basename)}"
+
+
 class Test:
     def __init__(self, data: dict, filename: str, count: int):
         self.cwd = os.getcwd()
         self.data = data
         self.filename = filename
+        self.name = _test_name(filename)
         self.ok = True
         self.post_args = []
-        self.linear = data.get("linear", False)
-        self.disabled = data.get("disabled")
+        self.linear: bool = data.get("linear", False)
+        self.disabled: Union[bool, str] = data.get("disabled", False)
         self.current_env: Optional[Env] = None
         self.additional_env: Dict[str, str] = {}
+        self.patches: Dict[str, str] = data.get("patches", {})
+
+        self.check = ["all", "all"]
+        for stream in range(len(_streams)):
+            self.check[stream] = data.get("check", {}).get(
+                _streams[stream], self.check[stream]
+            )
+
+        self.lang: str = data.get("lang", "en")
+        _env: Dict[str, Union[str, List[str], None]] = data.get("env", {})
+        self.env: Dict[str, Optional[str]] = {
+            key: os.pathsep.join(value) if isinstance(value, list) else value
+            for key, value in _env.items()
+        }
 
         if isinstance(self.disabled, bool):
             self.ok = not self.disabled
@@ -121,13 +149,6 @@ class Test:
             self.ok = self.disabled != sys.platform
 
         renovate = False
-
-        name = os.path.splitext(os.path.basename(filename))[0].split("-")
-        if int(name[0]) == count:
-            name = name[1:]
-        else:
-            name[0] = "({})".format(name[0])
-        self.name = " ".join(name)
 
         try:
             call_args, expected = data["args"], data["expected"]
@@ -165,18 +186,6 @@ class Test:
                 self.expected[2] = "\n".join(self.expected[2])
 
         try:
-            self.patches = data["patches"]
-        except KeyError:
-            self.patches = {}
-
-        self.check = ["all", "all"]
-        for stream in range(len(_streams)):
-            try:
-                self.check[stream] = data["check"][_streams[stream]]
-            except KeyError:
-                pass
-
-        try:
             self.prepare = data["prepare"]
             for cmd in self.prepare:
                 if not isinstance(cmd, str):
@@ -199,16 +208,6 @@ class Test:
                     break
         except KeyError:
             self.cleanup = []
-
-        try:
-            self.lang = data["lang"]
-        except KeyError:
-            self.lang = "en"
-
-        try:
-            self.env = data["env"]
-        except KeyError:
-            self.env = []
 
         if renovate:
             data["expected"] = [

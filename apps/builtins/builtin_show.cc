@@ -122,7 +122,7 @@ namespace cov::app::builtin::show {
 
 		if (auto files = as_a<cov::files>(generic); files) {
 			return files;
-		}
+		}  // GCOV_EXCL_LINE[WIN32]
 
 		// The only objects coming here are those above...
 		[[unlikely]];  // GCOV_EXCL_LINE

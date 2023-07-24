@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <filesystem>
 #include <thread>
+#include "path_env.hh"
 
 #ifdef RUNNING_GCOV
 extern "C" {
@@ -21,8 +22,33 @@ extern "C" int __llvm_profile_write_file(void);
 
 namespace cov::app::platform {
 	namespace {
-		[[noreturn]] void spawn(std::filesystem::path const& bin,
-		                        std::string const& program,
+		std::string env(char const* name) {
+			auto value = getenv(name);
+			return value ? value : std::string{};
+		}
+
+		bool executable(std::filesystem::path const& program) {
+			return !std::filesystem::is_directory(program) &&
+			       !access(program.c_str(), X_OK);
+		}
+
+		std::filesystem::path where(std::filesystem::path const& bin,
+		                            char const* environment_variable,
+		                            std::string const& program) {
+			auto path_str = env(environment_variable);
+			auto dirs = split(bin.native(), path_str);
+
+			for (auto const& dir : dirs) {
+				auto path = std::filesystem::path{dir} / program;
+				if (executable(path)) {
+					return path;
+				}
+			}
+
+			return {};
+		}
+
+		[[noreturn]] void spawn(std::filesystem::path const& program_path,
 		                        args::arglist args) {
 			auto const fd_max = static_cast<int>(sysconf(_SC_OPEN_MAX));
 			for (int fd = 3; fd < fd_max; fd++)
@@ -30,11 +56,9 @@ namespace cov::app::platform {
 
 			setpgid(0, 0);
 
-			auto const program_path = (bin / program);
-
 			std::vector<char*> argv;
 			argv.reserve(2 + args.size());  // arg0 and NULL
-			argv.push_back(const_cast<char*>(program.c_str()));
+			argv.push_back(const_cast<char*>(program_path.filename().c_str()));
 			for (unsigned i = 0; i < args.size(); ++i)
 				argv.push_back(const_cast<char*>(args[i].data()));
 			argv.push_back(nullptr);
@@ -183,12 +207,20 @@ namespace cov::app::platform {
 		};
 
 		captured_output execute(std::filesystem::path const& bin,
+		                        char const* environment_variable,
 		                        std::string const& program,
 		                        args::arglist args,
 		                        std::vector<std::byte> const* input,
 		                        std::filesystem::path const* cwd,
 		                        bool capture) {
 			captured_output result{};
+
+			auto const executable = where(bin, environment_variable, program);
+			if (executable.empty()) {
+				result.return_code = -ENOENT;
+				return result;
+			}
+
 			pipes_type pipes{};
 			if (!pipes.open(input != nullptr, capture)) {
 				// GCOV_EXCL_START[POSIX]
@@ -210,7 +242,7 @@ namespace cov::app::platform {
 					std::filesystem::current_path(*cwd, ignore);
 				}
 				pipes.dup();
-				spawn(bin, program, args);
+				spawn(executable, args);
 			}
 
 			signal(SIGINT, forward_signal);
@@ -239,8 +271,9 @@ namespace cov::app::platform {
 	int run_tool(std::filesystem::path const& tooldir,
 	             std::string_view tool,
 	             args::arglist args) {
-		return execute(tooldir, "cov-" + std::string(tool.data(), tool.size()),
-		               args, nullptr, nullptr, false)
+		return execute(tooldir, "COV_PATH",
+		               "cov-" + std::string(tool.data(), tool.size()), args,
+		               nullptr, nullptr, false)
 		    .return_code;
 	}
 
@@ -248,7 +281,8 @@ namespace cov::app::platform {
 	                           std::filesystem::path const& cwd,
 	                           std::string_view filter,
 	                           std::vector<std::byte> const& input) {
-		return execute(filter_dir, std::string(filter.data(), filter.size()),
-		               {}, &input, &cwd, true);
+		return execute(filter_dir, "COV_FILTER_PATH",
+		               std::string(filter.data(), filter.size()), {}, &input,
+		               &cwd, true);
 	}
 }  // namespace cov::app::platform

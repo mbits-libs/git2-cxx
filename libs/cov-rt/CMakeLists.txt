@@ -5,6 +5,7 @@ set(SOURCES
   src/cvg_info.cc
   src/line_printer.cc
   src/module.cc
+  src/path_env.hh
   src/report_command.cc
   src/report.cc
   src/root_command.cc
