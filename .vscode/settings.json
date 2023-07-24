@@ -126,6 +126,7 @@
         "hash_set": "cpp",
         "cfloat": "cpp",
         "climits": "cpp",
-        "queue": "cpp"
+        "queue": "cpp",
+        "source_location": "cpp"
     }
 }

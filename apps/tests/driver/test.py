@@ -116,6 +116,12 @@ def _test_name(filename: str) -> str:
     return f"{num(dirname)} :: {num(basename)}"
 
 
+def _paths(key: str, dirs: List[str]):
+    vals = [val for val in os.environ.get(key, "").split(os.pathsep) if val != ""]
+    vals.extend(dirs)
+    return os.pathsep.join(vals)
+
+
 class Test:
     def __init__(self, data: dict, filename: str, count: int):
         self.cwd = os.getcwd()
@@ -139,7 +145,7 @@ class Test:
         self.lang: str = data.get("lang", "en")
         _env: Dict[str, Union[str, List[str], None]] = data.get("env", {})
         self.env: Dict[str, Optional[str]] = {
-            key: os.pathsep.join(value) if isinstance(value, list) else value
+            key: _paths(key, value) if isinstance(value, list) else value
             for key, value in _env.items()
         }
 
@@ -365,17 +371,20 @@ Diff:
                 _env[key] = value
             elif key in _env:
                 del _env[key]
+        for key in os.environ:
+            if key[:4] == "COV_" and key not in _env:
+                _env[key] = os.environ[key]
 
         expanded = [env.expand(arg, tempdir) for arg in self.args]
         result += " ".join(
-            shlex.quote(arg)
+            shlex.quote(arg.replace(os.sep, "/"))
             for arg in [
                 *["{}={}".format(key, _env[key]) for key in _env],
                 env.target,
                 *expanded,
             ]
         )
-        result += f"\n{self.filename}"
+        result += f"\ncwd: {self.cwd}\ntest: {self.filename}"
 
         return result
 
