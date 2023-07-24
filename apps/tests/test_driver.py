@@ -137,13 +137,25 @@ def _make_env(args: argparse.Namespace, counter_total: int):
     )
 
 
+def _append(key: str, value: str):
+    vals = os.environ.get(key, "").split(os.pathsep)
+    vals.append(value)
+    os.environ[key] = os.pathsep.join(val for val in vals if val != "")
+
+
 def _install(install: Optional[str], install_with: List[str], env: Env):
     if install is None:
         return
 
     root_dir = os.path.dirname(os.path.dirname(env.target))
+    filters_target = os.path.join(install, "additional-filters")
+
+    _append("COV_FILTER_PATH", filters_target)
+    _append("COV_PATH", os.path.join(os.path.abspath(root_dir), "dont-copy"))
+
     os.makedirs(os.path.join(install, "bin"), exist_ok=True)
     os.makedirs(os.path.join(install, "libexec", "cov"), exist_ok=True)
+    os.makedirs(filters_target, exist_ok=True)
 
     shutil.copy2(env.target, os.path.join(install, "bin"))
     if os.path.exists(os.path.join(root_dir, "libexec")):
@@ -159,8 +171,6 @@ def _install(install: Optional[str], install_with: List[str], env: Env):
             dirs_exist_ok=True,
         )
 
-    filters_target = os.path.join(install, "additional-filters")
-    os.makedirs(filters_target, exist_ok=True)
     filters_source = os.path.join(os.path.dirname(__file__), "test-filters")
     for _, dirs, files in os.walk(filters_source):
         dirs[:] = []
@@ -172,10 +182,6 @@ def _install(install: Optional[str], install_with: List[str], env: Env):
                 os.path.join(filters_source, filename),
                 os.path.join(filters_target, name),
             )
-
-    os.environ["COV_FILTER_PATH"] = (
-        os.environ.get("COV_FILTER_PATH", "") + os.pathsep + filters_target
-    )
 
     for module in install_with:
         shutil.copy2(module, os.path.join(install, "libexec", "cov"))
@@ -194,9 +200,14 @@ def _load_tests(testsuite: List[str], run: List[str]):
         if counter not in run:
             continue
 
-        test = Test.load(filename, counter)
-        if not test.ok:
-            continue
+        try:
+            test = Test.load(filename, counter)
+            if not test.ok:
+                continue
+        except Exception:
+            print(">>>>>>", filename, file=sys.stderr)
+            raise
+
         if test.linear:
             linear_tests.append((test, counter))
         else:
