@@ -67,7 +67,7 @@
     - [x] show propset in non-`log` `show`s _(0.18.0)_
     - [x] show propset in `log` (_0.19.0_, mzdun/cov#46)
     - [x] fully alias co-existing function in report stats (_0.21.0_, mzdun/cov#55)
-    - [ ] `$COV_FILTER_PATH` (mzdun/cov#47)
+    - [x] `$COV_FILTER_PATH` (_0.21.1_, mzdun/cov#47)
   - [ ] `cov export` from report, build and files (mzdun/cov#58)
     - [ ] `--json`
     - [ ] `--html`
@@ -116,12 +116,11 @@
 
 ## Next steps:
 
-1. mzdun/cov#47 `$COV_FILTER_PATH`
+1. mzdun/cov#65 release with rc.#
 1. mzdun/cov#61 `branch_coverage`/`"bran"`
 1. mzdun/cov#59 build set manipulation (adding, removing from HEAD)
 1. mzdun/cov#58 `cov export (--json | --html)` 
 1. mzdun/cov#60 support for a pager
 1. mzdun/cov#62 look into tortoise and a hare
 1. mzdun/cov#63 freeze strings
-1. mzdun/cov#65 release with rc.#
 1. ??? major release

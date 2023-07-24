@@ -41,17 +41,17 @@ def _sem_ver(tag):
     return (*ver, stability)
 
 
-def _level_from_commit(commit: Commit) -> int:
+def _level_from_commit(commit: Commit) -> Tuple[int, str]:
     if commit.is_breaking:
-        return LEVEL_BREAKING
+        return (LEVEL_BREAKING, commit.scope)
     try:
         current_type = TYPE_FIX[commit.type]
+        current_scope = commit.type
     except KeyError:
         current_type = commit.type
-    try:
-        return {"feat": LEVEL_FEATURE, "fix": LEVEL_PATCH}[current_type]
-    except KeyError:
-        return LEVEL_BENIGN
+        current_scope = commit.scope
+    current_type = {"feat": LEVEL_FEATURE, "fix": LEVEL_PATCH}.get(current_type, LEVEL_BENIGN)
+    return (current_type, current_scope)
 
 
 def _get_commit(hash: str, short_hash: str, message: str) -> Commit:
@@ -168,13 +168,10 @@ def get_log(
             continue
         if "(no-log)" in commit.summary:
             continue
-        current_level = _level_from_commit(commit)
+        current_level, current_scope = _level_from_commit(commit)
         if current_level > level:
             level = current_level
-        try:
-            current_type = TYPE_FIX[commit.type]
-        except KeyError:
-            current_type = commit.type
+        current_type = TYPE_FIX.get(commit.type, commit.type)
         hidden = current_type not in KNOWN_TYPES
 
         if hidden and not commit.is_breaking and not take_all:
@@ -182,7 +179,7 @@ def get_log(
         if hidden and commit.is_breaking:
             current_type = BREAKING_CHANGE
 
-        current_scope = scope_fix.get(commit.scope, commit.scope)
+        current_scope = scope_fix.get(current_scope, current_scope)
         if current_type not in changes:
             changes[current_type] = []
         changes[current_type].append(

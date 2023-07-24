@@ -13,7 +13,7 @@ import subprocess
 from typing import List, Optional
 
 from github.api import API, format_release
-from github.changelog import FORCED_LEVEL, update_changelog
+from github.changelog import FORCED_LEVEL, LEVEL_STABILITY, LEVEL_BENIGN, update_changelog
 from github.cmake import get_version, set_version
 from github.git import add_files, annotated_tag, bump_version, commit, get_log, get_tags
 from github.runner import Environment, print_args
@@ -35,9 +35,11 @@ def release(
     github_link = f"https://github.com/{GITHUB_ORG}/{project.name.value}"
     tags = get_tags(project)
     log, level = get_log(tags, SCOPE_FIX, take_all)
+    force_stability = False
 
     if forced_level is not None:
-        level = forced_level
+        force_stability = forced_level == LEVEL_STABILITY
+        level = forced_level if not force_stability else level
 
     next_stability = project.stability.value
     if stability is not None:
@@ -45,6 +47,22 @@ def release(
         if len(stability):
             stability = f"-{stability}"
         next_stability = stability
+    if force_stability:
+        if next_stability:
+            stability_parts = next_stability.split('.')
+            if len(stability_parts) == 0:
+                next_stability = f"{next_stability}.2"
+            else:
+                iteration = int(stability_parts[1]) + 1
+                stability_parts[1] = str(iteration)
+                next_stability = '.'.join(stability_parts)
+            level = LEVEL_BENIGN
+        else:
+            next_stability = "-rc.1"
+    else:
+        if next_stability[:4] == '-rc.':
+            next_stability = ''
+            level = LEVEL_BENIGN
     next_tag = f"v{bump_version(project.ver(), level)}{next_stability}"
     if not Environment.DRY_RUN or show_changelog:
         update_changelog(log, next_tag, project.tag(), github_link)

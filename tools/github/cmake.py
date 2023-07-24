@@ -171,3 +171,6 @@ def set_version(ver: str):
     if len(ver_split) > 1:
         stability = f"-{ver_split[1]}"
         _patch(get_version().stability, stability)
+    elif len(get_version().stability.value):
+        _patch(get_version().stability, "")
+        
