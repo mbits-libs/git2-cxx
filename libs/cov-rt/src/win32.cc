@@ -14,6 +14,7 @@
 #include <thread>
 #include <vector>
 #include "fmt/format.h"
+#include "path_env.hh"
 
 namespace cov::app::platform {
 	namespace {
@@ -144,6 +145,23 @@ namespace cov::app::platform {
 			out[size] = 0;
 			return {out.get(), static_cast<size_t>(size)};
 		}
+
+		// GCOV_EXCL_START[WIN32]
+		// Currently, used only in debug fmt::prints
+		std::string to_utf8(std::wstring_view arg) {
+			if (arg.empty()) return {};
+
+			auto const length = static_cast<int>(arg.size());
+
+			auto size = WideCharToMultiByte(CP_UTF8, 0, arg.data(), length,
+			                                nullptr, 0, nullptr, nullptr);
+			std::unique_ptr<char[]> out{new char[size + 1]};
+			WideCharToMultiByte(CP_UTF8, 0, arg.data(), length, out.get(),
+			                    size + 1, nullptr, nullptr);
+			out[size] = 0;
+			return {out.get(), static_cast<size_t>(size)};
+		}
+		// GCOV_EXCL_STOP
 
 		struct win32_pipe {
 			HANDLE read{nullptr};
@@ -321,7 +339,7 @@ namespace cov::app::platform {
 				}
 
 				append(arg_string,
-				       ' ');  // becasue we need .data() in CreateProcess...
+				       ' ');  // because we need .data() in CreateProcess...
 				return arg_string;
 			}
 
@@ -329,16 +347,77 @@ namespace cov::app::platform {
 				return script_engine.empty() ? program_file.c_str() : nullptr;
 			}
 		};
+		std::wstring env(wchar_t const* name) {
+			wchar_t* env{};
+			size_t length{};
+			auto err = _wdupenv_s(&env, &length, name);
+			std::wstring result{};
+			if (!err && env && length) result.assign(env, length - 1);
+			return result;
+		}
+		std::wstring filename(std::wstring_view program,
+		                      std::wstring_view ext) {
+			std::wstring result{};
+			result.reserve(program.length() + ext.length());
+			result.append(program);
+			result.append(ext);
+			return result;
+		}
+
+		bool file_exists(std::filesystem::path const& path) {
+			std::error_code ec{};
+			auto status = std::filesystem::status(path, ec);
+			return !ec && std::filesystem::is_regular_file(status);
+		}
+
+		std::filesystem::path where(std::filesystem::path const& bin,
+		                            wchar_t const* environment_variable,
+		                            std::wstring const& program) {
+			auto path_str = env(environment_variable);
+			auto dirs = split(bin.native(), path_str);
+
+			auto ext_str = env(L"PATHEXT");
+			auto path_ext = split(std::wstring{}, ext_str);
+
+			for (auto const& dir : dirs) {
+				for (auto const ext : path_ext) {
+					auto path =
+					    std::filesystem::path{dir} / filename(program, ext);
+					if (file_exists(path)) {
+						return std::filesystem::canonical(path);
+					}
+				}
+			}
+
+			return {};
+		}
+
+		std::filesystem::path extensionless_where(
+		    std::filesystem::path const& bin,
+		    wchar_t const* environment_variable,
+		    std::wstring const& program) {
+			auto path_str = env(environment_variable);
+			auto dirs = split(bin.native(), path_str);
+
+			for (auto const& dir : dirs) {
+				auto path = std::filesystem::path{dir} / program;
+				if (file_exists(path)) {
+					return std::filesystem::canonical(path);
+				}
+			}
+
+			return {};
+		}
 
 		scripted_file locate_file(std::filesystem::path const& bin,
+		                          wchar_t const* environment_variable,
 		                          std::wstring const& program) {
 			// .exe -> extensionless python
 			scripted_file result{};
-			result.program_file = bin / (program + L".exe");
-			std::error_code ec{};
-			auto status = std::filesystem::status(result.program_file, ec);
-			if (ec || !std::filesystem::is_regular_file(status)) {
-				result.program_file = bin / program;
+			result.program_file = where(bin, environment_variable, program);
+			if (result.program_file.empty()) {
+				result.program_file =
+				    extensionless_where(bin, environment_variable, program);
 				auto in = io::fopen(result.program_file);
 				if (!in) {
 					result.program_file.clear();
@@ -357,6 +436,7 @@ namespace cov::app::platform {
 		}
 
 		captured_output execute(std::filesystem::path const& bin,
+		                        wchar_t const* environment_variable,
 		                        std::wstring const& program,
 		                        args::arglist args,
 		                        std::vector<std::byte> const* input,
@@ -364,7 +444,7 @@ namespace cov::app::platform {
 		                        bool capture) {
 			captured_output result{};
 
-			auto const path = locate_file(bin, program);
+			auto const path = locate_file(bin, environment_variable, program);
 			if (path.program_file.empty()) {
 				result.return_code = !path.access ? -EACCES : -ENOENT;
 				return result;
@@ -434,8 +514,8 @@ namespace cov::app::platform {
 	int run_tool(std::filesystem::path const& tooldir,
 	             std::string_view tool,
 	             args::arglist args) {
-		return execute(tooldir, L"cov-" + from_utf8(tool), args, nullptr,
-		               nullptr, false)
+		return execute(tooldir, L"COV_PATH", L"cov-" + from_utf8(tool), args,
+		               nullptr, nullptr, false)
 		    .return_code;
 	}
 
@@ -443,6 +523,7 @@ namespace cov::app::platform {
 	                           std::filesystem::path const& cwd,
 	                           std::string_view filter,
 	                           std::vector<std::byte> const& input) {
-		return execute(filter_dir, from_utf8(filter), {}, &input, &cwd, true);
+		return execute(filter_dir, L"COV_FILTER_PATH", from_utf8(filter), {},
+		               &input, &cwd, true);
 	}
 }  // namespace cov::app::platform

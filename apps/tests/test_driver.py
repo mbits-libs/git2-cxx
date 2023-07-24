@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # Copyright (c) 2022 Marcin Zdun
 # This code is licensed under MIT license (see LICENSE for details)
 
@@ -158,9 +159,8 @@ def _install(install: Optional[str], install_with: List[str], env: Env):
             dirs_exist_ok=True,
         )
 
-    filters_target = "share/cov-{}/filters".format(
-        ".".join(env.version.split(".", 2)[:2])
-    )
+    filters_target = os.path.join(install, "additional-filters")
+    os.makedirs(filters_target, exist_ok=True)
     filters_source = os.path.join(os.path.dirname(__file__), "test-filters")
     for _, dirs, files in os.walk(filters_source):
         dirs[:] = []
@@ -170,8 +170,12 @@ def _install(install: Optional[str], install_with: List[str], env: Env):
                 continue
             shutil.copy2(
                 os.path.join(filters_source, filename),
-                os.path.join(install, filters_target, name),
+                os.path.join(filters_target, name),
             )
+
+    os.environ["COV_FILTER_PATH"] = (
+        os.environ.get("COV_FILTER_PATH", "") + os.pathsep + filters_target
+    )
 
     for module in install_with:
         shutil.copy2(module, os.path.join(install, "libexec", "cov"))

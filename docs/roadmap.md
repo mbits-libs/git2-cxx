@@ -123,4 +123,5 @@
 1. mzdun/cov#60 support for a pager
 1. mzdun/cov#62 look into tortoise and a hare
 1. mzdun/cov#63 freeze strings
+1. mzdun/cov#65 release with rc.#
 1. ??? major release
