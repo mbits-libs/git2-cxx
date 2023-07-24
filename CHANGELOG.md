@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) and [COMMITS.md](COMMITS.md) for commit guidelines.
 
+## [0.21.1](https://github.com/mzdun/cov/compare/v0.21.0...v0.21.1) (2023-07-24)
+
+### Bug Fixes
+
+- **api**: use COV_PATH for tools ([649c449](https://github.com/mzdun/cov/commit/649c44963c45693f4c9e6b5c19062a0506fe8661)), closes [#47](https://github.com/mzdun/cov/issues/47)
+- **docs**: update roadmap, add next steps list ([04a6d23](https://github.com/mzdun/cov/commit/04a6d23bada0d2a4363615bd34f2ec5964f7158a))
+
 ## [0.21.0](https://github.com/mzdun/cov/compare/v0.20.0...v0.21.0) (2023-07-23)
 
 ### New Features

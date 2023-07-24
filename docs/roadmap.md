@@ -116,7 +116,6 @@
 
 ## Next steps:
 
-1. mzdun/cov#65 release with rc.#
 1. mzdun/cov#61 `branch_coverage`/`"bran"`
 1. mzdun/cov#59 build set manipulation (adding, removing from HEAD)
 1. mzdun/cov#58 `cov export (--json | --html)` 
