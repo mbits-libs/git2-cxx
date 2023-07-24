@@ -1,0 +1,12 @@
+{
+    "args": "pwd",
+    "expected": [
+        0,
+        "cov-pwd: $DATA/pwd-dir\n",
+        ""
+    ],
+    "prepare": [
+        "mkdirs '$DATA/pwd-dir'",
+        "cd '$DATA/pwd-dir'"
+    ]
+}

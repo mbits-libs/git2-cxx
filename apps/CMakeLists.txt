@@ -114,13 +114,25 @@ if (COV_TESTING)
     target_link_libraries(cov-echo PRIVATE fmt::fmt mbits::args)
     set_target_properties(cov-echo PROPERTIES FOLDER tests/spawn)
 
+    add_cov_tool(cov-pwd tests/cov-pwd.cc)
+    target_compile_options(cov-pwd PRIVATE ${ADDITIONAL_WALL_FLAGS})
+    target_link_options(cov-pwd PRIVATE ${ADDITIONAL_LINK_FLAGS})
+    target_link_libraries(cov-pwd PRIVATE fmt::fmt mbits::args)
+    set_target_properties(cov-pwd PROPERTIES FOLDER tests/spawn)
+
     set_target_properties(cov-echo PROPERTIES
       RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/elsewhere/${CORE_DIR}"
+      )
+    set_target_properties(cov-pwd PROPERTIES
+      RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/dont-copy"
       )
 
     foreach(BUILD_TYPE DEBUG RELEASE RELWITHDEBINFO MINSIZEREL)
       set_target_properties(cov-echo PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY_${BUILD_TYPE} "${CMAKE_BINARY_DIR}/elsewhere/${CORE_DIR}"
+          )
+      set_target_properties(cov-pwd PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY_${BUILD_TYPE} "${CMAKE_BINARY_DIR}/dont-copy"
           )
     endforeach()
 
