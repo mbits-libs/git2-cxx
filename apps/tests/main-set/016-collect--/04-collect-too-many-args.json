@@ -1,0 +1,18 @@
+{
+    "args": "collect ctest -C Debug .",
+    "expected": [
+        2,
+        "",
+        [
+            "usage: cov-collect [-h] [-c ARG] [--clean] [--observe]",
+            "cov-collect: error: unrecognized argument: ctest\n"
+        ]
+    ],
+    "prepare": [
+        "mkdirs '$TMP/observe'",
+        "cd '$TMP/observe'",
+        "git init",
+        "cov init",
+        "git commit -m 'initial' --allow-empty"
+    ]
+}

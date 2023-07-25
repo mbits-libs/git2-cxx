@@ -25,6 +25,10 @@ namespace git {
 			return git::create_handle<reference>(ec, git_reference_resolve,
 			                                     this->get());
 		}
+
+		char const* shorthand() const noexcept {
+			return git_reference_shorthand(this->get());
+		}
 	};
 
 	template <class Holder>

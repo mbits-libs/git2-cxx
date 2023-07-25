@@ -1,0 +1,18 @@
+{
+    "args": "collect --observe",
+    "expected": [
+        2,
+        "",
+        [
+            "usage: cov-collect [-h] [-c ARG] [--clean] [--observe]",
+            "cov-collect: error: argument --observe: missing tool name and arguments\n"
+        ]
+    ],
+    "prepare": [
+        "mkdirs '$TMP/observe'",
+        "cd '$TMP/observe'",
+        "git init",
+        "cov init",
+        "git commit -m 'initial' --allow-empty"
+    ]
+}

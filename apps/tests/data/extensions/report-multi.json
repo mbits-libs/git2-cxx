@@ -1,0 +1,89 @@
+{
+    "$schema": "https://raw.githubusercontent.com/mzdun/cov/v0.21.1/apps/report-schema.json",
+    "git": {
+        "branch": "main",
+        "head": "98d4978ecbddf677c1e6bf5a40da84bd0b337340"
+    },
+    "files": [
+        {
+            "name": "no-exclusions.cc",
+            "digest": "sha1:7a8387f153415d9943ed4194242acbdd19be01a0",
+            "line_coverage": {
+                "1": 1,
+                "2": 1,
+                "3": 1,
+                "4": 1,
+                "5": 1,
+                "6": 1
+            },
+            "functions": [
+                {
+                    "name": "foo",
+                    "count": 1,
+                    "start_line": 1,
+                    "end_line": 6
+                }
+            ]
+        },
+        {
+            "name": "start-start.cc",
+            "digest": "sha1:ca07ba87cceec9631bc941369dba40d424804d9b",
+            "line_coverage": {
+                "1": 1,
+                "3": 1,
+                "4": 1,
+                "5": 1,
+                "6": 1,
+                "8": 1
+            },
+            "functions": [
+                {
+                    "name": "foo",
+                    "count": 1,
+                    "start_line": 1,
+                    "end_line": 8
+                }
+            ]
+        },
+        {
+            "name": "start-end.cc",
+            "digest": "sha1:c37d4dd51a1a6d24bbe16ce734bd6939d0126750",
+            "line_coverage": {
+                "1": 1,
+                "3": 1,
+                "4": 1,
+                "5": 1,
+                "6": 1,
+                "8": 1
+            },
+            "functions": [
+                {
+                    "name": "foo",
+                    "count": 1,
+                    "start_line": 1,
+                    "end_line": 8
+                }
+            ]
+        },
+        {
+            "name": "start.cc",
+            "digest": "sha1:070cb0e88d0b5ea1dfb8c003ff3a74d895ca0a4e",
+            "line_coverage": {
+                "1": 1,
+                "3": 1,
+                "4": 1,
+                "5": 1,
+                "6": 1,
+                "7": 1
+            },
+            "functions": [
+                {
+                    "name": "foo",
+                    "count": 1,
+                    "start_line": 1,
+                    "end_line": 7
+                }
+            ]
+        }
+    ]
+}

@@ -64,6 +64,7 @@ namespace cov::testing {
 		    {1250, {300, 299}, {0, 0}, {0, 0}}, {});
 		ASSERT_TRUE(report);
 
+		fmt::print("locale: {}\n", env.locale);
 		auto facade = ph::object_facade::present_report(report, nullptr);
 		auto actual = fmt.format(facade.get(), env);
 		ASSERT_EQ(expected, actual);
@@ -82,8 +83,14 @@ namespace cov::testing {
 	static constexpr auto feb29 =
 	    sys_days{2000_y / feb / 29} + 12h + 34min + 56s;
 
+	// If you'll get locale::facet::_S_create_c_locale name not valid exceptions
+	// on some of those tests, on Ubuntu:
+	// ```
+	// sudo locale-gen "pl_PL.UTF-8" "en_US.UTF-8" "en_GB.UTF-8"
+	// ```
+
 	static date_test const tests[] = {
-#ifndef CUTDOWN_OS
+#if !defined(_WIN32) || !defined(CUTDOWN_OS)
 	    {
 	        "Date in Poland/Polish"sv,
 	        "%rd"sv,
@@ -108,7 +115,7 @@ namespace cov::testing {
 	         .time_zone = "Europe/Warsaw"sv,
 	         .locale = "en_GB.UTF-8"sv},
 	    },
-#endif  // CUTDOWN_OS
+#endif  // !_WIN32 || !CUTDOWN_OS
 	    {
 	        "Date in Poland/US English"sv,
 	        "%rd"sv,
@@ -121,7 +128,7 @@ namespace cov::testing {
 	         .time_zone = "Europe/Warsaw"sv,
 	         .locale = "en_US.UTF-8"sv},
 	    },
-#ifndef CUTDOWN_OS
+#if !defined(_WIN32) || !defined(CUTDOWN_OS)
 	    {
 	        "Date in Labrador/Polish"sv,
 	        "%rd"sv,
@@ -146,7 +153,7 @@ namespace cov::testing {
 	         .time_zone = "America/St_Johns"sv,
 	         .locale = "en_GB.UTF-8"sv},
 	    },
-#endif  // CUTDOWN_OS
+#endif  // !_WIN32 || !CUTDOWN_OS
 	    {
 	        "Date in Labrador/US English"sv,
 	        "%rd"sv,

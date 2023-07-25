@@ -64,13 +64,8 @@ if (COV_TESTING)
   message(STATUS "JsonRunner_EXECUTABLE is: ${JsonRunner_EXECUTABLE}")
 
   set(COVERALLS_PREFIX cov_)
-  
-  set(INCLUDED_IN_COVERAGE
-    apps/builtins
-    apps/cov
-    extensions/filters
-  )
 
+  set(INCLUDED_IN_COVERAGE apps extensions)
   foreach(module
     libs/cov-api
     libs/cell
@@ -84,12 +79,6 @@ if (COV_TESTING)
 
   foreach(extra cxx py3 ts)
     list(APPEND INCLUDED_IN_COVERAGE libs/hilite/hilite-${extra}/src)
-  endforeach()
-
-  foreach(ext_lib excludes ext_native ext_platform)
-    list(APPEND INCLUDED_IN_COVERAGE
-      extensions/libs/${ext_lib}/include
-      extensions/libs/${ext_lib}/src)
   endforeach()
 
   set(EXCLUDED_FROM_COVERAGE
@@ -220,6 +209,10 @@ add_subdirectory(external)
 add_subdirectory(libs)
 add_subdirectory(extensions)
 add_subdirectory(apps)
+
+message(STATUS "COV_TOOLS: ${COV_TOOLS}")
+message(STATUS "COV_LIBS: ${COV_LIBS}")
+message(STATUS "VS_MODS: ${VS_MODS}")
 
 execute_process(COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/packages/system.py props
     OUTPUT_VARIABLE COV_PROPERTIES

@@ -5,6 +5,7 @@
 
 #include <args/parser.hpp>
 #include <cov/app/cov_tr.hh>
+#include <cov/app/run.hh>
 #include <cov/git2/config.hh>
 #include <filesystem>
 #include <set>
@@ -48,22 +49,4 @@ namespace cov::app {
 		git::config cfg_;
 		std::span<builtin_tool const> builtins_;
 	};
-
-	namespace platform {
-		int run_tool(std::filesystem::path const& tooldir,
-		             std::string_view tool,
-		             args::arglist args);
-
-		struct captured_output {
-			std::vector<std::byte> output{};
-			std::vector<std::byte> error{};
-			int return_code{};
-		};
-
-		captured_output run_filter(std::filesystem::path const& filter_dir,
-		                           std::filesystem::path const& cwd,
-		                           std::string_view filter,
-		                           args::arglist args,
-		                           std::vector<std::byte> const& input);
-	}  // namespace platform
 }  // namespace cov::app

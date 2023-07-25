@@ -1,4 +1,5 @@
 add_subdirectory(libs)
+add_subdirectory(tests)
 
 set(NATIVE_FILTERS
     strip-excludes
@@ -29,5 +30,10 @@ target_sources(strip-excludes PRIVATE
   filters/strip_excludes/parser.cc
 )
 target_link_libraries(strip-excludes PRIVATE excludes ext_platform)
+
+add_cov_ext(collect)
+add_win32_icon(cov-collect "plugin.ico")
+target_link_libraries(cov-collect PRIVATE collect-api)
+
 
 set_parent_scope()

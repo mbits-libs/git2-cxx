@@ -5,7 +5,6 @@ set(SOURCES
   src/cvg_info.cc
   src/line_printer.cc
   src/module.cc
-  src/path_env.hh
   src/report_command.cc
   src/report.cc
   src/root_command.cc
@@ -37,19 +36,9 @@ set(SOURCES
   include/cov/app/tools.hh
 )
 
-if (UNIX)
-	list(APPEND SOURCES src/posix.cc)
-elseif(WIN32)
-	list(APPEND SOURCES src/win32.cc)
-endif()
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})
 
-add_library(cov-rt STATIC ${SOURCES})
-target_compile_options(cov-rt PRIVATE ${ADDITIONAL_WALL_FLAGS})
-target_link_options(cov-rt PRIVATE ${ADDITIONAL_LINK_FLAGS})
-target_include_directories(cov-rt PUBLIC
-  ${CMAKE_CURRENT_SOURCE_DIR}/include
-  ${CMAKE_CURRENT_BINARY_DIR}/include)
+add_cov_library(cov-rt ${SOURCES})
 target_link_libraries(cov-rt PUBLIC app)
 
 set_target_properties(cov-rt PROPERTIES FOLDER libs)

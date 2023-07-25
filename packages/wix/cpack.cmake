@@ -7,6 +7,7 @@ list(REMOVE_ITEM CPACK_COMPONENTS_ALL
     hilite
     hilite_cxx
     lighter
+    libexts
 )
 
 foreach(COMP ${CPACK_COMPONENTS_ALL})

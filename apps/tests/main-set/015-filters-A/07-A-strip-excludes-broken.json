@@ -1,0 +1,15 @@
+{
+    "args": "report -f strip-excludes '$DATA/extensions/report-broken-A.json'",
+    "expected": [
+        2,
+        "",
+        [
+            "cov report: /files[0]/name: undefined",
+            "cov report: error: there were issues with $DATA/extensions/report-broken-A.json processed by strip-excludes filter\n"
+        ]
+    ],
+    "prepare": [
+        "unpack $DATA/extensions.tar $TMP",
+        "cd '$TMP/extensions'"
+    ]
+}

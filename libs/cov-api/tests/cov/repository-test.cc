@@ -11,6 +11,7 @@
 #include <cov/tag.hh>
 #include "db-helper.hh"
 #include "path-utils.hh"
+#include "path.hh"
 #include "setup.hh"
 
 namespace cov::testing {
@@ -134,6 +135,11 @@ namespace cov::testing {
 		auto const repo = cov::repository::open(
 		    setup::test_dir() / "sysroot"sv,
 		    setup::test_dir() / "inside_git/.git/.covdata"sv, ec);
+		fmt::print("cov::repository::open({}): {}, {}\n",
+		           ::testing::path::get_path(setup::test_dir() /
+		                                     "inside_git/.git/.covdata"sv),
+		           ec.value(), ec.message());
+
 		ASSERT_TRUE(ec);
 	}
 

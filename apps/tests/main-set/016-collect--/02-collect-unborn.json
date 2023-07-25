@@ -1,0 +1,14 @@
+{
+    "args": "collect",
+    "expected": [
+        1,
+        "",
+        "[git] called on unborn branch\n"
+    ],
+    "prepare": [
+        "mkdirs '$TMP/unborn'",
+        "cd '$TMP/unborn'",
+        "git init",
+        "cov init"
+    ]
+}

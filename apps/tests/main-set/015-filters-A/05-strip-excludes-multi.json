@@ -1,0 +1,53 @@
+{
+    "args": "report -f strip-excludes '$DATA/extensions/report-multi.json'",
+    "post": "show",
+    "patches": {
+        "report [0-9a-f]{40}": "report $OID",
+        "build  [0-9a-f]{40} (.*)": "build  $BUILD_HASH \\1"
+    },
+    "expected": [
+        0,
+        [
+            "\u001b[31m[main $REPORT]\u001b[m Commit \"extensions\"",
+            " 4 files, \u001b[32m100%\u001b[m (9/9), Fn\u001b[32m100%\u001b[m (4/4)",
+            " \u001b[2;37mbased on\u001b[m \u001b[2;33m$HEAD@main\u001b[m",
+            " parent $PARENT",
+            " \u001b[2;37mcontains $BUILD:\u001b[m \u001b[32m100%\u001b[m",
+            "",
+            "report $OID",
+            "commit 98d4978ecbddf677c1e6bf5a40da84bd0b337340",
+            "build  $BUILD_HASH [100%]",
+            "GitBranch: main",
+            "Coverage:  [100%] 9/9 (pass)",
+            "Functions: [100%] 4/4 (pass)",
+            "Author:    Johnny Appleseed <johnny@appleseed.com>",
+            "Added:     $DATE",
+            "",
+            "      Commit \"extensions\"",
+            "",
+            "+--------------------+----------------+----------------+---------+----------+------------+",
+            "| Name               |    % Funcs     |    % Lines     | Visited | Relevant | Line count |",
+            "+--------------------+----------------+----------------+---------+----------+------------+",
+            "|   no-exclusions.cc | 100.00 +100.00 | 100.00 +100.00 |    6 +6 |     6 +6 |      6 +6  |",
+            "|   start-end.cc     | 100.00 +100.00 | 100.00 +100.00 |    1 +1 |     1 +1 |      8 +8  |",
+            "|   start-start.cc   | 100.00 +100.00 | 100.00 +100.00 |    1 +1 |     1 +1 |      8 +8  |",
+            "|   start.cc         | 100.00 +100.00 | 100.00 +100.00 |    1 +1 |     1 +1 |      7 +7  |",
+            "+--------------------+----------------+----------------+---------+----------+------------+",
+            "| > TOTAL            | 100.00 +100.00 | 100.00 +100.00 |    9 +9 |     9 +9 |     29 +29 |",
+            "+--------------------+----------------+----------------+---------+----------+------------+\n"
+        ],
+        [
+            "\u001b[1;37m$TMP/extensions/start-start.cc:7:8:\u001b[m \u001b[1;35mwarning:\u001b[m double start: found GCOV_EXCL_START",
+            "\u001b[1;37m$TMP/extensions/start-start.cc:2:8:\u001b[m \u001b[1;36mnote:\u001b[m see previous start",
+            "\u001b[1;37m$TMP/extensions/start-start.cc:2:8:\u001b[m \u001b[1;35mwarning:\u001b[m GCOV_EXCL_START not matched with GCOV_EXCL_STOP",
+            "\u001b[1;37m$TMP/extensions/start-end.cc:7:8:\u001b[m \u001b[1;35mwarning:\u001b[m found GCOV_EXCL_END; did you mean GCOV_EXCL_STOP?",
+            "\u001b[1;37m$TMP/extensions/start-end.cc:2:8:\u001b[m \u001b[1;35mwarning:\u001b[m GCOV_EXCL_START not matched with GCOV_EXCL_STOP",
+            "\u001b[1;37m$TMP/extensions/start.cc:2:8:\u001b[m \u001b[1;35mwarning:\u001b[m GCOV_EXCL_START not matched with GCOV_EXCL_STOP",
+            "strip-excludes: excluded 15 lines\n"
+        ]
+    ],
+    "prepare": [
+        "unpack $DATA/extensions.tar $TMP",
+        "cd '$TMP/extensions'"
+    ]
+}

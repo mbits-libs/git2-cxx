@@ -304,7 +304,7 @@ namespace cov::app::line_printer {
 		}
 		ctx.paint_color();  // EOL reset
 		if (shortened) {
-			// GCOV_EXCL_START -- TODO: Add pty to test_driver
+			// LCOV_EXCL_START -- TODO: Add pty to test_driver
 			if (use_color) ctx.result.append("\033[2;49;39m"sv);
 			ctx.result.append("..."sv);
 			if (use_color) ctx.result.append("\033[m"sv);

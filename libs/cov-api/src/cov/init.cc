@@ -53,7 +53,14 @@ namespace cov {
 			if (out) {
 				auto const text = fmt::format("{}\n", get_path(gitdir));
 				out.store(text.data(), text.size());
+
+				fmt::print("fopen({}) -> {}\n",
+				           get_path(base_dir / names::gitdir_link), text);
 			}
+
+			fmt::print("set_path[{}](\"{}\", \"{}\")\n",
+			           get_path(base_dir / names::config), names::core_gitdir,
+			           get_path(gitdir));
 
 			return cfg.set_path(names::core_gitdir, gitdir);
 		}

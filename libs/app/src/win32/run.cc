@@ -7,6 +7,7 @@
 #include <errno.h>
 #include <args/parser.hpp>
 #include <cov/app/dirs.hh>
+#include <cov/app/run.hh>
 #include <cov/app/tools.hh>
 #include <cov/io/file.hh>
 #include <filesystem>
@@ -14,8 +15,8 @@
 #include <string_view>
 #include <thread>
 #include <vector>
+#include "../path_env.hh"
 #include "fmt/format.h"
-#include "path_env.hh"
 
 namespace cov::app::platform {
 	namespace {
@@ -371,21 +372,38 @@ namespace cov::app::platform {
 			return !ec && std::filesystem::is_regular_file(status);
 		}
 
+		std::vector<std::wstring> all_lower(
+		    std::span<std::wstring_view const> items) {
+			std::vector<std::wstring> result{};
+			result.reserve(items.size());
+			for (auto view : items) {
+				std::wstring arg;
+				arg.assign(view);
+				CharLowerW(arg.data());
+				result.push_back(std::move(arg));
+			}
+			return result;
+		}
+
 		std::filesystem::path where(std::filesystem::path const& bin,
 		                            wchar_t const* environment_variable,
 		                            std::wstring const& program) {
+			auto ext_str = env(L"PATHEXT");
+			auto path_ext = all_lower(split(std::wstring{}, ext_str));
+
+			if (program.find_first_of(L"\\/"sv) != std::string::npos) {
+				return program;
+			}
+
 			auto path_str = env(environment_variable);
 			auto dirs = split(bin.native(), path_str);
-
-			auto ext_str = env(L"PATHEXT");
-			auto path_ext = split(std::wstring{}, ext_str);
 
 			for (auto const& dir : dirs) {
 				for (auto const ext : path_ext) {
 					auto path =
 					    std::filesystem::path{dir} / filename(program, ext);
 					if (file_exists(path)) {
-						return std::filesystem::canonical(path);
+						return path;
 					}
 				}
 			}
@@ -530,5 +548,46 @@ namespace cov::app::platform {
 	                           std::vector<std::byte> const& input) {
 		return execute(filter_dir, L"COV_FILTER_PATH", from_utf8(filter), args,
 		               &input, &cwd, true);
+	}
+
+	std::optional<std::filesystem::path> find_program(
+	    std::span<std::string const> names,
+	    std::filesystem::path const& hint) {
+		for (auto const& name : names) {
+			auto candidate = where(hint, L"PATH", from_utf8(name));
+			if (!candidate.empty()) return candidate;
+		}
+		return std::nullopt;
+	}
+
+	captured_output run(std::filesystem::path const& exec,
+	                    args::arglist args,
+	                    std::filesystem::path const& cwd,
+	                    std::vector<std::byte> const& input) {
+		return execute({}, L"PATH", exec.native(), args, &input, &cwd, true);
+	}
+
+	captured_output run(std::filesystem::path const& exec,
+	                    args::arglist args,
+	                    std::vector<std::byte> const& input) {
+		return execute({}, L"PATH", exec.native(), args, &input, nullptr, true);
+	}
+
+	int call(std::filesystem::path const& exec,
+	         args::arglist args,
+	         std::filesystem::path const& cwd,
+	         std::vector<std::byte> const& input) {
+		auto input_ptr = input.empty() ? nullptr : &input;
+		return execute({}, L"PATH", exec.native(), args, input_ptr, &cwd, false)
+		    .return_code;
+	}
+
+	int call(std::filesystem::path const& exec,
+	         args::arglist args,
+	         std::vector<std::byte> const& input) {
+		auto input_ptr = input.empty() ? nullptr : &input;
+		return execute({}, L"PATH", exec.native(), args, input_ptr, nullptr,
+		               false)
+		    .return_code;
 	}
 }  // namespace cov::app::platform

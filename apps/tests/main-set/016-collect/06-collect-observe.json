@@ -1,0 +1,22 @@
+{
+    "linear": true,
+    "args": "collect --observe ctest -C Debug .",
+    "check": {
+        "stderr": "end"
+    },
+    "expected": [
+        0,
+        "Test project $TMP/observe\n",
+        "No tests were found!!!\n"
+    ],
+    "prepare": [
+        "mkdirs '$TMP/observe'",
+        "cd '$TMP/observe'",
+        "git init",
+        "cov init",
+        "git commit -m 'initial' --allow-empty",
+        "mock hal9000-lcars-GLaDOS-g++-17 g++",
+        "mock hal9000-lcars-GLaDOS-gcov-17 gcov",
+        "generate '$DATA/covcollect/ini' .covcollect 'COMPILER=$TMP/mocks/g++'"
+    ]
+}

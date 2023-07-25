@@ -33,7 +33,10 @@ namespace cov {
 		                        std::error_code& ec) {
 			auto result = git::config::open_default(sysroot, names::dot_config,
 			                                        "cov"sv, ec);
+			fmt::print("open_default: {}, {}\n", ec.value(), ec.message());
 			if (!ec) ec = result.add_local_config(common);
+			fmt::print("add_local_config({}): {}, {}\n", get_path(common),
+			           ec.value(), ec.message());
 			if (ec) result = nullptr;
 			return result;
 		}  // GCOV_EXCL_LINE[GCC] -- oom.open_config fires inside here...
@@ -51,9 +54,13 @@ namespace cov {
 			auto gitdir = cfg.get_path(names::core_gitdir);
 			if (!gitdir) {
 				ec = make_error_code(git::errc::notfound);
+				fmt::print("git::repository::open({}/???): {}, {}\n",
+				           get_path(common), ec.value(), ec.message());
 				return {};
 			}
-			return git::repository::open(cov_dir / *gitdir, ec);
+			fmt::print("git::repository::open({}): {}, {}\n",
+			           get_path(common / *gitdir), ec.value(), ec.message());
+			return git::repository::open(common / *gitdir, ec);
 		}
 
 		path move_to_common(path const& git_dir) {
@@ -77,8 +84,14 @@ namespace cov {
 	                                git::config const& cfg,
 	                                std::error_code& ec) {
 		if (!ec) odb_ = git::odb::open(common / names::objects_dir, ec);
+		fmt::print("git::odb::open({}): {}, {}\n",
+		           get_path(common / names::objects_dir), ec.value(),
+		           ec.message());
 		if (!ec) local_ = git::repository::wrap(odb_, ec);
+		fmt::print("git::repository::wrap: {}, {}\n", ec.value(), ec.message());
 		if (!ec) git_ = open_companion_git(cov_dir, cfg, ec);
+		fmt::print("open_companion_git({}): {}, {}\n", get_path(cov_dir),
+		           ec.value(), ec.message());
 		if (ec) {
 			odb_ = nullptr;
 			local_ = nullptr;
