@@ -17,6 +17,10 @@ set(REPORT_FILTERS
     coveralls
 )
 
+set(NATIVE_FILTERS
+    strip-excludes
+)
+
 set(SOURCES
 	  cov/cov.cc
 )
@@ -34,7 +38,7 @@ string(REPLACE ";" ", " BUILTIN_LIST "${BUILTINS}")
 message(STATUS "Builtins: ${BUILTIN_LIST}")
 include(builtins)
 
-string(REPLACE ";" ", " REPORT_FILTER_LIST "${REPORT_FILTERS}")
+string(REPLACE ";" ", " REPORT_FILTER_LIST "${REPORT_FILTERS};${NATIVE_FILTERS}")
 message(STATUS "Filters: ${REPORT_FILTER_LIST}")
 
 if (WIN32)
@@ -96,6 +100,40 @@ foreach(NAME ${REPORT_FILTERS})
         COMMENT "[FILTER] ${NAME}"
     )
 endforeach()
+
+foreach(NAME ${NATIVE_FILTERS})
+    string(REPLACE "-" "_" SAFE_NAME "${NAME}")
+    add_cov_tool(${NAME}
+        filters/${SAFE_NAME}.cc
+        filters/native/platform.cc
+        filters/native/platform.hh)
+    target_compile_options(${NAME} PRIVATE ${ADDITIONAL_WALL_FLAGS})
+    target_link_options(${NAME} PRIVATE ${ADDITIONAL_LINK_FLAGS})
+    target_include_directories(${NAME} PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/filters
+        ${CMAKE_CURRENT_BINARY_DIR}/gen
+    )
+    set_target_properties(${NAME} PROPERTIES FOLDER apps)
+
+    set_target_properties(${NAME} PROPERTIES
+      RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${SHARE_DIR}/filters"
+      )
+
+    foreach(BUILD_TYPE DEBUG RELEASE RELWITHDEBINFO MINSIZEREL)
+      set_target_properties(${NAME} PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY_${BUILD_TYPE} "${CMAKE_BINARY_DIR}/${SHARE_DIR}/filters"
+          )
+    endforeach()
+endforeach()
+
+target_link_libraries(strip-excludes PRIVATE ctre::ctre)
+target_sources(strip-excludes PRIVATE
+    filters/native/strip_excludes/parser.cc
+    filters/native/strip_excludes/parser.hh
+    filters/native/strip_excludes/excludes.cc
+    filters/native/strip_excludes/excludes.hh
+)
 
 ########################################################
 

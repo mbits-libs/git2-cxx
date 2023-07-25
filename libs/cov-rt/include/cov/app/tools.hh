@@ -63,6 +63,7 @@ namespace cov::app {
 		captured_output run_filter(std::filesystem::path const& filter_dir,
 		                           std::filesystem::path const& cwd,
 		                           std::string_view filter,
+		                           args::arglist args,
 		                           std::vector<std::byte> const& input);
 	}  // namespace platform
 }  // namespace cov::app
