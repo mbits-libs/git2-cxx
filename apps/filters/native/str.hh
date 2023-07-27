@@ -7,13 +7,22 @@
 #include <filesystem>
 #include <string>
 #include <string_view>
+#include <vector>
 
 namespace cov::app {
 	inline std::u8string_view to_u8(std::string_view str) {
 		return {reinterpret_cast<char8_t const*>(str.data()), str.size()};
 	}
 
+	inline std::u8string to_u8s(std::string_view str) {
+		return {reinterpret_cast<char8_t const*>(str.data()), str.size()};
+	}
+
 	inline std::string_view from_u8(std::u8string_view str) {
+		return {reinterpret_cast<char const*>(str.data()), str.size()};
+	}
+
+	inline std::string from_u8s(std::u8string_view str) {
 		return {reinterpret_cast<char const*>(str.data()), str.size()};
 	}
 
@@ -51,5 +60,16 @@ namespace cov::app {
 		}
 		++block;
 		cb(block, text.substr(prev));
+	}
+
+	inline std::vector<std::string_view> split(std::string_view text,
+	                                           char sep) {
+		size_t length{};
+		split(text, sep, [&length](auto, auto const&) { ++length; });
+		std::vector<std::string_view> result{};
+		result.reserve(length);
+		split(text, sep,
+		      [&result](auto, auto view) { result.push_back(view); });
+		return result;
 	}
 };  // namespace cov::app

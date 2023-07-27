@@ -5,7 +5,6 @@ set(SOURCES
   src/cvg_info.cc
   src/line_printer.cc
   src/module.cc
-  src/path_env.hh
   src/report_command.cc
   src/report.cc
   src/root_command.cc
@@ -37,11 +36,6 @@ set(SOURCES
   include/cov/app/tools.hh
 )
 
-if (UNIX)
-	list(APPEND SOURCES src/posix.cc)
-elseif(WIN32)
-	list(APPEND SOURCES src/win32.cc)
-endif()
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})
 
 add_library(cov-rt STATIC ${SOURCES})

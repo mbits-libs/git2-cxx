@@ -142,17 +142,17 @@ namespace cov::testing {
 		ASSERT_FALSE(ec) << ec.message();
 
 		static constexpr quick_stat initial_files[] = {
-		    {"main.cc"sv, {5, 1, 0, 0, 0, 0, 0}},
+		    {"main.cc"sv, {5, {1, 0}, {0, 0}, {0, 0}}},
 		};
 
 		static constexpr quick_stat middle_files[] = {
-		    {"src/main.cc"sv, {5, 1, 0, 0, 0, 0, 0}},
-		    {"src/old-name.cc"sv, {6, 1, 0, 0, 0, 0, 0}},
+		    {"src/main.cc"sv, {5, {1, 0}, {0, 0}, {0, 0}}},
+		    {"src/old-name.cc"sv, {6, {1, 0}, {0, 0}, {0, 0}}},
 		};
 
 		static constexpr quick_stat current_files[] = {
-		    {"src/main.cc"sv, {5, 1, 1, 0, 0, 0, 0}},
-		    {"src/greetings.cc"sv, {8, 3, 3, 0, 0, 0, 0}},
+		    {"src/main.cc"sv, {5, {1, 1}, {0, 0}, {0, 0}}},
+		    {"src/greetings.cc"sv, {8, {3, 3}, {0, 0}, {0, 0}}},
 		};
 
 		git::oid initial{}, middle{}, current{};

@@ -370,13 +370,21 @@ class runner:
         os.makedirs(fullname, exist_ok=True)
 
     @staticmethod
-    def call(*args):
+    def call(*args, **kwargs):
         print_args(*args)
         if runner.DRY_RUN:
             return
+        env_kwarg = kwargs.get("env", {})
+        env = {**os.environ}
+        for key, value in env_kwarg.items():
+            if value is None:
+                if key in env:
+                    del env[key]
+            else:
+                env[key] = value
         found = shutil.which(args[0])
         args = (found if found is not None else args[0], *args[1:])
-        proc = subprocess.run(args, check=False)
+        proc = subprocess.run(args, check=False, env=env)
         if proc.returncode != 0:
             sys.exit(1)
 

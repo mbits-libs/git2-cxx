@@ -256,7 +256,10 @@ def __main__():
             counters.report(outcome, test_id, message)
             shutil.rmtree(tempdir, ignore_errors=True)
     else:
-        with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+        hw_concurrency = os.cpu_count()
+        with concurrent.futures.ThreadPoolExecutor(
+            min(61, max(1, hw_concurrency * 2))
+        ) as executor:
             futures = []
             for test, counter in independent_tests:
                 futures.append(executor.submit(task, env, test, counter))

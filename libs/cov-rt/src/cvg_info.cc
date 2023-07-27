@@ -156,7 +156,7 @@ namespace cov::app {
 			max_width -= std::min(max_width, widths.line_no_width);
 			max_width -= std::min(max_width, margins);
 			max_width = std::max(max_width, MAGIC);
-			// GCOV_EXCL_END
+			// GCOV_EXCL_STOP
 		}
 
 		auto name = fn.label;
@@ -167,7 +167,7 @@ namespace cov::app {
 			// GCOV_EXCL_START -- TODO: Add pty to test_driver
 			backing.assign(name.substr(0, max_width - 3));
 			name = backing;
-			// GCOV_EXCL_END
+			// GCOV_EXCL_STOP
 		}
 
 		auto const count_column = fmt::format("{}x", fn.count);

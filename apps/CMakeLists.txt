@@ -139,6 +139,29 @@ target_sources(strip-excludes PRIVATE
 
 # add_cov_ext(serve)
 
+add_cov_ext(collect)
+target_include_directories(cov-collect PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/collect
+    ${CMAKE_CURRENT_SOURCE_DIR}/filters
+)
+target_link_libraries(cov-collect PRIVATE ctre::ctre)
+target_sources(cov-collect PRIVATE
+    collect/gnu.cc
+    collect/llvm.cc
+    collect/msvc.cc
+    collect/queue.hh
+    collect/report.cc
+    collect/report.hh
+    collect/toolkit.cc
+    collect/toolkit.hh
+    collect/task_watcher.cc
+    collect/task_watcher.hh
+    collect/thread_pool.cc
+    collect/thread_pool.hh
+    collect/walk.cc
+    collect/walk.hh
+)
+
 print_cov_ext()
 
 ########################################################

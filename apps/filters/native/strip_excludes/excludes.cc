@@ -34,6 +34,13 @@ namespace cov::app::strip {
 		return has;
 	}
 
+	template <typename Match>
+	unsigned column_from(std::string_view text, Match const& matcher) {
+		auto const diff = matcher.get<0>().to_view().data() - text.data();
+		decltype(diff) zero = 0;
+		return static_cast<unsigned>(std::max(zero, diff) + 1);
+	}
+
 	void excludes::on_line(unsigned line_no, std::string_view text) {
 		if (trim(text).empty()) {
 			empties.insert(line_no);
@@ -51,20 +58,19 @@ namespace cov::app::strip {
 		} else if (auto end_match = matches_end(text); end_match) {
 			if (inside_exclude) {
 				auto const end = end_match.get<0>().to_view();
-				warn(line_no, end_match.get<0>().begin() - text.data() + 1,
+				warn(line_no, column_from(text, end_match),
 				     fmt::format("found {}; did you mean {}?"sv, end,
 				                 stop_for(end, "_END"sv)));
 			}
 		} else if (auto start_match = matches_start(text); start_match) {
 			if (inside_exclude) {
-				warn(line_no, start_match.get<0>().begin() - text.data() + 1,
+				warn(line_no, column_from(text, start_match),
 				     fmt::format("double start: found {}"sv,
 				                 start_match.get<0>().to_view()));
 				note(std::get<0>(last_start), std::get<1>(last_start),
 				     "see previous start");
 			} else {
-				last_start = {line_no,
-				              start_match.get<0>().begin() - text.data() + 1,
+				last_start = {line_no, column_from(text, start_match),
 				              start_match.get<0>().to_string()};
 			}
 			inside_exclude = true;

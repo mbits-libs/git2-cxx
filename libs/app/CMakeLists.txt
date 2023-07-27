@@ -9,18 +9,26 @@ set(LOCALE_DIR "${PROJECT_BINARY_DIR}/${SHARE_DIR}/locale")
 
 set(SOURCES
   src/args.cc
+  src/path_env.hh
   src/path.cc
   src/tr.cc
 
   include/cov/app/args.hh
   include/cov/app/path.hh
+  include/cov/app/run.hh
   include/cov/app/tr.hh
 )
 
 if (UNIX)
-	list(APPEND SOURCES src/posix.cc)
+	list(APPEND SOURCES
+    src/posix/exec_path.cc
+    src/posix/run.cc
+  )
 elseif(WIN32)
-	list(APPEND SOURCES src/win32.cc)
+	list(APPEND SOURCES
+    src/win32/exec_path.cc
+    src/win32/run.cc
+  )
 endif()
 
 set(GEN_SOURCES

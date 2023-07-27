@@ -11,6 +11,10 @@
 [module "app/main"]
     path = apps/cov/
     path = apps/builtins/
+[module "app/ext"]
+    path = apps/collect
+[module "app/filters"]
+    path = apps/filters
 [module "hilite/lighter"]
     path = libs/hilite/hilite
     path = libs/hilite/lighter

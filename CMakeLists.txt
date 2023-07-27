@@ -44,6 +44,7 @@ list(APPEND CMAKE_PREFIX_PATH "${PROJECT_BINARY_DIR}/conan")
 
 set(CONAN_CMAKE_SILENT_OUTPUT ON)
 find_package(Python3 COMPONENTS Interpreter REQUIRED)
+find_package(ctre REQUIRED)
 find_package(libgit2 REQUIRED)
 find_package(fmt REQUIRED)
 find_package(mbits-args REQUIRED)
@@ -55,11 +56,8 @@ if (COV_TESTING)
   find_package(GTest REQUIRED)
 
   set(COVERALLS_PREFIX cov_)
-  set(cov_COVERALLS_DIRS
-    apps/builtins
-    apps/cov
-  )
 
+  set(INCLUDED_IN_COVERAGE apps)
   foreach(module
     libs/cov-api
     libs/cell
@@ -68,11 +66,16 @@ if (COV_TESTING)
     libs/app
     libs/cov-rt
   )
-    list(APPEND cov_COVERALLS_DIRS ${module}/include ${module}/src)
+    list(APPEND INCLUDED_IN_COVERAGE ${module}/include ${module}/src)
   endforeach()
+
   foreach(extra cxx py3 ts)
-    list(APPEND cov_COVERALLS_DIRS libs/hilite/hilite-${extra}/src)
+    list(APPEND INCLUDED_IN_COVERAGE libs/hilite/hilite-${extra}/src)
   endforeach()
+
+  set(EXCLUDED_FROM_COVERAGE apps/tests)
+
+  set(cov_COVERALLS_DIRS ${INCLUDED_IN_COVERAGE})
   include(${PROJECT_SOURCE_DIR}/tools/coveralls/Coveralls.cmake)
 
   set(TEST_REPORT_DIR "${PROJECT_BINARY_DIR}/test-results")
@@ -216,6 +219,8 @@ if (MSVC_VERSION GREATER_EQUAL 1936 AND MSVC_IDE)
     lighter-stress-test
     date-tz
     json
+    strip-excludes
+    cov-collect
   )
     if(TARGET ${TGT})
       set_target_properties(${TGT} PROPERTIES VS_USER_PROPS "${PROJECT_SOURCE_DIR}/cmake/VS17.NoModules.props")
@@ -252,3 +257,6 @@ else()
 endif()
 
 file(GENERATE OUTPUT "${PROJECT_BINARY_DIR}/report_answers.txt" CONTENT "${COV_PROPERTIES}\n")
+string(REPLACE ";" "\n    include = " SRC_INCLUDE "${INCLUDED_IN_COVERAGE}")
+string(REPLACE ";" "\n    exclude = " SRC_EXCLUDE "${EXCLUDED_FROM_COVERAGE}")
+configure_file("${PROJECT_SOURCE_DIR}/.covcollect.in" "${PROJECT_BINARY_DIR}/.covcollect" @ONLY)

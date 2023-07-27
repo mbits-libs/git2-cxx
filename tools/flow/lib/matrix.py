@@ -27,6 +27,7 @@ from github.cmake import get_version
 _conan: Optional[conan] = None
 _platform_name, _platform_version, _platform_arch = uname()
 
+_collect_version = (0, 21, 1)
 
 platform = _platform_name
 
@@ -275,7 +276,7 @@ class steps:
         CONAN_PROFILE_GEN = "_profile-build_type"
         profile_gen = f"./{CONAN_DIR}/{CONAN_PROFILE_GEN}-{config['preset']}"
 
-        if config.get("--first-build", False):
+        if config.get("--first-build"):
             runner.refresh_build_dir("conan")
 
         if _conan is None:
@@ -307,8 +308,8 @@ class steps:
     @step_call("CMake")
     def configure_cmake(config: dict):
         runner.refresh_build_dir(config["preset"])
-        cov_COVERALLS = "ON" if config.get("coverage", False) else "OFF"
-        COV_SANITIZE = "ON" if config.get("sanitizer", False) else "OFF"
+        cov_COVERALLS = "ON" if config.get("coverage") else "OFF"
+        COV_SANITIZE = "ON" if config.get("sanitizer") else "OFF"
         COV_CUTDOWN_OS = "ON" if runner.CUTDOWN_OS else "OFF"
         runner.call(
             "cmake",
@@ -325,9 +326,46 @@ class steps:
         runner.call("cmake", "--build", "--preset", config["preset"], "--parallel")
 
     @staticmethod
+    def get_bin(version: Tuple[int], config: dict):
+        ext = ".exe" if os.name == "nt" else ""
+        for dirname in [".local", "release", config["preset"]]:
+            path = f"build/{dirname}/bin/cov{ext}"
+            if not os.path.isfile(path):
+                continue
+            proc = subprocess.run([path, "--version"], shell=False, capture_output=True)
+            if proc.returncode:
+                continue
+            exe_version = tuple(
+                int(x)
+                for x in proc.stdout.strip()
+                .split(b" ")[-1]
+                .split(b"-")[0]
+                .decode("UTF-8")
+                .split(".")
+            )
+            if exe_version >= version:
+                return path
+        return None
+
+    @staticmethod
     @step_call("Test")
     def test(config: dict):
-        if config.get("coverage", False):
+        has_coverage = config.get("coverage")
+        uses_occ = config.get("os") == "windows"
+        cov_exe = None
+        if has_coverage and not uses_occ:
+            cov_exe = steps.get_bin(_collect_version, config)
+
+        if cov_exe is not None:
+            runner.call(cov_exe, "collect", "--clean")
+            runner.call(
+                cov_exe, "collect", "--observe", "ctest", "--preset", config["preset"]
+            )
+            runner.call(cov_exe, "collect")
+            # todo: report coverage to github, somehow
+            return
+
+        if has_coverage:
             runner.call(
                 "cmake",
                 "--build",
@@ -346,8 +384,9 @@ class steps:
                         _append_coverage(GITHUB_STEP_SUMMARY, json.load(f))
                 except KeyError:
                     pass
-        else:
-            runner.call("ctest", "--preset", config["preset"])
+            return
+
+        runner.call("ctest", "--preset", config["preset"])
 
     @staticmethod
     @step_call("Pack", lambda config: len(config.get("cpack_generator", [])) > 0)
@@ -423,11 +462,16 @@ class steps:
         preset = config["preset"]
 
         runner.copy(f"build/{preset}/test-results", "build/artifacts/test-results")
-        if config.get("coverage", False):
+        if config.get("coverage"):
             output = f"build/artifacts/coveralls/{config['report_os']}-{config['report_compiler']}-{config['build_type']}.json"
-            print_args("cp", f"build/{preset}/coveralls.json", output)
-            if not runner.DRY_RUN:
-                copy_file(f"build/{preset}/coveralls.json", output)
+            if os.path.exists(f"build/{preset}/coveralls.json"):
+                print_args("cp", f"build/{preset}/coveralls.json", output)
+                if not runner.DRY_RUN:
+                    copy_file(f"build/{preset}/coveralls.json", output)
+            else:
+                print_args("cp", f"build/{preset}/collected.json", output)
+                if not runner.DRY_RUN:
+                    copy_file(f"build/{preset}/collected.json", output)
 
     @staticmethod
     @step_call(
@@ -459,9 +503,14 @@ class steps:
     @step_call(
         "Report",
         flags=step_info.VERBOSE,
-        visible=lambda config: config.get("coverage", False) == True,
+        visible=lambda config: config.get("coverage") == True,
     )
     def report(config: dict):
+        uses_occ = config.get("os") == "windows"
+        cov_exe = None
+        if not uses_occ:
+            cov_exe = steps.get_bin(_collect_version, config)
+
         reporter = f"build/{config['preset']}/bin/cov"
         try:
             tag_process = subprocess.run([reporter, "tag"], stdout=subprocess.PIPE)
@@ -474,15 +523,23 @@ class steps:
         except:
             tags = ()
         version = get_version()
-        legacy_reporter = os.environ.get("LEGACY_COV")
-        report = f"build/{config['preset']}/coveralls.json"
+        report = f"build/{config['preset']}/collected.json"
         response = f"build/{config['preset']}/report_answers.txt"
         at_args = []
         if os.path.isfile(response):
             at_args.append(f"@{response}")
-        runner.call(reporter, "report", "--filter", "coveralls", report, *at_args)
-        if legacy_reporter is not None:
-            runner.call(legacy_reporter, "import", "--in", report, "--amend")
+        if cov_exe is None:
+            coveralls = f"build/{config['preset']}/coveralls.json"
+            runner.call(
+                reporter,
+                "report",
+                "--out",
+                report,
+                "--filter",
+                "coveralls",
+                coveralls,
+            )
+        runner.call(reporter, "report", "--filter", "strip-excludes", report, *at_args)
         if version.tag() in tags:
             runner.call(
                 reporter,

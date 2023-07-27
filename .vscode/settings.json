@@ -6,6 +6,7 @@
         "cfglng",
         "cobertura",
         "covdata",
+        "covcollect",
         "covlng",
         "covmodules",
         "demangled",
@@ -127,6 +128,7 @@
         "cfloat": "cpp",
         "climits": "cpp",
         "queue": "cpp",
-        "source_location": "cpp"
+        "source_location": "cpp",
+        "condition_variable": "cpp"
     }
 }

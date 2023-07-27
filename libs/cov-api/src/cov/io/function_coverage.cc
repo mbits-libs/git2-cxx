@@ -183,9 +183,6 @@ namespace cov::io::handlers {
 
 		return true;
 	}
-#if defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif
 }  // namespace cov::io::handlers
 
 namespace cov {

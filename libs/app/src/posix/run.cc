@@ -4,11 +4,12 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <args/parser.hpp>
-#include <cov/app/tools.hh>
+#include <cov/app/path.hh>
+#include <cov/app/run.hh>
 #include <cstdlib>
 #include <filesystem>
 #include <thread>
-#include "path_env.hh"
+#include "../path_env.hh"
 
 #ifdef RUNNING_GCOV
 extern "C" {
@@ -35,6 +36,8 @@ namespace cov::app::platform {
 		std::filesystem::path where(std::filesystem::path const& bin,
 		                            char const* environment_variable,
 		                            std::string const& program) {
+			if (program.find('/') != std::string::npos) return program;
+
 			auto path_str = env(environment_variable);
 			auto dirs = split(bin.native(), path_str);
 
@@ -140,6 +143,37 @@ namespace cov::app::platform {
 				    this, std::ref(src));
 			}
 
+			static void dump(std::span<std::byte const> buffer) {
+				static constexpr auto len = 20zu;
+				char line[len * 4 + 2];
+				line[len * 4] = '\n';
+				line[len * 4 + 1] = 0;
+				auto index = 0zu;
+				for (auto b : buffer) {
+					if (index == len) {
+						fputs(line, stdout);
+						index = 0;
+					}
+
+					static constexpr char alphabet[] = "0123456789ABCDEF";
+					auto const c = static_cast<unsigned char>(b);
+					line[index * 3] = alphabet[(c >> 4) & 0xF];
+					line[index * 3 + 1] = alphabet[c & 0xF];
+					line[index * 3 + 2] = ' ';
+					line[len * 3 + index] = std::isprint(c) ? c : '.';
+					++index;
+				}
+				if (index < len) {
+					for (; index < len; ++index) {
+						line[index * 3] = ' ';
+						line[index * 3 + 1] = ' ';
+						line[index * 3 + 2] = ' ';
+						line[len * 3 + index] = ' ';
+					}
+					fputs(line, stdout);
+				}
+			}
+
 			std::thread async_read(std::vector<std::byte>& dst) {
 				return std::thread(
 				    [](int fd, std::vector<std::byte>& bytes) {
@@ -149,6 +183,7 @@ namespace cov::app::platform {
 						    auto const actual =
 						        ::read(fd, buffer, std::size(buffer));
 						    if (actual <= 0) break;
+						    // dump({buffer, buffer + actual});
 						    bytes.insert(bytes.end(), buffer, buffer + actual);
 					    }
 				    },
@@ -285,5 +320,45 @@ namespace cov::app::platform {
 		return execute(filter_dir, "COV_FILTER_PATH",
 		               std::string(filter.data(), filter.size()), args, &input,
 		               &cwd, true);
+	}
+
+	std::optional<std::filesystem::path> find_program(
+	    std::span<std::string const> names,
+	    std::filesystem::path const& hint) {
+		for (auto const& name : names) {
+			auto candidate = where(hint, "PATH", name);
+			if (!candidate.empty()) return candidate;
+		}
+		return std::nullopt;
+	}
+
+	captured_output run(std::filesystem::path const& exec,
+	                    args::arglist args,
+	                    std::filesystem::path const& cwd,
+	                    std::vector<std::byte> const& input) {
+		return execute({}, "PATH", get_u8path(exec), args, &input, &cwd, true);
+	}
+
+	captured_output run(std::filesystem::path const& exec,
+	                    args::arglist args,
+	                    std::vector<std::byte> const& input) {
+		return execute({}, "PATH", get_u8path(exec), args, &input, nullptr,
+		               true);
+	}
+
+	int call(std::filesystem::path const& exec,
+	         args::arglist args,
+	         std::filesystem::path const& cwd,
+	         std::vector<std::byte> const& input) {
+		return execute({}, "PATH", get_u8path(exec), args, &input, &cwd, false)
+		    .return_code;
+	}
+
+	int call(std::filesystem::path const& exec,
+	         args::arglist args,
+	         std::vector<std::byte> const& input) {
+		return execute({}, "PATH", get_u8path(exec), args, &input, nullptr,
+		               false)
+		    .return_code;
 	}
 }  // namespace cov::app::platform
