@@ -36,7 +36,8 @@ namespace cov::app::strip {
 
 	template <typename Match>
 	unsigned column_from(std::string_view text, Match const& matcher) {
-		auto const diff = matcher.get<0>().to_view().data() - text.data();
+		auto const group0 = matcher.template get<0>().to_view();
+		auto const diff = group0.data() - text.data();
 		decltype(diff) zero = 0;
 		return static_cast<unsigned>(std::max(zero, diff) + 1);
 	}

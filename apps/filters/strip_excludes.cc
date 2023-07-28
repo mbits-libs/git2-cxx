@@ -201,13 +201,13 @@ namespace cov::app::strip {
 				           line_counter == 1 ? "line"sv : "lines"sv);
 			}
 			if (fn_counter) {
-				if (first) fmt::print(stderr, ", ");
+				if (!first) fmt::print(stderr, ", ");
 				first = false;
 				fmt::print(stderr, "{} {}", fn_counter,
 				           fn_counter == 1 ? "function"sv : "functions"sv);
 			}
 			if (br_counter) {
-				if (first) fmt::print(stderr, ", ");
+				if (!first) fmt::print(stderr, ", ");
 				first = false;
 				fmt::print(stderr, "{} {}", br_counter,
 				           br_counter == 1 ? "branch"sv : "branches"sv);

@@ -134,6 +134,7 @@ namespace cov::io::handlers {
 	                              write_stream& out) const {
 		auto const obj = as_a<cov::function_coverage>(
 		    static_cast<object const*>(value.get()));
+		if (!obj) return false;
 		auto entries = obj->entries();
 
 		auto stg = [&] {
