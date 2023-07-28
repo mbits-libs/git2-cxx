@@ -254,7 +254,7 @@ def __main__():
     else:
         hw_concurrency = os.cpu_count()
         try:
-            thread_count = int(os.environ.get('POOL_SIZE'))
+            thread_count = int(os.environ.get("POOL_SIZE"))
         except TypeError:
             thread_count = min(61, max(1, hw_concurrency * 2))
         with concurrent.futures.ThreadPoolExecutor(thread_count) as executor:
