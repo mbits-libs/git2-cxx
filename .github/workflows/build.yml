@@ -73,6 +73,7 @@ jobs:
         sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++-12 90
         sudo update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-12 90
         sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-12 90
+        sudo locale-gen pl_PL.UTF-8 en_US.UTF-8 en_GB.UTF-8
 
     - name: Set up Clang
       if: ${{ matrix.clang }}

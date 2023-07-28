@@ -90,7 +90,7 @@ namespace cov::testing {
 	// ```
 
 	static date_test const tests[] = {
-#ifndef CUTDOWN_OS
+#if !defined(_WIN32) || !defined(CUTDOWN_OS)
 	    {
 	        "Date in Poland/Polish"sv,
 	        "%rd"sv,
@@ -115,7 +115,7 @@ namespace cov::testing {
 	         .time_zone = "Europe/Warsaw"sv,
 	         .locale = "en_GB.UTF-8"sv},
 	    },
-#endif  // CUTDOWN_OS
+#endif  // !_WIN32 || !CUTDOWN_OS
 	    {
 	        "Date in Poland/US English"sv,
 	        "%rd"sv,
@@ -128,7 +128,7 @@ namespace cov::testing {
 	         .time_zone = "Europe/Warsaw"sv,
 	         .locale = "en_US.UTF-8"sv},
 	    },
-#ifndef CUTDOWN_OS
+#if !defined(_WIN32) || !defined(CUTDOWN_OS)
 	    {
 	        "Date in Labrador/Polish"sv,
 	        "%rd"sv,
@@ -153,7 +153,7 @@ namespace cov::testing {
 	         .time_zone = "America/St_Johns"sv,
 	         .locale = "en_GB.UTF-8"sv},
 	    },
-#endif  // CUTDOWN_OS
+#endif  // !_WIN32 || !CUTDOWN_OS
 	    {
 	        "Date in Labrador/US English"sv,
 	        "%rd"sv,
