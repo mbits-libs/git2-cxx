@@ -24,10 +24,7 @@ set(SOURCES
 )
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})
 
-add_library(hilite STATIC ${SOURCES})
-target_compile_options(hilite PRIVATE ${ADDITIONAL_WALL_FLAGS})
-target_link_options(hilite PRIVATE ${ADDITIONAL_LINK_FLAGS})
-target_include_directories(hilite PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+add_cov_library(hilite ${SOURCES})
 set_target_properties(hilite PROPERTIES FOLDER libs/hilite)
 
 install(
@@ -45,3 +42,5 @@ cpack_add_component(hilite
   DISPLAY_NAME "libhilite"
   GROUP devel
 )
+
+set_parent_scope()

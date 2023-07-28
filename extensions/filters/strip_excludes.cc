@@ -11,12 +11,12 @@
 #include <cov/git2/tree.hh>
 #include <cov/io/file.hh>
 #include <cov/version.hh>
+#include <excludes.hh>
 #include <json/json.hpp>
 #include <native/platform.hh>
 #include <native/str.hh>
-#include <native/strip_excludes/excludes.hh>
-#include <native/strip_excludes/parser.hh>
 #include <optional>
+#include <parser.hh>
 #include <set>
 #include <span>
 #include <string>

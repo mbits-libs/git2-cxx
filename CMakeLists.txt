@@ -65,6 +65,7 @@ if (COV_TESTING)
     libs/hilite/lighter
     libs/app
     libs/cov-rt
+    libs/collect-api
   )
     list(APPEND INCLUDED_IN_COVERAGE ${module}/include ${module}/src)
   endforeach()
@@ -179,54 +180,16 @@ set(CORE_ROOT_DIR "../..")
 
 message(STATUS "Sanitizer: ${COV_SANITIZE}")
 
+include(cov)
+
 add_subdirectory(external)
 add_subdirectory(libs)
+add_subdirectory(extensions)
 add_subdirectory(apps)
 
-
-if (CMAKE_GENERATOR MATCHES "Visual Studio" AND TARGET cov_coveralls_test)
-  add_dependencies(cov_coveralls_test
-    git2-test git2-stress-test
-    cov-test cov-stress-test
-    lighter-test lighter-stress-test
-    cov
-  )
-endif()
-
-if (MSVC_VERSION GREATER_EQUAL 1936 AND MSVC_IDE)
-  foreach (TGT
-    cov
-    cov-rt
-    json
-    app_main
-    app
-    cov-api
-    date-tz
-    lighter
-    hilite-cxx
-    hilite-py
-    hilite-ts
-    hilite
-    testing-lib
-    cov-echo
-    git2-test
-    git2-stress-test
-    cov-test
-    cov-stress-test
-    cov-rt-test
-    cov-rt-stress-test
-    lighter-test
-    lighter-stress-test
-    date-tz
-    json
-    strip-excludes
-    cov-collect
-  )
-    if(TARGET ${TGT})
-      set_target_properties(${TGT} PROPERTIES VS_USER_PROPS "${PROJECT_SOURCE_DIR}/cmake/VS17.NoModules.props")
-    endif()
-  endforeach()
-endif()
+message(STATUS "COV_TOOLS: ${COV_TOOLS}")
+message(STATUS "COV_LIBS: ${COV_LIBS}")
+message(STATUS "VS_MODS: ${VS_MODS}")
 
 execute_process(COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/packages/system.py props
     OUTPUT_VARIABLE COV_PROPERTIES

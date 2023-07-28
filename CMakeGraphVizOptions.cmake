@@ -6,4 +6,5 @@ set(GRAPHVIZ_IGNORE_TARGETS "CONAN_LIB::.*"
     ".*_DEPS_TARGET"
     ".*-test"
     cov-echo
+    cov-pwd
 )

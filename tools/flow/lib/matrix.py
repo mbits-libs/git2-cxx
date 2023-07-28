@@ -353,13 +353,15 @@ class steps:
         has_coverage = config.get("coverage")
         uses_occ = config.get("os") == "windows"
         cov_exe = None
+        env = {}
+        if not uses_occ: env["POOL_SIZE"] = "1"
         if has_coverage and not uses_occ:
             cov_exe = steps.get_bin(_collect_version, config)
 
         if cov_exe is not None:
             runner.call(cov_exe, "collect", "--clean")
             runner.call(
-                cov_exe, "collect", "--observe", "ctest", "--preset", config["preset"]
+                cov_exe, "collect", "--observe", "ctest", "--preset", config["preset"], env=env
             )
             runner.call(cov_exe, "collect")
             # todo: report coverage to github, somehow
@@ -372,7 +374,7 @@ class steps:
                 "--preset",
                 config["preset"],
                 "--target",
-                "cov_coveralls",
+                "cov_coveralls", env=env,
             )
 
             if runner.GITHUB_ANNOTATE:

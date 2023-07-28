@@ -13,6 +13,7 @@
     path = apps/builtins/
 [module "app/ext"]
     path = apps/collect
+    path = libs/collect-api
 [module "app/filters"]
     path = apps/filters
 [module "hilite/lighter"]

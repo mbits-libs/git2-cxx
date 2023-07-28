@@ -17,10 +17,6 @@ set(REPORT_FILTERS
     coveralls
 )
 
-set(NATIVE_FILTERS
-    strip-excludes
-)
-
 set(SOURCES
 	  cov/cov.cc
 )
@@ -78,13 +74,11 @@ if (WIN32)
 endif()
 
 add_cov_tool(cov ${SOURCES})
-target_compile_options(cov PRIVATE ${ADDITIONAL_WALL_FLAGS})
-target_link_options(cov PRIVATE ${ADDITIONAL_LINK_FLAGS})
 target_include_directories(cov PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}/gen
 )
-target_link_libraries(cov PRIVATE cov-rt)
+target_link_libraries(cov PRIVATE cov-rt app_main)
 set_target_properties(cov PROPERTIES FOLDER apps)
 
 ########################################################
@@ -101,66 +95,9 @@ foreach(NAME ${REPORT_FILTERS})
     )
 endforeach()
 
-foreach(NAME ${NATIVE_FILTERS})
-    string(REPLACE "-" "_" SAFE_NAME "${NAME}")
-    add_cov_tool(${NAME}
-        filters/${SAFE_NAME}.cc
-        filters/native/platform.cc
-        filters/native/platform.hh)
-    target_compile_options(${NAME} PRIVATE ${ADDITIONAL_WALL_FLAGS})
-    target_link_options(${NAME} PRIVATE ${ADDITIONAL_LINK_FLAGS})
-    target_include_directories(${NAME} PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}
-        ${CMAKE_CURRENT_SOURCE_DIR}/filters
-        ${CMAKE_CURRENT_BINARY_DIR}/gen
-    )
-    set_target_properties(${NAME} PROPERTIES FOLDER apps)
-
-    set_target_properties(${NAME} PROPERTIES
-      RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${SHARE_DIR}/filters"
-      )
-
-    foreach(BUILD_TYPE DEBUG RELEASE RELWITHDEBINFO MINSIZEREL)
-      set_target_properties(${NAME} PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY_${BUILD_TYPE} "${CMAKE_BINARY_DIR}/${SHARE_DIR}/filters"
-          )
-    endforeach()
-endforeach()
-
-target_link_libraries(strip-excludes PRIVATE ctre::ctre)
-target_sources(strip-excludes PRIVATE
-    filters/native/strip_excludes/parser.cc
-    filters/native/strip_excludes/parser.hh
-    filters/native/strip_excludes/excludes.cc
-    filters/native/strip_excludes/excludes.hh
-)
-
 ########################################################
 
 # add_cov_ext(serve)
-
-add_cov_ext(collect)
-target_include_directories(cov-collect PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/collect
-    ${CMAKE_CURRENT_SOURCE_DIR}/filters
-)
-target_link_libraries(cov-collect PRIVATE ctre::ctre)
-target_sources(cov-collect PRIVATE
-    collect/gnu.cc
-    collect/llvm.cc
-    collect/msvc.cc
-    collect/queue.hh
-    collect/report.cc
-    collect/report.hh
-    collect/toolkit.cc
-    collect/toolkit.hh
-    collect/task_watcher.cc
-    collect/task_watcher.hh
-    collect/thread_pool.cc
-    collect/thread_pool.hh
-    collect/walk.cc
-    collect/walk.hh
-)
 
 print_cov_ext()
 
@@ -170,15 +107,11 @@ if (COV_TESTING)
     enable_testing()
 
     add_cov_tool(cov-echo tests/cov-echo.cc)
-    target_compile_options(cov-echo PRIVATE ${ADDITIONAL_WALL_FLAGS})
-    target_link_options(cov-echo PRIVATE ${ADDITIONAL_LINK_FLAGS})
-    target_link_libraries(cov-echo PRIVATE fmt::fmt mbits::args)
+    target_link_libraries(cov-echo PRIVATE app_main fmt::fmt mbits::args)
     set_target_properties(cov-echo PROPERTIES FOLDER tests/spawn)
 
     add_cov_tool(cov-pwd tests/cov-pwd.cc)
-    target_compile_options(cov-pwd PRIVATE ${ADDITIONAL_WALL_FLAGS})
-    target_link_options(cov-pwd PRIVATE ${ADDITIONAL_LINK_FLAGS})
-    target_link_libraries(cov-pwd PRIVATE fmt::fmt mbits::args)
+    target_link_libraries(cov-pwd PRIVATE app_main fmt::fmt mbits::args)
     set_target_properties(cov-pwd PROPERTIES FOLDER tests/spawn)
 
     set_target_properties(cov-echo PROPERTIES
@@ -232,7 +165,7 @@ if (COV_TESTING)
 
   if (CMAKE_GENERATOR MATCHES "Visual Studio" AND TARGET cov_coveralls_test)
     add_dependencies(cov_coveralls_test
-      cov-echo
+      cov cov-echo cov-pwd
     )
   endif()
 endif()
@@ -263,3 +196,5 @@ cpack_add_component_group(apps
     DISPLAY_NAME "Executables"
     EXPANDED
 )
+
+set_parent_scope()

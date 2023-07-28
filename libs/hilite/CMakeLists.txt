@@ -8,3 +8,5 @@ add_subdirectory(hilite-cxx)
 add_subdirectory(hilite-py3)
 add_subdirectory(hilite-ts)
 add_subdirectory(lighter)
+
+set_parent_scope()
