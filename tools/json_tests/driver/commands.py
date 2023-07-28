@@ -5,11 +5,15 @@ import os
 import stat
 import subprocess
 import sys
-import tarfile
-import zipfile
 from typing import Callable, Dict, List, Tuple
 
 from . import test
+
+__file_dir__ = os.path.dirname(__file__)
+sys.path.append(os.path.dirname(os.path.dirname(__file_dir__)))
+
+from archives import locate_unpack
+
 
 _file_cache = {}
 _rw_mask = stat.S_IWRITE | stat.S_IWGRP | stat.S_IWOTH
@@ -40,44 +44,10 @@ def _make_RW(test: test.Test, args: List[str]):
     os.chmod(filename, mode)
 
 
-def _untar(test: test.Test, src, dst):
-    with tarfile.open(src) as TAR:
-
-        def is_within_directory(directory, target):
-            abs_directory = os.path.abspath(directory)
-            abs_target = os.path.abspath(target)
-
-            prefix = os.path.commonprefix([abs_directory, abs_target])
-
-            return prefix == abs_directory
-
-        def safe_extract(tar, path=".", members=None, *, numeric_owner=False):
-            for member in tar.getmembers():
-                member_path = os.path.join(path, member.name)
-                if not is_within_directory(path, member_path):
-                    raise Exception("Attempted Path Traversal in Tar File")
-
-            tar.extractall(path, members, numeric_owner=numeric_owner)
-
-        safe_extract(TAR, test.path(dst))
-
-
-def _unzip(test: test.Test, src, dst):
-    with zipfile.ZipFile(src) as ZIP:
-        ZIP.extractall(test.path(dst))
-
-
-_ARCHIVES = {".tar": _untar, ".zip": _unzip}
-
-
 def _unpack(test: test.Test, args: List[str]):
     archive = args[0]
     dst = args[1]
-    reminder, ext = os.path.splitext(archive)
-    _, mid = os.path.splitext(reminder)
-    if mid == ".tar":
-        ext = ".tar"
-    _ARCHIVES[ext](test, archive, dst)
+    locate_unpack(archive)[0](archive, test.path(dst))
 
 
 def _cat(test: test.Test, args: List[str]):

@@ -212,7 +212,7 @@ if (COV_TESTING)
         add_test(
             NAME cov-exec--${TEST_SET}
             COMMAND "${Python3_EXECUTABLE}"
-                "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_runner.py"
+                "${PROJECT_SOURCE_DIR}/tools/json_tests/runner.py"
                 --bin "${PROJECT_BINARY_DIR}"
                 --tests "main-set/${TEST_SET}"
                 --version "${PROJECT_VERSION}${PROJECT_VERSION_STABILITY}${PROJECT_VERSION_BUILD_META}"
@@ -223,7 +223,7 @@ if (COV_TESTING)
         add_test(
             NAME cov-exec-pl
             COMMAND "${Python3_EXECUTABLE}"
-                "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_runner.py"
+                "${PROJECT_SOURCE_DIR}/tools/json_tests/runner.py"
                 --bin "${PROJECT_BINARY_DIR}"
                 --tests "messages-pl"
                 --version "${PROJECT_VERSION}${PROJECT_VERSION_STABILITY}${PROJECT_VERSION_BUILD_META}"

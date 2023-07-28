@@ -8,7 +8,9 @@ from typing import List
 
 from driver.test import Test
 
-__dir__ = os.path.dirname(__file__)
+__file_dir__ = os.path.dirname(__file__)
+__root_dir__ = os.path.dirname(os.path.dirname(__file_dir__))
+__test_dir__ = os.path.join(__root_dir__, "apps", "tests")
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--tests", required=True, metavar="DIR")
@@ -51,7 +53,7 @@ def _load_tests(testsuite: List[str], run: List[str]):
 
 def __main__():
     args = parser.parse_args()
-    args.tests = os.path.join(__dir__, args.tests)
+    args.tests = os.path.join(__test_dir__, args.tests)
     testsuite = _enum_tests(args)
     print("tests:  ", args.tests)
 

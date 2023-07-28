@@ -18,11 +18,7 @@ from driver.testbed import Counters, task
 if os.name == "nt":
     sys.stdout.reconfigure(encoding="utf-8")  # type: ignore
 
-try:
-    os.environ["RUN_LINEAR"]
-    RUN_LINEAR = True
-except KeyError:
-    RUN_LINEAR = False
+RUN_LINEAR = os.environ.get("RUN_LINEAR", 0) != 0
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--target", required=True, metavar="EXE")
@@ -149,6 +145,7 @@ def _install(install: Optional[str], install_with: List[str], env: Env):
 
     root_dir = os.path.dirname(os.path.dirname(env.target))
     filters_target = os.path.join(install, "additional-filters")
+    filters_source = os.path.join(os.path.dirname(install), "test-filters")
 
     _append("COV_FILTER_PATH", filters_target)
     _append("COV_PATH", os.path.join(os.path.abspath(root_dir), "dont-copy"))
@@ -171,7 +168,6 @@ def _install(install: Optional[str], install_with: List[str], env: Env):
             dirs_exist_ok=True,
         )
 
-    filters_source = os.path.join(os.path.dirname(__file__), "test-filters")
     for _, dirs, files in os.walk(filters_source):
         dirs[:] = []
         for filename in files:
@@ -257,9 +253,11 @@ def __main__():
             shutil.rmtree(tempdir, ignore_errors=True)
     else:
         hw_concurrency = os.cpu_count()
-        with concurrent.futures.ThreadPoolExecutor(
-            min(61, max(1, hw_concurrency * 2))
-        ) as executor:
+        try:
+            thread_count = int(os.environ.get('POOL_SIZE'))
+        except TypeError:
+            thread_count = min(61, max(1, hw_concurrency * 2))
+        with concurrent.futures.ThreadPoolExecutor(thread_count) as executor:
             futures = []
             for test, counter in independent_tests:
                 futures.append(executor.submit(task, env, test, counter))

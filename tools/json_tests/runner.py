@@ -7,7 +7,9 @@ import os
 import subprocess
 import sys
 
-__dir__ = os.path.dirname(__file__)
+__file_dir__ = os.path.dirname(__file__)
+__root_dir__ = os.path.dirname(os.path.dirname(__file_dir__))
+__test_dir__ = os.path.join(__root_dir__, "apps", "tests")
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--bin", required=True, metavar="BINDIR")
@@ -26,13 +28,13 @@ ext = ".exe" if sys.platform == "win32" else ""
 if not os.path.isdir(args.bin) and os.path.isdir(f"./build/{args.bin}"):
     args.bin = f"./build/{args.bin}"
 
-if not os.path.isdir(f"{__dir__}/{args.tests}") and os.path.isdir(
-    f"{__dir__}/main-set/{args.tests}"
+if not os.path.isdir(f"{__test_dir__}/{args.tests}") and os.path.isdir(
+    f"{__test_dir__}/main-set/{args.tests}"
 ):
     args.tests = f"main-set/{args.tests}"
 
 if args.version is None:
-    tools = os.path.join(os.path.dirname(os.path.dirname(__dir__)), "tools")
+    tools = os.path.join(__root_dir__, "tools")
     print(tools)
     sys.path.append(tools)
     from github.cmake import get_version
@@ -44,21 +46,23 @@ new_args = [
     (f"--{key}", value)
     for key, value in {
         "target": f"{args.bin}/bin/cov{ext}",
-        "tests": f"{__dir__}/{args.tests}",
-        "data-dir": f"{__dir__}/data",
+        "tests": f"{__test_dir__}/{args.tests}",
+        "data-dir": f"{__test_dir__}/data",
         "version": args.version,
-        "install": f"{__dir__}/copy",
+        "install": f"{__test_dir__}/copy",
         "install-with": f"{args.bin}/elsewhere/libexec/cov/cov-echo{ext}",
     }.items()
 ]
 
 new_args.extend([("--run", run) for run in args.run])
 
+print(f"{__file_dir__}/test_driver.py", [item for arg in new_args for item in arg])
+
 sys.exit(
     subprocess.run(
         [
             sys.executable,
-            f"{__dir__}/test_driver.py",
+            f"{__file_dir__}/test_driver.py",
             *(item for arg in new_args for item in arg),
         ],
         shell=False,
