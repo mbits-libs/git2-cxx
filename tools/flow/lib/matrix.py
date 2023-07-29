@@ -351,9 +351,8 @@ class steps:
     @step_call("Test")
     def test(config: dict):
         has_coverage = config.get("coverage")
-        uses_occ = config.get("os") == "windows"
         cov_exe = None
-        if has_coverage and not uses_occ:
+        if has_coverage:
             cov_exe = steps.get_bin(_collect_version, config)
 
         if cov_exe is not None:
@@ -548,10 +547,7 @@ class steps:
         visible=lambda config: config.get("coverage") == True,
     )
     def report(config: dict):
-        uses_occ = config.get("os") == "windows"
-        cov_exe = None
-        if not uses_occ:
-            cov_exe = steps.get_bin(_collect_version, config)
+        cov_exe = steps.get_bin(_collect_version, config)
 
         reporter = f"build/{config['preset']}/bin/cov"
         try:
