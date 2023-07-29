@@ -88,13 +88,13 @@ def get_key() -> Optional[Key]:
 key = get_key()
 
 if key is None or key.token is None or key.secret is None:
-    print("The key is missing", file=sys.stderr)
-    sys.exit(1)
+    print("sign.py: the key is missing", file=sys.stderr)
+    sys.exit(0)
 
 sign_tool = find_sign_tool()
 if sign_tool is None:
-    print("signtool.exe is missing", file=sys.stderr)
-    sys.exit(1)
+    print("sign.py: signtool.exe not found", file=sys.stderr)
+    sys.exit(0)
 
 with open("temp.pfx", "wb") as pfx:
     pfx.write(key.secret)
@@ -116,7 +116,7 @@ args = [
     *sys.argv[1:],
 ]
 try:
-    if subprocess.run(args, shell=False):
+    if subprocess.run(args, shell=False).returncode:
         sys.exit(1)
 finally:
     os.remove("temp.pfx")

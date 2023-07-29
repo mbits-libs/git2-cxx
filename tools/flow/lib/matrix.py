@@ -389,6 +389,27 @@ class steps:
         runner.call("ctest", "--preset", config["preset"])
 
     @staticmethod
+    @step_call("Sign", lambda config: config.get("os") == "windows")
+    def sign(config: dict):
+        files_to_sign: List[str] = []
+        for root in [
+            "bin",
+            "share",
+            os.path.join("libexec", "cov"),
+        ]:
+            for root_dir, _, files in os.walk(
+                os.path.join("build", config["preset"], root)
+            ):
+                for filename in files:
+                    stem, ext = os.path.splitext(filename)
+                    if stem[-5:] == "-test" or ext.lower() not in [".exe", ".dll"]:
+                        continue
+                    files_to_sign.append(
+                        os.path.join(root_dir, filename).replace("\\", "/")
+                    )
+        runner.call("python", "tools/win32/sign.py", *files_to_sign)
+
+    @staticmethod
     @step_call("Pack", lambda config: len(config.get("cpack_generator", [])) > 0)
     def pack(config: dict):
         runner.call(
@@ -398,6 +419,27 @@ class steps:
             "-G",
             ";".join(config.get("cpack_generator", [])),
         )
+
+    @staticmethod
+    @step_call(
+        "SignPackages",
+        lambda config: config.get("os") == "windows"
+        and len(config.get("cpack_generator", [])) > 0,
+    )
+    def sign_packages(config: dict):
+        files_to_sign: List[str] = []
+        for root_dir, dirs, files in os.walk(
+            os.path.join("build", config["preset"], "packages")
+        ):
+            dirs[:] = []
+            for filename in files:
+                _, ext = os.path.splitext(filename)
+                if ext.lower() != ".msi":
+                    continue
+                files_to_sign.append(
+                    os.path.join(root_dir, filename).replace("\\", "/")
+                )
+        runner.call("python", "tools/win32/sign.py", *files_to_sign)
 
     @staticmethod
     @step_call("Store")
@@ -557,7 +599,9 @@ class steps:
             steps.build,
             steps.test,
             steps.report,
+            steps.sign,
             steps.pack,
+            steps.sign_packages,
             steps.store,
             steps.store_packages,
             steps.store_tests,
