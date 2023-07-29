@@ -131,7 +131,7 @@ namespace cov::app::collect {
 			     line_segments[0]->is_entry);
 
 			auto mapped = !start_of_skipped_region &&
-			              ((wrapped_segment && wrapped_segment->has_count) or
+			              ((wrapped_segment && wrapped_segment->has_count) ||
 			               (min_region_count > 0));
 			if (!mapped) return result;
 

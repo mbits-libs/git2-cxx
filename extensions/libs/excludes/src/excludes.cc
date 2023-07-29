@@ -3,6 +3,7 @@
 
 #include "excludes.hh"
 #include <fmt/format.h>
+#include <algorithm>
 #include <ctre.hpp>
 #include <native/str.hh>
 

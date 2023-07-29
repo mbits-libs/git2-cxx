@@ -97,9 +97,10 @@ namespace xml {
 			if (expand) {
 				XML_SetDefaultHandlerExpand(parser_,
 				                            enable ? defaultHandler : nullptr);
-			} else
+			} else {
 				XML_SetDefaultHandler(parser_,
 				                      enable ? defaultHandler : nullptr);
+			}
 		}
 
 		void enableExternalEntityRefHandler(bool enable = true) {

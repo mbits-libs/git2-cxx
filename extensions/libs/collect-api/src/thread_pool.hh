@@ -6,6 +6,7 @@
 #include <functional>
 #include <queue.hh>
 #include <thread>
+#include <vector>
 
 namespace cov {
 	class thread_pool {
@@ -17,8 +18,8 @@ namespace cov {
 
 	private:
 		static void thread_proc(std::stop_token,
-		                        queue<std::function<void()>>& tasks);
-		queue<std::function<void()>> tasks_{};
+		                        mt_queue<std::function<void()>>& tasks);
+		mt_queue<std::function<void()>> tasks_{};
 		std::vector<std::jthread> threads_{};
 	};
 }  // namespace cov

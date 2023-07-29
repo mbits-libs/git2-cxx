@@ -5,6 +5,7 @@
 
 #include <fmt/format.h>
 #include <cov/app/path.hh>
+#include <string>
 
 #ifdef WIN32
 #include <shlwapi.h>

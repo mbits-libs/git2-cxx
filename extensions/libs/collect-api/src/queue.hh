@@ -7,17 +7,18 @@
 #include <mutex>
 #include <queue>
 #include <stop_token>
+#include <utility>
 
 namespace cov {
 	template <typename Element>
-	class queue {
+	class mt_queue {
 	public:
-		queue() = default;
-		queue(queue const& other) {
+		mt_queue() = default;
+		mt_queue(mt_queue const& other) {
 			std::lock_guard lock{other.m_};
 			items_ = other.items_;
 		}
-		queue& operator=(queue const& other) {
+		mt_queue& operator=(mt_queue const& other) {
 			std::unique_lock self{m_, std::defer_lock};
 			std::unique_lock lock{other.m_, std::defer_lock};
 			std::lock(self, lock);

@@ -4,7 +4,9 @@
 #include "occ_xml.hh"
 #include <cov/app/path.hh>
 #include <cov/io/file.hh>
+#include <memory>
 #include <stack>
+#include <utility>
 
 // define DEBUG_IGNORE
 

@@ -9,6 +9,8 @@
 #include <cov/app/run.hh>
 #include <cov/git2/config.hh>
 #include <native/str.hh>
+#include <string>
+#include <utility>
 #include <walk.hh>
 
 using namespace std::literals;

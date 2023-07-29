@@ -3,12 +3,14 @@
 
 #include "report.hh"
 #include <fmt/format.h>
+#include <algorithm>
 #include <cov/app/path.hh>
 #include <cov/hash/sha1.hh>
 #include <cov/io/file.hh>
 #include <cov/version.hh>
 #include <native/str.hh>
 #include <string>
+#include <utility>
 
 using namespace std::literals;
 

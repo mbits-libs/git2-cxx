@@ -3,11 +3,14 @@
 
 #pragma once
 
+#include <algorithm>
 #include <args/parser.hpp>
 #include <filesystem>
 #include <memory>
 #include <span>
+#include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 namespace cov::app::collect {

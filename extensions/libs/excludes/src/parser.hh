@@ -8,6 +8,8 @@
 #include <cov/app/strings/errors.hh>
 #include <cov/app/tr.hh>
 #include <native/str.hh>
+#include <optional>
+#include <string>
 #include <string_view>
 
 using namespace std::literals;

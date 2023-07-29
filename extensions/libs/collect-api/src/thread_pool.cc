@@ -23,14 +23,14 @@ namespace cov {
 
 	std::atomic<size_t> counter{1};
 	void thread_pool::thread_proc(std::stop_token tok,
-	                              queue<std::function<void()>>& tasks) {
+	                              mt_queue<std::function<void()>>& tasks) {
 #if REPORT_TIMES
 		using namespace std::chrono;
 		size_t id{1}, internal{};
 		steady_clock::duration runtime{};
 		while (!counter.compare_exchange_weak(id, id + 1,
-		                                      std::memory_order_relaxed))
-			;
+		                                      std::memory_order_relaxed)) {
+		}
 #endif
 		while (!tok.stop_requested()) {
 			std::function<void()> task;

@@ -3,8 +3,11 @@
 
 #pragma once
 
+#include <memory>
 #include <native/expat.hh>
+#include <string>
 #include <toolkit.hh>
+#include <utility>
 
 namespace cov::app::collect {
 	struct msvc_context {
