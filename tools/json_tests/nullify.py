@@ -9,11 +9,13 @@ from typing import List
 from driver.test import Test
 
 __file_dir__ = os.path.dirname(__file__)
-__root_dir__ = os.path.dirname(os.path.dirname(__file_dir__))
+__root_dir__ = os.path.abspath(os.path.dirname(os.path.dirname(__file_dir__)))
 __test_dir__ = os.path.join(__root_dir__, "apps", "tests")
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--tests", required=True, metavar="DIR")
+parser.add_argument(
+    "--tests", required=True, metavar="DIR", default=[], action="append", nargs="+"
+)
 parser.add_argument(
     "--lang",
     metavar="ID",
@@ -28,9 +30,10 @@ parser.add_argument(
 
 def _enum_tests(args: argparse.Namespace):
     testsuite: List[str] = []
-    for root, _, files in os.walk(args.tests):
-        for filename in files:
-            testsuite.append(os.path.join(root, filename))
+    for testdir in args.tests:
+        for root, _, files in os.walk(testdir):
+            for filename in files:
+                testsuite.append(os.path.join(root, filename))
     return testsuite
 
 
@@ -53,9 +56,18 @@ def _load_tests(testsuite: List[str], run: List[str]):
 
 def __main__():
     args = parser.parse_args()
-    args.tests = os.path.join(__test_dir__, args.tests)
+    args.tests = [testdir for group in args.tests for testdir in group]
+    for index in range(len(args.tests)):
+        testdir = args.tests[index]
+        if not os.path.isdir(f"{__test_dir__}/{testdir}") and os.path.isdir(
+            f"{__test_dir__}/main-set/{testdir}"
+        ):
+            testdir = f"main-set/{testdir}"
+        args.tests[index] = os.path.join(__test_dir__, testdir)
     testsuite = _enum_tests(args)
-    print("tests:  ", args.tests)
+    print("tests:")
+    for testdir in args.tests:
+        print(f" - {testdir}")
 
     run = args.run
 

@@ -3,10 +3,7 @@
     "expected": [
         2,
         "",
-        [
-            "usage: cov checkout [-h] [--detach|-b|--orphan] <name> [<start-point>]",
-            "cov checkout: git::category error: Name/ref spec was not in a valid format\n"
-        ]
+        "cov checkout: git::category error: Name/ref spec was not in a valid format\n"
     ],
     "prepare": [
         "unpack $DATA/revparse.tar $TMP",

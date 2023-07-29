@@ -108,10 +108,12 @@ namespace cov::app::builtin::report {
 		if (!result.report.load_from_text(
 		        report_contents(result.repo.git(), rest))) {
 			if (filter_) {
-				error(tr_.format(replng::ERROR_FILTERED_REPORT_ISSUES, report_,
-				                 *filter_));
+				simple_error(tr_, parser_.program(),
+				             tr_.format(replng::ERROR_FILTERED_REPORT_ISSUES,
+				                        report_, *filter_));
 			} else {  // GCOV_EXCL_LINE[WIN32]
-				error(tr_.format(replng::ERROR_REPORT_ISSUES, report_));
+				simple_error(tr_, parser_.program(),
+				             tr_.format(replng::ERROR_REPORT_ISSUES, report_));
 			}
 		}
 		result.props = cov::report::builder::properties(props_);

@@ -4,7 +4,7 @@
         2,
         "",
         [
-            "usage: cov report [-h] <report-file> [-f <filter>] [-p <property>=<value> ...] [--amend] [-o <arg>]",
+            "cov report: /git: undefined",
             "cov report: error: there were issues with $DATA/no-git-coverage.json processed by echo-to-stdout filter"
         ]
     ],

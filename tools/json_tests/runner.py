@@ -56,8 +56,6 @@ new_args = [
 
 new_args.extend([("--run", run) for run in args.run])
 
-print(f"{__file_dir__}/test_driver.py", [item for arg in new_args for item in arg])
-
 sys.exit(
     subprocess.run(
         [

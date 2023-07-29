@@ -3,10 +3,7 @@
     "expected": [
         2,
         "",
-        [
-            "usage: cov module [-h] [--show-sep [<git-commit>]] | [--set-sep <value> | --add <name> <dir> | --remove <name> <dir> | --remove-all <name>] | [<git-commit>]",
-            "cov module: error: requested file is a directory\n"
-        ]
+        "cov module: error: requested file is a directory\n"
     ],
     "prepare": [
         "git init $TMP/repo",

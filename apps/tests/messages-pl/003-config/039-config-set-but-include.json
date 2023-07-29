@@ -4,10 +4,7 @@
     "expected": [
         2,
         "",
-        [
-            "użycie: cov config [-h] [<opcje-pliku>] [<nazwa> [<wartość>] | --unset <nazwa> | -l | --list]",
-            "cov config: błąd: wpis nie jest unikalny ze względu na to, że został załączony\n"
-        ]
+        "cov config: błąd: wpis nie jest unikalny ze względu na to, że został załączony\n"
     ],
     "prepare": [
         "touch '$TMP/config.inc' '[group]\nkey = value 1'",
