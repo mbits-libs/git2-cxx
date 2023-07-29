@@ -27,7 +27,7 @@ from github.cmake import get_version
 _conan: Optional[conan] = None
 _platform_name, _platform_version, _platform_arch = uname()
 
-_collect_version = (0, 21, 1)
+_collect_version = (0, 22, 0)
 
 platform = _platform_name
 
@@ -328,7 +328,7 @@ class steps:
     @staticmethod
     def get_bin(version: Tuple[int], config: dict):
         ext = ".exe" if os.name == "nt" else ""
-        for dirname in [".local", "release", config["preset"]]:
+        for dirname in ["latest", "release", config["preset"]]:
             path = f"build/{dirname}/bin/cov{ext}"
             if not os.path.isfile(path):
                 continue

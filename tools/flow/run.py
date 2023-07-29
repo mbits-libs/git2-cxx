@@ -275,6 +275,7 @@ def main():
     runner.runner.DRY_RUN = args.dry_run
     runner.runner.CUTDOWN_OS = args.cutdown_os
     runner.runner.GITHUB_ANNOTATE = args.github
+    runner.runner.OFFICIAL = args.official
     root = os.path.join(os.path.dirname(__file__), "..", "..", ".github", "workflows")
     paths = [os.path.join(root, "flow.json")]
     if args.official:

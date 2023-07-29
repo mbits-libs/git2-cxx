@@ -267,6 +267,7 @@ class runner:
     DRY_RUN = False
     CUTDOWN_OS = False
     GITHUB_ANNOTATE = False
+    OFFICIAL = False
 
     @staticmethod
     def run_steps(config: dict, keys: list, steps: List[callable]):
