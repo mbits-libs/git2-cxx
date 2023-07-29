@@ -6,6 +6,10 @@
 #include <expat.h>
 #include <cstring>
 
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-parameter"
+#endif
 namespace xml {
 	template <class Final>
 	class ExpatBase {
@@ -231,7 +235,7 @@ namespace xml {
 		}
 
 		template <auto true_value, auto false_value, typename boolean_like>
-		auto bool2(boolean_like result) {
+		static auto bool2(boolean_like result) {
 			return result ? true_value : false_value;
 		}
 
@@ -275,11 +279,12 @@ namespace xml {
 			ptr(userData)->onDefault(data, length);
 		}
 
-		static int externalEntityRefHandler(void* userData,
+		static int externalEntityRefHandler(XML_Parser parser,
 		                                    const XML_Char* context,
 		                                    const XML_Char* base,
 		                                    const XML_Char* systemID,
 		                                    const XML_Char* publicID) {
+			auto const userData = XML_GetUserData(parser);
 			return bool2<1, 0>(ptr(userData)->onExternalEntityRef(
 			    context, base, systemID, publicID));
 		}
@@ -325,3 +330,6 @@ namespace xml {
 		XML_Parser parser_;
 	};
 }  // namespace xml
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif

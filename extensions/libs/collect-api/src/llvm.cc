@@ -215,7 +215,7 @@ namespace cov::app::collect {
 
 		int observe(config const& cfg,
 		            std::string_view command,
-		            args::arglist arguments) const {
+		            args::arglist arguments) const override {
 			auto const file_mask = get_u8path(cfg.bin_dir / prof_data_dir_ /
 			                                  "raw"sv / ("%p" + raw_ext_));
 			setenv("LLVM_PROFILE_FILE", file_mask.c_str(), 1);

@@ -31,5 +31,5 @@ namespace cov::app::platform {
 		}
 
 		return result;
-	}
-};  // namespace cov::app::platform
+	}  // GCOV_EXCL_LINE
+};     // namespace cov::app::platform

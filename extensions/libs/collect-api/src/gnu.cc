@@ -61,7 +61,7 @@ namespace cov::app::collect {
 
 		int observe(config const&,
 		            std::string_view command,
-		            args::arglist arguments) const {
+		            args::arglist arguments) const override {
 			return platform::call(make_u8path(command), arguments);
 		}
 
@@ -76,23 +76,24 @@ namespace cov::app::collect {
 			closure state{.cfg = cfg, .cvg = cvg};
 
 			for (auto const& [dirname, filenames] : paths) {
-				state.push([&, this]() {
-					std::vector<json::node> nodes;
+				state.push(
+				    [&, this, &dirname = dirname, &filenames = filenames]() {
+					    std::vector<json::node> nodes;
 
-					if (state.set_return_code(
-					        load_directory(dirname, filenames, nodes)))
-						return;
+					    if (state.set_return_code(
+					            load_directory(dirname, filenames, nodes)))
+						    return;
 
-					for (auto& node : nodes) {
-						state.push([this, &state, node = std::move(node)] {
-							auto const ret =
-							    analyze_node(state.cfg, state.cvg, node);
-							state.task_finished();
-							if (!ret) state.set_return_code(1);
-						});
-					}
-					state.task_finished();
-				});
+					    for (auto& node : nodes) {
+						    state.push([this, &state, node = std::move(node)] {
+							    auto const ret =
+							        analyze_node(state.cfg, state.cvg, node);
+							    state.task_finished();
+							    if (!ret) state.set_return_code(1);
+						    });
+					    }
+					    state.task_finished();
+				    });
 			}
 
 			return state.wait();
