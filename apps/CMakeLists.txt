@@ -37,12 +37,6 @@ include(builtins)
 string(REPLACE ";" ", " REPORT_FILTER_LIST "${REPORT_FILTERS};${NATIVE_FILTERS}")
 message(STATUS "Filters: ${REPORT_FILTER_LIST}")
 
-if (WIN32)
-    list(APPEND SOURCES
-        win32/cov.rc
-    )
-endif()
-
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})
 source_group(TREE ${CMAKE_CURRENT_BINARY_DIR} FILES ${CMAKE_CURRENT_BINARY_DIR}/gen/cov/builtins.hh ${CMAKE_CURRENT_BINARY_DIR}/gen/cov/versioninfo.rc)
 
@@ -69,11 +63,11 @@ if (WIN32)
 
     list(APPEND SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/gen/cov/versioninfo.rc"
-        "${CMAKE_SOURCE_DIR}/data/icons/win32.ico"
     )
 endif()
 
 add_cov_tool(cov ${SOURCES})
+add_win32_icon(cov "win32.ico")
 target_include_directories(cov PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}/gen

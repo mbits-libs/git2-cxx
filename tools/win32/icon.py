@@ -76,6 +76,20 @@ class path:
         self.code.append(f"L{self.pos + p}")
         self.pos += p
 
+    def a(
+        self,
+        p: pt,
+        r: Union[pt, number],
+        x_rot: number = 0,
+        large_arc: bool = False,
+        sweep: bool = False,
+    ):
+        radius = r if isinstance(r, pt) else pt(r, r)
+        large_arc_s = "1" if large_arc else "0"
+        sweep_s = "1" if sweep else "0"
+        self.code.append(f"A{radius} {x_rot} {large_arc_s} {sweep_s} {self.pos + p}")
+        self.pos += p
+
     def c(self, dst: pt, c1: pt, c2: pt):
         self.code.append(f"C{self.pos + c1} {dst - c2} {dst}")
         self.pos = dst
@@ -217,17 +231,68 @@ def trace_mark() -> path:
     return p
 
 
+class puzzle_side:
+    def __init__(self, width: number):
+        self.width = width
+
+        init_stub = 1
+        init_edge = 4
+        init_radius = 3
+
+        scale = width / (2 * (init_edge + init_radius))
+
+        self.stub = init_stub * scale
+        self.edge = init_edge * scale
+        self.radius = init_radius * scale
+
+    def draw(self, p: path, horiz: bool, innie: bool, returning: bool, last=False):
+        sign = -1 if returning else 1
+        stub_sign = -sign if (innie ^ horiz) else sign
+        main = p.h if horiz else p.v
+        across = p.v if horiz else p.h
+
+        reach = sign * 2 * self.radius
+        endpoint = pt(reach, 0) if horiz else pt(0, reach)
+
+        main(sign * self.edge)
+        across(stub_sign * self.stub)
+        # main(reach)
+        p.a(endpoint, self.radius, sweep=not innie)
+        across(-stub_sign * self.stub)
+        if not last:
+            main(sign * self.edge)
+
+
+def trace_puzzle() -> path:
+    width, _, top, mid = shield_calc()
+    puzzle_width = width / 2
+
+    side = puzzle_side(puzzle_width)
+
+    p = path()
+    p.M(pt(-puzzle_width / 2, top + mid - puzzle_width / 3))
+
+    side.draw(p, horiz=True, innie=False, returning=False)
+    side.draw(p, horiz=False, innie=True, returning=False)
+    side.draw(p, horiz=True, innie=False, returning=True)
+    side.draw(p, horiz=False, innie=True, returning=True, last=True)
+
+    p.z()
+    return p
+
+
 def trace_glyphs():
-    return (trace_shield(), trace_shadow(), trace_fail(), trace_mark())
+    return (trace_shield(), trace_shadow(), trace_fail(), trace_mark(), trace_puzzle())
 
 
 class Shield:
     def __init__(self):
-        shield_glyph, shadow, fail, mark = trace_glyphs()
+        shield_glyph, shadow, fail, mark, puzzle = trace_glyphs()
         self.shield_glyph = shield_glyph
         self.shadow = shadow
         self.fail_glyph = fail
         self.mark_glyph = mark
+        self.puzzle = puzzle
 
     def _favicon(self, symbol: path, shield_color: str, symbol_color: str):
         width, height, _, _ = shield_calc()
@@ -278,11 +343,32 @@ class Shield:
     def appicon_win32(self):
         return self._appicon(self.mark_glyph, "#b9e7fc", "#1f88e5", False)
 
+    def plugin_win32(self):
+        shield_color = "#b9e7fc"
+        symbol_color = "#1f88e5"
+        height = shield_calc()[1]
+        result = svg_group(pt(ICON_HEIGHT / 2, ICON_HEIGHT - height))
+        result.paths = [
+            svg_path(self.shield_glyph, style("fill", shield_color)),
+            svg_path(
+                self.puzzle,
+                style("stroke", symbol_color),
+                style("fill", symbol_color, opacity=".6"),
+            ),
+            svg_path(
+                self.shadow,
+                style("fill", "#000"),
+                style("opacity", ".2"),
+            ),
+            svg_path(self.shield_glyph, style("stroke", symbol_color, width="2")),
+        ]
+        return svg_root(ICON_HEIGHT, result, px_size=1024)
+
     def appicon_win32_mask(self):
         height = shield_calc()[1]
         result = svg_group(pt(ICON_HEIGHT / 2, ICON_HEIGHT - height))
         result.paths = [
-            f'<rect width="{ICON_HEIGHT}" height="{ICON_HEIGHT}" fill="#000"/>',
+            f'<rect width="{ICON_HEIGHT}" height="{ICON_HEIGHT}" x="{-ICON_HEIGHT/2}" fill="#000"/>',
             svg_path(self.shield_glyph, style("fill", "#fff")),
         ]
         return svg_root(ICON_HEIGHT, result, px_size=1024)
@@ -311,12 +397,13 @@ class Shield:
 
 shield = Shield()
 
-__dir__ = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)), "..", "data", "icons"
-)
+__dir_name__ = os.path.dirname(__file__)
+__root_dir__ = os.path.dirname(os.path.dirname(__dir_name__))
+__icons__ = os.path.join(__root_dir__, "data", "icons")
+
 for icon in ["good", "bad", "passing", "outline"]:
     pathname = f"favicon-{icon}.svg"
-    with open(os.path.join(__dir__, pathname), "wb") as f:
+    with open(os.path.join(__icons__, pathname), "wb") as f:
         svg = str(getattr(shield, f"favicon_{icon}")())
         f.write(svg.encode("UTF-8"))
         f.write(b"\n")
@@ -326,7 +413,12 @@ for icon in ["cov", "win32", "win32_mask"]:
         pathname = {"cov": "appicon.svg"}[icon]
     except KeyError:
         pathname = f"appicon-{icon.replace('_', '-')}.svg"
-    with open(os.path.join(__dir__, pathname), "wb") as f:
+    with open(os.path.join(__icons__, pathname), "wb") as f:
         svg = str(getattr(shield, f"appicon_{icon}")())
         f.write(svg.encode("UTF-8"))
         f.write(b"\n")
+
+with open(os.path.join(__icons__, "plugin-win32.svg"), "wb") as f:
+    svg = str(shield.plugin_win32())
+    f.write(svg.encode("UTF-8"))
+    f.write(b"\n")
