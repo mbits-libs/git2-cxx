@@ -62,7 +62,7 @@ namespace cov::app::collect {
 				return functions_;
 			}
 
-			void post_process(std::filesystem::path const& path);
+			bool post_process(std::filesystem::path const& path);
 			json::node get_json(std::string_view filename) const;
 			json::node get_lines() const;
 			json::node get_functions() const;

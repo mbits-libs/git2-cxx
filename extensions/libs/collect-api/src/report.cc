@@ -85,8 +85,14 @@ namespace cov::app::collect {
 	}
 
 	void report::post_process() {
+		std::vector<std::string> to_remove{};
+		to_remove.reserve(files_.size());
 		for (auto& [name, data] : files_) {
-			data->post_process(cfg_.src_dir / make_u8path(name));
+			if (!data->post_process(cfg_.src_dir / make_u8path(name)))
+				to_remove.push_back(name);
+		}
+		for (auto const& name : to_remove) {
+			files_.erase(name);
 		}
 	}
 
@@ -173,11 +179,11 @@ namespace cov::app::collect {
 		                  std::make_move_iterator(src.functions_.end()));
 	}
 
-	void report::file::post_process(std::filesystem::path const& path) {
+	bool report::file::post_process(std::filesystem::path const& path) {
 		auto input = cov::io::fopen(path, "rb");
 		if (!input) {
 			hash_.clear();
-			return;
+			return false;
 		}
 
 		std::byte buffer[8192];
@@ -189,6 +195,7 @@ namespace cov::app::collect {
 		hash_ = fmt::format("sha1:{}", m.finalize().str());
 
 		std::sort(functions_.begin(), functions_.end());
+		return true;
 	}
 
 	json::node report::file::get_json(std::string_view filename) const {
