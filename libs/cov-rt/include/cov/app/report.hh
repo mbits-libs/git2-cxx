@@ -57,12 +57,19 @@ namespace cov::app::report {
 		auto operator<=>(file_info const& rhs) const noexcept {
 			// without this definition, clang 16 does not like the
 			// function_coverage' spaceship...
-			if (auto const cmp = name <=> rhs.name; cmp != 0) return cmp;
-			if (auto const cmp = algorithm <=> rhs.algorithm; cmp != 0)
+			if (auto const cmp = name <=> rhs.name; cmp != 0) {
 				return cmp;
-			if (auto const cmp = digest <=> rhs.digest; cmp != 0) return cmp;
-			if (auto const cmp = line_coverage <=> rhs.line_coverage; cmp != 0)
+			}
+			if (auto const cmp = algorithm <=> rhs.algorithm; cmp != 0) {
 				return cmp;
+			}
+			if (auto const cmp = digest <=> rhs.digest; cmp != 0) {
+				return cmp;
+			}
+			if (auto const cmp = line_coverage <=> rhs.line_coverage;
+			    cmp != 0) {
+				return cmp;
+			}
 			return function_coverage <=> rhs.function_coverage;
 		}
 		coverage_info expand_coverage(size_t line_count) const;

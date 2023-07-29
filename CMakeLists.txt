@@ -194,10 +194,6 @@ add_subdirectory(libs)
 add_subdirectory(extensions)
 add_subdirectory(apps)
 
-message(STATUS "COV_TOOLS: ${COV_TOOLS}")
-message(STATUS "COV_LIBS: ${COV_LIBS}")
-message(STATUS "VS_MODS: ${VS_MODS}")
-
 execute_process(COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/packages/system.py props
     OUTPUT_VARIABLE COV_PROPERTIES
     OUTPUT_STRIP_TRAILING_WHITESPACE
