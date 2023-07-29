@@ -11,11 +11,12 @@
 [module "app/main"]
     path = apps/cov/
     path = apps/builtins/
-[module "app/ext"]
-    path = apps/collect
-    path = libs/collect-api
-[module "app/filters"]
-    path = apps/filters
+[module "ext/filters"]
+    path = extensions/filters
+[module "ext/libs"]
+    path = extensions/libs
+[module "ext"]
+    path = extensions
 [module "hilite/lighter"]
     path = libs/hilite/hilite
     path = libs/hilite/lighter

@@ -57,15 +57,13 @@ if (COV_TESTING)
 
   set(COVERALLS_PREFIX cov_)
 
-  set(INCLUDED_IN_COVERAGE apps)
+  set(INCLUDED_IN_COVERAGE apps extensions)
   foreach(module
     libs/cov-api
-    libs/cell
     libs/hilite/hilite
     libs/hilite/lighter
     libs/app
     libs/cov-rt
-    libs/collect-api
   )
     list(APPEND INCLUDED_IN_COVERAGE ${module}/include ${module}/src)
   endforeach()
@@ -75,6 +73,14 @@ if (COV_TESTING)
   endforeach()
 
   set(EXCLUDED_FROM_COVERAGE apps/tests)
+  foreach(extension
+    collect-api
+    excludes
+    native
+  )
+    list(APPEND EXCLUDED_FROM_COVERAGE
+      extension/${extension}/test)
+  endforeach()
 
   set(cov_COVERALLS_DIRS ${INCLUDED_IN_COVERAGE})
   include(${PROJECT_SOURCE_DIR}/tools/coveralls/Coveralls.cmake)
