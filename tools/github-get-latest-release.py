@@ -45,6 +45,6 @@ if release is None:
     sys.exit(0)
 
 unpack, msg = locate_unpack(release)
-print_args((*msg, release, "build/.local"))
+print_args((*msg, release.replace(os.path.sep, "/"), "build/.local"))
 if not Environment.DRY_RUN:
     unpack(release, "build/.local")
