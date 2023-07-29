@@ -6,7 +6,9 @@
 #include <cov/app/run.hh>
 #include <cov/git2/config.hh>
 #include <cov/io/file.hh>
+#include <memory>
 #include <native/str.hh>
+#include <occ_xml.hh>
 #include <string_view>
 #include <task_watcher.hh>
 #include <thread>
@@ -18,12 +20,6 @@
 using namespace std::literals;
 
 namespace cov::app::collect {
-	static unsigned u(long long val) {
-		static constexpr long long max_uint =
-		    std::numeric_limits<unsigned>::max();
-		return std::max(0u, static_cast<unsigned>(std::min(max_uint, val)));
-	}
-
 	std::string dos_path(std::filesystem::path const& path) {
 		auto copy = path;
 		copy.make_preferred();
@@ -69,15 +65,6 @@ namespace cov::app::collect {
 				return platform::call(make_u8path(command), args);
 			}
 
-			/*
-			OpenCppCoverage
-			    -q
-			    --working_dir <bin-dir>
-			    --export_type <filter>:<bin-dir>\\<occ-dir>\\<output>.xml
-			    --source <include>
-			    --cover_children
-			    --
-			    ...*/
 			std::vector occ_args{
 			    "-q"s,
 			    "--working_dir"s,
@@ -86,7 +73,7 @@ namespace cov::app::collect {
 			    fmt::format("{}:{}", occ_filter_,
 			                dos_path(cfg.bin_dir / occ_dir_ / occ_output_)),
 			};
-			// +2 for "--cover_children --"; +1 for command
+			// +2 for "--cover_children --"; +1 for the observed command
 			occ_args.reserve(occ_args.size() + 2 * cfg.include.size() + 2 + 1 +
 			                 args.size());
 
@@ -114,7 +101,7 @@ namespace cov::app::collect {
 			return platform::call(occ_, arguments{occ_args});
 		}
 
-		int report(config const&, coverage&) override { return 0; }
+		int report(config const&, coverage&) override;
 
 	private:
 		std::string ver_;
@@ -203,5 +190,10 @@ namespace cov::app::collect {
 		}
 		ver_ = fmt::format("{}.{}", major, minor);
 		return true;
+	}
+
+	int msvc_toolkit::report(config const& cfg, coverage& cvg) {
+		auto const report_path = cfg.bin_dir / occ_dir_ / occ_output_;
+		return occ_load(report_path, cfg, cvg) ? 0 : 1;
 	}
 }  // namespace cov::app::collect

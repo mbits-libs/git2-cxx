@@ -28,6 +28,9 @@ namespace cov::app::collect {
 			auto rest = path.substr(incl.size());
 			if (rest.empty() || rest.front() == '/') {
 				auto key = std::string{path.data(), path.size()};
+#ifdef _WIN32
+				std::replace(key.begin(), key.end(), '\\', '/');
+#endif
 				auto it = files_.find(key);
 				if (it == files_.end()) {
 					bool ignore = false;
@@ -42,21 +45,26 @@ namespace cov::app::collect {
 	}
 
 	std::unique_ptr<coverage_file> report::get_file_mt(std::string_view path) {
+		static constexpr auto sep =
+		    static_cast<char>(std::filesystem::path::preferred_separator);
 		if (!path.starts_with(src_prefix_)) return nullptr;
 		path = path.substr(src_prefix_.length());
 		for (auto const& excl_path : cfg_.exclude) {
 			auto excl = get_u8path(excl_path);
 			if (!path.starts_with(excl)) continue;
 			auto rest = path.substr(excl.size());
-			if (rest.empty() || rest.front() == '/') return nullptr;
+			if (rest.empty() || rest.front() == sep) return nullptr;
 		}
 		for (auto const& incl_path : cfg_.include) {
 			auto incl = get_u8path(incl_path);
 			if (!path.starts_with(incl)) continue;
 			auto rest = path.substr(incl.size());
-			if (rest.empty() || rest.front() == '/') {
-				return std::make_unique<file>(
-				    std::string{path.data(), path.size()});
+			if (rest.empty() || rest.front() == sep) {
+				auto key = std::string{path.data(), path.size()};
+#ifdef _WIN32
+				std::replace(key.begin(), key.end(), '\\', '/');
+#endif
+				return std::make_unique<file>(key);
 			}
 		}
 		return nullptr;
@@ -123,7 +131,9 @@ namespace cov::app::collect {
 	}
 
 	std::string report::build_prefix() const {
-		return fmt::format("{}/", get_u8path(cfg_.src_dir));
+		return fmt::format(
+		    "{}{}", get_u8path(cfg_.src_dir),
+		    static_cast<char>(std::filesystem::path::preferred_separator));
 	}
 
 	json::node report::function_cvg::get_json() const {

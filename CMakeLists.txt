@@ -49,6 +49,7 @@ find_package(libgit2 REQUIRED)
 find_package(fmt REQUIRED)
 find_package(mbits-args REQUIRED)
 find_package(mbits-lngs REQUIRED)
+find_package(expat REQUIRED)
 
 if (COV_TESTING)
   enable_testing()
@@ -79,7 +80,7 @@ if (COV_TESTING)
     native
   )
     list(APPEND EXCLUDED_FROM_COVERAGE
-      extension/${extension}/test)
+      extensions/${extension}/test)
   endforeach()
 
   set(cov_COVERALLS_DIRS ${INCLUDED_IN_COVERAGE})

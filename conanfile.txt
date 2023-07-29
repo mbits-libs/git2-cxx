@@ -4,6 +4,7 @@ fmt/9.1.0
 gtest/cci.20210126
 mbits-lngs/0.7.6
 ctre/3.7.2
+expat/2.2.10
 
 zlib/1.2.12
 libcurl/8.1.2

@@ -2,6 +2,8 @@ set(SOURCES
     src/gnu.cc
     src/llvm.cc
     src/msvc.cc
+    src/occ_xml.cc
+    src/occ_xml.hh
     src/queue.hh
     src/report.cc
     src/report.hh
