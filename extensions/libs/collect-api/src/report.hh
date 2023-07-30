@@ -18,7 +18,6 @@
 namespace cov::app::collect {
 	struct report : coverage {
 		report(config const& cfg) : cfg_{cfg} {}
-		coverage_file* get_file(std::string_view path) override;
 		std::unique_ptr<coverage_file> get_file_mt(
 		    std::string_view path) override;
 		void handover_mt(std::unique_ptr<coverage_file>&&) override;

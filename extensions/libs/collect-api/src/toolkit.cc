@@ -58,9 +58,7 @@ namespace cov::app::collect {
 	}
 
 	std::unique_ptr<toolkit> recognize_toolkit(config const& cfg) {
-#ifdef _WIN32
 		if (cfg.compiler.filename() == L"cl.exe"sv) return msvc(cfg);
-#endif
 		char ver[] = "--version";
 		char* v_args[] = {ver, nullptr};
 		auto const proc = platform::run(cfg.compiler, {1, v_args});
@@ -138,8 +136,8 @@ namespace cov::app::collect {
 			return 0;
 		});
 
-		if (bin_dir.empty()) bin_dir = cfg_dir;
 		if (src_dir.empty()) src_dir = cfg_dir;
+		if (bin_dir.empty()) bin_dir = src_dir;
 		if (output.empty()) output = "cov-collect.json";
 	}
 }  // namespace cov::app::collect

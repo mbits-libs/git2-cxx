@@ -133,13 +133,13 @@ int measure(std::string_view label, Callback&& cb) {
 int tool(args::args_view const& arguments) {
 	git::init memory{};
 
+	auto params = parse_arguments(arguments);
+
 	auto repo = open_here();
 	if (!repo) return 1;
 	json::string branch{};
 	git::oid ref{};
 	if (!repo_head(repo, branch, ref)) return 1;
-
-	auto params = parse_arguments(arguments);
 
 	if (!params.config) {
 		find_config(repo, params.config);
@@ -164,6 +164,7 @@ int tool(args::args_view const& arguments) {
 
 	fmt::print(stderr, "[toolkit] {} {} (from {})\n", toolkit->label(),
 	           toolkit->version(), get_u8path(*params.config));
+	toolkit->hello(cfg);
 	collect::report cvg{cfg};
 
 	if (toolkit->needs_preprocess()) {

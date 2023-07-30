@@ -189,15 +189,17 @@ namespace cov::app::collect {
 		std::string_view version() const noexcept override { return ver_; }
 
 		void hello(config const&) const override {
-			fmt::print("  [merge] {}\n", get_u8path(merger_));
-			fmt::print("  [cov]   {}\n", get_u8path(exporter_));
-			if (!raw_ext_.empty()) fmt::print("  [raw]   {}\n", raw_ext_);
+			fmt::print(stderr, "  [merge] {}\n", get_u8path(merger_));
+			fmt::print(stderr, "  [cov]   {}\n", get_u8path(exporter_));
+			if (!raw_ext_.empty())
+				fmt::print(stderr, "  [raw]   {}\n", raw_ext_);
 			if (!prof_data_dir_.empty())
-				fmt::print("  [data]  {}\n", get_u8path(prof_data_dir_));
+				fmt::print(stderr, "  [data]  {}\n",
+				           get_u8path(prof_data_dir_));
 			if (!exec_.empty()) {
-				fmt::print("  [exe]\n");
+				fmt::print(stderr, "  [exe]\n");
 				for (auto const& exe : exec_) {
-					fmt::print("   - {}\n", get_u8path(exe));
+					fmt::print(stderr, "   - {}\n", get_u8path(exe));
 				}
 			}
 		}
@@ -257,7 +259,10 @@ namespace cov::app::collect {
 		if (auto matched = CLANG(lines[0]); matched) {
 			auto tk = std::make_unique<llvm_toolkit>(
 			    cfg.compiler, matched.get<1>().to_string());
-			if (!tk->load_config(cfg) || !tk->find_tools()) tk.reset();
+			if (!tk->load_config(cfg) || !tk->find_tools()) {
+				fmt::print(stderr, "[clang] cannot configure the toolkit\n");
+				tk.reset();
+			}
 			return tk;
 		}
 		return {};
@@ -387,7 +392,7 @@ namespace cov::app::collect {
 
 						if (!filename || (!segments && !branches)) continue;
 
-						auto sink = cvg.get_file(from_u8(*filename));
+						auto sink = cvg.get_file_mt(from_u8(*filename));
 						if (!sink) continue;
 
 						if (segments) {
@@ -403,6 +408,8 @@ namespace cov::app::collect {
 
 							cvg_segment::run_coverage(data, *sink);
 						}
+
+						cvg.handover_mt(std::move(sink));
 					}
 				}
 				if (functions) {
@@ -423,10 +430,12 @@ namespace cov::app::collect {
 						if (!region) continue;
 
 						auto filename = cast<json::string>((*filenames)[0]);
-						auto sink = cvg.get_file(from_u8(*filename));
-						if (sink)
+						auto sink = cvg.get_file_mt(from_u8(*filename));
+						if (sink) {
 							sink->on_function(region->start, region->end,
 							                  u(*count), get_u8path(*name), {});
+							cvg.handover_mt(std::move(sink));
+						}
 					}
 				}
 			}

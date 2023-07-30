@@ -15,37 +15,6 @@
 using namespace std::literals;
 
 namespace cov::app::collect {
-	coverage_file* report::get_file(std::string_view path) {
-		if (!path.starts_with(src_prefix_)) return nullptr;
-		path = path.substr(src_prefix_.length());
-		for (auto const& excl_path : cfg_.exclude) {
-			auto excl = get_u8path(excl_path);
-			if (!path.starts_with(excl)) continue;
-			auto rest = path.substr(excl.size());
-			if (rest.empty() || rest.front() == '/') return nullptr;
-		}
-		for (auto const& incl_path : cfg_.include) {
-			auto incl = get_u8path(incl_path);
-			if (!path.starts_with(incl)) continue;
-			auto rest = path.substr(incl.size());
-			if (rest.empty() || rest.front() == '/') {
-				auto key = std::string{path.data(), path.size()};
-#ifdef _WIN32
-				std::replace(key.begin(), key.end(), '\\', '/');
-#endif
-				auto it = files_.find(key);
-				if (it == files_.end()) {
-					bool ignore = false;
-					std::tie(it, ignore) =
-					    files_.insert({key, std::make_unique<file>(key)});
-				}
-				return it->second.get();
-			}
-		}
-		return nullptr;
-		{}
-	}
-
 	std::unique_ptr<coverage_file> report::get_file_mt(std::string_view path) {
 		static constexpr auto sep =
 		    static_cast<char>(std::filesystem::path::preferred_separator);
@@ -76,11 +45,11 @@ namespace cov::app::collect {
 		std::lock_guard lock{m_};
 		std::unique_ptr<file> src{static_cast<file*>(returned.release())};
 
-		auto it = files_.find(src->filename());
+		auto key = src->filename();
+		auto it = files_.find(key);
 		if (it == files_.end()) {
 			bool ignore = false;
-			std::tie(it, ignore) =
-			    files_.insert({src->filename(), std::move(src)});
+			std::tie(it, ignore) = files_.insert({key, std::move(src)});
 			return;
 		}
 		it->second->merge(*src);

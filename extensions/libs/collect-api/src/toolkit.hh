@@ -44,7 +44,6 @@ namespace cov::app::collect {
 
 	struct coverage {
 		virtual ~coverage();
-		virtual coverage_file* get_file(std::string_view path) = 0;
 		virtual std::unique_ptr<coverage_file> get_file_mt(
 		    std::string_view path) = 0;
 		virtual void handover_mt(std::unique_ptr<coverage_file>&&) = 0;

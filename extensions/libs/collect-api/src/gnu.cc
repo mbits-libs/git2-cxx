@@ -52,7 +52,7 @@ namespace cov::app::collect {
 		std::string_view version() const noexcept override { return ver_; }
 
 		void hello(config const&) const override {
-			fmt::print("  [gcov] {}\n", get_u8path(gcov_));
+			fmt::print(stderr, "  [gcov] {}\n", get_u8path(gcov_));
 		}
 
 		void clean(config const& cfg) const override {
@@ -130,7 +130,10 @@ namespace cov::app::collect {
 			                   : std::string{};
 			auto tk = std::make_unique<gnu_toolkit>(
 			    cfg.compiler, matched.get<1>().to_string(), std::move(triplet));
-			if (!tk->find_tools()) tk.reset();
+			if (!tk->find_tools()) {
+				fmt::print(stderr, "[gcc] cannot configure the toolkit\n");
+				tk.reset();
+			}
 			return tk;
 		}
 		return {};

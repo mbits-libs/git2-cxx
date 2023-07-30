@@ -40,7 +40,7 @@ namespace cov::app::collect {
 		bool find_tools() {
 			auto const hint = compiler_.parent_path();
 			auto const ver = split(ver_, '.');
-			if (!find_tool(occ_, LR"(C:/Program Files/OpenCppCoverage)"sv,
+			if (!find_tool(occ_, "C:/Program Files/OpenCppCoverage"sv,
 			               "OpenCppCoverage"sv, {}))
 				return false;
 			occ_.make_preferred();
@@ -51,8 +51,8 @@ namespace cov::app::collect {
 		std::string_view version() const noexcept override { return ver_; }
 
 		void hello(config const&) const override {
-			fmt::print("  [occ] {}\n", get_u8path(occ_));
-			fmt::print("  [outfile] {}\n",
+			fmt::print(stderr, "  [occ] {}\n", get_u8path(occ_));
+			fmt::print(stderr, "  [outfile] {}\n",
 			           get_u8path("<bin>" / occ_dir_ / occ_output_));
 		}
 
@@ -114,8 +114,11 @@ namespace cov::app::collect {
 
 	std::unique_ptr<toolkit> msvc(config const& cfg) {
 		auto tk = std::make_unique<msvc_toolkit>(cfg.compiler);
-		if (!tk->load_config(cfg) || !tk->get_version(cfg) || !tk->find_tools())
+		if (!tk->load_config(cfg) || !tk->get_version(cfg) ||
+		    !tk->find_tools()) {
+			fmt::print(stderr, "[msvc] cannot configure the toolkit\n");
 			tk.reset();
+		}
 		return tk;
 	}
 
