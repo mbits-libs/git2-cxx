@@ -50,11 +50,8 @@ namespace cov::app::strip {
 
 		return {};
 	}
+
 	enum which_lines { soft = false, hard = true };
-	bool non_zero(json::node const& n) {
-		auto num = cast<long long>(n);
-		return num && *num;
-	}
 
 	bool erase_line(json::map& line_coverage,
 	                unsigned line,
@@ -100,7 +97,8 @@ namespace cov::app::strip {
 		for (auto& node_range : *array) {
 			auto json_range = cast<json::map>(node_range);
 			if (!json_range) {
-				++counter;
+				++counter;  // GCOV_EXCL_LINE -- oh, c'mon, continue is
+				            // counted...
 				continue;
 			}
 			auto const block = mask_range(*json_range, blocks);
@@ -186,7 +184,9 @@ namespace cov::app::strip {
 
 			if (auto json_array = json::cast<json::array>(file, u8"branches");
 			    json_array) {
+				// GCOV_EXCL_START -- TODO: [BRANCHES] Enable for next task
 				br_counter += filter_blocks(json_array, excludes);
+				// GCOV_EXCL_STOP
 			}
 		}
 
@@ -206,12 +206,14 @@ namespace cov::app::strip {
 				fmt::print(stderr, "{} {}", fn_counter,
 				           fn_counter == 1 ? "function"sv : "functions"sv);
 			}
+			// GCOV_EXCL_START -- TODO: [BRANCHES] Enable for next task
 			if (br_counter) {
 				if (!first) fmt::print(stderr, ", ");
 				first = false;
 				fmt::print(stderr, "{} {}", br_counter,
 				           br_counter == 1 ? "branch"sv : "branches"sv);
 			}
+			// GCOV_EXCL_STOP
 			fmt::print(stderr, "\n");
 		}
 

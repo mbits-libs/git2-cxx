@@ -15,7 +15,7 @@
 namespace cov::app::strip {
 	struct excl_block {
 		unsigned start{};
-		unsigned end{};
+		unsigned end{};  // GCOV_EXCL_LINE
 		auto operator<=>(excl_block const&) const noexcept = default;
 	};
 

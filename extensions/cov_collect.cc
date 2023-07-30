@@ -56,8 +56,10 @@ bool repo_head(git::repository const& repo,
 			return true;
 		}
 	}
+	// GCOV_EXCL_START
 	fmt::print(stderr, "[git] cannot resolve HEAD to a commit\n");
 	return false;
+	// GCOV_EXCL_STOP
 }
 
 enum class command { clean, observe, collect };

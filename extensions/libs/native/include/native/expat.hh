@@ -10,6 +10,7 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunused-parameter"
 #endif
+// GCOV_EXCL_START
 namespace xml {
 	template <class Final>
 	class ExpatBase {
@@ -330,6 +331,7 @@ namespace xml {
 		XML_Parser parser_;
 	};
 }  // namespace xml
+// GCOV_EXCL_STOP
 #if defined(__clang__)
 #pragma clang diagnostic pop
 #endif

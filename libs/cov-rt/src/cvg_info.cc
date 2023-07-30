@@ -178,8 +178,10 @@ namespace cov::app {
 		}
 
 		return fmt::format(
+		    // GCOV_EXCL_START[gcc]
 		    "{} {:>{}} |{} {}", prefix, count_column,
 		    widths.line_no_width + 3 + widths.count_width + 1, suffix,
+		    // GCOV_EXCL_STOP
 		    line_printer::to_string(total_count, name, shorten, use_color));
 	}
 
@@ -193,9 +195,11 @@ namespace cov::app {
 
 		auto const count_column = count ? fmt::format("{}x", *count) : " "s;
 		return fmt::format(
+		    // GCOV_EXCL_START[gcc]
 		    " {:>{}} | {:>{}} | {}", line_no + 1, widths.line_no_width,
 		    count_column, widths.count_width + 1,
 		    line_printer::to_string(count, line_text, line.contents,
+		                            // GCOV_EXCL_STOP
 		                            syntax.dict, use_color));
 	}
 }  // namespace cov::app

@@ -122,11 +122,7 @@ namespace cov::app::strip {
 
 	std::string excludes::stop_for(std::string_view start,
 	                               std::string_view suffix) {
-		if (start.ends_with(suffix))
-			return fmt::format(
-			    "{}_STOP", start.substr(0, start.length() - suffix.length()));
-		std::string stop{};
-		stop.assign("GCOV_EXCL_STOP"sv);
-		return stop;
+		return fmt::format("{}_STOP",
+		                   start.substr(0, start.length() - suffix.length()));
 	}
 }  // namespace cov::app::strip

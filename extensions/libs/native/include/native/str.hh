@@ -42,7 +42,7 @@ namespace cov::app {
 			c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
 		}
 		return result;
-	}
+	}  // GCOV_EXCL_LINE[GCC]
 
 	template <typename Callback>
 	inline void split(std::string_view text, char sep, Callback&& cb) {
@@ -71,5 +71,5 @@ namespace cov::app {
 		split(text, sep,
 		      [&result](auto, auto view) { result.push_back(view); });
 		return result;
-	}
-};  // namespace cov::app
+	}  // GCOV_EXCL_LINE[GCC]
+};     // namespace cov::app
