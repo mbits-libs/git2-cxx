@@ -6,7 +6,7 @@ param(
 $params = @{
     Type = 'Custom'
     Container = 'test*'
-    Subject = 'CN=Marcin Zdun, O=midnightBITS, L=Warszawa, C=PL'
+    Subject = 'CN=Marcin Zdun'
     TextExtension = @(
         '2.5.29.37={text}1.3.6.1.5.5.7.3.3',
         '2.5.29.17={text}email=mzdun@midnightbits.com' )
