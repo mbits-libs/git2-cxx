@@ -1,0 +1,37 @@
+{
+    "$schema": "../../../../tools/json_tests/schema.json",
+    "args": "collect",
+    "patches": {
+        "\\[([^]]+)\\] [0-9.]+ s": "[\\1] #.## s"
+    },
+    "expected": [
+        0,
+        "",
+        [
+            "[toolkit] LLVM 17.0.1 (from $TMP/clang/.covcollect)",
+            "  [merge] $TMP/mocks/llvm-profdata-17",
+            "  [cov]   $TMP/mocks/llvm-cov-17",
+            "  [data]  $TMP/clang/build/llvm",
+            "[preprocess] start...",
+            "[preprocess] #.## s",
+            "[report] start...",
+            "[0/0] finished        ",
+            "[report] #.## s",
+            "[files] 0",
+            "[lines] 0 / 0",
+            "[functions] 0 / 0",
+            "[i/o] $TMP/clang/build/cov-collect.json\n"
+        ]
+    ],
+    "prepare": [
+        "mkdirs '$TMP/clang'",
+        "cd '$TMP/clang'",
+        "git init",
+        "cov init",
+        "git commit -m 'initial' --allow-empty",
+        "mock clang++-17 clang++-17",
+        "mock llvm-cov-17 llvm-cov-17",
+        "mock llvm-profdata-17 llvm-profdata-17",
+        "generate '$DATA/covcollect/ini' .covcollect 'COMPILER=$TMP/mocks/clang++-17'"
+    ]
+}

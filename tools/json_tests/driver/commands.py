@@ -65,6 +65,7 @@ def _shell(test: test.Test, args: List[str]):
 HANDLERS: Dict[str, Tuple[int, Callable]] = {
     "mkdirs": (1, lambda test, args: test.makedirs(args[0])),
     "rm": (1, lambda test, args: test.rmtree(args[0])),
+    "cp": (2, lambda test, args: test.cp(args[0], args[1])),
     "ro": (1, _make_RO),
     "rw": (1, _make_RW),
     "touch": (1, _touch),
@@ -74,4 +75,6 @@ HANDLERS: Dict[str, Tuple[int, Callable]] = {
     "cat": (1, _cat),
     "store": (2, lambda test, args: test.store_output(args[0], args[1:])),
     "shell": (0, _shell),
+    "mock": (2, lambda test, args: test.mock(args[0], args[1])),
+    "generate": (3, lambda test, args: test.generate(args[0], args[1], args[2:])),
 }

@@ -1,0 +1,4 @@
+[collect]
+    compiler = /home/marcin/code/coverage/git2-cxx/apps/tests/copy/mocks/g++
+    bin-dir = build/
+    src-dir = .

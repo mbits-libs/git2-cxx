@@ -1,4 +1,5 @@
 add_subdirectory(libs)
+add_subdirectory(tests)
 
 set(NATIVE_FILTERS
     strip-excludes

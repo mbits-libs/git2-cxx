@@ -1,0 +1,36 @@
+{
+    "$schema": "../../../../tools/json_tests/schema.json",
+    "args": "collect",
+    "patches": {
+        "\\[([^]]+)\\] [0-9.]+ s": "[\\1] #.## s"
+    },
+    "expected": [
+        0,
+        "",
+        [
+            "[toolkit] MSVC 17.01.74656 (from $TMP/dir/.covcollect)",
+            "  [occ] $TMP/mocks/OpenCppCoverage",
+            "  [outfile] <bin>/OpenCppCoverage/cobertura.xml",
+            "[report] start...",
+            "[report] #.## s",
+            "[files] 1",
+            "[lines] 2 / 2",
+            "[functions] 0 / 0",
+            "[i/o] $TMP/dir/build/cov-collect.json\n"
+        ]
+    ],
+    "prepare": [
+        "mkdirs '$TMP/dir'",
+        "cd '$TMP/dir'",
+        "git init",
+        "cov init",
+        "git commit -m 'initial' --allow-empty",
+        "mkdirs build/OpenCppCoverage",
+        "cp '$DATA/covcollect/OpenCppCoverage.xml' build/OpenCppCoverage/cobertura.xml",
+        "touch src/main.cc",
+        "mock cl.exe cl.exe",
+        "mock OpenCppCoverage OpenCppCoverage",
+        "generate '$DATA/covcollect/ini' .covcollect 'COMPILER=$TMP/mocks/cl.exe'",
+        "generate '$DATA/covcollect/OpenCppCoverage.xml' build/OpenCppCoverage/cobertura.xml 'SOURCES=$TMP/dir'"
+    ]
+}

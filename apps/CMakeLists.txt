@@ -136,6 +136,7 @@ if (COV_TESTING)
         013-reset
         014-show
         015-filters-A
+        016-collect
     )
         add_test(
             NAME cov-exec--${TEST_SET}

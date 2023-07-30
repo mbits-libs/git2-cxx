@@ -122,6 +122,7 @@ def _make_env(args: argparse.Namespace, counter_total: int):
 
     return Env(
         target=target,
+        build_dir=os.path.dirname(os.path.dirname(target)),
         data_dir=args.data_dir,
         tempdir=tempdir,
         version=args.version,

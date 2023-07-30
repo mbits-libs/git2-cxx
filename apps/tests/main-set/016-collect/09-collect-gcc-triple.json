@@ -1,0 +1,19 @@
+{
+    "$schema": "../../../../tools/json_tests/schema.json",
+    "args": "collect",
+    "disabled": true,
+    "patches": {
+        "\\[([^]]+)\\] [0-9.]+ s": "[\\1] #.## s"
+    },
+    "expected": null,
+    "prepare": [
+        "mkdirs '$TMP/collect'",
+        "cd '$TMP/collect'",
+        "git init",
+        "cov init",
+        "git commit -m 'initial' --allow-empty",
+        "mock hal9000-lcars-GLaDOS-g++-17 hal9000-lcars-GLaDOS-g++-17",
+        "mock hal9000-lcars-GLaDOS-gcov-17 hal9000-lcars-GLaDOS-gcov",
+        "generate '$DATA/covcollect/ini' .covcollect 'COMPILER=$TMP/mocks/hal9000-lcars-GLaDOS-g++-17'"
+    ]
+}

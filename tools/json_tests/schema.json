@@ -5,11 +5,11 @@
     "properties": {
         "$schema": {"type": "string"},
         "linear": {"type": "boolean"},
-        "disabled": {"type": ["string", "boolean"]},
+        "disabled": {"type": ["boolean", "string"]},
         "lang": {"type": "boolean"},
         "args": {"type": "string"},
         "post": {"type": ["string", "array"], "items": {"type": "string"}},
-        "expected": {"type": ["array", "null"]},
+        "expected": {"type": ["null", "array"]},
         "patches": {
             "type": "object",
             "properties": {

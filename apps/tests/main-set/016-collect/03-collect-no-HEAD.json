@@ -1,0 +1,18 @@
+{
+    "$schema": "../../../../tools/json_tests/schema.json",
+    "disabled": true,
+    "args": "collect",
+    "expected": [
+        1,
+        "",
+        "[git] called on unborn branch\n"
+    ],
+    "prepare": [
+        "mkdirs '$TMP/unborn'",
+        "cd '$TMP/unborn'",
+        "git init",
+        "cov init",
+        "mkdirs .git/refs/heads",
+        "touch .git/refs/heads/main 'ref: refs/heads/main\n'"
+    ]
+}

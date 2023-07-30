@@ -35,7 +35,7 @@ def _alt_sep(input, value, var):
     first = split[0]
     split = split[1:]
     for index in range(len(split)):
-        m = re.match(r"(\S+)(\s*.*)", split[index])
+        m = re.match(r"^(\S+)(\s*(\n|.)*)$", split[index])
         if m is None:
             continue
         g2 = m.group(2)
@@ -58,6 +58,7 @@ def to_lines(stream: str):
 @dataclass
 class Env:
     target: str
+    build_dir: str
     data_dir: str
     tempdir: str
     version: str
@@ -66,6 +67,10 @@ class Env:
     handlers: Dict[str, Tuple[int, Callable]]
     data_dir_alt: Optional[str] = None
     tempdir_alt: Optional[str] = None
+
+    @property
+    def mocks_dir(self):
+        return os.path.join(self.tempdir, "mocks")
 
     def expand(self, input: str, tempdir: str, additional: Dict[str, str] = {}):
         input = (
@@ -135,6 +140,7 @@ class Test:
         self.current_env: Optional[Env] = None
         self.additional_env: Dict[str, str] = {}
         self.patches: Dict[str, str] = data.get("patches", {})
+        self.needs_occ_path: bool = False
 
         self.check = ["all", "all"]
         for stream in range(len(_streams)):
@@ -263,6 +269,7 @@ class Test:
         )
         root = self.cwd = os.path.join(self.cwd, root)
         os.makedirs(root, exist_ok=True)
+        shutil.rmtree(environment.mocks_dir, ignore_errors=True)
 
         prep = self.run_cmds(environment, self.prepare, environment.tempdir)
         if prep is None:
@@ -288,6 +295,9 @@ class Test:
                 _env[key] = environment.expand(value, environment.tempdir)
             elif key in _env:
                 del _env[key]
+        if self.needs_occ_path:
+            _env["PATH"] += os.pathsep
+            _env["PATH"] += environment.mocks_dir
 
         cwd = None if self.linear else self.cwd
         proc: subprocess.CompletedProcess = subprocess.run(
@@ -425,6 +435,9 @@ Diff:
     def rmtree(self, sub):
         shutil.rmtree(self.path(sub))
 
+    def cp(self, src: str, dst: str):
+        shutil.copy2(self.path(src), self.path(dst))
+
     def makedirs(self, sub):
         os.makedirs(self.path(sub), exist_ok=True)
 
@@ -437,6 +450,70 @@ Diff:
         proc = subprocess.run(args, shell=False, capture_output=True, cwd=self.cwd)
         self.additional_env[name] = proc.stdout.decode("UTF-8").strip()
         print(f"export {name}={self.additional_env[name]}")
+
+    def mock(self, exe, link: str):
+        ext = ".exe" if os.name == "nt" and os.path.filename(exe) != "cl.exe" else ""
+        src = os.path.join(self.current_env.build_dir, "mocks", f"{exe}{ext}")
+        dst = os.path.join(self.current_env.mocks_dir, f"{link}{ext}")
+        os.makedirs(os.path.dirname(dst), exist_ok=True)
+        try:
+            os.remove(dst)
+        except FileNotFoundError:
+            pass
+        os.symlink(src, dst, target_is_directory=os.path.isdir(src))
+        if exe == "OpenCppCoverage":
+            self.needs_occ_path = True
+
+    def generate_cov_collect(self, template, args: List[str]):
+        with open(template, encoding="UTF-8") as tmplt:
+            text = tmplt.read().split("$")
+
+        ext = ".exe" if os.name == "nt" and os.path.filename(exe) != "cl.exe" else ""
+        values = {
+            "COMPILER": os.path.join(self.current_env.mocks_dir, f"{args[0]}{ext}")
+        }
+        first = text[0]
+        text = text[1:]
+        for index in range(len(text)):
+            m = re.match(r"^(\S+)(\s*(\n|.)*)$", text[index])
+            if m:
+                key = m.group(1)
+                value = values.get(key, f"${key}")
+                text[index] = f"{value}{m.group(2)}"
+
+        with open(os.path.join(self.cwd, ".covcollect"), "w", encoding="UTF-8") as ini:
+            ini.write("".join([first, *text]))
+
+    def generate(self, template, dst, args: List[str]):
+        with open(template, encoding="UTF-8") as tmplt:
+            text = tmplt.read().split("$")
+
+        ext = ".exe" if os.name == "nt" and os.path.filename(exe) != "cl.exe" else ""
+        values = {}
+        for arg in args:
+            kv = [a.strip() for a in arg.split("=", 1)]
+            key = kv[0]
+            if len(kv) == 1:
+                values[key] = ""
+            else:
+                value = kv[1]
+                if key in ["COMPILER"]:
+                    value = f"{value}{ext}"
+                values[key] = value
+
+        first = text[0]
+        text = text[1:]
+        for index in range(len(text)):
+            m = re.match(r"^([a-zA-Z0-9_]+)(\s*(\n|.)*)$", text[index])
+            if m:
+                key = m.group(1)
+                value = values.get(key, f"${key}")
+                text[index] = f"{value}{m.group(2)}"
+
+        path = self.path(dst)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w", encoding="UTF-8") as ini:
+            ini.write("".join([first, *text]))
 
     @staticmethod
     def load(filename, count):

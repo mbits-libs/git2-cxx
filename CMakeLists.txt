@@ -73,7 +73,10 @@ if (COV_TESTING)
     list(APPEND INCLUDED_IN_COVERAGE libs/hilite/hilite-${extra}/src)
   endforeach()
 
-  set(EXCLUDED_FROM_COVERAGE apps/tests)
+  set(EXCLUDED_FROM_COVERAGE
+    apps/tests
+    extensions/tests
+  )
   foreach(extension
     collect-api
     excludes

@@ -1,0 +1,19 @@
+{
+    "$schema": "../../../../tools/json_tests/schema.json",
+    "args": "collect --clean",
+    "expected": [
+        0,
+        "",
+        ""
+    ],
+    "prepare": [
+        "mkdirs '$TMP/collect'",
+        "cd '$TMP/collect'",
+        "git init",
+        "cov init",
+        "git commit -m 'initial' --allow-empty",
+        "mock hal9000-lcars-GLaDOS-g++-17 g++",
+        "mock hal9000-lcars-GLaDOS-gcov-17 gcov",
+        "generate '$DATA/covcollect/ini' .covcollect 'COMPILER=$TMP/mocks/g++'"
+    ]
+}
