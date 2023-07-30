@@ -13,7 +13,7 @@ from typing import List, NamedTuple, Optional, Tuple
 __dir_name__ = os.path.dirname(__file__)
 __root_dir__ = os.path.dirname(os.path.dirname(__dir_name__))
 
-ENV_KEY = "SIGNATURE_KEY_SECRET"
+ENV_KEY = "SIGN_TOKEN"
 
 Version = Tuple[int, int, int]
 
