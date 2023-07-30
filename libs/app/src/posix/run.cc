@@ -11,6 +11,8 @@
 #include <thread>
 #include "../path_env.hh"
 
+// define STDOUT_DUMP
+
 #ifdef RUNNING_GCOV
 extern "C" {
 #include <gcov.h>
@@ -143,6 +145,7 @@ namespace cov::app::platform {
 				    this, std::ref(src));
 			}
 
+#ifdef STDOUT_DUMP
 			static void dump(std::span<std::byte const> buffer) {
 				static constexpr auto len = 20zu;
 				char line[len * 4 + 2];
@@ -160,7 +163,8 @@ namespace cov::app::platform {
 					line[index * 3] = alphabet[(c >> 4) & 0xF];
 					line[index * 3 + 1] = alphabet[c & 0xF];
 					line[index * 3 + 2] = ' ';
-					line[len * 3 + index] = std::isprint(c) ? c : '.';
+					line[len * 3 + index] =
+					    std::isprint(c) ? static_cast<char>(c) : '.';
 					++index;
 				}
 				if (index < len) {
@@ -173,6 +177,7 @@ namespace cov::app::platform {
 					fputs(line, stdout);
 				}
 			}
+#endif
 
 			std::thread async_read(std::vector<std::byte>& dst) {
 				return std::thread(
@@ -183,7 +188,9 @@ namespace cov::app::platform {
 						    auto const actual =
 						        ::read(fd, buffer, std::size(buffer));
 						    if (actual <= 0) break;
-						    // dump({buffer, buffer + actual});
+#ifdef STDOUT_DUMP
+						    dump({buffer, buffer + actual});
+#endif
 						    bytes.insert(bytes.end(), buffer, buffer + actual);
 					    }
 				    },
