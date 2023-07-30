@@ -1,10 +1,9 @@
 macro(mock_ex name source linkname)
     add_executable(mock-${name} mock_${source}.cc)
     set_target_properties(mock-${name} PROPERTIES OUTPUT_NAME ${linkname})
-
-    target_link_libraries(mock-${name} PRIVATE fmt::fmt mbits::args)
-
+    target_link_libraries(mock-${name} PRIVATE fmt::fmt mbits::args app)
     set_target_properties(mock-${name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/mocks")
+    fix_vs_modules(mock-${name})
 
     foreach(BUILD_TYPE DEBUG RELEASE RELWITHDEBINFO MINSIZEREL)
         set_target_properties(

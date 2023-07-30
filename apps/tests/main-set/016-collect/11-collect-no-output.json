@@ -2,7 +2,8 @@
     "$schema": "../../../../tools/json_tests/schema.json",
     "args": "collect",
     "patches": {
-        "\\[([^]]+)\\] [0-9.]+ s": "[\\1] #.## s"
+        "\\[([^]]+)\\] [0-9.]+ s": "[\\1] #.## s",
+        "(.+)\\.exe": "\\1"
     },
     "expected": [
         1,

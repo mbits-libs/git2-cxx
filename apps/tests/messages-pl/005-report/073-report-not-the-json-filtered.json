@@ -6,7 +6,7 @@
         "",
         [
             "cov report: /git: undefined",
-            "cov report: błąd: wystąpiły problemy z $DATA/no-git-coverage.json przetworzonym przez filtr echo-to-stdout"
+            "cov report: błąd: wystąpiły problemy z $DATA/no-git-coverage.json przetworzonym przez filtr echo-to-stdout\n"
         ]
     ],
     "prepare": [

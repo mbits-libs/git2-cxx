@@ -105,7 +105,12 @@ def _load_tests(dirname: str):
             if len(command.args) > 1:
                 name = command.args[0].value[3:-3]
                 cmd = [arg.value for arg in command.args[1:]]
+                if not len(cmd) or cmd[0] == "NOT_AVAILABLE":
+                    continue
                 tests[name] = cmd
+            continue
+
+        if command.name in ["if", "elseif", "else", "endif"]:
             continue
 
         pprint((dirname, command))
@@ -144,6 +149,10 @@ tests = _load_tests(bin_dir)
 if len(sys.argv) < 3:
     print("known test:", " ".join(tests.keys()))
     sys.exit(0)
-test = [*tests[sys.argv[2]], *sys.argv[3:]]
+try:
+    test = [*tests[sys.argv[2]], *sys.argv[3:]]
+except KeyError:
+    print("known test:", " ".join(tests.keys()))
+    sys.exit(1)
 print_args(*test)
 subprocess.run(test, shell=False)

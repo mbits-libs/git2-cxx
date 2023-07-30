@@ -35,7 +35,7 @@ def _alt_sep(input, value, var):
     first = split[0]
     split = split[1:]
     for index in range(len(split)):
-        m = re.match(r"^(\S+)(\s*(\n|.)*)$", split[index])
+        m = re.match(r"^(\S+)((\n|.)*)$", split[index])
         if m is None:
             continue
         g2 = m.group(2)
@@ -452,7 +452,7 @@ Diff:
         print(f"export {name}={self.additional_env[name]}")
 
     def mock(self, exe, link: str):
-        ext = ".exe" if os.name == "nt" and os.path.filename(exe) != "cl.exe" else ""
+        ext = ".exe" if os.name == "nt" and os.path.basename(exe) != "cl.exe" else ""
         src = os.path.join(self.current_env.build_dir, "mocks", f"{exe}{ext}")
         dst = os.path.join(self.current_env.mocks_dir, f"{link}{ext}")
         os.makedirs(os.path.dirname(dst), exist_ok=True)
@@ -468,7 +468,9 @@ Diff:
         with open(template, encoding="UTF-8") as tmplt:
             text = tmplt.read().split("$")
 
-        ext = ".exe" if os.name == "nt" and os.path.filename(exe) != "cl.exe" else ""
+        ext = (
+            ".exe" if os.name == "nt" and os.path.basename(args[0]) != "cl.exe" else ""
+        )
         values = {
             "COMPILER": os.path.join(self.current_env.mocks_dir, f"{args[0]}{ext}")
         }
@@ -488,7 +490,6 @@ Diff:
         with open(template, encoding="UTF-8") as tmplt:
             text = tmplt.read().split("$")
 
-        ext = ".exe" if os.name == "nt" and os.path.filename(exe) != "cl.exe" else ""
         values = {}
         for arg in args:
             kv = [a.strip() for a in arg.split("=", 1)]
@@ -498,6 +499,11 @@ Diff:
             else:
                 value = kv[1]
                 if key in ["COMPILER"]:
+                    ext = (
+                        ".exe"
+                        if os.name == "nt" and os.path.basename(value) != "cl.exe"
+                        else ""
+                    )
                     value = f"{value}{ext}"
                 values[key] = value
 

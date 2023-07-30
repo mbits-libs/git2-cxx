@@ -370,11 +370,24 @@ namespace cov::app::platform {
 			return !ec && std::filesystem::is_regular_file(status);
 		}
 
+		std::vector<std::wstring> all_lower(
+		    std::span<std::wstring_view const> items) {
+			std::vector<std::wstring> result{};
+			result.reserve(items.size());
+			for (auto view : items) {
+				std::wstring arg;
+				arg.assign(view);
+				CharLowerW(arg.data());
+				result.push_back(std::move(arg));
+			}
+			return result;
+		}
+
 		std::filesystem::path where(std::filesystem::path const& bin,
 		                            wchar_t const* environment_variable,
 		                            std::wstring const& program) {
 			auto ext_str = env(L"PATHEXT");
-			auto path_ext = split(std::wstring{}, ext_str);
+			auto path_ext = all_lower(split(std::wstring{}, ext_str));
 
 			if (program.find_first_of(L"\\/"sv) != std::string::npos) {
 				return program;
@@ -388,7 +401,7 @@ namespace cov::app::platform {
 					auto path =
 					    std::filesystem::path{dir} / filename(program, ext);
 					if (file_exists(path)) {
-						return std::filesystem::canonical(path);
+						return path;
 					}
 				}
 			}

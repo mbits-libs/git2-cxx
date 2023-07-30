@@ -2,7 +2,9 @@
     "$schema": "../../../../tools/json_tests/schema.json",
     "args": "collect",
     "patches": {
-        "\\[([^]]+)\\] [0-9.]+ s": "[\\1] #.## s"
+        "\\[([^]]+)\\] [0-9.]+ s": "[\\1] #.## s",
+        "  \\[occ\\] C:\\\\Program Files\\\\OpenCppCoverage\\\\OpenCppCoverage\\.exe": "  [occ] $TMP/mocks/OpenCppCoverage",
+        "  \\[outfile\\] <bin>\\\\OpenCppCoverage\\\\cobertura\\.xml": "  [outfile] <bin>/OpenCppCoverage/cobertura.xml"
     },
     "expected": [
         0,
