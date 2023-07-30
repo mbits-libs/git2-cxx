@@ -1,0 +1,47 @@
+{
+    "$schema": "../../../../tools/json_tests/schema.json",
+    "args": "report -f strip-excludes '$DATA/extensions/report-llvm.json' -- --os OS --compiler llvm",
+    "post": "show",
+    "patches": {
+        "\u001b\\[31m\\[main [0-9a-fA-F]+\\]\u001b\\[m (.*)": "\u001b[31m[main $REPORT]\u001b[m \\1",
+        " \u001b\\[2;37mcontains [0-9a-fA-F]+:\u001b\\[m (.+)": " \u001b[2;37mcontains $BUILD:\u001b[m \\1",
+        "report [0-9a-f]{40}": "report $OID",
+        "build  [0-9a-f]{40} (.*)": "build  $BUILD_HASH \\1",
+        "Added:     .*": "Added:     $DATE"
+    },
+    "expected": [
+        0,
+        [
+            "\u001b[31m[main $REPORT]\u001b[m Commit \"extensions\"",
+            " 2 files, \u001b[31m  0%\u001b[m (0/0), Fn\u001b[31m  0%\u001b[m (0/2)",
+            " \u001b[2;37mbased on\u001b[m \u001b[2;33m98d4978ec@main\u001b[m",
+            " parent 45c01b5bd",
+            " \u001b[2;37mcontains $BUILD:\u001b[m \u001b[31m  0%\u001b[m",
+            "",
+            "report $OID",
+            "commit 98d4978ecbddf677c1e6bf5a40da84bd0b337340",
+            "build  $BUILD_HASH [  0%]",
+            "GitBranch: main",
+            "Coverage:  [  0%] 0/0 (fail)",
+            "Functions: [  0%] 0/2 (fail)",
+            "Author:    Johnny Appleseed <johnny@appleseed.com>",
+            "Added:     $DATE",
+            "",
+            "      Commit \"extensions\"",
+            "",
+            "+------------+---------+---------+---------+---------+----------+------------+",
+            "| Name       | % Funcs | Missing | % Lines | Visited | Relevant | Line count |",
+            "+------------+---------+---------+---------+---------+----------+------------+",
+            "|   clang.cc |    0.00 |    1 +1 |    0.00 |       0 |        0 |      8 +8  |",
+            "|   llvm.cc  |    0.00 |    1 +1 |    0.00 |       0 |        0 |      8 +8  |",
+            "+------------+---------+---------+---------+---------+----------+------------+",
+            "| > TOTAL    |    0.00 |    2 +2 |    0.00 |       0 |        0 |     16 +16 |",
+            "+------------+---------+---------+---------+---------+----------+------------+\n"
+        ],
+        "strip-excludes: excluded 8 lines\n"
+    ],
+    "prepare": [
+        "unpack $DATA/extensions.tar $TMP",
+        "cd '$TMP/extensions'"
+    ]
+}

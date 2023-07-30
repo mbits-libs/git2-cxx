@@ -1,0 +1,70 @@
+{
+    "$schema": "../../../../tools/json_tests/schema.json",
+    "args": "report -f strip-excludes '$DATA/extensions/report-strip.json'",
+    "post": [
+        "show HEAD:main.cc"
+    ],
+    "patches": {
+        "\u001b\\[31m\\[main [0-9a-fA-F]+\\]\u001b\\[m (.*)": "\u001b[31m[main $REPORT]\u001b[m \\1",
+        " \u001b\\[2;37mcontains [0-9a-fA-F]+:\u001b\\[m (.+)": " \u001b[2;37mcontains $BUILD:\u001b[m \\1"
+    },
+    "expected": [
+        0,
+        [
+            "\u001b[31m[main $REPORT]\u001b[m Commit \"extensions\"",
+            " one file, \u001b[31m 33%\u001b[m (5/15, -10), Fn\u001b[31m 40%\u001b[m (2/5)",
+            " \u001b[2;37mbased on\u001b[m \u001b[2;33m98d4978ec@main\u001b[m",
+            " parent 45c01b5bd",
+            " \u001b[2;37mcontains $BUILD:\u001b[m \u001b[31m 33%\u001b[m",
+            "",
+            "file main.cc",
+            "blob 8413b254a0751500a3f50ecb1dd93ae4fbf12658",
+            "functions 2efee5e14da1591abe9e2af91e246c6e38199117",
+            "lines 6277d9678915703ea7af2326a3e214fc053e8cb6",
+            "stats 40 15 5, 5 2, 0 0",
+            "",
+            "+-----------+--------------+---------+--------------+---------+----------+---------+------------+",
+            "| Name      |   % Funcs    | Missing |   % Lines    | Visited | Relevant | Missing | Line count |",
+            "+-----------+--------------+---------+--------------+---------+----------+---------+------------+",
+            "|   main.cc | 40.00 +40.00 |    3 +3 | 33.33 +33.33 |    5 +5 |   15 +15 |  10 +10 |     40 +40 |",
+            "+-----------+--------------+---------+--------------+---------+----------+---------+------------+",
+            "",
+            "  1 |    |  module;",
+            "  2 |    |  import std;",
+            "  3 |    |  ",
+            "      0x | partial_function_exclusion1",
+            "  4 | 0x | -void partial_function_exclusion() /*after*/ {",
+            "  5 | 0x | -    line1();",
+            "  6 | 0x | -// GCOV_EXCL_START[OS]",
+            "  7 | 0x | -    line2();",
+            "  8 | 0x | -    line3();",
+            "  9 | 0x | -    line4();",
+            " 10 | 0x | -}",
+            " 11 |    |  ",
+            " 12 |    |  // GCOV_EXCL_STOP",
+            " 13 |    |  ",
+            "      0x | sep1",
+            " 14 | 4x | +void sep1() {}",
+            " 15 |    |  // GCOV_EXCL_START",
+            " 16 |    |  ",
+            "      0x | partial_function_exclusion2",
+            " 17 |    |  void partial_function_exclusion1() /*before*/ {",
+            " 18 |    |      line1();",
+            " 19 |    |      line2();",
+            " 20 |    |  // GCOV_EXCL_STOP",
+            " 21 | 0x | -    line3();",
+            " 22 | 0x | -    line4();",
+            " 23 | 0x | -}",
+            " 24 |    |  ",
+            "      1x | sep2",
+            " 25 | 5x | +void sep2() {}",
+            " 26 |    |  ",
+            "\n"
+        ],
+        "strip-excludes: excluded 10 lines, 1 function\n"
+    ],
+    "prepare": [
+        "unpack $DATA/extensions.tar $TMP",
+        "cd '$TMP/extensions'"
+    ]
+}

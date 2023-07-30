@@ -80,6 +80,8 @@
   - Update schema id and references in filters
   - [ ] change `SHARE_DIR` to `share/cov-${PROJECT_VERSION_MAJOR}`
   - [ ] Freeze translation IDs (mzdun/cov#63)
+- [ ] Post-release issues
+  - [ ] support `cov show --oneline` (see `matrix.py`'s Report)
 - [ ] `cov serve`
   - [ ] Boost.Beast WS
   - [ ] React frontend

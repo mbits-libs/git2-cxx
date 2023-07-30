@@ -28,6 +28,7 @@ _conan: Optional[conan] = None
 _platform_name, _platform_version, _platform_arch = uname()
 
 _collect_version = (0, 22, 0)
+_report_version = (0, 20, 0)
 
 platform = _platform_name
 
@@ -548,8 +549,8 @@ class steps:
     )
     def report(config: dict):
         cov_exe = steps.get_bin(_collect_version, config)
+        reporter = steps.get_bin(_report_version, config)
 
-        reporter = f"build/{config['preset']}/bin/cov"
         try:
             tag_process = subprocess.run([reporter, "tag"], stdout=subprocess.PIPE)
             tags = (
