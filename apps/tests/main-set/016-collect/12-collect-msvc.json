@@ -3,7 +3,8 @@
     "args": "collect",
     "patches": {
         "\\[([^]]+)\\] [0-9.]+ s": "[\\1] #.## s",
-        "  \\[occ\\] C:\\\\Program Files\\\\OpenCppCoverage\\\\OpenCppCoverage\\.exe": "  [occ] $TMP/mocks/OpenCppCoverage",
+        "  \\[occ\\] C:\\\\+Program Files(:? \\(x86\\))?\\\\+OpenCppCoverage\\\\+OpenCppCoverage\\.exe": "  [occ] $TMP/mocks/OpenCppCoverage",
+        "  \\[occ\\] \\$TMP\\/+mocks\\/+OpenCppCoverage\\.exe": "  [occ] $TMP/mocks/OpenCppCoverage",
         "  \\[outfile\\] <bin>\\\\OpenCppCoverage\\\\cobertura\\.xml": "  [outfile] <bin>/OpenCppCoverage/cobertura.xml"
     },
     "expected": [
