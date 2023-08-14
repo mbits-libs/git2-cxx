@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<coverage>
+  <sources>
+    <source>$SOURCES</source>
+    <unknown/>
+  </sources>
+  <packages>
+    <package>
+      <classes>
+        <class filename="src/main.cc">
+          <unknown/>
+          <methods><unknown/></methods>
+          <lines>
+            <unknown/>
+            <line number="9" hits="1"/>
+            <line number="10" hits="1"><unknown/></line>
+          </lines>
+        </class>
+        <class filename="src/test/main-test.cc">
+          <unknown/>
+          <methods><unknown/></methods>
+          <lines>
+            <unknown/>
+            <line number="9" hits="1"/>
+            <line number="10" hits="1"><unknown/></line>
+          </lines>
+        </class>
+        <unknown/>
+      </classes>
+      <unknown/>
+    </package>
+    <unknown/>
+  </packages>
+  <unknown/>
+</coverage>

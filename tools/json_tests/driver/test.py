@@ -60,6 +60,7 @@ class Env:
     target: str
     build_dir: str
     data_dir: str
+    inst_dir: str
     tempdir: str
     version: str
     counter_digits: int
@@ -76,6 +77,7 @@ class Env:
         input = (
             input.replace("$TMP", tempdir)
             .replace("$DATA", self.data_dir)
+            .replace("$INST", self.inst_dir)
             .replace("$VERSION", self.version)
         )
         for key, value in additional.items():
@@ -94,17 +96,32 @@ class Env:
             input = _alt_sep(input, self.tempdir_alt, "$TMP")
             input = _alt_sep(input, self.data_dir_alt, "$DATA")
 
-        if not len(patches):
-            return input
+        builtins = {
+            "\x1B\\[31m\\[(.+) [0-9a-fA-F]+\\]\x1B\\[m (.+)": "\x1B[31m[\\1 $REPORT]\x1B[m \\2",
+            " \x1B\\[2;37mbased on\x1B\\[m \x1B\\[2;33m[0-9a-fA-F]+@(.+)\x1B\\[m": " \x1B[2;37mbased on\x1B[m \x1B[2;33m$HEAD@\\1\x1B[m",
+            " \x1B\\[2;37mcontains [0-9a-fA-F]+:\x1B\\[m (.+)": " \x1B[2;37mcontains $BUILD:\x1B[m \\1",
+            " based on [0-9a-fA-F]+@(.+)": " based on $HEAD@\\1",
+            " contains [0-9a-fA-F]+: (.+)": " contains $BUILD: \\1",
+            "(\\s+)parent [0-9a-fA-F]+": "\\1parent $PARENT",
+            "Added:(\\s+).*": "Added:\\1$DATE",
+            "CommitDate:(\\s+).*": "CommitDate:\\1$DATE",
+            "\\[(.+) [0-9a-fA-F]+\\] (.+)": "[\\1 $REPORT] \\2",
+        }
 
         lines = input.split("\n")
-        for patch in patches:
-            patched = patches[patch]
+        for patch, replacement in builtins.items():
             pattern = re.compile(patch)
             for lineno in range(len(lines)):
                 m = pattern.match(lines[lineno])
                 if m:
-                    lines[lineno] = m.expand(patched)
+                    lines[lineno] = m.expand(replacement)
+
+        for patch, replacement in patches.items():
+            pattern = re.compile(patch)
+            for lineno in range(len(lines)):
+                m = pattern.match(lines[lineno])
+                if m:
+                    lines[lineno] = m.expand(replacement)
         return "\n".join(lines)
 
 

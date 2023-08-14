@@ -1,0 +1,75 @@
+import("fs");
+
+global proj = project("cov");
+proj.allow("git");
+
+proj.install_component("main_exec");
+proj.install_component("tools");
+
+proj.datasets(fs.abspath("apps/tests"), "main-set");
+proj.environment("DATA", fs.abspath("apps/tests/data"));
+
+proj.register_patch(
+    re_escape("\033[31m[") + "(.+) [0-9a-fA-F]+" + re_escape("]\033[m ") + "(.+)",
+    "\033[31m[\\1 $REPORT]\033[m \\2");
+proj.register_patch(
+    re_escape("[") + "(.+) [0-9a-fA-F]+" + re_escape("] ") + "(.+)",
+    "[\\1 $REPORT] \\2");
+proj.register_patch(
+    re_escape(" \033[2;37mcontains ") + "[0-9a-fA-F]+" + re_escape(":\033[m ") + "(.+)",
+    " \033[2;37mcontains $BUILD:\033[m \\1");
+proj.register_patch(" contains [0-9a-fA-F]+: (.+)", " contains $BUILD: \\1");
+proj.register_patch(
+    re_escape(" \033[2;37mbased on\033[m \033[2;33m") + "[0-9a-fA-F]+@(.+)" + re_escape("\033[m"),
+    " \033[2;37mbased on\033[m \033[2;33m$HEAD@\\1\033[m");
+proj.register_patch(" based on [0-9a-fA-F]+@(.+)", " based on $HEAD@\\1");
+proj.register_patch("(\\s+)parent [0-9a-fA-F]+", "\\1parent $PARENT");
+
+proj.register_patch("CommitDate:(\\s+).*", "CommitDate:\\1$DATE");
+proj.register_patch("Added:(\\s+).*", "Added:\\1$DATE");
+
+
+def text_from(path) {
+    var file = path.open();
+    if (!file) {
+        return "";
+    }
+    var text = file.read();
+    file.close();
+    return text;
+}
+
+def detach(test, args) {
+    var dirname = test.path(args[0]);
+    var HEAD = fs.join(dirname, "HEAD");
+    var branch = text_from(HEAD).trim_right();
+    if (!branch.starts_with("ref: ")) {
+        return true;
+    }
+    branch = branch.substr(5, branch.size());
+
+    var commit = text_from(fs.join(dirname, branch));
+    if (commit.trim().empty()) { return false; }
+    var file = HEAD.open("w");
+    file.write(commit);
+    return true;
+}
+proj.handle("detach", 1, detach);
+
+def cov_install(copy_dir, rt) {
+    var filters_target = fs.join(copy_dir, "additional-filters");
+
+    rt.append("COV_FILTER_PATH", filters_target);
+    rt.append("COV_PATH", fs.join(rt.build_dir, "dont-copy"));
+    rt.append("COV_PATH", fs.join(rt.build_dir, "elsewhere/libexec/cov"));
+
+    fs.create_directories(filters_target);
+    var filters = fs.directory_iterator("apps/tests/test-filters");
+    for (entry: filters) {
+        if (fs.extension(entry.path) != ".py") {
+            continue;
+        }
+        var installed_path = fs.join(filters_target, fs.stem(entry.path));
+        fs.copy(entry.path, installed_path);
+    }
+}

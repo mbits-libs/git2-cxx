@@ -124,6 +124,7 @@ def _make_env(args: argparse.Namespace, counter_total: int):
         target=target,
         build_dir=os.path.dirname(os.path.dirname(target)),
         data_dir=args.data_dir,
+        inst_dir=os.path.join(os.path.dirname(args.data_dir), "copy", "bin"),
         tempdir=tempdir,
         version=args.version,
         counter_digits=digits,
