@@ -55,6 +55,11 @@ if (COV_TESTING)
   enable_testing()
 
   find_package(GTest REQUIRED)
+  find_program(Runner_EXECUTABLE runner REQUIRED HINTS
+    "${PROJECT_SOURCE_DIR}/build/downloads"
+    "${PROJECT_SOURCE_DIR}/../build/release/bin"
+  )
+  message(STATUS "Runner_EXECUTABLE is: ${Runner_EXECUTABLE}")
 
   set(COVERALLS_PREFIX cov_)
 

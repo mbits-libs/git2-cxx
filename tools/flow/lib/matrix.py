@@ -29,6 +29,7 @@ _platform_name, _platform_version, _platform_arch = uname()
 
 _collect_version = (0, 22, 0)
 _report_version = (0, 20, 0)
+_runner_version = (0, 1, 2)
 
 platform = _platform_name
 
@@ -312,6 +313,11 @@ class steps:
         cov_COVERALLS = "ON" if config.get("coverage") else "OFF"
         COV_SANITIZE = "ON" if config.get("sanitizer") else "OFF"
         COV_CUTDOWN_OS = "ON" if runner.CUTDOWN_OS else "OFF"
+        runner.call(
+            sys.executable,
+            "tools/download-runner.py",
+            ".".join(str(x) for x in _runner_version),
+        )
         runner.call(
             "cmake",
             "--preset",
