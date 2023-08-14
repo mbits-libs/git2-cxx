@@ -1,5 +1,6 @@
 {
-    "$schema": "../../../../tools/json_tests/schema.json",
+    "$schema": "../../runner-schema.json",
+    "linear": true,
     "args": "collect --observe ctest -C Debug .",
     "expected": [
         0,

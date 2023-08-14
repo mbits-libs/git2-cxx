@@ -1,11 +1,10 @@
 {
+    "$schema": "../../runner-schema.json",
     "args": "config --file $TMP/config group.key 'value 3'",
     "expected": [
         2,
         "",
         "cov config: error: entry is not unique due to being a multivar\n"
     ],
-    "prepare": [
-        "touch '$TMP/config' '[group]\nkey = value 1\nkey = value 2'"
-    ]
+    "prepare": ["touch '$TMP/config' '[group]\nkey = value 1\nkey = value 2'"]
 }

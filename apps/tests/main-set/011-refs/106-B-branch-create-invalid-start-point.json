@@ -1,4 +1,5 @@
 {
+    "$schema": "../../runner-schema.json",
     "args": "branch feat/cov-4 non-existing",
     "expected": [
         2,

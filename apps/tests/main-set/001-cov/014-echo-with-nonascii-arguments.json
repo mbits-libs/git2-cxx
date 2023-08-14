@@ -1,4 +1,5 @@
 {
+    "$schema": "../../runner-schema.json",
     "args": "-C 'utf8-αβγδε' first '--hjälp'",
     "expected": [
         0,

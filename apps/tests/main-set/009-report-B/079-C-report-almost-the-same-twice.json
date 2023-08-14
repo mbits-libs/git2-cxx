@@ -1,4 +1,5 @@
 {
+    "$schema": "../../runner-schema.json",
     "args": "report $DATA/build-coverage-same-stats-diff-visits.json -f create-report",
     "expected": [
         0,

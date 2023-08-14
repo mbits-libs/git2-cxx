@@ -1,4 +1,5 @@
 {
+    "$schema": "../../runner-schema.json",
     "args": "report $DATA/no-git-coverage.json",
     "expected": [
         2,

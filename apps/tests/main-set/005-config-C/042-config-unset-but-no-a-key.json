@@ -1,11 +1,10 @@
 {
+    "$schema": "../../runner-schema.json",
     "args": "config --file $TMP/config --unset group-other",
     "expected": [
         2,
         "",
         "cov config: error: invalid config item name 'group-other'\n"
     ],
-    "prepare": [
-        "touch '$TMP/config' '[group]\nkey = value 1\nkey = value 2'"
-    ]
+    "prepare": ["touch '$TMP/config' '[group]\nkey = value 1\nkey = value 2'"]
 }

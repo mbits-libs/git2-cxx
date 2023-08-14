@@ -1,4 +1,5 @@
 {
+    "$schema": "../../runner-schema.json",
     "lang": "pl",
     "args": "log",
     "expected": [

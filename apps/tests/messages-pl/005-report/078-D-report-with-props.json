@@ -1,4 +1,5 @@
 {
+    "$schema": "../../runner-schema.json",
     "args": "report $DATA/build-coverage.json -f create-report -pos=qnx -pdebug=false -pcompiler=javac",
     "patches": {
         "\u001b\\[31m\\[main [0-9a-fA-F]+\\]\u001b\\[m second": "\u001b[31m[main $REPORT]\u001b[m second",

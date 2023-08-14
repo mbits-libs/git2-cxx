@@ -1,8 +1,6 @@
 {
+    "$schema": "../../runner-schema.json",
     "args": "log --format=unknown --color always --decorate short Q..M",
-    "patches": {
-        "Added:     .*": "Added:     $DATE"
-    },
     "expected": [
         0,
         [

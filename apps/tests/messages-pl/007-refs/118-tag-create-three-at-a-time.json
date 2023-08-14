@@ -1,4 +1,5 @@
 {
+    "$schema": "../../runner-schema.json",
     "lang": "pl",
     "args": "tag tag-1 tag-2 tag-3",
     "expected": [

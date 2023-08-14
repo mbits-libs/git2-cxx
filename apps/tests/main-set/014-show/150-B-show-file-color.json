@@ -1,4 +1,5 @@
 {
+    "$schema": "../../runner-schema.json",
     "args": "show HEAD:src/main.cc --color always",
     "expected": [
         0,

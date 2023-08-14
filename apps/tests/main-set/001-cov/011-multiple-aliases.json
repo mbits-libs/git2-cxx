@@ -1,4 +1,5 @@
 {
+    "$schema": "../../runner-schema.json",
     "args": "-C recurse name",
     "expected": [
         0,

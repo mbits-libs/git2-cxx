@@ -1,11 +1,7 @@
 {
-    "$schema": "../../../../tools/json_tests/schema.json",
+    "$schema": "../../runner-schema.json",
     "args": "collect --clean",
-    "expected": [
-        0,
-        "",
-        ""
-    ],
+    "expected": [0, "", ""],
     "prepare": [
         "mkdirs '$TMP/collect'",
         "cd '$TMP/collect'",

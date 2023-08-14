@@ -1,8 +1,7 @@
 {
+    "$schema": "../../runner-schema.json",
     "args": "log '--format=%C(yellow)%hR%Creset (%s, %rs) %C(red)%hG@%rD%Creset' --color always --decorate short Q..M",
-    "check": {
-        "stderr": "begin"
-    },
+    "check": {"stderr": "begin"},
     "expected": [
         0,
         [

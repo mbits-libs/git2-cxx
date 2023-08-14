@@ -1,4 +1,5 @@
 {
+    "$schema": "../../runner-schema.json",
     "args": "log $BUILD --prop-names --decorate short",
     "expected": [
         2,

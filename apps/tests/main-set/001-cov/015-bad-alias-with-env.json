@@ -1,16 +1,13 @@
 {
+    "$schema": "../../runner-schema.json",
     "args": "-C bad-recurse first -D",
-    "env": {
-        "COV_PATH": [
-            "$TMP",
-            "",
-            "$TMP/tools",
-            ""
-        ]
-    },
-    "check": {
-        "stderr": "begin"
-    },
+    "env": {"COV_PATH": [
+        "$TMP",
+        "",
+        "$TMP/tools",
+        ""
+    ]},
+    "check": {"stderr": "begin"},
     "expected": [
         1,
         "",

@@ -1,9 +1,7 @@
 {
-    "$schema": "../../../../tools/json_tests/schema.json",
+    "$schema": "../../runner-schema.json",
     "args": "report -f strip-excludes '$DATA/extensions/report-strip.json'",
-    "post": [
-        "show HEAD:main.cc"
-    ],
+    "post": ["show HEAD:main.cc"],
     "patches": {
         "\u001b\\[31m\\[main [0-9a-fA-F]+\\]\u001b\\[m (.*)": "\u001b[31m[main $REPORT]\u001b[m \\1",
         " \u001b\\[2;37mcontains [0-9a-fA-F]+:\u001b\\[m (.+)": " \u001b[2;37mcontains $BUILD:\u001b[m \\1"
@@ -13,8 +11,8 @@
         [
             "\u001b[31m[main $REPORT]\u001b[m Commit \"extensions\"",
             " one file, \u001b[31m 33%\u001b[m (5/15, -10), Fn\u001b[31m 40%\u001b[m (2/5)",
-            " \u001b[2;37mbased on\u001b[m \u001b[2;33m98d4978ec@main\u001b[m",
-            " parent 45c01b5bd",
+            " \u001b[2;37mbased on\u001b[m \u001b[2;33m$HEAD@main\u001b[m",
+            " parent $PARENT",
             " \u001b[2;37mcontains $BUILD:\u001b[m \u001b[31m 33%\u001b[m",
             "",
             "file main.cc",

@@ -1,21 +1,18 @@
 {
-    "$schema": "../../../../tools/json_tests/schema.json",
+    "$schema": "../../runner-schema.json",
     "args": "report -f strip-excludes '$DATA/extensions/report-multi.json'",
     "post": "show",
     "patches": {
-        "\u001b\\[31m\\[main [0-9a-fA-F]+\\]\u001b\\[m (.*)": "\u001b[31m[main $REPORT]\u001b[m \\1",
-        " \u001b\\[2;37mcontains [0-9a-fA-F]+:\u001b\\[m (.+)": " \u001b[2;37mcontains $BUILD:\u001b[m \\1",
         "report [0-9a-f]{40}": "report $OID",
-        "build  [0-9a-f]{40} (.*)": "build  $BUILD_HASH \\1",
-        "Added:     .*": "Added:     $DATE"
+        "build  [0-9a-f]{40} (.*)": "build  $BUILD_HASH \\1"
     },
     "expected": [
         0,
         [
             "\u001b[31m[main $REPORT]\u001b[m Commit \"extensions\"",
             " 4 files, \u001b[32m100%\u001b[m (9/9), Fn\u001b[32m100%\u001b[m (4/4)",
-            " \u001b[2;37mbased on\u001b[m \u001b[2;33m98d4978ec@main\u001b[m",
-            " parent 45c01b5bd",
+            " \u001b[2;37mbased on\u001b[m \u001b[2;33m$HEAD@main\u001b[m",
+            " parent $PARENT",
             " \u001b[2;37mcontains $BUILD:\u001b[m \u001b[32m100%\u001b[m",
             "",
             "report $OID",

@@ -1,14 +1,15 @@
 {
+    "$schema": "../../runner-schema.json",
     "args": "reset F",
     "expected": [
         0,
         [
             "Detached HEAD now points to ebadfd936a9b1a7822bbe35de47122b879fa48bb",
-            "\u001b[31m[detached HEAD ebadfd936]\u001b[m Commit F",
+            "\u001b[31m[detached HEAD $REPORT]\u001b[m Commit F",
             " 0 files, \u001b[31m  0%\u001b[m (0/0)",
-            " \u001b[2;37mbased on\u001b[m \u001b[2;33m366f0b00e@main\u001b[m",
-            " parent 3dda7ce58",
-            " \u001b[2;37mcontains e7a2b8532:\u001b[m \u001b[31m  0%\u001b[m\n"
+            " \u001b[2;37mbased on\u001b[m \u001b[2;33m$HEAD@main\u001b[m",
+            " parent $PARENT",
+            " \u001b[2;37mcontains $BUILD:\u001b[m \u001b[31m  0%\u001b[m\n"
         ],
         ""
     ],

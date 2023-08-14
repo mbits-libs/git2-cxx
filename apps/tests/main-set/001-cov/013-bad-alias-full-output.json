@@ -1,4 +1,5 @@
 {
+    "$schema": "../../runner-schema.json",
     "args": "definitely-not-a-tool",
     "expected": [
         1,

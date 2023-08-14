@@ -1,5 +1,5 @@
 {
-    "$schema": "../../../../tools/json_tests/schema.json",
+    "$schema": "../../runner-schema.json",
     "args": "report -f strip-excludes '$DATA/extensions/report-broken-A.json'",
     "expected": [
         2,

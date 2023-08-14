@@ -1,4 +1,5 @@
 {
+    "$schema": "../../runner-schema.json",
     "args": "log --format=raw --decorate=short cov-separate",
     "expected": [
         0,

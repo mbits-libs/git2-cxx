@@ -1,4 +1,5 @@
 {
+    "$schema": "../../runner-schema.json",
     "args": "checkout -h",
     "expected": [
         0,
@@ -21,7 +22,5 @@
         ],
         ""
     ],
-    "prepare": [
-        "cd '$TMP'"
-    ]
+    "prepare": ["cd '$TMP'"]
 }

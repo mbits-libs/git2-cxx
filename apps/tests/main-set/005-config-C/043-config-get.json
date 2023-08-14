@@ -1,11 +1,6 @@
 {
+    "$schema": "../../runner-schema.json",
     "args": "config --file $TMP/config group.key",
-    "expected": [
-        0,
-        "value 2\n",
-        ""
-    ],
-    "prepare": [
-        "touch '$TMP/config' '[group]\nkey = value 1\nkey = value 2'"
-    ]
+    "expected": [0, "value 2\n", ""],
+    "prepare": ["touch '$TMP/config' '[group]\nkey = value 1\nkey = value 2'"]
 }

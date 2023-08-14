@@ -1,4 +1,5 @@
 {
+    "$schema": "../../runner-schema.json",
     "args": "branch --color=always",
     "expected": [
         0,

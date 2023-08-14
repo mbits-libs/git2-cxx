@@ -1,4 +1,5 @@
 {
+    "$schema": "../../runner-schema.json",
     "args": "checkout feat/cov-3",
     "post": [
         "branch --show-current",

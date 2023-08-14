@@ -1,8 +1,8 @@
 {
-    "$schema": "../../../../tools/json_tests/schema.json",
+    "$schema": "../../runner-schema.json",
     "args": "collect",
     "patches": {
-        "\\[([^]]+)\\] [0-9.]+ s": "[\\1] #.## s",
+        "\\[([^\\]]+)\\] [0-9.]+ s": "[\\1] #.## s",
         "  \\[occ\\] C:\\\\+Program Files(:? \\(x86\\))?\\\\+OpenCppCoverage\\\\+OpenCppCoverage\\.exe": "  [occ] $TMP/mocks/OpenCppCoverage",
         "  \\[occ\\] \\$TMP\\/+mocks\\/+OpenCppCoverage\\.exe": "  [occ] $TMP/mocks/OpenCppCoverage",
         "  \\[outfile\\] <bin>\\\\OpenCppCoverage\\\\cobertura\\.xml": "  [outfile] <bin>/OpenCppCoverage/cobertura.xml"
@@ -29,7 +29,6 @@
         "cov init",
         "git commit -m 'initial' --allow-empty",
         "mkdirs build/OpenCppCoverage",
-        "cp '$DATA/covcollect/OpenCppCoverage.xml' build/OpenCppCoverage/cobertura.xml",
         "touch src/main.cc",
         "mock cl.exe cl.exe",
         "mock OpenCppCoverage OpenCppCoverage",

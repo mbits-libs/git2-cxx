@@ -1,8 +1,7 @@
 {
+    "$schema": "../../runner-schema.json",
     "args": "-C bad-recurse first -D",
-    "check": {
-        "stderr": "begin"
-    },
+    "check": {"stderr": "begin"},
     "expected": [
         1,
         "",

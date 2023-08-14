@@ -1,4 +1,5 @@
 {
+    "$schema": "../../runner-schema.json",
     "args": "tag --help",
     "expected": [
         0,
@@ -17,7 +18,5 @@
         ],
         ""
     ],
-    "prepare": [
-        "cd '$TMP'"
-    ]
+    "prepare": ["cd '$TMP'"]
 }

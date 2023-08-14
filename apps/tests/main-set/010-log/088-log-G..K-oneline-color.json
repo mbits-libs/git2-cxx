@@ -1,4 +1,5 @@
 {
+    "$schema": "../../runner-schema.json",
     "args": "log --oneline --color always --decorate short G..K",
     "expected": [
         0,

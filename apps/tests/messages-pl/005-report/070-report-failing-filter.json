@@ -1,4 +1,5 @@
 {
+    "$schema": "../../runner-schema.json",
     "lang": "pl",
     "args": "report $DATA/basic-coverage.json -f echo-to-stderr",
     "expected": [

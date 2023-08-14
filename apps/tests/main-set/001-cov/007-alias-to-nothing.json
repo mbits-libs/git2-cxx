@@ -1,4 +1,5 @@
 {
+    "$schema": "../../runner-schema.json",
     "args": "-C bad-recurse start-bad",
     "expected": [
         22,

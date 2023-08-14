@@ -1,4 +1,5 @@
 {
+    "$schema": "../../runner-schema.json",
     "lang": "pl",
     "args": "config --file $TMP/config --unset group.other",
     "expected": [
@@ -6,7 +7,5 @@
         "",
         "cov config: błąd: nie można odnaleźć klucza „group.other” do usunięcia\n"
     ],
-    "prepare": [
-        "touch '$TMP/config' '[group]\nkey = value 1\nkey = value 2'"
-    ]
+    "prepare": ["touch '$TMP/config' '[group]\nkey = value 1\nkey = value 2'"]
 }

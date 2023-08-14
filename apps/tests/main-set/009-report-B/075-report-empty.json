@@ -1,15 +1,12 @@
 {
+    "$schema": "../../runner-schema.json",
     "args": "report $DATA/empty-coverage.json -f replace-head",
-    "patches": {
-        "\u001b\\[31m\\[main [0-9a-fA-F]+\\]\u001b\\[m second": "\u001b[31m[main $REPORT]\u001b[m second",
-        " \u001b\\[2;37mcontains [0-9a-fA-F]+:\u001b\\[m (.+)": " \u001b[2;37mcontains $BUILD:\u001b[m \\1"
-    },
     "expected": [
         0,
         [
             "\u001b[31m[main $REPORT]\u001b[m second",
             " 0 files, \u001b[31m  0%\u001b[m (0/0)",
-            " \u001b[2;37mbased on\u001b[m \u001b[2;33m384512442@main\u001b[m",
+            " \u001b[2;37mbased on\u001b[m \u001b[2;33m$HEAD@main\u001b[m",
             " \u001b[2;37mcontains $BUILD:\u001b[m \u001b[31m  0%\u001b[m\n"
         ],
         ""

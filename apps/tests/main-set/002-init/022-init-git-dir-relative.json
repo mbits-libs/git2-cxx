@@ -1,4 +1,5 @@
 {
+    "$schema": "../../runner-schema.json",
     "args": "init --git-dir ../.git",
     "expected": [
         0,
