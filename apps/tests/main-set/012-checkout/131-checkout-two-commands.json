@@ -1,5 +1,5 @@
 {
-    "$schema": "../../runner-schema.json",
+    "$schema": "../../../../build/downloads/runner-schema.json",
     "args": "checkout -b --orphan",
     "expected": [
         2,

@@ -1,5 +1,5 @@
 {
-    "$schema": "../../schema.json",
+    "$schema": "../../runner-schema.json",
     "args": "collect",
     "disabled": true,
     "patches": {

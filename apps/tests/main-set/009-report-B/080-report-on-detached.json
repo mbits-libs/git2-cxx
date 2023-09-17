@@ -1,5 +1,5 @@
 {
-    "$schema": "../../runner-schema.json",
+    "$schema": "../../../../build/downloads/runner-schema.json",
     "args": "report $DATA/build-coverage-2-files.json -f create-report",
     "patches": {"\u001b\\[0;49;90m\\[master [0-9a-fA-F]+\\] (.+)": "\u001b[0;49;90m[master $COMMIT] \\1"},
     "expected": [

@@ -1,7 +1,10 @@
 {
-    "$schema": "../../runner-schema.json",
+    "$schema": "../../../../build/downloads/runner-schema.json",
     "linear": true,
     "args": "collect --observe ctest -C Debug .",
+    "check": {
+        "stderr": "end"
+    },
     "expected": [
         0,
         "Test project $TMP/observe\n",

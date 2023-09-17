@@ -1,5 +1,5 @@
 {
-    "$schema": "../../runner-schema.json",
+    "$schema": "../../../../build/downloads/runner-schema.json",
     "args": "report $DATA/build-coverage-2-files.json -f hash-bang-less",
     "expected": [
         1,
