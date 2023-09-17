@@ -55,11 +55,12 @@ if (COV_TESTING)
   enable_testing()
 
   find_package(GTest REQUIRED)
-  find_program(Runner_EXECUTABLE runner REQUIRED HINTS
+  find_program(JsonRunner_EXECUTABLE json-runner REQUIRED HINTS
     "${PROJECT_SOURCE_DIR}/build/downloads"
-    "${PROJECT_SOURCE_DIR}/../build/release/bin"
+    "${PROJECT_SOURCE_DIR}/../json-runner/build/release/bin"
+    "${PROJECT_SOURCE_DIR}/../runner/build/release/bin"
   )
-  message(STATUS "Runner_EXECUTABLE is: ${Runner_EXECUTABLE}")
+  message(STATUS "JsonRunner_EXECUTABLE is: ${JsonRunner_EXECUTABLE}")
 
   set(COVERALLS_PREFIX cov_)
 

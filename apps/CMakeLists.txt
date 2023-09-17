@@ -142,7 +142,7 @@ if (COV_TESTING)
     )
         add_test(
             NAME cov-exec--${TEST_SET}-alt
-            COMMAND "${Runner_EXECUTABLE}"
+            COMMAND "${JsonRunner_EXECUTABLE}"
                 --preset "${CMAKE_PRESET}"
                 --tests "main-set/${TEST_SET}"
             WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
@@ -152,7 +152,7 @@ if (COV_TESTING)
     if (NOT cov_COVERALLS)
         add_test(
             NAME cov-exec-pl-alt
-            COMMAND "${Runner_EXECUTABLE}"
+            COMMAND "${JsonRunner_EXECUTABLE}"
                 --preset "${CMAKE_PRESET}"
                 --tests "messages-pl"
             WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}

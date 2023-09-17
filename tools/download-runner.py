@@ -10,7 +10,8 @@ from typing import Dict
 
 import requests
 
-TOOL_DIR = f"build/downloads"
+TOOL_DIR = "build/downloads"
+TOOL_NAME = "json-runner"
 if os.name == "nt":
     ARCHIVE_EXT = "zip"
     ARCHIVE_ARCH = "windows-x86_64"
@@ -115,11 +116,9 @@ else:
 
 
 def download_tools(version: str):
-    package_name = f"runner-{version}-{ARCHIVE_ARCH}"
-    sha_url = (
-        f"https://github.com/mzdun/runner/releases/download/v{version}/sha256sum.txt"
-    )
-    arch_url = f"https://github.com/mzdun/runner/releases/download/v{version}/{package_name}.{ARCHIVE_EXT}"
+    package_name = f"{TOOL_NAME}-{version}-{ARCHIVE_ARCH}"
+    sha_url = f"https://github.com/mzdun/{TOOL_NAME}/releases/download/v{version}/sha256sum.txt"
+    arch_url = f"https://github.com/mzdun/{TOOL_NAME}/releases/download/v{version}/{package_name}.{ARCHIVE_EXT}"
     path = f"{TOOL_DIR}/{package_name}.{ARCHIVE_EXT}"
 
     os.makedirs(TOOL_DIR, exist_ok=True)
@@ -170,19 +169,21 @@ def download_tools(version: str):
 
     short_version = ".".join(version.split(".")[:2])
     print(
-        f"[EXTRACT] {package_name}/share/runner-{short_version}/schema.json",
+        f"[EXTRACT] {package_name}/share/{TOOL_NAME}-{short_version}/schema.json",
         file=sys.stderr,
     )
     if not _extract(
         path,
-        f"{package_name}/share/runner-{short_version}/schema.json",
-        f"{TOOL_DIR}/runner-schema.json",
+        f"{package_name}/share/{TOOL_NAME}-{short_version}/schema.json",
+        f"{TOOL_DIR}/{TOOL_NAME}-schema.json",
     ):
         return False
 
-    print(f"[EXTRACT] {package_name}/bin/runner{EXEC_EXT}", file=sys.stderr)
+    print(f"[EXTRACT] {package_name}/bin/{TOOL_NAME}{EXEC_EXT}", file=sys.stderr)
     if not _extract(
-        path, f"{package_name}/bin/runner{EXEC_EXT}", f"{TOOL_DIR}/runner{EXEC_EXT}"
+        path,
+        f"{package_name}/bin/{TOOL_NAME}{EXEC_EXT}",
+        f"{TOOL_DIR}/{TOOL_NAME}{EXEC_EXT}",
     ):
         return False
 
@@ -190,6 +191,6 @@ def download_tools(version: str):
 
 
 if __name__ == "__main__" and not download_tools(
-    "0.1.2" if len(sys.argv) < 2 else sys.argv[1]
+    "0.2.0" if len(sys.argv) < 2 else sys.argv[1]
 ):
     sys.exit(1)
