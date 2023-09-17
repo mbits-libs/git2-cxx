@@ -1,13 +1,13 @@
 {
     "$schema": "../../../../build/downloads/runner-schema.json",
-    "args": "report $DATA/no-git-coverage.json -f echo-to-stdout",
+    "args": "report $DATA/invalid-coverage.json -f echo-to-stdout",
     "expected": [
         2,
         "",
         [
             "cov report: /git: undefined",
             "cov report: /files: undefined",
-            "cov report: error: there were issues with $DATA/no-git-coverage.json processed by echo-to-stdout filter\n"
+            "cov report: error: there were issues with $DATA/invalid-coverage.json processed by echo-to-stdout filter\n"
         ]
     ],
     "prepare": [
