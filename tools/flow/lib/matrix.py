@@ -29,7 +29,7 @@ _platform_name, _platform_version, _platform_arch = uname()
 
 _collect_version = (0, 22, 0)
 _report_version = (0, 20, 0)
-_runner_version = (0, 2, 0)
+_runner_version = (0, 2, 1)
 
 platform = _platform_name
 

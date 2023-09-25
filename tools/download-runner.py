@@ -191,6 +191,6 @@ def download_tools(version: str):
 
 
 if __name__ == "__main__" and not download_tools(
-    "0.2.0" if len(sys.argv) < 2 else sys.argv[1]
+    "0.2.1" if len(sys.argv) < 2 else sys.argv[1]
 ):
     sys.exit(1)
