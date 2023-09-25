@@ -10,6 +10,22 @@
             "args": [
                 "--gtest_filter=*"
             ]
+        },
+        {
+            "type": "cppdbg",
+            "request": "launch",
+            "name": "Launch cov collect (gdb)",
+            "cwd": "${workspaceFolder}",
+            "program": "${workspaceFolder}/build/debug/libexec/cov/cov-collect",
+            "args": []
+        },
+        {
+            "type": "cppvsdbg",
+            "request": "launch",
+            "name": "Launch cov collect (vs)",
+            "cwd": "${workspaceFolder}",
+            "program": "${workspaceFolder}/build/debug/libexec/cov/cov-collect",
+            "args": []
         }
     ]
 }

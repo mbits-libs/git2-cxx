@@ -1,12 +1,10 @@
 {
+    "$schema": "../../../../build/downloads/runner-schema.json",
     "args": "show",
     "expected": [
         2,
         "",
-        [
-            "usage: cov show [-h] [<report>] [-m <module>] [--format <format>] [--abbrev-hash] [--no-abbrev-hash] [--prop-names] [--no-prop-names] [--color <when>] [--decorate <how>]",
-            "cov show: error: HEAD refers to branch with no reports\n"
-        ]
+        "cov show: error: HEAD refers to branch with no reports\n"
     ],
     "prepare": [
         "mkdirs '$TMP/dirname'",

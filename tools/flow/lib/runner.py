@@ -15,37 +15,10 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from typing import Callable, ClassVar, Dict, List, Optional, Tuple
 
+__file_dir__ = os.path.dirname(__file__)
+sys.path.append(os.path.dirname(os.path.dirname(__file_dir__)))
 
-def _untar(src, dst):
-    with tarfile.open(src) as TAR:
-
-        def is_within_directory(directory, target):
-            abs_directory = os.path.abspath(directory)
-            abs_target = os.path.abspath(target)
-
-            prefix = os.path.commonprefix([abs_directory, abs_target])
-
-            return prefix == abs_directory
-
-        for member in TAR.getmembers():
-            member_path = os.path.join(dst, member.name)
-            if not is_within_directory(dst, member_path):
-                raise Exception(f"Attempted path traversal in Tar file: {member.name}")
-
-        TAR.extractall(dst)
-
-
-def _unzip(src, dst):
-    with zipfile.ZipFile(src) as ZIP:
-        ZIP.extractall(dst)
-
-
-_tar = (_untar, ["tar", "-xf"])
-ARCHIVES: Dict[str, Tuple[Callable[[str, str], None], List[str]]] = {
-    ".tar": _tar,
-    ".tar.gz": _tar,
-    ".zip": (_unzip, ["unzip"]),
-}
+from archives import locate_unpack
 
 
 def copy_file(src, dst):
@@ -294,6 +267,7 @@ class runner:
     DRY_RUN = False
     CUTDOWN_OS = False
     GITHUB_ANNOTATE = False
+    OFFICIAL = False
 
     @staticmethod
     def run_steps(config: dict, keys: list, steps: List[callable]):
@@ -370,13 +344,21 @@ class runner:
         os.makedirs(fullname, exist_ok=True)
 
     @staticmethod
-    def call(*args):
+    def call(*args, **kwargs):
         print_args(*args)
         if runner.DRY_RUN:
             return
+        env_kwarg = kwargs.get("env", {})
+        env = {**os.environ}
+        for key, value in env_kwarg.items():
+            if value is None:
+                if key in env:
+                    del env[key]
+            else:
+                env[key] = value
         found = shutil.which(args[0])
         args = (found if found is not None else args[0], *args[1:])
-        proc = subprocess.run(args, check=False)
+        proc = subprocess.run(args, check=False, env=env)
         if proc.returncode != 0:
             sys.exit(1)
 
@@ -395,11 +377,7 @@ class runner:
     def extract(src_dir: str, dst_dir: str, package: str):
         archive = f"{src_dir}/{package}"
 
-        reminder, ext = os.path.splitext(archive)
-        _, mid = os.path.splitext(reminder)
-        if mid == ".tar":
-            ext = ".tar"
-        unpack, msg = ARCHIVES[ext]
+        unpack, msg = locate_unpack(archive)
 
         print_args(*msg, archive, dst_dir)
         if not runner.DRY_RUN:

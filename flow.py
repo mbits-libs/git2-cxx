@@ -31,4 +31,7 @@ if sys.argv[1] not in flows:
     sys.exit(0)
 
 args = [sys.executable, os.path.join(__flow__, f"{sys.argv[1]}.py"), *sys.argv[2:]]
-sys.exit(subprocess.run(args, shell=False).returncode)
+try:
+    sys.exit(subprocess.run(args, shell=False).returncode)
+except KeyboardInterrupt:
+    sys.exit(1)

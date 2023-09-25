@@ -106,12 +106,7 @@ set(COV_SOURCES
 )
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${GIT2_SOURCES} ${COV_SOURCES})
 
-add_library(cov-api STATIC ${GIT2_SOURCES} ${COV_SOURCES})
-target_compile_options(cov-api PRIVATE ${ADDITIONAL_WALL_FLAGS})
-target_link_options(cov-api PRIVATE ${ADDITIONAL_LINK_FLAGS})
-target_include_directories(cov-api PUBLIC
-  ${CMAKE_CURRENT_SOURCE_DIR}/include
-  ${CMAKE_CURRENT_BINARY_DIR}/include)
+add_cov_library(cov-api ${GIT2_SOURCES} ${COV_SOURCES})
 target_link_libraries(cov-api PUBLIC libgit2::libgit2 fmt::fmt date::date-tz mbits::args json PRIVATE hilite openssl::openssl)
 
 set_target_properties(cov-api PROPERTIES FOLDER libs)
@@ -139,45 +134,18 @@ if (COV_TESTING)
     ${COV_TEST_SRCS_CXX}
     ${COV_STRESS_TEST_SRCS_CC})
 
-  add_executable(git2-test ${GIT2_TEST_SRCS_CC} ${GIT2_TEST_SRCS_CPP} ${GIT2_TEST_SRCS_CXX})
-  add_executable(git2-stress-test ${GIT2_STRESS_TEST_SRCS_CC} tests/git2-c++/setup.cc)
-  add_executable(cov-test ${COV_TEST_SRCS_CC} ${COV_TEST_SRCS_CPP} ${COV_TEST_SRCS_CXX})
-  add_executable(cov-stress-test ${COV_STRESS_TEST_SRCS_CC} tests/cov/setup.cc tests/git2-c++/stress/new.cc)
+  add_cov_test(git2 ${GIT2_TEST_SRCS_CC} ${GIT2_TEST_SRCS_CPP} ${GIT2_TEST_SRCS_CXX})
+  add_cov_test(git2-stress ${GIT2_STRESS_TEST_SRCS_CC} tests/git2-c++/setup.cc)
+  add_cov_test(cov ${COV_TEST_SRCS_CC} ${COV_TEST_SRCS_CPP} ${COV_TEST_SRCS_CXX})
+  add_cov_test(cov-stress ${COV_STRESS_TEST_SRCS_CC} tests/cov/setup.cc tests/git2-c++/stress/new.cc)
 
-  set_target_properties(git2-test git2-stress-test cov-test cov-stress-test PROPERTIES FOLDER tests)
-
-  target_compile_options(git2-test PRIVATE ${ADDITIONAL_WALL_FLAGS})
-  target_link_options(git2-test PRIVATE ${ADDITIONAL_LINK_FLAGS})
   target_link_libraries(git2-test PRIVATE cov-api testing-lib)
-  target_include_directories(git2-test
-    PRIVATE
-      ${CMAKE_CURRENT_SOURCE_DIR}/tests
-      ${CMAKE_CURRENT_BINARY_DIR})
-
-  target_compile_options(git2-stress-test PRIVATE ${ADDITIONAL_WALL_FLAGS})
-  target_link_options(git2-stress-test PRIVATE ${ADDITIONAL_LINK_FLAGS})
   target_link_libraries(git2-stress-test PRIVATE cov-api testing-lib)
-  target_include_directories(git2-stress-test
-    PRIVATE
-      ${CMAKE_CURRENT_SOURCE_DIR}/tests
-      ${CMAKE_CURRENT_BINARY_DIR})
-
-  target_compile_options(cov-test PRIVATE ${ADDITIONAL_WALL_FLAGS})
-  target_link_options(cov-test PRIVATE ${ADDITIONAL_LINK_FLAGS})
-  target_link_libraries(cov-test PRIVATE cov-api testing-lib mbits::args)
-  target_include_directories(cov-test
-    PRIVATE
-      ${CMAKE_CURRENT_SOURCE_DIR}/tests
-      ${CMAKE_CURRENT_BINARY_DIR})
-
-  target_compile_options(cov-stress-test PRIVATE ${ADDITIONAL_WALL_FLAGS})
-  target_link_options(cov-stress-test PRIVATE ${ADDITIONAL_LINK_FLAGS})
+  target_link_libraries(cov-test PRIVATE cov-api mbits::args testing-lib)
   target_link_libraries(cov-stress-test PRIVATE cov-api testing-lib)
   target_include_directories(cov-stress-test
     PRIVATE
-      ${CMAKE_CURRENT_SOURCE_DIR}/tests
-      ${CMAKE_CURRENT_SOURCE_DIR}/../cov-api/tests/git2-c++/stress
-      ${CMAKE_CURRENT_BINARY_DIR})
+      ${CMAKE_CURRENT_SOURCE_DIR}/tests/git2-c++/stress)
 
   if (COV_CUTDOWN_OS)
     message(STATUS "cov-api tests: removing some tests on cutdown OS")
@@ -191,6 +159,13 @@ if (COV_TESTING)
   add_test(NAME git2-stress COMMAND git2-stress-test "--gtest_output=xml:${TEST_REPORT_DIR}/libgit2-c++-stress/${TEST_REPORT_FILE}")
   add_test(NAME cov COMMAND cov-test "--gtest_output=xml:${TEST_REPORT_DIR}/libcov/${TEST_REPORT_FILE}")
   add_test(NAME cov-stress COMMAND cov-stress-test "--gtest_output=xml:${TEST_REPORT_DIR}/libcov-stress/${TEST_REPORT_FILE}")
+
+  if (CMAKE_GENERATOR MATCHES "Visual Studio" AND TARGET cov_coveralls_test)
+    add_dependencies(cov_coveralls_test
+      git2-test git2-stress-test
+      cov-test cov-stress-test
+    )
+  endif()
 endif()
 
 install(
@@ -209,3 +184,5 @@ cpack_add_component(libcov
   DEPENDS lighter
   GROUP devel
 )
+
+set_parent_scope()

@@ -7,3 +7,8 @@ add_subdirectory(date)
 add_subdirectory(json)
 
 set_target_properties(json PROPERTIES FOLDER libs)
+
+fix_vs_modules(date-tz)
+fix_vs_modules(json)
+
+set_parent_scope()

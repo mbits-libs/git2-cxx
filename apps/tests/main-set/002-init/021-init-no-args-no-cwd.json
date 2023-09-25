@@ -1,8 +1,7 @@
 {
+    "$schema": "../../runner-schema.json",
     "args": "init",
-    "patches": {
-        "cov init: error: argument -C: .*": "cov init: error: argument -C: ERROR MESSAGE"
-    },
+    "patches": {"cov init: error: argument -C: .*": "cov init: error: argument -C: ERROR MESSAGE"},
     "expected": [
         2,
         "",

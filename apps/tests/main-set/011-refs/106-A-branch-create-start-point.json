@@ -1,4 +1,5 @@
 {
+    "$schema": "../../../../build/downloads/runner-schema.json",
     "args": "branch feat/cov-4 G~2",
     "post": "log --oneline -n1",
     "expected": [

@@ -1,11 +1,7 @@
 {
+    "$schema": "../../../../build/downloads/runner-schema.json",
     "args": "log",
-    "check": {
-        "stderr": "begin"
-    },
-    "patches": {
-        "Added:     .*": "Added:     $DATE"
-    },
+    "check": {"stderr": "begin"},
     "expected": [
         0,
         [

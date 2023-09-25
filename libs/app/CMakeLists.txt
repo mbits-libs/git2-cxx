@@ -9,18 +9,26 @@ set(LOCALE_DIR "${PROJECT_BINARY_DIR}/${SHARE_DIR}/locale")
 
 set(SOURCES
   src/args.cc
+  src/path_env.hh
   src/path.cc
   src/tr.cc
 
   include/cov/app/args.hh
   include/cov/app/path.hh
+  include/cov/app/run.hh
   include/cov/app/tr.hh
 )
 
 if (UNIX)
-	list(APPEND SOURCES src/posix.cc)
+	list(APPEND SOURCES
+    src/posix/exec_path.cc
+    src/posix/run.cc
+  )
 elseif(WIN32)
-	list(APPEND SOURCES src/win32.cc)
+	list(APPEND SOURCES
+    src/win32/exec_path.cc
+    src/win32/run.cc
+  )
 endif()
 
 set(GEN_SOURCES
@@ -56,17 +64,10 @@ source_group(TREE ${CMAKE_CURRENT_BINARY_DIR} FILES ${GEN_SOURCES} PREFIX gen)
 source_group(TREE "${PROJECT_BINARY_DIR}/${SHARE_DIR}" FILES ${SHARE_SOURCES} PREFIX gen/share)
 source_group(TREE ${DATA_DIR} FILES ${DATA_SOURCES} PREFIX data)
 
-add_library(app STATIC ${SOURCES} ${GEN_SOURCES} ${SHARE_SOURCES} ${DATA_SOURCES})
-target_compile_options(app PRIVATE ${ADDITIONAL_WALL_FLAGS})
-target_link_options(app PRIVATE ${ADDITIONAL_LINK_FLAGS})
-target_include_directories(app PUBLIC
-  ${CMAKE_CURRENT_SOURCE_DIR}/include
-  ${CMAKE_CURRENT_BINARY_DIR}/include)
+add_cov_library(app ${SOURCES} ${GEN_SOURCES} ${SHARE_SOURCES} ${DATA_SOURCES})
 target_link_libraries(app PUBLIC cov-api lighter mbits::liblngs mbits::args)
 
-add_library(app_main STATIC src/main.cc)
-target_compile_options(app_main PRIVATE ${ADDITIONAL_WALL_FLAGS})
-target_link_options(app_main PRIVATE ${ADDITIONAL_LINK_FLAGS})
+add_cov_library(app_main src/main.cc)
 target_link_libraries(app_main PUBLIC app)
 
 if (WIN32)
@@ -145,3 +146,5 @@ cpack_add_component(libapp
   DISPLAY_NAME "libapp"
   GROUP devel
 )
+
+set_parent_scope()

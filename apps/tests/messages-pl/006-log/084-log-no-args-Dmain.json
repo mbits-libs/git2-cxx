@@ -1,9 +1,8 @@
 {
+    "$schema": "../../runner-schema.json",
     "lang": "pl",
     "args": "log",
-    "patches": {
-        "Added:     .*": "Added:     $DATE"
-    },
+    "patches": {"Added:     .*": "Added:     $DATE"},
     "expected": [
         0,
         [

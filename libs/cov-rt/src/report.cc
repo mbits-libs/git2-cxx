@@ -290,11 +290,26 @@ namespace cov::app::report {
 		auto const json_git_head =
 		    cast_from_json<json::string>(json_git, u8"head"sv);
 
-		if (!json_git_branch || !json_git_head || !json_files) return false;
+		if (!json_git_branch || !json_git_head || !json_files) {
+			if (!json_git) {
+				fmt::print(stderr, "cov report: /git: undefined\n");
+			} else {
+				if (!json_git_branch)
+					fmt::print(stderr, "cov report: /git/branch: undefined\n");
+				if (!json_git_head)
+					fmt::print(stderr, "cov report: /git/head: undefined\n");
+			}
+			if (!json_files)
+				fmt::print(stderr, "cov report: /files: undefined\n");
+			return false;
+		}
 
 		files.reserve(json_files->size());
 
+		auto file_index{std::numeric_limits<size_t>::max()};
 		for (auto const& file_node : *json_files) {
+			++file_index;
+
 			auto const json_file_name =
 			    cast_from_json<json::string>(file_node, u8"name"sv);
 			auto const json_file_digest =
@@ -306,6 +321,25 @@ namespace cov::app::report {
 
 			if (!json_file_name || !json_file_digest ||
 			    !json_file_line_coverage) {
+				std::string format = "cov report: /files[{}]/{}";
+				if (json_file_name) format += " ({})";
+				format += ": undefined\n";
+				if (!json_file_name)
+					fmt::print(stderr, fmt::runtime(format), file_index,
+					           "name"sv,
+					           json_file_name ? from_json(*json_file_name)
+					                          : std::string_view{});
+				if (!json_file_digest)
+					fmt::print(stderr, fmt::runtime(format), file_index,
+					           "digest"sv,
+					           json_file_name ? from_json(*json_file_name)
+					                          : std::string_view{});
+				if (!json_file_line_coverage)
+					fmt::print(stderr, fmt::runtime(format), file_index,
+					           "line_coverage"sv,
+					           json_file_name ? from_json(*json_file_name)
+					                          : std::string_view{});
+
 				[[unlikely]];
 				files.clear();
 				return false;
@@ -315,6 +349,8 @@ namespace cov::app::report {
 			auto const pos = digest_view.find(':');
 			auto const algorithm = lookup_digest(digest_view.substr(0, pos));
 			if (pos == std::string_view::npos || algorithm == digest::unknown) {
+				fmt::print(stderr, "cov report: /file[{}]/digest ({}): '{}'\n",
+				           file_index, from_json(*json_file_name), digest_view);
 				[[unlikely]];
 				files.clear();
 				return false;
@@ -333,6 +369,12 @@ namespace cov::app::report {
 
 				unsigned line{};
 				if (!hits || !conv_rebase(node_key, line)) {
+					json::string val;
+					json::write_json(val, node_value, json::concise);
+					fmt::print(stderr,
+					           "cov report: /file[{}]/line_coverage[{}]: {}\n",
+					           file_index, from_json(*json_file_name),
+					           from_json(node_key), from_json(val));
 					[[unlikely]];
 					files.clear();
 					return false;
@@ -343,7 +385,10 @@ namespace cov::app::report {
 			if (json_file_functions_coverage) {
 				auto& cvg = dst.function_coverage;
 				cvg.reserve(json_file_functions_coverage->size());
+
+				auto function_index{std::numeric_limits<size_t>::max()};
 				for (auto const& node_file : *json_file_functions_coverage) {
+					++function_index;
 					auto const name =
 					    cast_from_json<json::string>(node_file, u8"name"sv);
 					auto const count =
@@ -351,7 +396,36 @@ namespace cov::app::report {
 					auto const start_line =
 					    cast_from_json<long long>(node_file, u8"start_line"sv);
 
-					if (!name || !count || !start_line) continue;
+					if (!name || !count || !start_line) {
+						std::string format = "cov report: /files[{}]/{}";
+						if (json_file_name) format += " ({})";
+						format += ": undefined\n";
+						if (!name)
+							fmt::print(
+							    stderr,
+							    "cov report: /files[{}]/functions[{}]/name "
+							    "({}): undefined",
+							    file_index, function_index,
+							    from_json(*json_file_name));
+						if (!count)
+							fmt::print(
+							    stderr,
+							    "cov report: /files[{}]/functions[{}]/count "
+							    "({}): undefined",
+							    file_index, function_index,
+							    from_json(*json_file_name));
+						if (!start_line)
+							fmt::print(stderr,
+							           "cov report: "
+							           "/files[{}]/functions[{}]/start_line "
+							           "({}): undefined",
+							           file_index, function_index,
+							           from_json(*json_file_name));
+
+						[[unlikely]];
+						files.clear();
+						return false;
+					}
 
 					auto const demangled = cast_from_json<json::string>(
 					    node_file, u8"demangled"sv);

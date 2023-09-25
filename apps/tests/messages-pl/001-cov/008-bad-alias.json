@@ -1,24 +1,14 @@
 {
+    "$schema": "../../runner-schema.json",
     "args": "-C bad-recurse first -D",
-    "check": {
-        "stderr": "begin"
-    },
+    "check": {"stderr": "begin"},
     "expected": [
         1,
         "",
         [
             "użycie: cov [-h] [-C <katalog>] <polecenie> [<argumenty>]",
             "cov: „fourth” nie jest poleceniem cov",
-            "",
-            "typowe polecenia:",
-            " init   tworzy nowe repozytorium cov",
-            " config pokazuje i/lub ustawia różne ustawienia",
-            " module definiuje grupy plików",
-            " report dołącza raport do repozytorium",
-            " remove usuwa określony raport z repozytorium",
-            " log    drukuje listę raportów",
-            " show   pokazuje konkretny raport",
-            " serve  uruchamia lokalny serwer WWW raportów\n"
+            "\n"
         ]
     ],
     "prepare": [

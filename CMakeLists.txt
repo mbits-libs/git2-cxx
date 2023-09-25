@@ -44,35 +44,55 @@ list(APPEND CMAKE_PREFIX_PATH "${PROJECT_BINARY_DIR}/conan")
 
 set(CONAN_CMAKE_SILENT_OUTPUT ON)
 find_package(Python3 COMPONENTS Interpreter REQUIRED)
+find_package(ctre REQUIRED)
 find_package(libgit2 REQUIRED)
 find_package(fmt REQUIRED)
 find_package(mbits-args REQUIRED)
 find_package(mbits-lngs REQUIRED)
+find_package(expat REQUIRED)
 
 if (COV_TESTING)
   enable_testing()
 
   find_package(GTest REQUIRED)
+  find_program(JsonRunner_EXECUTABLE json-runner REQUIRED HINTS
+    "${PROJECT_SOURCE_DIR}/build/downloads"
+    "${PROJECT_SOURCE_DIR}/../json-runner/build/release/bin"
+    "${PROJECT_SOURCE_DIR}/../runner/build/release/bin"
+  )
+  message(STATUS "JsonRunner_EXECUTABLE is: ${JsonRunner_EXECUTABLE}")
 
   set(COVERALLS_PREFIX cov_)
-  set(cov_COVERALLS_DIRS
-    apps/builtins
-    apps/cov
-  )
 
+  set(INCLUDED_IN_COVERAGE apps extensions)
   foreach(module
     libs/cov-api
-    libs/cell
     libs/hilite/hilite
     libs/hilite/lighter
     libs/app
     libs/cov-rt
   )
-    list(APPEND cov_COVERALLS_DIRS ${module}/include ${module}/src)
+    list(APPEND INCLUDED_IN_COVERAGE ${module}/include ${module}/src)
   endforeach()
+
   foreach(extra cxx py3 ts)
-    list(APPEND cov_COVERALLS_DIRS libs/hilite/hilite-${extra}/src)
+    list(APPEND INCLUDED_IN_COVERAGE libs/hilite/hilite-${extra}/src)
   endforeach()
+
+  set(EXCLUDED_FROM_COVERAGE
+    apps/tests
+    extensions/tests
+  )
+  foreach(extension
+    collect-api
+    excludes
+    native
+  )
+    list(APPEND EXCLUDED_FROM_COVERAGE
+      extensions/${extension}/test)
+  endforeach()
+
+  set(cov_COVERALLS_DIRS ${INCLUDED_IN_COVERAGE})
   include(${PROJECT_SOURCE_DIR}/tools/coveralls/Coveralls.cmake)
 
   set(TEST_REPORT_DIR "${PROJECT_BINARY_DIR}/test-results")
@@ -176,52 +196,12 @@ set(CORE_ROOT_DIR "../..")
 
 message(STATUS "Sanitizer: ${COV_SANITIZE}")
 
+include(cov)
+
 add_subdirectory(external)
 add_subdirectory(libs)
+add_subdirectory(extensions)
 add_subdirectory(apps)
-
-
-if (CMAKE_GENERATOR MATCHES "Visual Studio" AND TARGET cov_coveralls_test)
-  add_dependencies(cov_coveralls_test
-    git2-test git2-stress-test
-    cov-test cov-stress-test
-    lighter-test lighter-stress-test
-    cov
-  )
-endif()
-
-if (MSVC_VERSION GREATER_EQUAL 1936 AND MSVC_IDE)
-  foreach (TGT
-    cov
-    cov-rt
-    json
-    app_main
-    app
-    cov-api
-    date-tz
-    lighter
-    hilite-cxx
-    hilite-py
-    hilite-ts
-    hilite
-    testing-lib
-    cov-echo
-    git2-test
-    git2-stress-test
-    cov-test
-    cov-stress-test
-    cov-rt-test
-    cov-rt-stress-test
-    lighter-test
-    lighter-stress-test
-    date-tz
-    json
-  )
-    if(TARGET ${TGT})
-      set_target_properties(${TGT} PROPERTIES VS_USER_PROPS "${PROJECT_SOURCE_DIR}/cmake/VS17.NoModules.props")
-    endif()
-  endforeach()
-endif()
 
 execute_process(COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/packages/system.py props
     OUTPUT_VARIABLE COV_PROPERTIES
@@ -252,3 +232,6 @@ else()
 endif()
 
 file(GENERATE OUTPUT "${PROJECT_BINARY_DIR}/report_answers.txt" CONTENT "${COV_PROPERTIES}\n")
+string(REPLACE ";" "\n    include = " SRC_INCLUDE "${INCLUDED_IN_COVERAGE}")
+string(REPLACE ";" "\n    exclude = " SRC_EXCLUDE "${EXCLUDED_FROM_COVERAGE}")
+configure_file("${PROJECT_SOURCE_DIR}/.covcollect.in" "${PROJECT_BINARY_DIR}/.covcollect" @ONLY)

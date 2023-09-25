@@ -1,4 +1,5 @@
 {
+    "$schema": "../../../../build/downloads/runner-schema.json",
     "env": {
         "HOME": "$TMP/home",
         "XDG_CONFIG_HOME": null,

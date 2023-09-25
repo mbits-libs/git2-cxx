@@ -1,13 +1,11 @@
 {
+    "$schema": "../../runner-schema.json",
     "lang": "pl",
     "args": "log 123456789",
     "expected": [
         2,
         "",
-        [
-            "użycie: cov log [-h] [<zakres-rewizji>] [-n <liczba>] [--oneline] [--format <format>] [--abbrev-hash] [--no-abbrev-hash] [--prop-names] [--no-prop-names] [--color <kiedy>] [--decorate <jak>]",
-            "cov log: błąd: nie można odnaleźć żądanego obiektu\n"
-        ]
+        "cov log: błąd: nie można odnaleźć żądanego obiektu\n"
     ],
     "prepare": [
         "unpack $DATA/revparse.tar $TMP",

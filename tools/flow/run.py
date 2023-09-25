@@ -15,7 +15,17 @@ import lib.runner as runner
 DEF_STEPS = {
     "config": ["Conan", "CMake"],
     "build": ["Build"],
-    "verify": ["Build", "Test", "Report", "Pack", "Store", "BinInst", "DevInst"],
+    "verify": [
+        "Build",
+        "Test",
+        "Report",
+        "Sign",
+        "Pack",
+        "SignPackages",
+        "Store",
+        "BinInst",
+        "DevInst",
+    ],
     "report": ["Build", "Test", "Report"],
 }
 cmd = os.path.splitext(os.path.basename(sys.argv[0]))[0]
@@ -265,6 +275,7 @@ def main():
     runner.runner.DRY_RUN = args.dry_run
     runner.runner.CUTDOWN_OS = args.cutdown_os
     runner.runner.GITHUB_ANNOTATE = args.github
+    runner.runner.OFFICIAL = args.official
     root = os.path.join(os.path.dirname(__file__), "..", "..", ".github", "workflows")
     paths = [os.path.join(root, "flow.json")]
     if args.official:
@@ -309,4 +320,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        sys.exit(1)

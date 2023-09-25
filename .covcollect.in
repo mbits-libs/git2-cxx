@@ -1,0 +1,15 @@
+[collect]
+    compiler = @CMAKE_CXX_COMPILER@
+    output = collected.json
+    bin-dir = .
+    src-dir = ../..
+    include = @SRC_INCLUDE@
+    exclude = @SRC_EXCLUDE@
+
+[clang]
+    exec = bin/cov
+    exec = bin/cov-*
+    exec = libexec/cov/cov-*
+    exec = share/cov-*/**/filters/*
+    raw = .profraw
+    profdata = llvm-profiler

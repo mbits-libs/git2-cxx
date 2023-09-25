@@ -1,4 +1,5 @@
 {
+    "$schema": "../../../../build/downloads/runner-schema.json",
     "env": {
         "HOME": "$TMP/home",
         "XDG_CONFIG_HOME": null,
@@ -11,7 +12,7 @@
         ""
     ],
     "prepare": [
-        "touch '$DATA/../copy/etc/covconfig' '[group]\nkey = system\n'",
+        "touch '$INST/../etc/covconfig' '[group]\nkey = system\n'",
         "touch '$TMP/home/.config/cov/config' '[group]\nkey = global\n'",
         "cd $TMP"
     ]

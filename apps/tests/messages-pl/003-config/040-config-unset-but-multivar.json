@@ -1,15 +1,11 @@
 {
+    "$schema": "../../runner-schema.json",
     "lang": "pl",
     "args": "config --file $TMP/config --unset group.key",
     "expected": [
         2,
         "",
-        [
-            "użycie: cov config [-h] [<opcje-pliku>] [<nazwa> [<wartość>] | --unset <nazwa> | -l | --list]",
-            "cov config: błąd: wpis nie jest unikalny ze względu na to, że jest zmienną wielokrotną\n"
-        ]
+        "cov config: błąd: wpis nie jest unikalny ze względu na to, że jest zmienną wielokrotną\n"
     ],
-    "prepare": [
-        "touch '$TMP/config' '[group]\nkey = value 1\nkey = value 2'"
-    ]
+    "prepare": ["touch '$TMP/config' '[group]\nkey = value 1\nkey = value 2'"]
 }

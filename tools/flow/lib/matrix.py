@@ -27,6 +27,9 @@ from github.cmake import get_version
 _conan: Optional[conan] = None
 _platform_name, _platform_version, _platform_arch = uname()
 
+_collect_version = (0, 22, 0)
+_report_version = (0, 20, 0)
+_runner_version = (0, 2, 1)
 
 platform = _platform_name
 
@@ -275,7 +278,7 @@ class steps:
         CONAN_PROFILE_GEN = "_profile-build_type"
         profile_gen = f"./{CONAN_DIR}/{CONAN_PROFILE_GEN}-{config['preset']}"
 
-        if config.get("--first-build", False):
+        if config.get("--first-build"):
             runner.refresh_build_dir("conan")
 
         if _conan is None:
@@ -307,9 +310,14 @@ class steps:
     @step_call("CMake")
     def configure_cmake(config: dict):
         runner.refresh_build_dir(config["preset"])
-        cov_COVERALLS = "ON" if config.get("coverage", False) else "OFF"
-        COV_SANITIZE = "ON" if config.get("sanitizer", False) else "OFF"
+        cov_COVERALLS = "ON" if config.get("coverage") else "OFF"
+        COV_SANITIZE = "ON" if config.get("sanitizer") else "OFF"
         COV_CUTDOWN_OS = "ON" if runner.CUTDOWN_OS else "OFF"
+        runner.call(
+            sys.executable,
+            "tools/download-runner.py",
+            ".".join(str(x) for x in _runner_version),
+        )
         runner.call(
             "cmake",
             "--preset",
@@ -325,9 +333,45 @@ class steps:
         runner.call("cmake", "--build", "--preset", config["preset"], "--parallel")
 
     @staticmethod
+    def get_bin(version: Tuple[int], config: dict):
+        ext = ".exe" if os.name == "nt" else ""
+        for dirname in ["latest", "release", config["preset"]]:
+            path = f"build/{dirname}/bin/cov{ext}"
+            if not os.path.isfile(path):
+                continue
+            proc = subprocess.run([path, "--version"], shell=False, capture_output=True)
+            if proc.returncode:
+                continue
+            exe_version = tuple(
+                int(x)
+                for x in proc.stdout.strip()
+                .split(b" ")[-1]
+                .split(b"-")[0]
+                .decode("UTF-8")
+                .split(".")
+            )
+            if exe_version >= version:
+                return path
+        return None
+
+    @staticmethod
     @step_call("Test")
     def test(config: dict):
-        if config.get("coverage", False):
+        has_coverage = config.get("coverage")
+        cov_exe = None
+        if has_coverage:
+            cov_exe = steps.get_bin(_collect_version, config)
+
+        if cov_exe is not None:
+            runner.call(cov_exe, "collect", "--clean")
+            runner.call(
+                cov_exe, "collect", "--observe", "ctest", "--preset", config["preset"]
+            )
+            runner.call(cov_exe, "collect")
+            # todo: report coverage to github, somehow
+            return
+
+        if has_coverage:
             runner.call(
                 "cmake",
                 "--build",
@@ -346,8 +390,30 @@ class steps:
                         _append_coverage(GITHUB_STEP_SUMMARY, json.load(f))
                 except KeyError:
                     pass
-        else:
-            runner.call("ctest", "--preset", config["preset"])
+            return
+
+        runner.call("ctest", "--preset", config["preset"])
+
+    @staticmethod
+    @step_call("Sign", lambda config: config.get("os") == "windows")
+    def sign(config: dict):
+        files_to_sign: List[str] = []
+        for root in [
+            "bin",
+            "share",
+            os.path.join("libexec", "cov"),
+        ]:
+            for root_dir, _, files in os.walk(
+                os.path.join("build", config["preset"], root)
+            ):
+                for filename in files:
+                    stem, ext = os.path.splitext(filename)
+                    if stem[-5:] == "-test" or ext.lower() not in [".exe", ".dll"]:
+                        continue
+                    files_to_sign.append(
+                        os.path.join(root_dir, filename).replace("\\", "/")
+                    )
+        runner.call("python", "tools/win32/sign.py", *files_to_sign)
 
     @staticmethod
     @step_call("Pack", lambda config: len(config.get("cpack_generator", [])) > 0)
@@ -359,6 +425,27 @@ class steps:
             "-G",
             ";".join(config.get("cpack_generator", [])),
         )
+
+    @staticmethod
+    @step_call(
+        "SignPackages",
+        lambda config: config.get("os") == "windows"
+        and len(config.get("cpack_generator", [])) > 0,
+    )
+    def sign_packages(config: dict):
+        files_to_sign: List[str] = []
+        for root_dir, dirs, files in os.walk(
+            os.path.join("build", config["preset"], "packages")
+        ):
+            dirs[:] = []
+            for filename in files:
+                _, ext = os.path.splitext(filename)
+                if ext.lower() != ".msi":
+                    continue
+                files_to_sign.append(
+                    os.path.join(root_dir, filename).replace("\\", "/")
+                )
+        runner.call("python", "tools/win32/sign.py", *files_to_sign)
 
     @staticmethod
     @step_call("Store")
@@ -423,11 +510,16 @@ class steps:
         preset = config["preset"]
 
         runner.copy(f"build/{preset}/test-results", "build/artifacts/test-results")
-        if config.get("coverage", False):
+        if config.get("coverage"):
             output = f"build/artifacts/coveralls/{config['report_os']}-{config['report_compiler']}-{config['build_type']}.json"
-            print_args("cp", f"build/{preset}/coveralls.json", output)
-            if not runner.DRY_RUN:
-                copy_file(f"build/{preset}/coveralls.json", output)
+            if os.path.exists(f"build/{preset}/coveralls.json"):
+                print_args("cp", f"build/{preset}/coveralls.json", output)
+                if not runner.DRY_RUN:
+                    copy_file(f"build/{preset}/coveralls.json", output)
+            else:
+                print_args("cp", f"build/{preset}/collected.json", output)
+                if not runner.DRY_RUN:
+                    copy_file(f"build/{preset}/collected.json", output)
 
     @staticmethod
     @step_call(
@@ -459,10 +551,12 @@ class steps:
     @step_call(
         "Report",
         flags=step_info.VERBOSE,
-        visible=lambda config: config.get("coverage", False) == True,
+        visible=lambda config: config.get("coverage") == True,
     )
     def report(config: dict):
-        reporter = f"build/{config['preset']}/bin/cov"
+        cov_exe = steps.get_bin(_collect_version, config)
+        reporter = steps.get_bin(_report_version, config)
+
         try:
             tag_process = subprocess.run([reporter, "tag"], stdout=subprocess.PIPE)
             tags = (
@@ -474,15 +568,23 @@ class steps:
         except:
             tags = ()
         version = get_version()
-        legacy_reporter = os.environ.get("LEGACY_COV")
-        report = f"build/{config['preset']}/coveralls.json"
+        report = f"build/{config['preset']}/collected.json"
         response = f"build/{config['preset']}/report_answers.txt"
         at_args = []
         if os.path.isfile(response):
             at_args.append(f"@{response}")
-        runner.call(reporter, "report", "--filter", "coveralls", report, *at_args)
-        if legacy_reporter is not None:
-            runner.call(legacy_reporter, "import", "--in", report, "--amend")
+        if cov_exe is None:
+            coveralls = f"build/{config['preset']}/coveralls.json"
+            runner.call(
+                reporter,
+                "report",
+                "--out",
+                report,
+                "--filter",
+                "coveralls",
+                coveralls,
+            )
+        runner.call(reporter, "report", "--filter", "strip-excludes", report, *at_args)
         if version.tag() in tags:
             runner.call(
                 reporter,
@@ -500,7 +602,9 @@ class steps:
             steps.build,
             steps.test,
             steps.report,
+            steps.sign,
             steps.pack,
+            steps.sign_packages,
             steps.store,
             steps.store_packages,
             steps.store_tests,

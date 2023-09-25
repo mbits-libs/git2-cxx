@@ -1,12 +1,13 @@
 {
+    "$schema": "../../runner-schema.json",
     "lang": "pl",
     "args": "report $DATA/no-git-coverage.json -f echo-to-stdout",
     "expected": [
         2,
         "",
         [
-            "użycie: cov report [-h] <plik-raportu> [-f <filtr>] [-p <właściwość>=<wartość> ...] [--amend]",
-            "cov report: błąd: wystąpiły problemy z $DATA/no-git-coverage.json przetworzonym przez filtr echo-to-stdout"
+            "cov report: /git: undefined",
+            "cov report: błąd: wystąpiły problemy z $DATA/no-git-coverage.json przetworzonym przez filtr echo-to-stdout\n"
         ]
     ],
     "prepare": [

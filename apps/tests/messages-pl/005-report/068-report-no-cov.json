@@ -1,11 +1,12 @@
 {
+    "$schema": "../../runner-schema.json",
     "lang": "pl",
     "args": "report $DATA/basic-coverage.json",
     "expected": [
         2,
         "",
         [
-            "użycie: cov report [-h] <plik-raportu> [-f <filtr>] [-p <właściwość>=<wartość> ...] [--amend]",
+            "użycie: cov report [-h] <plik-raportu> [-f <filtr>] [-p <właściwość>=<wartość> ...] [--amend] [-o <arg>]",
             "cov report: błąd: Nie można znaleźć repozytorium Cov w $TMP\n"
         ]
     ],

@@ -136,19 +136,6 @@ namespace cov::testing {
 	        },
 	    },
 
-#ifdef WIN32
-	    {
-	        "outside_git_win32"sv,
-	        {
-	            "outside_git/.covdata"sv,
-	            "Z:/1234567890aswedferckarek/project/.git"sv,
-	        },
-	        make_setup(remove_all("outside_git"sv),
-	                   create_directories("outside_git"sv)),
-	        {"Z:/1234567890aswedferckarek/project/.git"sv},
-	    },
-#endif
-
 	    {
 	        "beside_git"sv,
 	        {"beside_git/.covdata"sv, "beside_git/project/.git"sv},

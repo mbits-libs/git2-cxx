@@ -5,13 +5,13 @@ import sys
 from typing import Dict, List, Optional
 
 
-def lines_from(lines: List[Optional[int]]) -> Dict[int, int]:
+def lines_from(lines: List[Optional[int]]) -> Dict[str, int]:
     result: Dict[int, int] = {}
     for index in range(len(lines)):
         count = lines[index]
         if count is not None:
             result[index + 1] = count
-    return result
+    return {str(line): count for line, count in result.items()}
 
 
 def cov_from(coveralls: dict) -> dict:
@@ -36,4 +36,5 @@ json.dump(
         "files": [cov_from(source_file) for source_file in data["source_files"]],
     },
     sys.stdout,
+    sort_keys=True,
 )

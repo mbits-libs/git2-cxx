@@ -1,4 +1,5 @@
 {
+    "$schema": "../../runner-schema.json",
     "lang": "pl",
     "args": "module v1.0.0..HEAD",
     "expected": [

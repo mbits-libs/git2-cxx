@@ -339,7 +339,7 @@ namespace cov::placeholder::testing {
 		ASSERT_FALSE(ec) << ec.message();
 
 		auto const report_id = "92b91e27801bbd1ee4e2cc456b81be767a03fbbf"_oid;
-		git::oid zero{}, build_id{}, files_id{};
+		git::oid zero{}, build_id{};
 
 		io::v1::coverage_stats const stats{1250, {300, 299}, {1, 1}, {0, 0}};
 

@@ -1,4 +1,5 @@
 {
+    "$schema": "../../runner-schema.json",
     "lang": "pl",
     "args": "branch",
     "expected": [
@@ -9,7 +10,5 @@
             "cov branch: błąd: Nie można znaleźć repozytorium Cov w $TMP\n"
         ]
     ],
-    "prepare": [
-        "cd '$TMP'"
-    ]
+    "prepare": ["cd '$TMP'"]
 }

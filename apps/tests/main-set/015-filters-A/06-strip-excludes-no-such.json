@@ -1,0 +1,13 @@
+{
+    "$schema": "../../../../build/downloads/runner-schema.json",
+    "args": "report -f strip-excludes '$DATA/extensions/report-no-such.json'",
+    "expected": [
+        1,
+        "",
+        "cov report: error: cannot find no-such-file.cc\n"
+    ],
+    "prepare": [
+        "unpack $DATA/extensions.tar $TMP",
+        "cd '$TMP/extensions'"
+    ]
+}

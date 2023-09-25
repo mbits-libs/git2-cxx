@@ -94,11 +94,11 @@
                         "patternProperties": {
                             "^[1-9][0-9]*$": {
                                 "type": "integer",
-                                "minimum": 1
+                                "minimum": 0
                             },
                             "^0[0-9]+$": {
                                 "type": "integer",
-                                "minimum": 1
+                                "minimum": 0
                             },
                             "^0$": {
                                 "title": "line numbers should start from 1",

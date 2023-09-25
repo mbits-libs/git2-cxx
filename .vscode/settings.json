@@ -5,24 +5,32 @@
         "arglist",
         "cfglng",
         "cobertura",
+        "covcollect",
         "covdata",
         "covlng",
         "covmodules",
+        "cpack",
+        "ctest",
+        "DCOV",
         "demangled",
+        "devel",
         "errlng",
         "fmtlng",
         "hilite",
         "initlng",
+        "libexec",
         "lngs",
         "loglng",
         "modcnt",
         "modlng",
+        "oneline",
         "pofile",
         "polib",
         "propset",
         "refslng",
         "replng",
         "resetlng",
+        "stdclang",
         "workdir"
     ],
     "files.associations": {
@@ -127,6 +135,7 @@
         "cfloat": "cpp",
         "climits": "cpp",
         "queue": "cpp",
-        "source_location": "cpp"
+        "source_location": "cpp",
+        "condition_variable": "cpp"
     }
 }

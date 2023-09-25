@@ -1,13 +1,11 @@
 {
+    "$schema": "../../runner-schema.json",
     "lang": "pl",
     "args": "checkout --orphan main",
     "expected": [
         2,
         "",
-        [
-            "użycie: cov checkout [-h] [--detach|-b|--orphan] <nazwa> [<punkt-startowy>]",
-            "cov checkout: błąd git::category: Object exists preventing operation\n"
-        ]
+        "cov checkout: błąd git::category: Object exists preventing operation\n"
     ],
     "prepare": [
         "unpack $DATA/revparse.tar $TMP",

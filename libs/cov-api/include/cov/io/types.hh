@@ -295,7 +295,7 @@ namespace cov::io {
 				// would not overflow an uintmax...
 				return {static_cast<unsigned>(out / divider),
 				        static_cast<unsigned>(out % divider), digits};
-				// GCOV_EXCL_END
+				// GCOV_EXCL_STOP
 			}
 		};
 

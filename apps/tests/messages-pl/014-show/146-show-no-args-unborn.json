@@ -1,13 +1,11 @@
 {
+    "$schema": "../../runner-schema.json",
     "lang": "pl",
     "args": "show",
     "expected": [
         2,
         "",
-        [
-            "użycie: cov show [-h] [<raport>] [-m <moduł>] [--format <format>] [--abbrev-hash] [--no-abbrev-hash] [--prop-names] [--no-prop-names] [--color <kiedy>] [--decorate <jak>]",
-            "cov show: błąd: HEAD odnosi się do gałęzi bez raportów\n"
-        ]
+        "cov show: błąd: HEAD odnosi się do gałęzi bez raportów\n"
     ],
     "prepare": [
         "mkdirs '$TMP/dirname'",

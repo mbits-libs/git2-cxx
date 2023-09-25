@@ -1,19 +1,21 @@
 {
+    "$schema": "../../runner-schema.json",
     "lang": "pl",
     "args": "report -h",
     "expected": [
         0,
         [
-            "użycie: cov report [-h] <plik-raportu> [-f <filtr>] [-p <właściwość>=<wartość> ...] [--amend]",
+            "użycie: cov report [-h] <plik-raportu> [-f <filtr>] [-p <właściwość>=<wartość> ...] [--amend] [-o <arg>]",
             "",
             "argumenty pozycyjne:",
             " <plik-raportu>                    wybiera raport do zaimportowania",
             "",
             "argumenty opcjonalne:",
             " -h, --help                        pokazuje ten komunikat pomocy i wychodzi",
-            " -f, --filter <filtr>              filtruje inne formaty raportów do wewnętrznego formatu cov; znane filtry to: ‘cobertura’ i ‘coveralls’",
+            " -f, --filter <filtr>              filtruje inne formaty raportów do wewnętrznego formatu cov; znane filtry to: ‘cobertura’, ‘coveralls’ i ‘strip-excludes’",
             " -p, --prop <właściwość>=<wartość> dodaje właściwość do tego raportu z kompilacji; jeśli <wartość> jest jedną z „true”, „false”, „on” or „off”, będzie traktowana jako wartość logiczna, jeśli wygląda jak liczba całkowita, będzie traktowana jako liczba, w przeciwnym razie będzie traktowana jako ciąg znaków; dobrymi nazwami właściwości mogą być „os”, „arch”, „build_type” lub „compiler”",
-            " --amend                           zastępuje końcówkę bieżącej gałęzi, tworząc nowy zapis\n"
+            " --amend                           zastępuje końcówkę bieżącej gałęzi, tworząc nowy zapis",
+            " -o, --out <arg>                   \n"
         ],
         ""
     ]

@@ -60,6 +60,7 @@ namespace cov::app::testing {
 		    {
 		        // add missing externals here... (this test will fail with every
 		        // new external added)
+		        "collect"sv,
 		    },
 		    actual);
 	}

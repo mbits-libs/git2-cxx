@@ -1,12 +1,10 @@
 {
+    "$schema": "../../../../build/downloads/runner-schema.json",
     "args": "log $BUILD --prop-names --decorate short",
     "expected": [
         2,
         "",
-        [
-            "usage: cov log [-h] [<revision-range>] [-n <number>] [--oneline] [--format <format>] [--abbrev-hash] [--no-abbrev-hash] [--prop-names] [--no-prop-names] [--color <when>] [--decorate <how>]",
-            "cov log: cov::category error: Object cannot be cast to required type\n"
-        ]
+        "cov log: cov::category error: Object cannot be cast to required type\n"
     ],
     "prepare": [
         "unpack $DATA/repo.git.tar $TMP",

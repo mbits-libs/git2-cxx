@@ -215,6 +215,7 @@ namespace cov::io::handlers {
 	bool files::store(ref_ptr<counted> const& value, write_stream& out) const {
 		auto const obj =
 		    as_a<cov::files>(static_cast<object const*>(value.get()));
+		if (!obj) return false;
 		auto entries = obj->entries();
 
 		auto only_lines = true;

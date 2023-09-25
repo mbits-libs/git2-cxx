@@ -1,13 +1,11 @@
 {
+    "$schema": "../../runner-schema.json",
     "lang": "pl",
     "args": "module --add module dir",
     "expected": [
         2,
         "",
-        [
-            "użycie: cov module [-h] [--show-sep [<zapis-gita>]] | [--set-sep <wartość> | --add <nazwa> <katalog> | --remove <nazwa> <katalog> | --remove-all <nazwa>] | [<zapis-gita>]",
-            "cov module: błąd: requested file is a directory\n"
-        ]
+        "cov module: błąd: requested file is a directory\n"
     ],
     "prepare": [
         "git init $TMP/repo",

@@ -1,0 +1,16 @@
+{
+    "$schema": "../../../../build/downloads/runner-schema.json",
+    "args": "report -f strip-excludes '$DATA/extensions/report-broken-C.json'",
+    "expected": [
+        2,
+        "",
+        [
+            "cov report: /files[0]/line_coverage (main.cc): undefined",
+            "cov report: error: there were issues with $DATA/extensions/report-broken-C.json processed by strip-excludes filter\n"
+        ]
+    ],
+    "prepare": [
+        "unpack $DATA/extensions.tar $TMP",
+        "cd '$TMP/extensions'"
+    ]
+}

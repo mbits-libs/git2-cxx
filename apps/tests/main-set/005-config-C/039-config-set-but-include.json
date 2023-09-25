@@ -1,12 +1,10 @@
 {
+    "$schema": "../../../../build/downloads/runner-schema.json",
     "args": "config --file $TMP/config group.key 'value 3'",
     "expected": [
         2,
         "",
-        [
-            "usage: cov config [-h] [<file-options>] [<name> [<value>] | --unset <name> | -l | --list]",
-            "cov config: error: entry is not unique due to being included\n"
-        ]
+        "cov config: error: entry is not unique due to being included\n"
     ],
     "prepare": [
         "touch '$TMP/config.inc' '[group]\nkey = value 1'",

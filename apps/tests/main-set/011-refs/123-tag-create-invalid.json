@@ -1,5 +1,6 @@
 {
-    "args": "tag \"bad:name\"",
+    "$schema": "../../../../build/downloads/runner-schema.json",
+    "args": "tag bad\\:name",
     "expected": [
         2,
         "",

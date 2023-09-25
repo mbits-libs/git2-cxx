@@ -1,0 +1,34 @@
+{
+    "$schema": "../../../../build/downloads/runner-schema.json",
+    "args": "collect",
+    "patches": {
+        "\\[([^\\]]+)\\] [0-9.]+ s": "[\\1] #.## s",
+        "(.+)\\.exe": "\\1"
+    },
+    "expected": [
+        1,
+        "",
+        [
+            "[toolkit] GNU 17.0.1 (from $TMP/dir/.covcollect)",
+            "  [gcov] $TMP/mocks/gcov",
+            "[report] start...",
+            "[0/0] finished        ",
+            "[report] #.## s",
+            "[files] 0",
+            "[lines] 0 / 0",
+            "[functions] 0 / 0",
+            "[i/o] cannot open $TMP/dir/build/cov-collect.json\n"
+        ]
+    ],
+    "prepare": [
+        "mkdirs '$TMP/dir'",
+        "cd '$TMP/dir'",
+        "git init",
+        "cov init",
+        "git commit -m 'initial' --allow-empty",
+        "mkdirs build/cov-collect.json",
+        "mock hal9000-lcars-GLaDOS-g++-17 g++",
+        "mock hal9000-lcars-GLaDOS-gcov-17 gcov",
+        "generate '$DATA/covcollect/ini' .covcollect 'COMPILER=$TMP/mocks/g++'"
+    ]
+}

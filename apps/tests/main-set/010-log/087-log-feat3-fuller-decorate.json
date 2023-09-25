@@ -1,12 +1,7 @@
 {
+    "$schema": "../../../../build/downloads/runner-schema.json",
     "args": "log --format=fuller --decorate=short feat/cov-3",
-    "check": {
-        "stderr": "begin"
-    },
-    "patches": {
-        "CommitDate: .*": "CommitDate: $DATE",
-        "Added:      .*": "Added:      $DATE"
-    },
+    "check": {"stderr": "begin"},
     "expected": [
         0,
         [

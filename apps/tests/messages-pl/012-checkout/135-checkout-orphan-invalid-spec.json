@@ -1,13 +1,11 @@
 {
+    "$schema": "../../runner-schema.json",
     "lang": "pl",
     "args": "checkout --orphan 'invalid:spec'",
     "expected": [
         2,
         "",
-        [
-            "użycie: cov checkout [-h] [--detach|-b|--orphan] <nazwa> [<punkt-startowy>]",
-            "cov checkout: błąd git::category: Name/ref spec was not in a valid format\n"
-        ]
+        "cov checkout: błąd git::category: Name/ref spec was not in a valid format\n"
     ],
     "prepare": [
         "unpack $DATA/revparse.tar $TMP",

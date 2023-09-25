@@ -1,0 +1,7 @@
+[collect]
+    compiler = $COMPILER
+    bin-dir = build/
+    src-dir = .
+    include = src
+    include = include
+    exclude = src/test

@@ -1,4 +1,5 @@
 {
+    "$schema": "../../../../build/downloads/runner-schema.json",
     "args": "config --file $TMP/config --unset group.key value",
     "expected": [
         2,

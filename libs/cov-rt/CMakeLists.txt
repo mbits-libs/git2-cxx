@@ -5,7 +5,6 @@ set(SOURCES
   src/cvg_info.cc
   src/line_printer.cc
   src/module.cc
-  src/path_env.hh
   src/report_command.cc
   src/report.cc
   src/root_command.cc
@@ -37,19 +36,9 @@ set(SOURCES
   include/cov/app/tools.hh
 )
 
-if (UNIX)
-	list(APPEND SOURCES src/posix.cc)
-elseif(WIN32)
-	list(APPEND SOURCES src/win32.cc)
-endif()
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})
 
-add_library(cov-rt STATIC ${SOURCES})
-target_compile_options(cov-rt PRIVATE ${ADDITIONAL_WALL_FLAGS})
-target_link_options(cov-rt PRIVATE ${ADDITIONAL_LINK_FLAGS})
-target_include_directories(cov-rt PUBLIC
-  ${CMAKE_CURRENT_SOURCE_DIR}/include
-  ${CMAKE_CURRENT_BINARY_DIR}/include)
+add_cov_library(cov-rt ${SOURCES})
 target_link_libraries(cov-rt PUBLIC app)
 
 set_target_properties(cov-rt PROPERTIES FOLDER libs)
@@ -76,27 +65,14 @@ if (COV_TESTING)
     ${STRESS_TEST_SRCS_CC}
   )
 
-  add_executable(cov-rt-test ${TEST_SRCS_CC} ${TEST_SRCS_CPP} ${TEST_SRCS_CXX})
-  add_executable(cov-rt-stress-test ${STRESS_TEST_SRCS_CC} tests/setup.cc ../cov-api/tests/git2-c++/stress/new.cc)
+  add_cov_test(cov-rt ${TEST_SRCS_CC} ${TEST_SRCS_CPP} ${TEST_SRCS_CXX})
+  add_cov_test(cov-rt-stress ${STRESS_TEST_SRCS_CC} tests/setup.cc ../cov-api/tests/git2-c++/stress/new.cc)
 
-  set_target_properties(cov-rt-test cov-rt-stress-test PROPERTIES FOLDER tests)
-
-  target_compile_options(cov-rt-test PRIVATE ${ADDITIONAL_WALL_FLAGS})
-  target_link_options(cov-rt-test PRIVATE ${ADDITIONAL_LINK_FLAGS})
   target_link_libraries(cov-rt-test PRIVATE cov-rt testing-lib)
-  target_include_directories(cov-rt-test
-    PRIVATE
-      ${CMAKE_CURRENT_SOURCE_DIR}/tests
-      ${CMAKE_CURRENT_BINARY_DIR})
-
-  target_compile_options(cov-rt-stress-test PRIVATE ${ADDITIONAL_WALL_FLAGS})
-  target_link_options(cov-rt-stress-test PRIVATE ${ADDITIONAL_LINK_FLAGS})
   target_link_libraries(cov-rt-stress-test PRIVATE cov-rt testing-lib)
   target_include_directories(cov-rt-stress-test
     PRIVATE
-      ${CMAKE_CURRENT_SOURCE_DIR}/tests
-      ${CMAKE_CURRENT_SOURCE_DIR}/../cov-api/tests/git2-c++/stress
-      ${CMAKE_CURRENT_BINARY_DIR})
+      ${CMAKE_CURRENT_SOURCE_DIR}/../cov-api/tests/git2-c++/stress)
 
   add_test(NAME cov-rt COMMAND cov-rt-test "--gtest_output=xml:${TEST_REPORT_DIR}/libcov-rt/${TEST_REPORT_FILE}")
   add_test(NAME cov-rt-stress COMMAND cov-rt-stress-test "--gtest_output=xml:${TEST_REPORT_DIR}/libcov-rt-stress/${TEST_REPORT_FILE}")
@@ -123,3 +99,5 @@ cpack_add_component(librt
   DISPLAY_NAME "libcov-rt"
   GROUP devel
 )
+
+set_parent_scope()

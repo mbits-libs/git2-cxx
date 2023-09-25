@@ -54,8 +54,8 @@ namespace cov::app::builtin::report {
 	parser::parser(::args::args_view const& arguments,
 	               str::translator_open_info const& langs)
 	    : base_parser<errlng, replng>{langs, arguments} {
-		static constexpr std::string_view filters[] = {"cobertura"sv,
-		                                               "coveralls"sv};
+		static constexpr std::string_view filters[] = {
+		    "cobertura"sv, "coveralls"sv, "strip-excludes"sv};
 
 		parser_.arg(report_)
 		    .meta(tr_(replng::REPORT_FILE_META))
@@ -70,28 +70,58 @@ namespace cov::app::builtin::report {
 		parser_.set<std::true_type>(amend_, "amend")
 		    .help(tr_(replng::AMEND_DESCRIPTION))
 		    .opt();
+		parser_.arg(output_, "o", "out").opt();
 	}
 
 	parser::parse_results parser::parse() {
 		using namespace str;
 
-		parser_.parse();
+		auto rest = parser_.parse(::args::parser::allow_subcommands);
+		if (!rest.empty()) {
+			if (rest[0] != "--"sv) {
+				error(fmt::format(fmt::runtime(tr_(args::lng::UNRECOGNIZED)),
+				                  rest[0]));
+			}
+			rest = rest.shift();
+		}
 
 		parse_results result{open_here(*this, tr_)};
 
-		if (!result.report.load_from_text(report_contents(result.repo.git()))) {
+		if (output_) {
+			if (!filter_) error("--out requires --filter");
+			if (amend_) error("--out cannot be used with --amend");
+
+			auto const text = report_contents(result.repo.git(), rest);
+			if (*output_ == "-") {
+				fputs(text.c_str(), stdout);
+			} else {
+				auto filename = make_u8path(*output_);
+				std::error_code ec{};
+				std::filesystem::create_directories(filename.parent_path(), ec);
+				if (ec) error(ec, tr_);
+				auto file = io::fopen(filename, "wb");
+				if (file) file.store(text.data(), text.size());
+				std::exit(0);
+			}
+		}
+
+		if (!result.report.load_from_text(
+		        report_contents(result.repo.git(), rest))) {
 			if (filter_) {
-				error(tr_.format(replng::ERROR_FILTERED_REPORT_ISSUES, report_,
-				                 *filter_));
+				simple_error(tr_, parser_.program(),
+				             tr_.format(replng::ERROR_FILTERED_REPORT_ISSUES,
+				                        report_, *filter_));
 			} else {  // GCOV_EXCL_LINE[WIN32]
-				error(tr_.format(replng::ERROR_REPORT_ISSUES, report_));
+				simple_error(tr_, parser_.program(),
+				             tr_.format(replng::ERROR_REPORT_ISSUES, report_));
 			}
 		}
 		result.props = cov::report::builder::properties(props_);
 		return result;
 	}  // GCOV_EXCL_LINE[GCC] -- and now it wants th throw something...
 
-	std::string parser::report_contents(git::repository_handle repo) const {
+	std::string parser::report_contents(git::repository_handle repo,
+	                                    ::args::arglist args) const {
 		auto source = io::fopen(make_u8path(report_));
 		if (!source) error(tr_.format(str::args::lng::FILE_NOT_FOUND, report_));
 
@@ -99,7 +129,7 @@ namespace cov::app::builtin::report {
 		if (filter_) {
 			auto dir = repo.workdir();
 			if (!dir) dir = repo.commondir();
-			content = filter(content, *filter_, make_u8path(*dir));
+			content = filter(content, *filter_, args, make_u8path(*dir));
 		}
 
 		return {reinterpret_cast<char const*>(content.data()), content.size()};
@@ -108,10 +138,11 @@ namespace cov::app::builtin::report {
 	std::vector<std::byte> parser::filter(
 	    std::vector<std::byte> const& contents,
 	    std::string_view filter,
+	    ::args::arglist args,
 	    std::filesystem::path const& cwd) const {
 		auto output = platform::run_filter(
 		    platform::sys_root() / directory_info::share / "filters"sv, cwd,
-		    filter, contents);
+		    filter, args, contents);
 
 		if (!output.error.empty())
 			fwrite(output.error.data(), 1, output.error.size(), stderr);

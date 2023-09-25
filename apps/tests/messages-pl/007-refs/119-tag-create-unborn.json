@@ -1,13 +1,11 @@
 {
+    "$schema": "../../runner-schema.json",
     "lang": "pl",
     "args": "tag name",
     "expected": [
         2,
         "",
-        [
-            "użycie: cov tag [-h] [<nazwa> [<punkt-startowy>] | -d <nazwa>... | -l [<wzorzec>...]]",
-            "cov tag: błąd: HEAD odnosi się do gałęzi bez raportów\n"
-        ]
+        "cov tag: błąd: HEAD odnosi się do gałęzi bez raportów\n"
     ],
     "prepare": [
         "cd $TMP",

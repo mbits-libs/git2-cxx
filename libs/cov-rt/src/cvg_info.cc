@@ -156,7 +156,7 @@ namespace cov::app {
 			max_width -= std::min(max_width, widths.line_no_width);
 			max_width -= std::min(max_width, margins);
 			max_width = std::max(max_width, MAGIC);
-			// GCOV_EXCL_END
+			// GCOV_EXCL_STOP
 		}
 
 		auto name = fn.label;
@@ -167,7 +167,7 @@ namespace cov::app {
 			// GCOV_EXCL_START -- TODO: Add pty to test_driver
 			backing.assign(name.substr(0, max_width - 3));
 			name = backing;
-			// GCOV_EXCL_END
+			// GCOV_EXCL_STOP
 		}
 
 		auto const count_column = fmt::format("{}x", fn.count);
@@ -178,8 +178,10 @@ namespace cov::app {
 		}
 
 		return fmt::format(
+		    // GCOV_EXCL_START[gcc]
 		    "{} {:>{}} |{} {}", prefix, count_column,
 		    widths.line_no_width + 3 + widths.count_width + 1, suffix,
+		    // GCOV_EXCL_STOP
 		    line_printer::to_string(total_count, name, shorten, use_color));
 	}
 
@@ -193,9 +195,11 @@ namespace cov::app {
 
 		auto const count_column = count ? fmt::format("{}x", *count) : " "s;
 		return fmt::format(
+		    // GCOV_EXCL_START[gcc]
 		    " {:>{}} | {:>{}} | {}", line_no + 1, widths.line_no_width,
 		    count_column, widths.count_width + 1,
 		    line_printer::to_string(count, line_text, line.contents,
+		                            // GCOV_EXCL_STOP
 		                            syntax.dict, use_color));
 	}
 }  // namespace cov::app
