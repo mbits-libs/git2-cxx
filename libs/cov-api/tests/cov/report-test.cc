@@ -866,18 +866,18 @@ namespace cov::testing {
 		    "prop9=\"missing"s,    "prop10=still missing\"\n\r"s,
 		};
 		auto const expected =
-		    "\"prop1\":\"value\","
-		    "\"prop10\":\"still missing\\\"\","
-		    "\"prop11\":\"mixed'\","
-		    "\"prop12\":\"mixed\\\"\","
-		    "\"prop2\":\"123\","
-		    "\"prop3\":123,"
-		    "\"prop4\":true,"
 		    "\"prop5\":false,"
 		    "\"prop6\":\"single\","
 		    "\"prop7\":\"missing\","
 		    "\"prop8\":\"still missing'\","
-		    "\"prop9\":\"missing\""sv;
+		    "\"prop1\":\"value\","
+		    "\"prop2\":\"123\","
+		    "\"prop3\":123,"
+		    "\"prop4\":true,"
+		    "\"prop11\":\"mixed'\","
+		    "\"prop12\":\"mixed\\\"\","
+		    "\"prop9\":\"missing\","
+		    "\"prop10\":\"still missing\\\"\""sv;
 		auto const actual = cov::report::builder::properties(args);
 		ASSERT_EQ(expected, actual);
 	}

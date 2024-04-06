@@ -328,7 +328,7 @@ namespace cov::app::report {
 			dst.digest.assign(digest_view.substr(pos + 1));
 
 			for (auto const& [node_key, node_value] :
-			     *json_file_line_coverage) {
+			     json_file_line_coverage->items()) {
 				auto const hits = cast<long long>(node_value);
 
 				unsigned line{};

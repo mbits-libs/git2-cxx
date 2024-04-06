@@ -60,7 +60,7 @@ namespace cov::testing {
 		                         {104, 15}},
 		               .finish = 20}}};
 		auto const props = "{ \"os\": \"qnx\",  \"build_type\": \"Debug\" }"sv;
-		auto const expected_props = "\"build_type\":\"Debug\",\"os\":\"qnx\""sv;
+		auto const expected_props = "\"os\":\"qnx\",\"build_type\":\"Debug\""sv;
 
 		// write
 		{
@@ -104,7 +104,7 @@ namespace cov::testing {
 			ASSERT_TRUE(cvg_report);
 			ASSERT_TRUE(backend->write(report_id, cvg_report));
 		}
-		ASSERT_EQ("bd6a8c2bbd43d5f4aa26f20ae1964066015358bc"sv,
+		ASSERT_EQ("696ea44aaf1babdcd2cd3c81eafeadbb3f19ce30"sv,
 		          report_id.str());
 
 		// read

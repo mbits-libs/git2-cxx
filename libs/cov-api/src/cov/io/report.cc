@@ -425,12 +425,12 @@ namespace cov {
 			auto const property = strip(prop);
 			auto const pos = property.find('=');
 			if (pos == std::string_view::npos) {
-				result[to_u8s(property)] = json::string{};
+				result.set(to_u8s(property), json::string{});
 				continue;
 			}
 			auto const name = strip(property.substr(0, pos));
 			auto const value = strip(property.substr(pos + 1));
-			result[to_u8s(name)] = node(value);
+			result.set(to_u8s(name), node(value));
 		}
 		return escape_dict(result);
 	}
@@ -471,7 +471,7 @@ namespace cov {
 		auto const map = json::cast<json::map>(node);
 		if (!map) return {};
 
-		for (auto const& [key, value] : *map) {
+		for (auto const& [key, value] : map->items()) {
 			if (auto const str = json::cast<json::string>(value); str) {
 				result[from_u8s(key)] = from_u8s(*str);
 			} else if (auto const b = json::cast<bool>(value); b) {
