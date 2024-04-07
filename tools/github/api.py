@@ -4,8 +4,10 @@
 import json
 import os
 import subprocess
+import sys
 import urllib.parse
 from typing import Any, List, Optional, Union
+import hashlib
 
 from .changelog import ChangeLog, format_changelog, read_tag_date
 from .runner import Environment, capture, checked, checked_capture, print_args
@@ -49,12 +51,14 @@ def gh(
     method: Optional[str] = None,
     server: Optional[str] = None,
     capture_output: bool = True,
+    **kwargs,
 ):
+    accept = kwargs.get("accept", "application/vnd.github+json")
     cmd = [
         "gh",
         "api",
         "-H",
-        "Accept: application/vnd.github+json",
+        f"Accept: {accept}",
         "-H",
         "X-GitHub-Api-Version: 2022-11-28",
     ]
@@ -88,6 +92,7 @@ class API:
         method: Optional[str] = None,
         server: Optional[str] = None,
         capture_output: bool = True,
+        **kwargs,
     ):
         return gh(
             f"{self.root}{res}",
@@ -95,6 +100,7 @@ class API:
             method=method,
             server=server,
             capture_output=capture_output,
+            **kwargs,
         )
 
     def json_from(
@@ -252,3 +258,102 @@ class API:
             "make_latest=legacy",
             method="PATCH",
         ).get("html_url")
+
+    def get_release(
+        self, tag: Optional[str] = None, platform: Optional[str] = None
+    ) -> Optional[str]:
+        try:
+            proc = checked_capture("git", "rev-parse", "--show-toplevel")
+            if proc is None:
+                return None
+            root = proc.stdout.decode("UTF-8").strip()
+            rel_dir = os.path.join(root, "build", "downloads", "releases")
+            os.makedirs(rel_dir, exist_ok=True)
+
+            proc = self.gh("/releases/latest" if tag is None else f"/releases/tags/{tag}")
+            if proc is None:
+                return None
+
+            data = json.loads(proc.stdout.decode("UTF-8"))
+            name = data.get("name")
+            tag_name = data.get("tag_name")
+            version = name if name != None and name[:1] == 'v' else tag_name
+            version = version[1:]
+            assets = {
+                asset.get("name"): (
+                    asset.get("id"),
+                    asset.get("browser_download_url"),
+                    asset.get("content_type"),
+                )
+                for asset in data.get("assets", [])
+            }
+            sha256sum = assets["sha256sum.txt"]
+            prefix = f"{self.repo}-{version}-"
+            if platform is not None:
+                prefix = f"{prefix}{platform}."
+            exts = [".tar.gz", ".zip"]
+            filtered = {}
+            for key, value in assets.items():
+                if key[: len(prefix)] != prefix:
+                    continue
+                cont = True
+                for ext in exts:
+                    if key[-len(ext) :] == ext:
+                        cont = False
+                        break
+                if cont:
+                    continue
+                filtered[key] = value
+
+            if len(filtered) != 1:
+                return None
+
+            for filename, asset in filtered.items():
+                break
+
+            proc = self.gh(
+                f"/releases/assets/{sha256sum[0]}",
+                accept="application/octet-stream",
+            )
+            if proc is None:
+                return None
+
+            sum_lines = proc.stdout.decode("UTF-8").rstrip().split("\n")
+            sums = {}
+            for line in sum_lines:
+                split = line.split(" ", 1)
+                if len(split) != 2:
+                    continue
+                digest, file = split
+                binary = file[:1] == "*"
+                if binary:
+                    file = file[1:]
+                sums[file] = (digest, binary)
+            archive_sum = sums[filename][0]
+
+            proc = self.gh(
+                f"/releases/assets/{asset[0]}",
+                accept="application/octet-stream",
+            )
+            if proc is None:
+                return None
+
+            actual_sum = hashlib.sha256(proc.stdout).hexdigest()
+            if archive_sum.lower() != actual_sum.lower():
+                print(
+                    f"""SHA256 checksum mismatch for file {filename}
+Expected: {archive_sum}
+Actual:   {actual_sum}""",
+                    file=sys.stderr,
+                )
+                return None
+
+            result = os.path.join(rel_dir, filename)
+            with open(result, "wb") as archive:
+                archive.write(proc.stdout)
+
+            return os.path.relpath(result, root)
+
+        except subprocess.CalledProcessError as e:
+            sys.stderr.write(e.stderr.decode("UTF-8"))
+            sys.exit(e.returncode)

@@ -95,7 +95,9 @@ def task(
 
     env2 = test.Env(
         env1.target,
+        env1.build_dir,
         env1.data_dir,
+        env1.inst_dir,
         tempdir,
         env1.version,
         env1.counter_digits,

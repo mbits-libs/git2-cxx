@@ -9,7 +9,7 @@ from github.api import API
 from github.cmake import get_version
 from github.runner import Environment
 
-ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 GITHUB_ORG = "mzdun"
 
 parser = argparse.ArgumentParser(usage="Download artifacts from GitHub")
