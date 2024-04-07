@@ -94,12 +94,7 @@ jobs:
       id: conan
       uses: turtlebrowser/get-conan@main
       with:
-        version: 1.57.0
-
-    - name: Configure Conan (deprecated)
-      run: |
-        conan remote add mbits-conan https://mbits.jfrog.io/artifactory/api/conan/mbits-conan
-        conan user -p ${{ secrets.JFROG_KEY }} -r mbits-conan ${{ secrets.JFROG_USER }}
+        version: 1.64.0
 
     - name: Conan cache
       uses: actions/cache@v3

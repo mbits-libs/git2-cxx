@@ -4,7 +4,7 @@
 
 To configure the project:
 - [Python 3.8](https://www.python.org/) to run all the tools and scripts, including `./flow`.
-- [Conan 1.60](https://conan.io/) to get all the dependencies.
+- [Conan 1.64](https://conan.io/) to get all the dependencies.
 - [CMake 3.25](https://cmake.org/) to configure the build and to pack the binaries.
 
 To build the project:

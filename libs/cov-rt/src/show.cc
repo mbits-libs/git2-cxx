@@ -82,7 +82,7 @@ namespace cov::app::show {
 		               placeholder::color::faint_red);
 	           },
 	           show_column::other, with_branches_missing},
-	    // GCOV_EXCL_END
+	    // GCOV_EXCL_STOP
 	    column{"% Funcs"sv,
 	           [](environment const& env,
 	              cell_row& cells,
