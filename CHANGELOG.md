@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) and [COMMITS.md](COMMITS.md) for commit guidelines.
 
+## [0.21.2](https://github.com/mzdun/cov/compare/v0.21.1...v0.21.2) (2024-04-07)
+
+### patch
+
+- code signing on Windows (#77) ([50e5c49](https://github.com/mzdun/cov/commit/50e5c49260968b753a9d87ca686808170cecfca2)), references [#71](https://github.com/mzdun/cov/issues/71)
+
 ## [0.21.1](https://github.com/mzdun/cov/compare/v0.21.0...v0.21.1) (2023-07-24)
 
 ### Bug Fixes
