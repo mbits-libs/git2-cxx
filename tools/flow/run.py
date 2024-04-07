@@ -15,7 +15,17 @@ import lib.runner as runner
 DEF_STEPS = {
     "config": ["Conan", "CMake"],
     "build": ["Build"],
-    "verify": ["Build", "Test", "Report", "Pack", "Store", "BinInst", "DevInst"],
+    "verify": [
+        "Build",
+        "Test",
+        "Report",
+        "Sign",
+        "Pack",
+        "SignPackages",
+        "Store",
+        "BinInst",
+        "DevInst",
+    ],
     "report": ["Build", "Test", "Report"],
 }
 cmd = os.path.splitext(os.path.basename(sys.argv[0]))[0]
@@ -309,4 +319,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        sys.exit(1)
