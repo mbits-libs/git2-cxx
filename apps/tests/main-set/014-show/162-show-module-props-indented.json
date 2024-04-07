@@ -1,15 +1,11 @@
 {
     "args": "show $BUILD --format=fuller --prop-names --decorate short",
-    "patches": {
-        "build [0-9a-f]{40}": "build $BUILD_HASH",
-        "Added:    .*": "Added:    $NOW"
-    },
     "expected": [
         0,
         [
             "build $BUILD_HASH",
             "Coverage: [ 67%] 2/3 (fail)",
-            "Added:    $NOW",
+            "Added:    $DATE",
             "Config:   build_type: Debug,",
             "          flag: on,",
             "          os: qnx",

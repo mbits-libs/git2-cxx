@@ -136,6 +136,8 @@ if (COV_TESTING)
           )
     endforeach()
 
+    string(TOLOWER ${CMAKE_BUILD_TYPE} CMAKE_PRESET)
+
     foreach(TEST_SET
         001-cov
         002-init
@@ -150,28 +152,26 @@ if (COV_TESTING)
     )
         add_test(
             NAME cov-exec--${TEST_SET}
-            COMMAND "${Python3_EXECUTABLE}"
-                "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_runner.py"
-                --bin "${PROJECT_BINARY_DIR}"
+            COMMAND "${JsonRunner_EXECUTABLE}"
+                --preset "${CMAKE_PRESET}"
                 --tests "main-set/${TEST_SET}"
-                --version "${PROJECT_VERSION}${PROJECT_VERSION_STABILITY}${PROJECT_VERSION_BUILD_META}"
-                )
+            WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+        )
     endforeach()
 
     if (NOT cov_COVERALLS)
         add_test(
             NAME cov-exec-pl
-            COMMAND "${Python3_EXECUTABLE}"
-                "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_runner.py"
-                --bin "${PROJECT_BINARY_DIR}"
+            COMMAND "${JsonRunner_EXECUTABLE}"
+                --preset "${CMAKE_PRESET}"
                 --tests "messages-pl"
-                --version "${PROJECT_VERSION}${PROJECT_VERSION_STABILITY}${PROJECT_VERSION_BUILD_META}"
-                )
+            WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+        )
     endif()
 
   if (CMAKE_GENERATOR MATCHES "Visual Studio" AND TARGET cov_coveralls_test)
     add_dependencies(cov_coveralls_test
-      cov-echo
+      cov cov-echo
     )
   endif()
 endif()

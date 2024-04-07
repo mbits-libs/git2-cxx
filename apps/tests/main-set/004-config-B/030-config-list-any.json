@@ -21,7 +21,7 @@
         "cd $TMP/repo.covdata",
         "git init --bare $TMP/repo.git",
         "cov init --git-dir $TMP/repo.git .",
-        "touch '$DATA/../copy/etc/covconfig' '[group]\nkey = system\n'",
+        "touch '$INST/../etc/covconfig' '[group]\nkey = system\n'",
         "touch '$TMP/home/.config/cov/config' '[group]\nkey = global\n'",
         "cd $TMP/repo.covdata",
         "cov config --local group.key local"

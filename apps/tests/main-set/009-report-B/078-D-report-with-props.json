@@ -9,7 +9,7 @@
         [
             "\u001b[31m[main $REPORT]\u001b[m second",
             " one file, \u001b[31m 67%\u001b[m (2/3, -1)",
-            " \u001b[2;37mbased on\u001b[m \u001b[2;33m384512442@main\u001b[m",
+            " \u001b[2;37mbased on\u001b[m \u001b[2;33m$HEAD@main\u001b[m",
             " \u001b[2;37mcontains $BUILD:\u001b[m \u001b[31m 67%\u001b[m\u001b[2;33m (\u001b[m\u001b[33mjavac\u001b[m\u001b[2;33m, debug: \u001b[m\u001b[34moff\u001b[m\u001b[2;33m, \u001b[m\u001b[33mqnx\u001b[m\u001b[2;33m)\u001b[m\n"
         ],
         "[ADD] src/main.cc\n"

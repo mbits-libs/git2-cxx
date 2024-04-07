@@ -27,6 +27,8 @@ from github.cmake import get_version
 _conan: Optional[conan] = None
 _platform_name, _platform_version, _platform_arch = uname()
 
+_report_version = (0, 20, 0)
+_runner_version = (0, 2, 1)
 
 platform = _platform_name
 
@@ -311,6 +313,11 @@ class steps:
         COV_SANITIZE = "ON" if config.get("sanitizer", False) else "OFF"
         COV_CUTDOWN_OS = "ON" if runner.CUTDOWN_OS else "OFF"
         runner.call(
+            sys.executable,
+            "tools/download-runner.py",
+            ".".join(str(x) for x in _runner_version),
+        )
+        runner.call(
             "cmake",
             "--preset",
             f"{config['preset']}-{config['build_generator']}",
@@ -504,7 +511,8 @@ class steps:
         visible=lambda config: config.get("coverage", False) == True,
     )
     def report(config: dict):
-        reporter = f"build/{config['preset']}/bin/cov"
+        reporter = steps.get_bin(_report_version, config)
+
         try:
             tag_process = subprocess.run([reporter, "tag"], stdout=subprocess.PIPE)
             tags = (
@@ -533,6 +541,28 @@ class steps:
                 "--abbrev-hash",
                 f"{version.tag()}..",
             )
+
+    @staticmethod
+    def get_bin(version: Tuple[int], config: dict):
+        ext = ".exe" if os.name == "nt" else ""
+        for dirname in ["latest", "release", config["preset"]]:
+            path = f"build/{dirname}/bin/cov{ext}"
+            if not os.path.isfile(path):
+                continue
+            proc = subprocess.run([path, "--version"], shell=False, capture_output=True)
+            if proc.returncode:
+                continue
+            exe_version = tuple(
+                int(x)
+                for x in proc.stdout.strip()
+                .split(b" ")[-1]
+                .split(b"-")[0]
+                .decode("UTF-8")
+                .split(".")
+            )
+            if exe_version >= version:
+                return path
+        return None
 
     @staticmethod
     def build_steps():
