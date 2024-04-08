@@ -23,7 +23,9 @@
         "refslng",
         "replng",
         "resetlng",
-        "workdir"
+        "workdir",
+        "worktree",
+        "worktrees"
     ],
     "files.associations": {
         "*.lngs": "idl",
