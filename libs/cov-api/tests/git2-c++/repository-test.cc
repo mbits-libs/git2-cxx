@@ -32,6 +32,7 @@ namespace git::testing {
 			std::string_view discovered{};
 			std::string_view workdir{};
 			std::string_view head{};
+			std::optional<std::string_view> common{std::nullopt};
 		} expected{};
 		repo_kind kind{repo_kind::workspace};
 
@@ -184,7 +185,13 @@ namespace git::testing {
 		ASSERT_FALSE(ec);
 		ASSERT_TRUE(repo);
 		auto const common = repo.commondir();
-		ASSERT_EQ(get_path(result), common);
+		if (expected.common) {
+			ASSERT_EQ(get_path(make_absolute(*expected.common,
+			                                 kind == repo_kind::failing)),
+			          common);
+		} else {
+			ASSERT_EQ(get_path(result), common);
+		}
 	}
 
 	TEST_P(repository, head) {
@@ -237,6 +244,11 @@ namespace git::testing {
 	    {
 	        "gitdir/bare/"sv,
 	        {"gitdir/.git/modules/bare/"sv, "gitdir/bare/"sv, b3},
+	    },
+	    {
+	        "worktree/subdir/"sv,
+	        {"gitdir/.git/worktrees/worktree/"sv, "worktree/"sv, b7,
+	         "gitdir/.git/"sv},
 	    },
 	};
 

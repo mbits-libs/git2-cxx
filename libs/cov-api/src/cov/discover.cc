@@ -68,6 +68,14 @@ namespace cov {
 		        ec);
 		    !git_dir.empty()) {
 			TRY(git_dir / names::covdata_dir);
+			std::error_code local{};
+			auto const repo = git::repository::open(git_dir, local);
+			if (!local) {
+				auto const commondir = repo.commondir();
+				if (!commondir.empty()) {
+					TRY(make_path(commondir) / names::covdata_dir);
+				}
+			}
 		}
 
 		auto dirname = absolute(current_dir);
