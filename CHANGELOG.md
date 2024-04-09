@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) and [COMMITS.md](COMMITS.md) for commit guidelines.
 
+## [0.21.3](https://github.com/mzdun/cov/compare/v0.21.2...v0.21.3) (2024-04-09)
+
+### Bug Fixes
+
+- discover cov from inside worktree ([2279586](https://github.com/mzdun/cov/commit/2279586910385ef9c3d7a2703ab54446cf83159c)), closes [#78](https://github.com/mzdun/cov/issues/78)
+
 ## [0.21.2](https://github.com/mzdun/cov/compare/v0.21.1...v0.21.2) (2024-04-07)
 
 ### patch
