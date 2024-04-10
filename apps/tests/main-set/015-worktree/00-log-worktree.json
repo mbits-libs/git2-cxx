@@ -1,0 +1,25 @@
+{
+    "args": "log",
+    "expected": [
+        1,
+        "",
+        [
+            "This directory is a Git worktree. You can initialize it with",
+            "",
+            "    cov init --worktree <branch>",
+            "\n"
+        ]
+    ],
+    "prepare": [
+        "mkdirs '$TMP/main/subdir'",
+        "cd '$TMP/main'",
+        "git init",
+        "cov init",
+        "touch '$TMP/main/file.txt' 'file contents\n'",
+        "git add file.txt",
+        "git commit -m 'Initial commit'",
+        "git branch secondary",
+        "git worktree add ../secondary secondary",
+        "cd ../secondary"
+    ]
+}

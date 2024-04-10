@@ -91,7 +91,13 @@ namespace cov {
 	};
 
 	struct references : object {
-		static ref_ptr<references> make_refs(std::filesystem::path const& root);
+		static ref_ptr<references> make_refs(
+		    std::filesystem::path const& common_dir,
+		    std::filesystem::path const& cov_dir);
+		static ref_ptr<references> make_refs(
+		    std::filesystem::path const& common_dir) {
+			return make_refs(common_dir, common_dir);
+		}
 		static reference_name prefix_info(std::string_view name);
 		obj_type type() const noexcept override { return obj_references; };
 		bool is_references() const noexcept final { return true; }

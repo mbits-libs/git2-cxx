@@ -7,15 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cov latest\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-14 19:44+0200\n"
-"PO-Revision-Date: 2022-08-14 19:46+0200\n"
+"POT-Creation-Date: 2024-04-10 13:16+0200\n"
+"PO-Revision-Date: 2024-04-10 13:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 "
+"|| n%100>14) ? 1 : 2);\n"
 "X-Generator: Poedit 2.4.2\n"
 
 #. Error message for creating a branch with a name, which is already taken
@@ -28,7 +29,7 @@ msgctxt "BRANCH_NAME_INVALID"
 msgid "'{}' is not a valid branch name"
 msgstr "„{}” nie jest prawidłową nazwą gałęzi"
 
-#. Error message for trying to delete current branch
+#. Error message for deleting current branch
 msgctxt "BRANCH_NOT_DELETABLE"
 msgid "cannot delete branch '{0}' selected in '{1}'"
 msgstr "nie można usunąć gałęzi „{0}” wybranej w „{1}”"
@@ -53,9 +54,7 @@ msgctxt "CONFIG_NON_UNIQUE_MULTIVAR"
 msgid "entry is not unique due to being a multivar"
 msgstr "wpis nie jest unikalny ze względu na to, że jest zmienną wielokrotną"
 
-#. Error message template; placeholder 0 will get the name of program,
-#. placeholder 1 the name of domain (such as "regex"), placeholder 2 an actual
-#. message
+#. Error message template; placeholder 0 will get the name of program, placeholder 1 the name of domain (such as "regex"), placeholder 2 an actual message
 msgctxt "DOMAIN_ERROR_MSG"
 msgid "{0}: {1} error: {2}"
 msgstr "{0}: błąd {1}: {2}"
@@ -69,6 +68,11 @@ msgstr "HEAD odnosi się do gałęzi bez raportów"
 msgctxt "SHOW_INVALID_PATTERN"
 msgid "invalid pattern '{}'"
 msgstr "nieprawidłowy wzorzec '{}'"
+
+#. Error message for reference not being a branch
+msgctxt "SHOW_NOT_BRANCH"
+msgid "reference does not point to a branch"
+msgstr "referencja nie wskazuje gałęzi"
 
 #. Error message for not found
 msgctxt "SHOW_NOT_FOUND"

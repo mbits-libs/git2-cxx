@@ -4,7 +4,7 @@
     "expected": [
         0,
         [
-            "użycie: cov init [-h] [--git-dir <katalog>] [--force] [katalog]",
+            "użycie: cov init [-h] [--git-dir <katalog>] [--force] [--worktree <gałąź>] [katalog]",
             "",
             "argumenty pozycyjne:",
             " katalog             ustawia katalog, w którym ma zostać umieszczone repozytorium; domyślnie wybiera bieżący katalog",
@@ -12,7 +12,8 @@
             "argumenty opcjonalne:",
             " -h, --help          pokazuje ten komunikat pomocy i wychodzi",
             " --git-dir <katalog> wskazuje na połączone repozytorium Git; domyślnie wybiera bieżące repozytorium",
-            " --force             ponownie zainicjuje repozytorium ze świeżą bazą danych\n"
+            " --force             ponownie zainicjuje repozytorium ze świeżą bazą danych",
+            " --worktree <gałąź>  inicjalizacja wewnątrz katalogu drzewa roboczego z repozytorium Cov już istniejącym w nadrzędnym repozytorium Git\n"
         ],
         ""
     ],

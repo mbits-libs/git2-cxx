@@ -18,6 +18,8 @@
     SHOW_EMPTY_HEAD="HEAD refers to branch with no reports";
     [help("Error message for not found"), id(-1)]
     SHOW_NOT_FOUND="requested object could not be found";
+    [help("Error message for reference not being a branch"), id(-1)]
+    SHOW_NOT_BRANCH="reference does not point to a branch";
     [help("Error message for invalid pattern"), id(-1)]
     SHOW_INVALID_PATTERN="invalid pattern '{}'";
     [help("Error message for deleting current branch"), id(-1)]

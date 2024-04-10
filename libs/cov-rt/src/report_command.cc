@@ -97,8 +97,8 @@ namespace cov::app::builtin::report {
 
 		auto content = source.read();
 		if (filter_) {
-			auto dir = repo.workdir();
-			if (!dir) dir = repo.commondir();
+			auto dir = repo.work_dir();
+			if (!dir) dir = repo.common_dir();
 			content = filter(content, *filter_, make_u8path(*dir));
 		}
 
@@ -339,8 +339,8 @@ namespace cov::app::builtin::report {
 
 		if ((stg.flags & text::in_repo) != text::in_repo ||
 		    (stg.flags & text::mismatched) == text::mismatched) {
-			auto const workdir = repo.git().workdir();
-			if (!workdir) {
+			auto const work_dir = repo.git_work_dir();
+			if (!work_dir) {
 				// GCOV_EXCL_START
 				// we got here through either in_repo | in_fs |
 				// mismatched, or in_fs | mismatched; this means we got
@@ -352,7 +352,7 @@ namespace cov::app::builtin::report {
 			}  // GCOV_EXCL_STOP
 
 			auto const opened =
-			    io::fopen(make_u8path(*workdir) / make_u8path(info.name), "r");
+			    io::fopen(make_u8path(*work_dir) / make_u8path(info.name), "r");
 			if (!opened) {
 				// GCOV_EXCL_START
 				// same here: we read this file once already...

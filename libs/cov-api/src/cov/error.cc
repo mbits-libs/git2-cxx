@@ -21,6 +21,13 @@ namespace cov {
 						return "Current branch cannot be deleted";
 					case wrong_object_type:
 						return "Object cannot be cast to required type";
+					case uninitialized_worktree:
+						return "This directory is a Git worktree";
+					case not_a_worktree:
+						return "This directory is expected to be a Git "
+						       "worktree, but is not";
+					case not_a_branch:
+						return "Reference does not points to a branch";
 				}
 				return "cov::errc{" + std::to_string(value) + "}";
 			}

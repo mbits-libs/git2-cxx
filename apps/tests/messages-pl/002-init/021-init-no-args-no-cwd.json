@@ -1,14 +1,12 @@
 {
     "lang": "pl",
     "args": "init",
-    "patches": {
-        "cov init: błąd: argument -C: .*": "cov init: błąd: argument -C: ERROR MESSAGE"
-    },
+    "patches": {"cov init: błąd: argument -C: .*": "cov init: błąd: argument -C: ERROR MESSAGE"},
     "expected": [
         2,
         "",
         [
-            "użycie: cov init [-h] [--git-dir <katalog>] [--force] [katalog]",
+            "użycie: cov init [-h] [--git-dir <katalog>] [--force] [--worktree <gałąź>] [katalog]",
             "cov init: błąd: argument -C: ERROR MESSAGE\n"
         ]
     ],

@@ -52,6 +52,8 @@
 	FILE_NOT_FOUND = "cannot open {0}";
 	[help("Error message for tool called outside Cov repository"), id(-1)]
 	CANNOT_FIND_COV = "Cannot find a Cov repository in {0}";
+    [help("Error message for tool called inside Git worktree, but without Cov worktree"), id(-1)]
+	COV_WITHIN_WORKTREE = "This directory is a Git worktree. You can initialize it with";
     [help("Error message for tool called outside Git repository"), id(-1)]
     CANNOT_FIND_GIT = "cannot find Git repository in {}";
 }

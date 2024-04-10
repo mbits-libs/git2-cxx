@@ -3,13 +3,16 @@
 
 #pragma once
 #include <filesystem>
+#include <string>
 
 namespace cov {
 	struct init_options {
 		enum {
 			reinit = 1,
+			worktree = 2,
 		};
 		int flags{};
+		std::string branch_name{};
 	};
 
 	std::filesystem::path init_repository(std::filesystem::path const& base,

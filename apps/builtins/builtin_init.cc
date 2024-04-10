@@ -31,7 +31,7 @@ namespace cov::app::builtin::init {
 				return common;  // GCOV_EXCL_LINE
 			}                   // GCOV_EXCL_LINE
 
-			auto const workdir = repo.workdir();
+			auto const workdir = repo.work_dir();
 			if (workdir) {
 				ec.clear();
 				auto result = weakly_canonical(make_u8path(*workdir), ec);
@@ -50,6 +50,7 @@ namespace cov::app::builtin::init {
 		struct arguments {
 			path git_dir{};
 			path directory{};
+			std::string branch{};
 			int flags;
 		};
 
@@ -61,6 +62,7 @@ namespace cov::app::builtin::init {
 	private:
 		std::optional<std::string> git_dir_{};
 		std::optional<std::string> directory_{};
+		std::optional<std::string> worktree_branch_{};
 		bool force_{};
 	};
 
@@ -75,6 +77,9 @@ namespace cov::app::builtin::init {
 		parser_.set<std::true_type>(force_, "force")
 		    .help(tr_(cov_init::lng::ARG_FORCE))
 		    .opt();
+		parser_.arg(worktree_branch_, "worktree")
+		    .meta(tr_(cov_init::lng::BRANCH_META))
+		    .help(tr_(cov_init::lng::ARG_WORKTREE));
 		parser_.arg(directory_)
 		    .meta(tr_(cov_init::lng::DIR_META))
 		    .help(tr_(cov_init::lng::ARG_DIRECTORY));
@@ -85,10 +90,17 @@ namespace cov::app::builtin::init {
 
 		parser_.parse();
 
-		arguments result = {.flags = force_ ? cov::init_options::reinit : 0};
+		arguments result = {
+		    .flags = (force_ ? cov::init_options::reinit : 0) |
+		             (worktree_branch_ ? cov::init_options::worktree : 0),
+		};
 		bool had_both = git_dir_ && directory_;
 
 		std::error_code ec{};
+		if (worktree_branch_) {
+			result.branch = std::move(*worktree_branch_);
+		}
+
 		if (!git_dir_) {
 			if (directory_) {
 				git_dir_ = directory_;
@@ -147,26 +159,33 @@ namespace cov::app::builtin::init {
 		using namespace str;
 		parser p{{tool, args},
 		         {platform::locale_dir(), ::lngs::system_locales()}};
-		auto const [git_dir, directory, flags] = p.parse();
+		auto const [git_dir, directory, branch, flags] = p.parse();
 
 		std::error_code ec{};
-		auto const repo = cov::repository::init(platform::sys_root(), directory,
-		                                        git_dir, ec, {.flags = flags});
+		auto const repo =
+		    cov::repository::init(platform::sys_root(), directory, git_dir, ec,
+		                          {.flags = flags, .branch_name = branch});
 		if (!ec) {
 			p.tr().print(flags & cov::init_options::reinit
 			                 ? cov_init::lng::REINITIALIZED
 			                 : cov_init::lng::INITIALIZED,
-			             get_u8path(repo.commondir()));
+			             get_u8path(repo.cov_dir()));
 			fputs("\n ", stdout);
-			p.tr().print(cov_init::lng::USING_GIT,
-			             get_u8path(weakly_canonical(
-			                 make_u8path(repo.git_commondir()))));
+			p.tr().print(
+			    cov_init::lng::USING_GIT,
+			    get_u8path(weakly_canonical(make_u8path(repo.git_dir()))));
 			fputc('\n', stdout);
 			return 0;
 		}
 
 		if (ec == std::errc::file_exists) {
 			p.tr().print(cov_init::lng::EXISTS, get_u8path(directory));
+			std::fputc('\n', stdout);
+			return 1;
+		}
+
+		if (ec == cov::errc::not_a_worktree) {
+			p.tr().print(cov_init::lng::NOT_WORKTREE, get_u8path(git_dir));
 			std::fputc('\n', stdout);
 			return 1;
 		}

@@ -11,9 +11,10 @@ namespace cov::app {
 		using namespace std::literals;
 		using errlng = str::errors::lng;
 
+		template <typename Enum>
 		struct error_code_lookup {
 			errlng id;
-			git::errc ec;
+			Enum ec;
 			std::string_view message{};
 		};
 
@@ -29,14 +30,18 @@ namespace cov::app {
 			std::span<error_lookup const> regex{};
 		};
 
-		static constexpr error_code_lookup general_direct[] = {
+		static constexpr error_code_lookup<git::errc> git_general_direct[] = {
 		    {errlng::SHOW_EMPTY_HEAD, git::errc::unbornbranch},
 		    {errlng::SHOW_NOT_FOUND, git::errc::notfound},
 		};
 
-		static constexpr error_code_lookup general_regex[] = {
+		static constexpr error_code_lookup<git::errc> git_general_regex[] = {
 		    {errlng::SHOW_INVALID_PATTERN, git::errc::invalidspec,
 		     "Invalid pattern '(.*)'"sv},
+		};
+
+		static constexpr error_code_lookup<cov::errc> cov_general_direct[] = {
+		    {errlng::SHOW_NOT_BRANCH, cov::errc::not_a_branch},
 		};
 
 		static constexpr error_lookup config_direct[] = {
@@ -97,6 +102,16 @@ namespace cov::app {
 			}
 		}  // GCOV_EXCL_LINE[WIN32]
 
+		if (ec.category() == cov::category()) {
+			auto message =
+			    message_from_cov_api(tr, static_cast<cov::errc>(ec.value()));
+			if (!message.empty()) {
+				auto fmt = args(str::args::lng::ERROR_MSG);
+				return fmt::format(fmt::runtime(fmt), parser_.program(),
+				                   message);
+			}
+		}  // GCOV_EXCL_LINE[WIN32]
+
 		auto cat_name = ec.category().name();
 		auto fmt = tr(str::errors::lng::DOMAIN_ERROR_MSG);
 		return fmt::format(fmt::runtime(fmt), parser_.program(), cat_name,
@@ -132,21 +147,27 @@ namespace cov::app {
 		return fmt::vformat(fmt, args);
 	}
 
+	template <typename Enum, size_t Length>
+	std::string message_from_errc(
+	    str::errors::Strings const& tr,
+	    Enum ec,
+	    error_code_lookup<Enum> const (&map)[Length]) {
+		for (auto const& [id, err, _] : map) {
+			if (err != ec) continue;
+			auto const view = tr(id);
+			return {view.data(), view.size()};
+		}  // GCOV_EXCL_LINE[WIN32]
+
+		return {};
+	}
+
 	std::pair<char const*, std::string> parser_holder::message_from_libgit(
 	    str::errors::Strings const& tr,
 	    git::errc ec) {
 		auto const error = git_error_last();
 
 		if (!error || !error->message || !*error->message) {
-			for (auto const& [id, err, _] : general_direct) {
-				if (err != ec) continue;
-				auto const view = tr(id);
-				return {nullptr, {view.data(), view.size()}};
-			}  // GCOV_EXCL_LINE[WIN32]
-
-			// by definition, any ID coming into this branch should return two
-			// lines above
-			return {nullptr, {}};  // GCOV_EXCL_LINE
+			return {nullptr, message_from_errc(tr, ec, git_general_direct)};
 		}
 		auto const cat = error->klass;
 		auto message = std::string{error->message};
@@ -169,17 +190,13 @@ namespace cov::app {
 			return {group.domain, std::move(message)};
 		}  // GCOV_EXCL_LINE[WIN32]
 
-		for (auto const& [id, err, _] : general_direct) {
+		for (auto const& [id, err, _] : git_general_direct) {
 			if (err != ec) continue;
-			// GCOV_EXCL_START
-			// So far, all the patches on errors from general_direct happen on
-			// no-message errors...
 			auto const view = tr(id);
 			return {nullptr, {view.data(), view.size()}};
-			// GCOV_EXCL_STOP
 		}  // GCOV_EXCL_LINE[WIN32]
 
-		for (auto const& [id, err, regex] : general_regex) {
+		for (auto const& [id, err, regex] : git_general_regex) {
 			if (err != ec) continue;
 			bool matches = false;
 			auto result = from_regex(tr, id, regex, message, matches);
@@ -187,5 +204,11 @@ namespace cov::app {
 		}  // GCOV_EXCL_LINE[WIN32]
 
 		return {nullptr, std::move(message)};
+	}
+
+	std::string parser_holder::message_from_cov_api(
+	    str::errors::Strings const& tr,
+	    cov::errc ec) {
+		return message_from_errc(tr, ec, cov_general_direct);
 	}
 }  // namespace cov::app

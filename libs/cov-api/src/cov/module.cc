@@ -297,12 +297,12 @@ namespace cov {
 
 	static inline ref_ptr<modules> modules_from_workdir(
 	    git::repository_handle handle) {
-		auto const workdir = handle.workdir();
-		if (!workdir) return {};
+		auto const work_dir = handle.work_dir();
+		if (!work_dir) return {};
 
 		auto cfg = git::config::create();
 		auto const ec =
-		    cfg.add_file_ondisk(make_path(*workdir) / ".covmodules"sv);
+		    cfg.add_file_ondisk(make_path(*work_dir) / ".covmodules"sv);
 		UNLIKELY(ec);
 
 		std::error_code secondary{};

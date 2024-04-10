@@ -136,27 +136,39 @@ namespace cov {
 		}
 
 		static repository init(std::filesystem::path const& sysroot,
-		                       std::filesystem::path const& base,
+		                       std::filesystem::path const& cov_dir,
 		                       std::filesystem::path const& git_dir,
 		                       std::error_code& ec,
 		                       init_options const& options = {}) {
-			auto common = init_repository(base, git_dir, ec, options);
+			auto cov_directory = init_repository(cov_dir, git_dir, ec, options);
 			if (ec) return repository{};
-			return repository{sysroot, common, ec};
+			return repository{sysroot, cov_directory, ec};
 		}
 
 		static repository open(std::filesystem::path const& sysroot,
-		                       std::filesystem::path const& common,
+		                       std::filesystem::path const& cov_dir,
 		                       std::error_code& ec) {
-			return repository{sysroot, common, ec};
+			return repository{sysroot, cov_dir, ec};
 		}
 
-		std::filesystem::path const& commondir() const noexcept {
-			return commondir_;
+		std::filesystem::path const& cov_dir() const noexcept {
+			return cov_dir_;
 		}
 
-		std::string_view git_commondir() const noexcept {
-			return git_.repo().commondir();
+		std::filesystem::path const& common_dir() const noexcept {
+			return common_dir_;
+		}
+
+		std::string_view git_dir() const noexcept {
+			return git_.repo().git_dir();
+		}
+
+		std::optional<std::string_view> git_work_dir() const noexcept {
+			return git_.repo().work_dir();
+		}
+
+		std::string_view git_common_dir() const noexcept {
+			return git_.repo().common_dir();
 		}
 
 		git::repository_handle git() const noexcept { return git_.repo(); }
@@ -201,7 +213,7 @@ namespace cov {
 
 	protected:
 		explicit repository(std::filesystem::path const& sysroot,
-		                    std::filesystem::path const& common,
+		                    std::filesystem::path const& cov_dir,
 		                    std::error_code&);
 
 		ref_ptr<object> lookup_object(git::oid_view id, std::error_code&) const;
@@ -209,7 +221,8 @@ namespace cov {
 	private:
 		struct git_repo {
 			git_repo();
-			void open(std::filesystem::path const& common,
+			void open(std::filesystem::path const& common_dir,
+			          std::filesystem::path const& cov_dir,
 			          git::config const& cfg,
 			          std::error_code&);
 			ref_ptr<blob> lookup(git::oid_view id, std::error_code&) const;
@@ -223,7 +236,8 @@ namespace cov {
 			git::odb odb_{};
 		};
 
-		std::filesystem::path commondir_{};
+		std::filesystem::path cov_dir_{};
+		std::filesystem::path common_dir_{};
 		git::config cfg_{};
 		git_repo git_{};
 		ref_ptr<references> refs_{};

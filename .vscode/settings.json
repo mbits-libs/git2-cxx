@@ -5,6 +5,7 @@
         "arglist",
         "cfglng",
         "cobertura",
+        "commondir",
         "covdata",
         "covlng",
         "covmodules",
@@ -30,6 +31,7 @@
     "files.associations": {
         "*.lngs": "idl",
         "*.widl": "idl",
+        "*.js": "javascript",
         "iosfwd": "cpp",
         "chrono": "cpp",
         "type_traits": "cpp",
@@ -129,6 +131,7 @@
         "cfloat": "cpp",
         "climits": "cpp",
         "queue": "cpp",
-        "source_location": "cpp"
+        "source_location": "cpp",
+        "cerrno": "cpp"
     }
 }

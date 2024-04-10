@@ -7,7 +7,11 @@
 namespace cov::testing {
 	using namespace ::std::literals;
 
-#define ON_ERRC(X) X(error) X(current_branch) X(wrong_object_type)
+#define ON_ERRC(X)       \
+	X(error)             \
+	X(current_branch)    \
+	X(wrong_object_type) \
+	X(uninitialized_worktree) X(not_a_worktree) X(not_a_branch)
 
 	TEST(error, same_error) {
 #define X_ASSERT_EQ(ERR) ASSERT_EQ(errc::ERR, cov::make_error_code(errc::ERR));

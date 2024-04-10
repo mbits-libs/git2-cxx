@@ -283,8 +283,8 @@ namespace cov::app::module {
 
 	std::filesystem::path parser::workdir_path(
 	    git::repository_handle repo) const {
-		auto const workdir = repo.workdir();
-		if (!workdir) error(to_string(tr_(modlng::ERROR_NO_GIT_WORKDIR)));
-		return make_u8path(*workdir) / ".covmodules"sv;
+		auto const work_dir = repo.work_dir();
+		if (!work_dir) error(to_string(tr_(modlng::ERROR_NO_GIT_WORKDIR)));
+		return make_u8path(*work_dir) / ".covmodules"sv;
 	}
 }  // namespace cov::app::module

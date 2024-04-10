@@ -2,6 +2,7 @@
 // This code is licensed under MIT license (see LICENSE for details)
 
 #include <cov/discover.hh>
+#include <cov/error.hh>
 #include <cov/git2/repository.hh>
 #include <cov/io/file.hh>
 #include "path-utils.hh"
@@ -42,16 +43,18 @@ namespace cov {
 		}
 	}  // namespace
 
-#define TRY(DIRNAME)                                                      \
-	do {                                                                  \
-		auto local = (DIRNAME);                                           \
-		if (is_valid_path(local)) return weakly_canonical(local, ec);     \
-		auto covlink = read_covlink(local);                               \
-		if (covlink) {                                                    \
-			local = std::move(*covlink);                                  \
-			if (is_valid_path(local)) return weakly_canonical(local, ec); \
-		}                                                                 \
+#define TRY_EX(DIRNAME, RET)                \
+	do {                                    \
+		auto local = (DIRNAME);             \
+		if (is_valid_path(local)) RET;      \
+		auto covlink = read_covlink(local); \
+		if (covlink) {                      \
+			local = std::move(*covlink);    \
+			if (is_valid_path(local)) RET;  \
+		}                                   \
 	} while (0)
+
+#define TRY(DIRNAME) TRY_EX(DIRNAME, return weakly_canonical(local, ec))
 
 	std::filesystem::path discover_repository(
 	    std::filesystem::path const& current_dir,
@@ -71,9 +74,12 @@ namespace cov {
 			std::error_code local{};
 			auto const repo = git::repository::open(git_dir, local);
 			if (!local) {
-				auto const commondir = repo.commondir();
-				if (!commondir.empty()) {
-					TRY(make_path(commondir) / names::covdata_dir);
+				auto const common_dir = repo.common_dir();
+				if (!common_dir.empty()) {
+					TRY_EX(make_path(common_dir) / names::covdata_dir, {
+						ec = make_error_code(errc::uninitialized_worktree);
+						return {};
+					});
 				}
 			}
 		}

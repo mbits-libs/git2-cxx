@@ -1,0 +1,25 @@
+{
+    "args": "init --worktree work-tree --force",
+    "expected": [
+        0,
+        [
+            "Reinitialized empty Cov repository in $TMP/main/.git/.covdata/worktrees/secondary",
+            " Using Git repository in $TMP/main/.git/worktrees/secondary\n"
+        ],
+        ""
+    ],
+    "prepare": [
+        "mkdirs '$TMP/main/subdir'",
+        "cd '$TMP/main'",
+        "git init",
+        "cov init",
+        "touch '$TMP/main/.git/.covdata/refs/heads/work-tree' '2fd4e1c67a2d28fced849ee1bb76e7391b93eb12'",
+        "touch '$TMP/main/file.txt' 'file contents\n'",
+        "git add file.txt",
+        "git commit -m 'Initial commit'",
+        "git branch secondary",
+        "git worktree add ../secondary secondary",
+        "cd ../secondary",
+        "cov init --worktree work-tree"
+    ]
+}

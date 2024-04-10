@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cov latest\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-14 19:44+0200\n"
-"PO-Revision-Date: 2022-08-14 19:46+0200\n"
+"POT-Creation-Date: 2024-04-10 13:16+0200\n"
+"PO-Revision-Date: 2024-04-10 13:16+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: en\n"
@@ -28,7 +28,7 @@ msgctxt "BRANCH_NAME_INVALID"
 msgid "'{}' is not a valid branch name"
 msgstr "'{}' is not a valid branch name"
 
-#. Error message for trying to delete current branch
+#. Error message for deleting current branch
 msgctxt "BRANCH_NOT_DELETABLE"
 msgid "cannot delete branch '{0}' selected in '{1}'"
 msgstr "cannot delete branch '{0}' selected in '{1}'"
@@ -53,9 +53,7 @@ msgctxt "CONFIG_NON_UNIQUE_MULTIVAR"
 msgid "entry is not unique due to being a multivar"
 msgstr "entry is not unique due to being a multivar"
 
-#. Error message template; placeholder 0 will get the name of program,
-#. placeholder 1 the name of domain (such as "regex"), placeholder 2 an actual
-#. message
+#. Error message template; placeholder 0 will get the name of program, placeholder 1 the name of domain (such as "regex"), placeholder 2 an actual message
 msgctxt "DOMAIN_ERROR_MSG"
 msgid "{0}: {1} error: {2}"
 msgstr "{0}: {1} error: {2}"
@@ -69,6 +67,11 @@ msgstr "HEAD refers to branch with no reports"
 msgctxt "SHOW_INVALID_PATTERN"
 msgid "invalid pattern '{}'"
 msgstr "invalid pattern '{}'"
+
+#. Error message for reference not being a branch
+msgctxt "SHOW_NOT_BRANCH"
+msgid "reference does not point to a branch"
+msgstr "reference does not point to a branch"
 
 #. Error message for not found
 msgctxt "SHOW_NOT_FOUND"

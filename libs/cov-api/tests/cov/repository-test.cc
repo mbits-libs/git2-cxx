@@ -73,11 +73,11 @@ namespace cov::testing {
 		    setup::test_dir() / "inside_git/.git"sv, ec);
 		ASSERT_FALSE(ec);
 
-		auto const& commondir = repo.commondir();
+		auto const& common_dir = repo.common_dir();
 		std::vector<entry_t> entries;
-		for (auto const& entry : recursive_directory_iterator{commondir}) {
+		for (auto const& entry : recursive_directory_iterator{common_dir}) {
 			entries.push_back(
-			    {setup::get_path(proximate(entry.path(), commondir)),
+			    {setup::get_path(proximate(entry.path(), common_dir)),
 			     entry.status().type()});
 		}
 		std::sort(entries.begin(), entries.end());
@@ -85,6 +85,7 @@ namespace cov::testing {
 		std::vector<entry_t> const expected_tree{
 		    {"HEAD"s, file_type::regular},
 		    {"config"s, file_type::regular},
+		    {"gitdir"s, file_type::regular},
 		    {"objects"s, file_type::directory},
 		    {"objects/coverage"s, file_type::directory},
 		    {"objects/pack"s, file_type::directory},
@@ -123,8 +124,10 @@ namespace cov::testing {
 		    remove_all("inside_git"sv), init_git_workspace("inside_git"sv),
 		    init_repo("inside_git/.git/.covdata"sv, "inside_git/.git"sv)));
 		{
-			auto f = io::fopen(
-			    setup::test_dir() / "inside_git/.git/.covdata/config"sv, "w");
+			io::fopen(setup::test_dir() / "inside_git/.git/.covdata/config"sv,
+			          "w");
+			io::fopen(setup::test_dir() / "inside_git/.git/.covdata/gitdir"sv,
+			          "w");
 		}
 
 		std::error_code ec{};

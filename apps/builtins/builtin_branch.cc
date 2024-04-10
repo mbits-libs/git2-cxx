@@ -103,7 +103,7 @@ namespace cov::app::builtin::branch {
 			if (ec == cov::errc::current_branch) {
 				auto fmt = p.tr()(str::errors::lng::BRANCH_NOT_DELETABLE);
 				error(fmt::format(fmt::runtime(fmt), p.params.names.front(),
-				                  get_u8path(repo.commondir())));
+				                  get_u8path(repo.cov_dir())));
 			}  // GCOV_EXCL_LINE
 
 			if (ec == git::errc::exists) {

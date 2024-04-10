@@ -54,6 +54,7 @@ namespace cov::testing {
 			std::vector<entry_t> const expected_tree{
 			    {"HEAD"s, file_type::regular},
 			    {"config"s, file_type::regular},
+			    {"gitdir"s, file_type::regular},
 			    {"objects"s, file_type::directory},
 			    {"objects/coverage"s, file_type::directory},
 			    {"objects/pack"s, file_type::directory},

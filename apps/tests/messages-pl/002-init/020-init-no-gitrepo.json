@@ -5,7 +5,7 @@
         2,
         "",
         [
-            "użycie: cov init [-h] [--git-dir <katalog>] [--force] [katalog]",
+            "użycie: cov init [-h] [--git-dir <katalog>] [--force] [--worktree <gałąź>] [katalog]",
             "cov init: błąd: nie repo gita: $TMP/repo.git\n"
         ]
     ],

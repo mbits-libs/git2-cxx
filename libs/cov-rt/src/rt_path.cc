@@ -22,6 +22,12 @@ namespace cov::app {
 
 		auto const repo_path = cov::discover_repository(current_directory, ec);
 		if (ec) {
+			if (ec == errc::uninitialized_worktree) {
+				fmt::print(stderr, "{}\n\n    cov init --worktree <branch>\n\n",
+				           arg_str(str::args::lng::COV_WITHIN_WORKTREE));
+				std::exit(1);
+			}
+
 			parser.error(fmt::format(
 			    fmt::runtime(arg_str(str::args::lng::CANNOT_FIND_COV)),
 			    get_u8path(current_directory)));
