@@ -7,7 +7,7 @@
         2,
         "",
         [
-            "usage: cov init [-h] [--git-dir <dir>] [--force] [directory]",
+            "usage: cov init [-h] [--git-dir <dir>] [--force] [--worktree <branch>] [directory]",
             "cov init: error: argument -C: ERROR MESSAGE\n"
         ]
     ],

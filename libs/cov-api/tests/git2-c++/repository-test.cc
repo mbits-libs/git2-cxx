@@ -30,7 +30,7 @@ namespace git::testing {
 		std::string_view start_path{};
 		struct {
 			std::string_view discovered{};
-			std::string_view workdir{};
+			std::string_view work_dir{};
 			std::string_view head{};
 			std::optional<std::string_view> common{std::nullopt};
 		} expected{};
@@ -135,7 +135,7 @@ namespace git::testing {
 		}
 	}
 
-	TEST_P(repository, workdir) {
+	TEST_P(repository, work_dir) {
 		auto [start_path, expected, kind] = GetParam();
 		auto const start =
 		    make_absolute(start_path, kind == repo_kind::failing);
@@ -155,16 +155,16 @@ namespace git::testing {
 		auto const repo = git::repository::open(result, ec);
 		ASSERT_FALSE(ec);
 		ASSERT_TRUE(repo);
-		auto const view = repo.workdir();
+		auto const view = repo.work_dir();
 		if (kind == repo_kind::bare) {
 			ASSERT_FALSE(view);
 			return;
 		}
 		ASSERT_TRUE(view);
-		ASSERT_EQ(*view, get_path(make_absolute(expected.workdir, false)));
+		ASSERT_EQ(*view, get_path(make_absolute(expected.work_dir, false)));
 	}
 
-	TEST_P(repository, commondir) {
+	TEST_P(repository, common_dir) {
 		auto [start_path, expected, kind] = GetParam();
 		auto const start =
 		    make_absolute(start_path, kind == repo_kind::failing);
@@ -184,7 +184,7 @@ namespace git::testing {
 		auto const repo = git::repository::open(result, ec);
 		ASSERT_FALSE(ec);
 		ASSERT_TRUE(repo);
-		auto const common = repo.commondir();
+		auto const common = repo.common_dir();
 		if (expected.common) {
 			ASSERT_EQ(get_path(make_absolute(*expected.common,
 			                                 kind == repo_kind::failing)),

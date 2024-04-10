@@ -15,13 +15,20 @@ namespace cov {
 		std::string name_for(std::string_view name, bool as_branch) {
 			return fmt::format("{}/{}", as_branch ? heads : tags, name);
 		}
+
+		auto use_common_for(std::string_view name) {
+			return std::find(name.begin(), name.end(), '/') != name.end();
+		}
+
 	}  // namespace
 
 	class references_impl
 	    : public counted_impl<references>,
 	      public enable_ref_from_this<references, references_impl> {
 	public:
-		references_impl(std::filesystem::path const& root) : root_{root} {}
+		references_impl(std::filesystem::path const& common_dir,
+		                std::filesystem::path const& cov_dir)
+		    : common_dir_{common_dir}, cov_dir_{cov_dir} {}
 
 		ref_ptr<reference> create(std::string_view name,
 		                          git::oid_view target) override {
@@ -105,7 +112,9 @@ namespace cov {
 		ref_ptr<reference> lookup(std::string_view name) override {
 			if (!reference::is_valid_name(name)) return {};
 
-			auto in = io::fopen(root_ / make_path(name));
+			auto in =
+			    io::fopen((use_common_for(name) ? common_dir_ : cov_dir_) /
+			              make_path(name));
 			if (!in) return {};
 
 			auto line = in.read_line();
@@ -143,8 +152,9 @@ namespace cov {
 		}
 
 		ref_ptr<reference_list> iterator(std::string_view prefix) override {
-			return reference_list::create(root_, {prefix.data(), prefix.size()},
-			                              ref_from_this());
+			// TODO: support cov != common here
+			return reference_list::create(
+			    common_dir_, {prefix.data(), prefix.size()}, ref_from_this());
 		}
 
 		std::error_code remove_ref(ref_ptr<reference> const& ref) override {
@@ -154,10 +164,14 @@ namespace cov {
 				return git::make_error_code(git::errc::error);
 			}
 
+			auto const use_common = use_common_for(full_name);
+
 			if (!reference::is_valid_name(full_name)) {
 				// clean an invalid name, if it exists...
 				std::error_code ec{};
-				std::filesystem::remove(root_ / make_path(full_name), ec);
+				std::filesystem::remove((use_common ? common_dir_ : cov_dir_) /
+				                            make_path(full_name),
+				                        ec);
 				if (ec) return ec;
 				return git::make_error_code(git::errc::invalidspec);
 			}
@@ -184,7 +198,9 @@ namespace cov {
 			}
 
 			std::error_code ec{};
-			std::filesystem::remove(root_ / make_path(full_name), ec);
+			std::filesystem::remove(
+			    (use_common ? common_dir_ : cov_dir_) / make_path(full_name),
+			    ec);
 			return ec;
 		}
 
@@ -215,7 +231,8 @@ namespace cov {
 
 	private:
 		bool print(std::string_view name, std::string const& line) {
-			auto filename = root_ / make_path(name);
+			auto filename = (use_common_for(name) ? common_dir_ : cov_dir_) /
+			                make_path(name);
 
 			std::error_code ec{};
 			std::filesystem::create_directories(filename.parent_path(), ec);
@@ -231,12 +248,14 @@ namespace cov {
 			}                    // GCOV_EXCL_LINE[Clang]
 			return result;
 		}
-		std::filesystem::path root_;
+		std::filesystem::path common_dir_;
+		std::filesystem::path cov_dir_;
 	};
 
 	ref_ptr<references> references::make_refs(
-	    std::filesystem::path const& root) {
-		return make_ref<references_impl>(root);
+	    std::filesystem::path const& root,
+	    std::filesystem::path const& alt_root) {
+		return make_ref<references_impl>(root, alt_root);
 	}
 
 	static std::string S(std::string_view value) {

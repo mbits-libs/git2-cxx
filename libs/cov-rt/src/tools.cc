@@ -7,6 +7,7 @@
 #include <cov/app/tools.hh>
 #include <cov/app/tr.hh>
 #include <cov/discover.hh>
+#include <cov/error.hh>
 #include "../../cov-api/src/cov/path-utils.hh"
 
 namespace cov::app {
@@ -101,7 +102,9 @@ namespace cov::app {
 		if (!current_directory.empty()) {
 			auto const directory = discover_repository(current_directory, ec);
 			if (!ec) ec = result.add_local_config(directory);
-			if (ec == git::errc::notfound) ec.clear();
+			if (ec == git::errc::notfound ||
+			    ec == cov::errc::uninitialized_worktree)
+				ec.clear();
 		}
 		if (ec) result = nullptr;
 		return result;

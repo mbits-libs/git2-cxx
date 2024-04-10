@@ -149,6 +149,7 @@ if (COV_TESTING)
         012-checkout
         013-reset
         014-show
+        015-worktree
     )
         add_test(
             NAME cov-exec--${TEST_SET}

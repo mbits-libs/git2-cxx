@@ -308,7 +308,7 @@ namespace cov::app::line_printer {
 			if (use_color) ctx.result.append("\033[2;49;39m"sv);
 			ctx.result.append("..."sv);
 			if (use_color) ctx.result.append("\033[m"sv);
-			// GCOV_EXCL_END
+			// GCOV_EXCL_STOP
 		}
 
 		return ctx.result;

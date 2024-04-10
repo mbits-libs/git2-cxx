@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cov latest\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-14 19:44+0200\n"
-"PO-Revision-Date: 2022-08-14 19:46+0200\n"
+"POT-Creation-Date: 2024-04-10 12:39+0200\n"
+"PO-Revision-Date: 2024-04-10 12:43+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: en\n"
@@ -35,6 +35,20 @@ msgctxt "ARG_GITDIR"
 msgid "points to connected Git repository; defaults to current repo"
 msgstr "points to connected Git repository; defaults to current repo"
 
+#. Description for the --worktree argument
+msgctxt "ARG_WORKTREE"
+msgid ""
+"initialize inside a worktree directory with a Cov repository already "
+"existing on parent Git repository"
+msgstr ""
+"initialize inside a worktree directory with a Cov repository already "
+"existing on parent Git repository"
+
+#. Name of a branch argument
+msgctxt "BRANCH_META"
+msgid "<branch>"
+msgstr "<branch>"
+
 #. Error message for filesystem issues with new repository
 msgctxt "CANNOT_INITIALIZE"
 msgid "Cannot initialize Cov repository in {0}"
@@ -45,8 +59,7 @@ msgctxt "CANNOT_REMOVE"
 msgid "Cannot remove Cov repository in {0}"
 msgstr "Cannot remove Cov repository in {0}"
 
-#. Name of the init's last argument; note this one does not have angle
-#. brackets
+#. Name of the init's last argument; note this one does not have angle brackets
 msgctxt "DIR_META"
 msgid "directory"
 msgstr "directory"
@@ -65,6 +78,11 @@ msgstr "Initialized empty Cov repository in {0}"
 msgctxt "NOT_GIT"
 msgid "not git repo: {0}"
 msgstr "not git repo: {0}"
+
+#. Error message for calling cov init --worktree in main repository
+msgctxt "NOT_WORKTREE"
+msgid "Git repository in {0} is not a worktree"
+msgstr "Git repository in {0} is not a worktree"
 
 #. Message for successful re-initialization
 msgctxt "REINITIALIZED"

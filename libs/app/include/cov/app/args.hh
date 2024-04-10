@@ -59,6 +59,9 @@ namespace cov::app {
 		    str::errors::Strings const&,
 		    git::errc = git::errc{});
 
+		static std::string message_from_cov_api(str::errors::Strings const&,
+		                                        cov::errc = cov::errc{});
+
 	protected:
 		::args::parser parser_;
 

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cov latest\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-14 19:44+0200\n"
-"PO-Revision-Date: 2023-04-21 20:05+0200\n"
+"POT-Creation-Date: 2024-04-09 11:36+0200\n"
+"PO-Revision-Date: 2024-04-09 11:50+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: pl\n"
@@ -33,6 +33,12 @@ msgctxt "CANNOT_FIND_GIT"
 msgid "cannot find Git repository in {}"
 msgstr "nie można znaleźć repozytorium Git w {}"
 
+#. Error message for tool called inside Git worktree, but without Cov worktree
+msgctxt "COV_WITHIN_WORKTREE"
+msgid "This directory is a Git worktree. You can initialize it with"
+msgstr ""
+"Ten katalog jest drzewem roboczym Gita. Możesz je zainicjować za pomocą"
+
 #. Default name of an argument
 msgctxt "DEF_META"
 msgid "<arg>"
@@ -43,8 +49,7 @@ msgctxt "DIR_META"
 msgid "<dir>"
 msgstr "<katalog>"
 
-#. Error message template; placeholder 0 will get the name of program,
-#. placeholder 1 an actual message
+#. Error message template; placeholder 0 will get the name of program, placeholder 1 an actual message
 msgctxt "ERROR_MSG"
 msgid "{0}: error: {1}"
 msgstr "{0}: błąd: {1}"
@@ -74,8 +79,7 @@ msgctxt "NAME_META"
 msgid "<name>"
 msgstr "<nazwa>"
 
-#. Error message for a numeric argument, when parsing would get outside of
-#. representable bounds
+#. Error message for a numeric argument, when parsing would get outside of representable bounds
 msgctxt "NEEDED_NUMBER_EXCEEDED"
 msgid "argument {0}: number outside of expected bounds"
 msgstr "argument {0}: liczba poza oczekiwanym zakresem"
@@ -125,8 +129,7 @@ msgctxt "REQUIRED"
 msgid "argument {0} is required"
 msgstr "argument {0} jest wymagany"
 
-#. Error message for an unrecognized argument; the placeholder will contain
-#. the name of the argument
+#. Error message for an unrecognized argument; the placeholder will contain the name of the argument
 msgctxt "UNRECOGNIZED"
 msgid "unrecognized argument: {0}"
 msgstr "nierozpoznany argument: {0}"
@@ -141,8 +144,7 @@ msgctxt "VALUE_META"
 msgid "<value>"
 msgstr "<wartość>"
 
-#. Warning message template; placeholder 0 will get the name of program,
-#. placeholder 1 an actual message
+#. Warning message template; placeholder 0 will get the name of program, placeholder 1 an actual message
 msgctxt "WARNING_MSG"
 msgid "{0}: warning: {1}"
 msgstr "{0}: ostrzeżenie: {1}"

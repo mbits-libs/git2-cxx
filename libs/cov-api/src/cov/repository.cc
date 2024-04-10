@@ -6,6 +6,7 @@
 #include <cov/git2/commit.hh>
 #include <cov/git2/error.hh>
 #include <cov/git2/repository.hh>
+#include <cov/io/file.hh>
 #include <cov/report.hh>
 #include <cov/repository.hh>
 #include <cov/tag.hh>
@@ -37,15 +38,31 @@ namespace cov {
 			return result;
 		}  // GCOV_EXCL_LINE[GCC] -- oom.open_config fires inside here...
 
-		git::repository open_companion_git(std::filesystem::path const& common,
+		git::repository open_companion_git(std::filesystem::path const& cov_dir,
 		                                   git::config const& cfg,
 		                                   std::error_code& ec) {
+			auto const in = io::fopen(cov_dir / names::gitdir_link, "rb");
+			if (in) {
+				auto link = in.read_line();
+				if (!link.empty()) {
+					return git::repository::open(cov_dir / link, ec);
+				}
+			}
 			auto gitdir = cfg.get_path(names::core_gitdir);
 			if (!gitdir) {
 				ec = make_error_code(git::errc::notfound);
 				return {};
 			}
-			return git::repository::open(common / *gitdir, ec);
+			return git::repository::open(cov_dir / *gitdir, ec);
+		}
+
+		path move_to_common(path const& git_dir) {
+			if (git_dir.empty()) return git_dir;
+			auto in = io::fopen(git_dir / names::commondir_link);
+			if (!in) return git_dir;
+
+			auto line = in.read_line();
+			return std::filesystem::weakly_canonical(git_dir / make_path(line));
 		}
 	}  // namespace
 
@@ -56,11 +73,12 @@ namespace cov {
 	repository::git_repo::git_repo() = default;
 
 	void repository::git_repo::open(std::filesystem::path const& common,
+	                                std::filesystem::path const& cov_dir,
 	                                git::config const& cfg,
 	                                std::error_code& ec) {
 		if (!ec) odb_ = git::odb::open(common / names::objects_dir, ec);
 		if (!ec) local_ = git::repository::wrap(odb_, ec);
-		if (!ec) git_ = open_companion_git(common, cfg, ec);
+		if (!ec) git_ = open_companion_git(cov_dir, cfg, ec);
 		if (ec) {
 			odb_ = nullptr;
 			local_ = nullptr;
@@ -87,13 +105,16 @@ namespace cov {
 	repository::~repository() = default;
 
 	repository::repository(std::filesystem::path const& sysroot,
-	                       std::filesystem::path const& common,
+	                       std::filesystem::path const& cov_dir,
 	                       std::error_code& ec)
-	    : commondir_{common}, cfg_{open_config(sysroot, common, ec)} {
-		if (!common.empty()) {
-			if (!ec) refs_ = references::make_refs(common);
-			if (!ec) db_ = backend::loose_backend(common / names::coverage_dir);
-			if (!ec) git_.open(common, cfg_, ec);
+	    : cov_dir_{cov_dir}
+	    , common_dir_{move_to_common(cov_dir)}
+	    , cfg_{open_config(sysroot, common_dir_, ec)} {
+		if (!common_dir_.empty()) {
+			if (!ec) refs_ = references::make_refs(common_dir_, cov_dir_);
+			if (!ec)
+				db_ = backend::loose_backend(common_dir_ / names::coverage_dir);
+			if (!ec) git_.open(common_dir_, cov_dir_, cfg_, ec);
 		}
 	}
 

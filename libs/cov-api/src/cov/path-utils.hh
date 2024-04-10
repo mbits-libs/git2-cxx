@@ -7,6 +7,7 @@
 #include <cov/git2/error.hh>
 #include <cov/git2/repository.hh>
 #include <cov/init.hh>
+#include <cov/io/file.hh>
 #include <optional>
 #include <string>
 
@@ -39,6 +40,9 @@ namespace cov {
 			constexpr auto config = "config"sv;
 			constexpr auto dot_config = ".covconfig"sv;
 			constexpr auto HEAD = "HEAD"sv;
+			constexpr auto covdir_link = "covdir"sv;
+			constexpr auto commondir_link = "commondir"sv;
+			constexpr auto gitdir_link = "gitdir"sv;
 
 			constexpr char core_gitdir[] = "core.gitdir";
 		}  // namespace names
@@ -68,9 +72,19 @@ namespace cov {
 
 		inline bool is_valid_path(path const& base_dir) {
 			std::error_code ec{};
-			if (!is_directory(base_dir / names::coverage_dir, ec) || ec)
+			auto true_base = base_dir;
+			auto const in = io::fopen(base_dir / names::commondir_link, "rb");
+			if (in) {
+				auto const line = in.read_line();
+				if (!line.empty()) {
+					true_base = std::filesystem::weakly_canonical(
+					    base_dir / make_path(line));
+				}
+			}
+
+			if (!is_directory(true_base / names::coverage_dir, ec) || ec)
 				return false;
-			if (!is_regular_file(base_dir / names::config, ec) || ec)
+			if (!is_regular_file(true_base / names::config, ec) || ec)
 				return false;
 			if (!is_regular_file(base_dir / names::HEAD, ec) || ec)
 				return false;

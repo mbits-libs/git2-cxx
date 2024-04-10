@@ -423,14 +423,14 @@ namespace cov::app::report {
 		}
 
 		auto raw = git_object_owner(reinterpret_cast<git_object*>(tree.raw()));
-		auto workdir = git::repository_handle{raw}.workdir();
-		if (!workdir) {
+		auto work_dir = git::repository_handle{raw}.work_dir();
+		if (!work_dir) {
 			// there is no source to compare against...
 			return {};
 		}
 
 		auto const opened =
-		    io::fopen(make_u8path(*workdir) / make_u8path(file.name), "rb");
+		    io::fopen(make_u8path(*work_dir) / make_u8path(file.name), "rb");
 		if (!opened) return {};
 
 		auto stg = opened.read();

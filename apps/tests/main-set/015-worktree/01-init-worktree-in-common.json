@@ -1,0 +1,13 @@
+{
+    "args": "init --worktree work-tree",
+    "expected": [
+        1,
+        "Git repository in $TMP/main/.git/ is not a worktree\n",
+        ""
+    ],
+    "prepare": [
+        "mkdirs '$TMP/main'",
+        "cd '$TMP/main'",
+        "git init"
+    ]
+}

@@ -10,6 +10,9 @@ namespace cov {
 		error = -1,
 		current_branch = -2,
 		wrong_object_type = -3,
+		uninitialized_worktree = -4,
+		not_a_worktree = -5,
+		not_a_branch = -6,
 	};
 
 	std::error_category const& category();

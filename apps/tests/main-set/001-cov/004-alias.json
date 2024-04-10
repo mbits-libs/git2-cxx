@@ -3,15 +3,16 @@
     "expected": [
         0,
         [
-            "usage: cov init [-h] [--git-dir <dir>] [--force] [directory]",
+            "usage: cov init [-h] [--git-dir <dir>] [--force] [--worktree <branch>] [directory]",
             "",
             "positional arguments:",
-            " directory       sets the directory to put the repository in; defaults to current directory",
+            " directory           sets the directory to put the repository in; defaults to current directory",
             "",
             "optional arguments:",
-            " -h, --help      shows this help message and exits",
-            " --git-dir <dir> points to connected Git repository; defaults to current repo",
-            " --force         will re-init the repository with a fresh database\n"
+            " -h, --help          shows this help message and exits",
+            " --git-dir <dir>     points to connected Git repository; defaults to current repo",
+            " --force             will re-init the repository with a fresh database",
+            " --worktree <branch> initialize inside a worktree directory with a Cov repository already existing on parent Git repository\n"
         ],
         ""
     ],

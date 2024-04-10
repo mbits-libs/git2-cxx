@@ -31,10 +31,13 @@ namespace git {
 	struct basic_repository : Holder {
 		using Holder::Holder;
 
-		std::optional<std::string_view> workdir() const noexcept {
+		std::string_view git_dir() const noexcept {
+			return git_repository_path(this->get());
+		}
+		std::optional<std::string_view> work_dir() const noexcept {
 			return safe(git_repository_workdir(this->get()));
 		}
-		std::string_view commondir() const noexcept {
+		std::string_view common_dir() const noexcept {
 			return git_repository_commondir(this->get());
 		}
 
@@ -75,6 +78,10 @@ namespace git {
 		reference head(std::error_code& ec) const noexcept {
 			return git::create_handle<reference>(ec, git_repository_head,
 			                                     this->get());
+		}
+
+		bool is_worktree() const noexcept {
+			return !!git_repository_is_worktree(get());
 		}
 
 		auto get() const { return Holder::get(); }
