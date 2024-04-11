@@ -157,7 +157,7 @@ namespace cov::testing {
 			auto out = io::fopen(path, "wb");
 			out.store(message.data(), message.size());
 		}
-		auto in = io::fopen(path, "rb");
+		auto in = io::fopen(path);
 		OOM_BEGIN(OOM_STR_THRESHOLD);
 		in.read_line();
 		OOM_END;

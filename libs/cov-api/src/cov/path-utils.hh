@@ -73,7 +73,7 @@ namespace cov {
 		inline bool is_valid_path(path const& base_dir) {
 			std::error_code ec{};
 			auto true_base = base_dir;
-			auto const in = io::fopen(base_dir / names::commondir_link, "rb");
+			auto const in = io::fopen(base_dir / names::commondir_link);
 			if (in) {
 				auto const line = in.read_line();
 				if (!line.empty()) {

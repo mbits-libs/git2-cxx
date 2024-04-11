@@ -182,7 +182,7 @@ namespace cov::testing {
 		std::vector<std::string> expected{std::begin(input), std::end(input)};
 
 		actual.reserve(std::size(input));
-		auto in = io::fopen(setup::test_dir() / "lines"sv, "rb");
+		auto in = io::fopen(setup::test_dir() / "lines"sv);
 		ASSERT_TRUE(in);
 		while (!in.feof())
 			actual.push_back(in.read_line());
