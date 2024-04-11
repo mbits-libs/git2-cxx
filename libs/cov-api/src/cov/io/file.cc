@@ -69,7 +69,7 @@ namespace cov::io {
 		char buffer[1024];
 
 		while (true) {
-			auto const pos = std::ftell(get());
+			auto const pos = static_cast<size_t>(std::ftell(get()));
 			auto ret = std::fread(buffer, 1, sizeof(buffer), get());
 			if (!ret) {
 				// GCOV_EXCL_START
@@ -87,7 +87,7 @@ namespace cov::io {
 			auto new_length = static_cast<size_t>(it - buffer);
 			out.insert(end(out), buffer, buffer + new_length);
 			auto offset = new_length + 1;
-			std::fseek(get(), pos + offset, SEEK_SET);
+			std::fseek(get(), to_long(pos + offset), SEEK_SET);
 			break;
 		}  // GCOV_EXCL_LINE[WIN32]
 
