@@ -41,7 +41,7 @@ namespace cov {
 		git::repository open_companion_git(std::filesystem::path const& cov_dir,
 		                                   git::config const& cfg,
 		                                   std::error_code& ec) {
-			auto const in = io::fopen(cov_dir / names::gitdir_link, "rb");
+			auto const in = io::fopen(cov_dir / names::gitdir_link);
 			if (in) {
 				auto link = in.read_line();
 				if (!link.empty()) {
