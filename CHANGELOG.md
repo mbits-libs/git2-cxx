@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) and [COMMITS.md](COMMITS.md) for commit guidelines.
 
+## [0.22.0](https://github.com/mzdun/cov/compare/v0.21.3...v0.22.0) (2024-04-11)
+
+### New Features
+
+- allow opening Cov repos from worktrees ([ae04133](https://github.com/mzdun/cov/commit/ae041335b951880443a01d350673ec670774ea1e)), closes [#81](https://github.com/mzdun/cov/issues/81)
+
+### Bug Fixes
+
+- compilation warning on GCC ([aa695da](https://github.com/mzdun/cov/commit/aa695da8558bf6039832e6e426e9199f8645d717))
+- read_line ([4969867](https://github.com/mzdun/cov/commit/4969867553321c9125bcb5676c8d19c98751fd2a))
+
 ## [0.21.3](https://github.com/mzdun/cov/compare/v0.21.2...v0.21.3) (2024-04-09)
 
 ### Bug Fixes
