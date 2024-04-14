@@ -160,7 +160,7 @@ if (COV_TESTING)
 
   if (CMAKE_GENERATOR MATCHES "Visual Studio" AND TARGET cov_coveralls_test)
     add_dependencies(cov_coveralls_test
-      cov cov-echo
+      cov cov-echo cov-pwd
     )
   endif()
 endif()

@@ -1,6 +1,7 @@
 // Copyright (c) 2022 Marcin Zdun
 // This code is licensed under MIT license (see LICENSE for details)
 
+#include <signal.h>
 #include <sys/wait.h>
 #include <unistd.h>
 #include <args/parser.hpp>
@@ -83,6 +84,37 @@ namespace cov::app::platform {
 		void forward_signal(int signo) { kill(pid, signo); }
 		// GCOV_EXCL_STOP
 
+		struct sigpipe_handler {
+			sigset_t sig_block, sig_restore;
+			sigpipe_handler() {
+				sigemptyset(&sig_block);
+				sigaddset(&sig_block, SIGPIPE);
+
+				pthread_sigmask(SIG_BLOCK, &sig_block, &sig_restore);
+			}
+			// GCOV_EXCL_START[POSIX]
+			bool wait_if_needed() {
+				if (errno != EPIPE) {
+					return false;
+				}
+				struct timespec ts;
+				ts.tv_sec = 0;
+				ts.tv_nsec = 0;
+
+				int sig;
+				while ((sig = sigtimedwait(&sig_block, 0, &ts)) == -1) {
+					if (errno != EINTR) {
+						break;
+					}
+				}
+				return true;
+			}
+			// GCOV_EXCL_STOP
+			~sigpipe_handler() {
+				pthread_sigmask(SIG_SETMASK, &sig_restore, NULL);
+			}
+		};
+
 		struct pipe_type {
 			int read{-1};
 			int write{-1};
@@ -122,6 +154,8 @@ namespace cov::app::platform {
 				    // GCOV_EXCL_START[POSIX]
 				    [](pipe_type* self, std::vector<std::byte> const& bytes) {
 					    // GCOV_EXCL_STOP
+					    sigpipe_handler block_sigpipe{};
+
 					    auto ptr = bytes.data();
 					    auto size = bytes.size();
 
@@ -130,7 +164,12 @@ namespace cov::app::platform {
 						    auto chunk = size;
 						    if (chunk > BUFSIZE) chunk = BUFSIZE;
 						    auto actual = ::write(fd, ptr, chunk);
-						    if (actual < 0) break;
+						    // GCOV_EXCL_START[POSIX]
+						    if (actual < 0) {
+							    block_sigpipe.wait_if_needed();
+							    break;
+						    }
+						    // GCOV_EXCL_STOP
 						    ptr += actual;
 						    size -= static_cast<size_t>(actual);
 					    }
@@ -280,9 +319,10 @@ namespace cov::app::platform {
 	captured_output run_filter(std::filesystem::path const& filter_dir,
 	                           std::filesystem::path const& cwd,
 	                           std::string_view filter,
+	                           args::arglist args,
 	                           std::vector<std::byte> const& input) {
 		return execute(filter_dir, "COV_FILTER_PATH",
-		               std::string(filter.data(), filter.size()), {}, &input,
+		               std::string(filter.data(), filter.size()), args, &input,
 		               &cwd, true);
 	}
 }  // namespace cov::app::platform

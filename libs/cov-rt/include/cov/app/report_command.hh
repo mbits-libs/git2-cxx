@@ -32,7 +32,8 @@ namespace cov::app::builtin::report {
 		};
 		parse_results parse();
 
-		std::string report_contents(git::repository_handle repo) const;
+		std::string report_contents(git::repository_handle repo,
+		                            ::args::arglist args) const;
 
 		std::string_view report_path() const noexcept { return report_; }
 		std::string_view report_filter() const noexcept {
@@ -90,6 +91,7 @@ namespace cov::app::builtin::report {
 		// "private : std::vector"
 		std::vector<std::byte> filter(std::vector<std::byte> const& contents,
 		                              std::string_view filter,
+		                              ::args::arglist args,
 		                              std::filesystem::path const& cwd) const;
 		// visual space
 

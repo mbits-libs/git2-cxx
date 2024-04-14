@@ -522,8 +522,9 @@ namespace cov::app::platform {
 	captured_output run_filter(std::filesystem::path const& filter_dir,
 	                           std::filesystem::path const& cwd,
 	                           std::string_view filter,
+	                           args::arglist args,
 	                           std::vector<std::byte> const& input) {
-		return execute(filter_dir, L"COV_FILTER_PATH", from_utf8(filter), {},
+		return execute(filter_dir, L"COV_FILTER_PATH", from_utf8(filter), args,
 		               &input, &cwd, true);
 	}
 }  // namespace cov::app::platform
