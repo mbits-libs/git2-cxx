@@ -1,0 +1,15 @@
+{
+    "args": "report $DATA/empty-coverage.json -f strip-excludes -o ignored",
+    "expected": [
+        0,
+        "",
+        [
+            "strip-excludes: nothing was excluded.\n"
+        ]
+    ],
+    "prepare": [
+        "unpack $DATA/repo.git.tar $TMP",
+        "cd '$TMP/repo.git'",
+        "cov init"
+    ]
+}

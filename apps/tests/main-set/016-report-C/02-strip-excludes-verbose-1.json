@@ -1,0 +1,18 @@
+{
+    "args": "report $DATA/empty-coverage.json -f strip-excludes -o ignored -- -v --os l-cars --compiler gcc",
+    "expected": [
+        0,
+        "",
+        [
+            "verbose: ON",
+            "markers: l-cars and gcc.",
+            "sources: $TMP/repo.git",
+            "strip-excludes: nothing was excluded.\n"
+        ]
+    ],
+    "prepare": [
+        "unpack $DATA/repo.git.tar $TMP",
+        "cd '$TMP/repo.git'",
+        "cov init"
+    ]
+}

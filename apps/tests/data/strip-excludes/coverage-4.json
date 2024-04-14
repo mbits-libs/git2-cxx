@@ -1,0 +1,33 @@
+{
+    "$schema": "https://raw.githubusercontent.com/mzdun/cov/v0.20.0/apps/report-schema.json",
+    "git": {
+        "branch": "main",
+        "head": "f8632047e4ea88f5e30bf57570694e5b145c5c0d"
+    },
+    "files": [
+        {
+            "digest": "sha1:c2d41d07c18b314be45063cd145ca2f9019fb893",
+            "line_coverage": {
+                "3": 0,
+                "4": 0,
+                "16": 1,
+                "17": 2,
+                "18": 3
+            }
+        },
+        {
+            "name": "file.cc",
+            "line_coverage": {
+                "3": 0,
+                "4": 0,
+                "16": 1,
+                "17": 2,
+                "18": 3
+            }
+        },
+        {
+            "name": "file.cc",
+            "digest": "sha1:c2d41d07c18b314be45063cd145ca2f9019fb893"
+        }
+    ]
+}
