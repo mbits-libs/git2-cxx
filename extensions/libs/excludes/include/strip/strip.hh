@@ -1,12 +1,15 @@
-// Copyright (c) 2023 Marcin Zdun
+// Copyright (c) 2024 Marcin Zdun
 // This code is licensed under MIT license (see LICENSE for details)
 
 #pragma once
 
 #include <filesystem>
 #include <json/json.hpp>
+#include <set>
 #include <span>
+#include <string>
 #include <string_view>
+#include <vector>
 #include "excludes.hh"
 
 namespace cov::app::strip {
