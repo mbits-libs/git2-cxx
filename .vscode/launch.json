@@ -9,7 +9,8 @@
             "program": "${workspaceFolder}/build/debug/bin/cov-test",
             "args": [
                 "--gtest_filter=*"
-            ]
+            ],
+            "preLaunchTask": "CMake: build (debug)"
         }
     ]
 }
