@@ -1,4 +1,5 @@
 {
+    "disabled": "win32",
     "args": "report $DATA/empty-coverage.json -f strip-excludes -o ignored -- --help",
     "expected": [
         0,

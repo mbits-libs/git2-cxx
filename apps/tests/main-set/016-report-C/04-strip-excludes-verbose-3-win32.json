@@ -1,0 +1,31 @@
+{
+    "disabled": "linux",
+    "args": "report $DATA/strip-excludes/coverage-1.json -f strip-excludes -o- -- -vv --os l-cars --compiler gcc",
+    "expected": [
+        0,
+        "{\"$schema\":\"https://raw.githubusercontent.com/mzdun/cov/v0.20.0/apps/report-schema.json\",\"git\":{\"branch\":\"main\",\"head\":\"f8632047e4ea88f5e30bf57570694e5b145c5c0d\"},\"files\":[{\"name\":\"file.cc\",\"digest\":\"sha1:c2d41d07c18b314be45063cd145ca2f9019fb893\",\"line_coverage\":{\"3\":0}}]}",
+        [
+            "verbose: ON",
+            "markers: l-cars and gcc.",
+            "sources: $TMP/repo",
+            "\u001b[1;37m$TMP/repo/file.cc:12:5:\u001b[m \u001b[1;35mwarning:\u001b[m found GCOV_EXCL_END; did you mean GCOV_EXCL_STOP?",
+            "\u001b[1;37m$TMP/repo/file.cc:17:5:\u001b[m \u001b[1;35mwarning:\u001b[m double start: found GCOV_EXCL_START",
+            "\u001b[1;37m$TMP/repo/file.cc:8:5:\u001b[m \u001b[1;36mnote:\u001b[m see previous start",
+            "file.cc(4)",
+            "     0 | \u001b[2;49;30m}  // GCOV_EXCL_LINE\u001b[m",
+            "file.cc(17)",
+            "       | \u001b[2;49;30m\t// GCOV_EXCL_START\u001b[m",
+            "       | \u001b[2;49;30m\tfoo();\u001b[m",
+            "       | \u001b[2;49;30m\t// GCOV_EXCL_STOP\u001b[m",
+            "strip-excludes: excluded one line.\n"
+        ]
+    ],
+    "prepare": [
+        "unpack $DATA/repo.git.tar $TMP",
+        "cd '$TMP'",
+        "git clone repo.git",
+        "cd repo",
+        "cov init",
+        "cp '$DATA/strip-excludes/file-1.cc' 'file.cc'"
+    ]
+}
