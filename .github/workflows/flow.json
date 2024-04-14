@@ -1,6 +1,6 @@
 {
   "matrix": {
-    "compiler": ["gcc", "msvc"],
+    "compiler": ["gcc", "clang", "msvc"],
     "build_type": ["Release", "Debug"],
     "sanitizer": [true, false],
     "os": ["ubuntu", "windows"]
