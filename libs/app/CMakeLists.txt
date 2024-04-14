@@ -65,8 +65,8 @@ target_include_directories(app PUBLIC
 target_link_libraries(app PUBLIC cov-api lighter mbits::liblngs mbits::args)
 
 add_library(app_main STATIC src/main.cc)
-target_compile_options(app_main PRIVATE ${ADDITIONAL_WALL_FLAGS})
-target_link_options(app_main PRIVATE ${ADDITIONAL_LINK_FLAGS})
+target_compile_options(app_main PUBLIC ${ADDITIONAL_WALL_FLAGS})
+target_link_options(app_main PUBLIC ${ADDITIONAL_LINK_FLAGS})
 target_link_libraries(app_main PUBLIC app)
 
 if (WIN32)
