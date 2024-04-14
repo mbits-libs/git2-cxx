@@ -1,0 +1,16 @@
+{
+    "args": "report $DATA/empty-coverage.json --not-help",
+    "expected": [
+        2,
+        "",
+        [
+            "usage: cov report [-h] <report-file> [-f <filter>] [-p <property>=<value> ...] [--amend]",
+            "cov report: error: unrecognized argument: --not-help\n"
+        ]
+    ],
+    "prepare": [
+        "unpack $DATA/repo.git.tar $TMP",
+        "cd '$TMP/repo.git'",
+        "cov init"
+    ]
+}

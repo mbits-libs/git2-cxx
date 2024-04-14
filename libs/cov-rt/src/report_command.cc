@@ -75,11 +75,20 @@ namespace cov::app::builtin::report {
 	parser::parse_results parser::parse() {
 		using namespace str;
 
-		parser_.parse();
+		auto rest = parser_.parse(::args::parser::allow_subcommands);
+
+		if (!rest.empty()) {
+			if (rest[0] != "--"sv) {
+				error(fmt::format(fmt::runtime(tr_(args::lng::UNRECOGNIZED)),
+				                  rest[0]));
+			}
+			rest = rest.shift();
+		}
 
 		parse_results result{open_here(*this, tr_)};
 
-		if (!result.report.load_from_text(report_contents(result.repo.git()))) {
+		if (!result.report.load_from_text(
+		        report_contents(result.repo.git(), rest))) {
 			if (filter_) {
 				error(tr_.format(replng::ERROR_FILTERED_REPORT_ISSUES, report_,
 				                 *filter_));
@@ -89,9 +98,10 @@ namespace cov::app::builtin::report {
 		}
 		result.props = cov::report::builder::properties(props_);
 		return result;
-	}  // GCOV_EXCL_LINE[GCC] -- and now it wants th throw something...
+	}  // GCOV_EXCL_LINE[GCC] -- and now it wants to throw something...
 
-	std::string parser::report_contents(git::repository_handle repo) const {
+	std::string parser::report_contents(git::repository_handle repo,
+	                                    ::args::arglist args) const {
 		auto source = io::fopen(make_u8path(report_));
 		if (!source) error(tr_.format(str::args::lng::FILE_NOT_FOUND, report_));
 
@@ -99,7 +109,7 @@ namespace cov::app::builtin::report {
 		if (filter_) {
 			auto dir = repo.work_dir();
 			if (!dir) dir = repo.common_dir();
-			content = filter(content, *filter_, make_u8path(*dir));
+			content = filter(content, *filter_, args, make_u8path(*dir));
 		}
 
 		return {reinterpret_cast<char const*>(content.data()), content.size()};
@@ -108,16 +118,27 @@ namespace cov::app::builtin::report {
 	std::vector<std::byte> parser::filter(
 	    std::vector<std::byte> const& contents,
 	    std::string_view filter,
+	    ::args::arglist args,
 	    std::filesystem::path const& cwd) const {
 		auto output = platform::run_filter(
 		    platform::sys_root() / directory_info::share / "filters"sv, cwd,
-		    filter, contents);
+		    filter, args, contents);
 
 		if (!output.error.empty())
 			fwrite(output.error.data(), 1, output.error.size(), stderr);
 
+		if (!output.output.empty()) {
+			const auto value = json::read_json(
+			    {reinterpret_cast<char8_t const*>(output.output.data()),
+			     output.output.size()},
+			    {}, json::read_mode::ECMA);
+			if (std::holds_alternative<std::monostate>(value)) {
+				fwrite(output.output.data(), 1, output.output.size(), stdout);
+				output.output.clear();
+			}
+		}
+
 		if (output.return_code) {
-			if (output.error.size()) fputc('\n', stderr);
 			if (output.return_code == -ENOENT)
 				data_error(replng::ERROR_FILTER_NOENT, filter);
 			if (output.return_code == -EACCES)
