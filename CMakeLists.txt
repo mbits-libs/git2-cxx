@@ -27,6 +27,7 @@ set(STRINGS
   cov_report
   cov_reset
   cov_show
+  strip_excludes
 )
 set(LANGUAGES pl en)
 
@@ -48,6 +49,8 @@ find_package(libgit2 REQUIRED)
 find_package(fmt REQUIRED)
 find_package(mbits-args REQUIRED)
 find_package(mbits-lngs REQUIRED)
+find_package(ctre REQUIRED)
+find_package(expat REQUIRED)
 
 if (COV_TESTING)
   enable_testing()
@@ -61,9 +64,11 @@ if (COV_TESTING)
   message(STATUS "JsonRunner_EXECUTABLE is: ${JsonRunner_EXECUTABLE}")
 
   set(COVERALLS_PREFIX cov_)
+  
   set(cov_COVERALLS_DIRS
     apps/builtins
     apps/cov
+    extensions/filters
   )
 
   foreach(module
@@ -80,6 +85,17 @@ if (COV_TESTING)
   foreach(extra cxx py3 ts)
     list(APPEND cov_COVERALLS_DIRS libs/hilite/hilite-${extra}/src)
   endforeach()
+
+  foreach(ext_lib excludes ext_native ext_platform)
+    list(APPEND cov_COVERALLS_DIRS
+      extensions/libs/${ext_lib}/include
+      extensions/libs/${ext_lib}/src)
+  endforeach()
+
+  foreach(dir ${cov_COVERALLS_DIRS})
+    message(STATUS "cov_COVERALLS_DIRS: ${dir}")
+  endforeach()
+  
 
   include(${PROJECT_SOURCE_DIR}/tools/coveralls/Coveralls.cmake)
 

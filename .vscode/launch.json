@@ -11,6 +11,22 @@
                 "--gtest_filter=*"
             ],
             "preLaunchTask": "CMake: build (debug)"
+        },
+        {
+            "type": "cppdbg",
+            "request": "launch",
+            "name": "Launch strip-excludes",
+            "cwd": "${workspaceFolder}",
+            "program": "${workspaceFolder}/build/debug/bin/cov",
+            "args": [
+                "report",
+                "-f",
+                "strip-excludes",
+                "${workspaceFolder}/apps/tests/data/empty-coverage.json",
+                "--",
+                "-v"
+            ],
+            "preLaunchTask": "CMake: build (debug)"
         }
     ]
 }

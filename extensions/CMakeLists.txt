@@ -1,6 +1,7 @@
 add_subdirectory(libs)
 
 set(NATIVE_FILTERS
+    strip-excludes
 )
 
 set(NATIVE_FILTERS ${NATIVE_FILTERS} PARENT_SCOPE)
@@ -22,5 +23,11 @@ foreach(NAME ${NATIVE_FILTERS})
           )
     endforeach()
 endforeach()
+
+target_sources(strip-excludes PRIVATE
+  filters/strip_excludes/parser.hh
+  filters/strip_excludes/parser.cc
+)
+target_link_libraries(strip-excludes PRIVATE excludes ext_platform)
 
 set_parent_scope()

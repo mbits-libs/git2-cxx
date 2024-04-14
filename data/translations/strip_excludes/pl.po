@@ -1,0 +1,105 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2024 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the cov package.
+# marcin.zdun@midnightbits.com, 2024.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: cov latest\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-04-13 12:09+0200\n"
+"PO-Revision-Date: 2024-04-13 11:05+0200\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: pl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 "
+"|| n%100>14) ? 1 : 2);\n"
+"X-Generator: Poedit 2.4.2\n"
+
+#. Description for the --compiler argument. Default argument is the name of platform-default compiler, such as 'gcc', 'msvc' or 'clang'
+msgctxt "ARG_COMPILER"
+msgid "adds the name of current compiler to list of markers; defaults to '{}'"
+msgstr ""
+"dodaje nazwę bieżącego kompilatora do listy znaczników; wartość domyślna to "
+"'{}'"
+
+#. Description for the --os argument. Default argument is the name of platform, such as 'posix', 'win32' or 'macos'
+msgctxt "ARG_OS"
+msgid "adds the name of current platform to list of markers; defaults to '{}'"
+msgstr ""
+"dodaje nazwę bieżącej platformy do listy znaczników; wartość domyślna to '{}'"
+
+#. Description for the --src argument
+msgctxt "ARG_SRC"
+msgid "points to root of source files; defaults to current directory"
+msgstr ""
+"wskazuje na katalog główny plików źródłowych; wartość domyślna to bieżący "
+"katalog"
+
+#. Description for the -v argument.
+msgctxt "ARG_VERBOSE"
+msgid "shows more output"
+msgstr "pokazuje więcej danych wyjściowych"
+
+#. label for exclude stats
+msgctxt "DETAILS_EXCLUDED"
+msgid "excluded"
+msgstr "wykluczono"
+
+#. label for exclude stats (branches)
+msgctxt "DETAILS_EXCLUDED_BRANCHES"
+msgid "one branch"
+msgid_plural "{} branches"
+msgstr[0] "jedną gałąź"
+msgstr[1] "{} gałęzie"
+msgstr[2] "{} gałęzi"
+
+#. label for exclude stats (functions)
+msgctxt "DETAILS_EXCLUDED_FUNCTIONS"
+msgid "one function"
+msgid_plural "{} functions"
+msgstr[0] "jedną funkcję"
+msgstr[1] "{} funkcje"
+msgstr[2] "{} funkcji"
+
+#. label for exclude stats (lines)
+msgctxt "DETAILS_EXCLUDED_LINES"
+msgid "one line"
+msgid_plural "{} lines"
+msgstr[0] "jedną linię"
+msgstr[1] "{} linie"
+msgstr[2] "{} linii"
+
+#. label for the list of valid markers
+msgctxt "DETAILS_MARKERS"
+msgid "markers"
+msgstr "znaczniki"
+
+#. label for empty stats
+#, fuzzy
+msgctxt "DETAILS_NOTHING_EXCLUDED"
+msgid "nothing was excluded"
+msgstr "niczego nie wykluczono"
+
+#. label for source root directory
+msgctxt "DETAILS_SOURCES"
+msgid "sources"
+msgstr "źródła"
+
+#. last list item separator
+msgctxt "LIST_AND"
+msgid " and "
+msgstr " i "
+
+#. list item separator, all but last one
+msgctxt "LIST_COMMA"
+msgid ", "
+msgstr ", "
+
+#. error message for missing JSON key
+msgctxt "REPORT_MISSING_KEY"
+msgid "missing '{}' key in report"
+msgstr "w raporcie brakuje klucza '{}'"

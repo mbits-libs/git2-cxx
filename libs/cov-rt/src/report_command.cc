@@ -7,6 +7,7 @@
 #include <cov/app/tools.hh>
 #include <cov/format.hh>
 #include <cov/io/file.hh>
+#include <json/json.hpp>
 
 namespace cov::app::builtin::report {
 	using namespace std::literals;
@@ -54,8 +55,8 @@ namespace cov::app::builtin::report {
 	parser::parser(::args::args_view const& arguments,
 	               str::translator_open_info const& langs)
 	    : base_parser<errlng, replng>{langs, arguments} {
-		static constexpr std::string_view filters[] = {"cobertura"sv,
-		                                               "coveralls"sv};
+		static constexpr std::string_view filters[] = {
+		    "cobertura"sv, "coveralls"sv, "strip-excludes"sv};
 
 		parser_.arg(report_)
 		    .meta(tr_(replng::REPORT_FILE_META))
