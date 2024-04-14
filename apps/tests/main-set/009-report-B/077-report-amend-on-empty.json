@@ -8,7 +8,7 @@
         "",
         [
             "[ADD] src/main.cc",
-            "usage: cov report [-h] <report-file> [-f <filter>] [-p <property>=<value> ...] [--amend]",
+            "usage: cov report [-h] <report-file> [-f <filter>] [-p <property>=<value> ...] [--amend] [-o <arg>]",
             "cov report: error: you have nothing to amend\n"
         ]
     ],

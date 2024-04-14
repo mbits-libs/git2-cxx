@@ -3,16 +3,17 @@
     "expected": [
         0,
         [
-            "usage: cov report [-h] <report-file> [-f <filter>] [-p <property>=<value> ...] [--amend]",
+            "usage: cov report [-h] <report-file> [-f <filter>] [-p <property>=<value> ...] [--amend] [-o <arg>]",
             "",
             "positional arguments:",
             " <report-file>                 selects report to import",
             "",
             "optional arguments:",
             " -h, --help                    shows this help message and exits",
-            " -f, --filter <filter>         filters other report formats to internal cov format; known filters are: ‘cobertura’ and ‘coveralls’",
+            " -f, --filter <filter>         filters other report formats to internal cov format; known filters are: ‘cobertura’, ‘coveralls’ and ‘strip-excludes’",
             " -p, --prop <property>=<value> adds a property to this build report; if the <value> is one of 'true', 'false', 'on' or 'off', it will treated as a boolean, if it looks like a whole number, it will be treated as a number, otherwise it will be treated as string; good names for properties could be 'os', 'arch', 'build_type' or 'compiler'",
-            " --amend                       replaces the tip of the current branch by creating a new commit\n"
+            " --amend                       replaces the tip of the current branch by creating a new commit",
+            " -o, --out <arg>               \n"
         ],
         ""
     ]

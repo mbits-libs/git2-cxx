@@ -22,7 +22,6 @@
             "        }",
             "    ]",
             "}",
-            "",
             "cov report: error: filter echo-to-stderr exited with return code 1\n"
         ]
     ],

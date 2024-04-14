@@ -71,6 +71,7 @@ namespace cov::app::builtin::report {
 		parser_.set<std::true_type>(amend_, "amend")
 		    .help(tr_(replng::AMEND_DESCRIPTION))
 		    .opt();
+		parser_.arg(output_, "o", "out").opt();
 	}
 
 	parser::parse_results parser::parse() {
@@ -87,6 +88,26 @@ namespace cov::app::builtin::report {
 		}
 
 		parse_results result{open_here(*this, tr_)};
+
+		if (output_) {
+			if (!filter_) error("--out requires --filter");
+			if (amend_) error("--out cannot be used with --amend");
+
+			auto const text = report_contents(result.repo.git(), rest);
+			if (*output_ == "-") {
+				fputs(text.c_str(), stdout);
+			} else {
+				auto filename = make_u8path(*output_);
+				auto dirname = filename.parent_path();
+				std::error_code ec{};
+				std::filesystem::create_directories(
+				    dirname.empty() ? "."sv : dirname, ec);
+				if (ec) error(ec, tr_);
+				auto file = io::fopen(filename, "wb");
+				if (file) file.store(text.data(), text.size());
+			}
+			std::exit(0);
+		}  // GCOV_EXCL_LINE[GCC]
 
 		if (!result.report.load_from_text(
 		        report_contents(result.repo.git(), rest))) {
