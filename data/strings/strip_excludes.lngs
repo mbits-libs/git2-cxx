@@ -1,0 +1,44 @@
+[
+    project("cov"),
+    namespace("cov::app::str::excludes"),
+    version("latest"),
+    serial(1)
+] strings {
+    [help("Description for the --src argument"), id(-1)]
+    ARG_SRC = "points to root of source files; defaults to current directory";
+    [help(
+        "Description for the --compiler argument. "
+        "Default argument is the name of platform-default compiler, such as 'gcc', 'msvc' or 'clang'"
+    ), id(-1)]
+    ARG_COMPILER = "adds the name of current compiler to list of markers; defaults to '{}'";
+    [help(
+        "Description for the --os argument. "
+        "Default argument is the name of platform, such as 'posix', 'win32' or 'macos'"
+    ), id(-1)]
+    ARG_OS = "adds the name of current platform to list of markers; defaults to '{}'";
+    [help("Description for the -v argument."), id(-1)]
+    ARG_VERBOSE = "shows more output";
+
+    [help("list item separator, all but last one"), id(-1)]
+    LIST_COMMA = ", ";
+    [help("last list item separator"), id(-1)]
+    LIST_AND = " and ";
+    [help("label for the list of valid markers"), id(-1)]
+    DETAILS_MARKERS = "markers";
+    [help("label for source root directory"), id(-1)]
+    DETAILS_SOURCES = "sources";
+    [help("label for exclude stats"), id(-1)]
+    DETAILS_EXCLUDED = "excluded";
+    [help("label for empty stats"), id(-1)]
+    DETAILS_NOTHING_EXCLUDED = "nothing was excluded";
+
+    [help("label for exclude stats (lines)"), plural("{} lines"), id(-1)]
+    DETAILS_EXCLUDED_LINES = "one line";
+    [help("label for exclude stats (functions)"), plural("{} functions"), id(-1)]
+    DETAILS_EXCLUDED_FUNCTIONS = "one function";
+    [help("label for exclude stats (branches)"), plural("{} branches"), id(-1)]
+    DETAILS_EXCLUDED_BRANCHES = "one branch";
+
+    [help("error message for missing JSON key"), id(-1)]
+    REPORT_MISSING_KEY = "missing '{}' key in report";
+}

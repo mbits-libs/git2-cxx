@@ -1,0 +1,96 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2024 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the cov package.
+# marcin.zdun@midnightbits.com, 2024.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: cov latest\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-04-13 12:09+0200\n"
+"PO-Revision-Date: 2024-04-13 11:04+0200\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 2.4.2\n"
+
+#. Description for the --compiler argument. Default argument is the name of platform-default compiler, such as 'gcc', 'msvc' or 'clang'
+msgctxt "ARG_COMPILER"
+msgid "adds the name of current compiler to list of markers; defaults to '{}'"
+msgstr "adds the name of current compiler to list of markers; defaults to '{}'"
+
+#. Description for the --os argument. Default argument is the name of platform, such as 'posix', 'win32' or 'macos'
+msgctxt "ARG_OS"
+msgid "adds the name of current platform to list of markers; defaults to '{}'"
+msgstr "adds the name of current platform to list of markers; defaults to '{}'"
+
+#. Description for the --src argument
+msgctxt "ARG_SRC"
+msgid "points to root of source files; defaults to current directory"
+msgstr "points to root of source files; defaults to current directory"
+
+#. Description for the -v argument.
+msgctxt "ARG_VERBOSE"
+msgid "shows more output"
+msgstr "shows more output"
+
+#. label for exclude stats
+msgctxt "DETAILS_EXCLUDED"
+msgid "excluded"
+msgstr "excluded"
+
+#. label for exclude stats (branches)
+msgctxt "DETAILS_EXCLUDED_BRANCHES"
+msgid "one branch"
+msgid_plural "{} branches"
+msgstr[0] "one branch"
+msgstr[1] "{} branches"
+
+#. label for exclude stats (functions)
+msgctxt "DETAILS_EXCLUDED_FUNCTIONS"
+msgid "one function"
+msgid_plural "{} functions"
+msgstr[0] "one function"
+msgstr[1] "{} functions"
+
+#. label for exclude stats (lines)
+msgctxt "DETAILS_EXCLUDED_LINES"
+msgid "one line"
+msgid_plural "{} lines"
+msgstr[0] "one line"
+msgstr[1] "{} lines"
+
+#. label for the list of valid markers
+msgctxt "DETAILS_MARKERS"
+msgid "markers"
+msgstr "markers"
+
+#. label for empty stats
+#, fuzzy
+msgctxt "DETAILS_NOTHING_EXCLUDED"
+msgid "nothing was excluded"
+msgstr "nothing was excluded"
+
+#. label for source root directory
+msgctxt "DETAILS_SOURCES"
+msgid "sources"
+msgstr "sources"
+
+#. last list item separator
+msgctxt "LIST_AND"
+msgid " and "
+msgstr " and "
+
+#. list item separator, all but last one
+msgctxt "LIST_COMMA"
+msgid ", "
+msgstr ", "
+
+#. error message for missing JSON key
+msgctxt "REPORT_MISSING_KEY"
+msgid "missing '{}' key in report"
+msgstr "missing '{}' key in report"
