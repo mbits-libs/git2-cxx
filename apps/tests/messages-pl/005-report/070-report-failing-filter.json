@@ -23,7 +23,6 @@
             "        }",
             "    ]",
             "}",
-            "",
             "cov report: błąd: filtr echo-to-stderr zakończył się kodem 1\n"
         ]
     ],
