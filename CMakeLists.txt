@@ -92,11 +92,6 @@ if (COV_TESTING)
       extensions/libs/${ext_lib}/src)
   endforeach()
 
-  foreach(dir ${cov_COVERALLS_DIRS})
-    message(STATUS "cov_COVERALLS_DIRS: ${dir}")
-  endforeach()
-  
-
   include(${PROJECT_SOURCE_DIR}/tools/coveralls/Coveralls.cmake)
 
   set(TEST_REPORT_DIR "${PROJECT_BINARY_DIR}/test-results")
