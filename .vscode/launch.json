@@ -23,6 +23,7 @@
                 "-f",
                 "strip-excludes",
                 "${workspaceFolder}/apps/tests/data/empty-coverage.json",
+                "-o-",
                 "--",
                 "-v"
             ],

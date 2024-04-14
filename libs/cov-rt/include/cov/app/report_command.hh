@@ -118,6 +118,7 @@ namespace cov::app::builtin::report {
 		std::optional<std::string> filter_{};
 		std::vector<std::string> props_{};
 		bool amend_{};
+		std::optional<std::string> output_{};
 	};
 
 	struct stored_file {
