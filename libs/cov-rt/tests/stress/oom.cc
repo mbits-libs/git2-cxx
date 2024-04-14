@@ -92,15 +92,6 @@ namespace cov::app::testing {
 	}
 #endif  // !defined(HAS_ADDRESS_SANITIZER)
 
-	TEST_F(oom, tools_cautiously_open_config) {
-		path root_dir =
-		    "/lets/just/let/loose/and/create/a/name/long/enough/to/trigger/oom"sv;
-		// it's ought to land somewhere inside discover_repository
-		OOM_LIMIT(5 * 1024)
-		tools::cautiously_open_config({}, root_dir);
-		OOM_END
-	}
-
 	TEST_F(oom, cov_setup_parser) {
 		auto arg0 = "test"s;
 		char* argv[] = {

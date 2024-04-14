@@ -13,25 +13,21 @@
 #include <vector>
 
 namespace cov::app::strip {
-	// GCOV_EXCL_START
 	struct excl_block {
 		unsigned start{};
-		unsigned end{};
+		unsigned end{};  // GCOV_EXCL_LINE
 		auto operator<=>(excl_block const&) const noexcept = default;
 	};
-	// GCOV_EXCL_STOP
 
 	using exclude_result =
 	    std::pair<std::vector<excl_block>, std::set<unsigned>>;
 
-	// GCOV_EXCL_START
 	struct exclude_report_line {
 		unsigned line;
-		std::string counter;
-		std::string text;
+		std::string counter;  // GCOV_EXCL_LINE
+		std::string text;     // GCOV_EXCL_LINE
 		auto operator<=>(exclude_report_line const&) const noexcept = default;
 	};
-	// GCOV_EXCL_STOP
 
 	struct exclude_report {
 		std::string path{};

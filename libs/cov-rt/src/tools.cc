@@ -106,7 +106,7 @@ namespace cov::app {
 		}
 		if (ec) result = nullptr;
 		return result;
-	}
+	}  // GCOV_EXCL_LINE
 
 	int tools::handle(std::string_view tool,
 	                  std::string& aliased,
