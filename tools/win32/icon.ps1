@@ -1,3 +1,6 @@
+# Copyright (c) 2022 Marcin Zdun
+# This code is licensed under MIT license (see LICENSE for details)
+
 $Icons = Resolve-Path "$PSScriptRoot\..\..\data\icons"
 $sizes = @("16", "24", "32", "48", "256")
 

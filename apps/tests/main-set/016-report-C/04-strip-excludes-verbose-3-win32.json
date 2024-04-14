@@ -26,6 +26,6 @@
         "git clone repo.git",
         "cd repo",
         "cov init",
-        "cp '$DATA/strip-excludes/file-1.cc' 'file.cc'"
+        "cp '$DATA/strip-excludes/file-1' 'file.cc'"
     ]
 }

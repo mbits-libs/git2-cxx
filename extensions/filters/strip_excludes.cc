@@ -1,4 +1,4 @@
-// Copyright (c) 2023 Marcin Zdun
+// Copyright (c) 2024 Marcin Zdun
 // This code is licensed under MIT license (see LICENSE for details)
 
 #include <fmt/format.h>
