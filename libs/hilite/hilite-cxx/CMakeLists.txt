@@ -28,3 +28,5 @@ cpack_add_component(hilite_cxx
   GROUP devel
   HIDDEN
 )
+
+set_parent_scope()

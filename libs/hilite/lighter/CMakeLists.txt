@@ -88,3 +88,5 @@ cpack_add_component(lighter
   DEPENDS ${_DEPS}
   GROUP devel
 )
+
+set_parent_scope()

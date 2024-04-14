@@ -76,9 +76,11 @@ if (COV_TESTING)
   )
     list(APPEND cov_COVERALLS_DIRS ${module}/include ${module}/src)
   endforeach()
+
   foreach(extra cxx py3 ts)
     list(APPEND cov_COVERALLS_DIRS libs/hilite/hilite-${extra}/src)
   endforeach()
+
   include(${PROJECT_SOURCE_DIR}/tools/coveralls/Coveralls.cmake)
 
   set(TEST_REPORT_DIR "${PROJECT_BINARY_DIR}/test-results")
@@ -182,8 +184,11 @@ set(CORE_ROOT_DIR "../..")
 
 message(STATUS "Sanitizer: ${COV_SANITIZE}")
 
+include(cov)
+
 add_subdirectory(external)
 add_subdirectory(libs)
+add_subdirectory(extensions)
 add_subdirectory(apps)
 
 
@@ -194,39 +199,6 @@ if (CMAKE_GENERATOR MATCHES "Visual Studio" AND TARGET cov_coveralls_test)
     lighter-test lighter-stress-test
     cov
   )
-endif()
-
-if (MSVC_VERSION GREATER_EQUAL 1936 AND MSVC_IDE)
-  foreach (TGT
-    cov
-    cov-rt
-    json
-    app_main
-    app
-    cov-api
-    date-tz
-    lighter
-    hilite-cxx
-    hilite-py
-    hilite-ts
-    hilite
-    testing-lib
-    cov-echo
-    git2-test
-    git2-stress-test
-    cov-test
-    cov-stress-test
-    cov-rt-test
-    cov-rt-stress-test
-    lighter-test
-    lighter-stress-test
-    date-tz
-    json
-  )
-    if(TARGET ${TGT})
-      set_target_properties(${TGT} PROPERTIES VS_USER_PROPS "${PROJECT_SOURCE_DIR}/cmake/VS17.NoModules.props")
-    endif()
-  endforeach()
 endif()
 
 execute_process(COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/packages/system.py props

@@ -34,14 +34,8 @@ string(REPLACE ";" ", " BUILTIN_LIST "${BUILTINS}")
 message(STATUS "Builtins: ${BUILTIN_LIST}")
 include(builtins)
 
-string(REPLACE ";" ", " REPORT_FILTER_LIST "${REPORT_FILTERS}")
+string(REPLACE ";" ", " REPORT_FILTER_LIST "${REPORT_FILTERS};${NATIVE_FILTERS}")
 message(STATUS "Filters: ${REPORT_FILTER_LIST}")
-
-if (WIN32)
-    list(APPEND SOURCES
-        win32/cov.rc
-    )
-endif()
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})
 source_group(TREE ${CMAKE_CURRENT_BINARY_DIR} FILES ${CMAKE_CURRENT_BINARY_DIR}/gen/cov/builtins.hh ${CMAKE_CURRENT_BINARY_DIR}/gen/cov/versioninfo.rc)
@@ -69,18 +63,16 @@ if (WIN32)
 
     list(APPEND SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/gen/cov/versioninfo.rc"
-        "${CMAKE_SOURCE_DIR}/data/icons/win32.ico"
-    )
+            )
 endif()
 
 add_cov_tool(cov ${SOURCES})
-target_compile_options(cov PRIVATE ${ADDITIONAL_WALL_FLAGS})
-target_link_options(cov PRIVATE ${ADDITIONAL_LINK_FLAGS})
+add_win32_icon(cov "win32.ico")
 target_include_directories(cov PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}/gen
 )
-target_link_libraries(cov PRIVATE cov-rt)
+target_link_libraries(cov PRIVATE cov-rt app_main)
 set_target_properties(cov PROPERTIES FOLDER apps)
 
 ########################################################
@@ -109,15 +101,11 @@ if (COV_TESTING)
     enable_testing()
 
     add_cov_tool(cov-echo tests/cov-echo.cc)
-    target_compile_options(cov-echo PRIVATE ${ADDITIONAL_WALL_FLAGS})
-    target_link_options(cov-echo PRIVATE ${ADDITIONAL_LINK_FLAGS})
-    target_link_libraries(cov-echo PRIVATE fmt::fmt mbits::args)
+    target_link_libraries(cov-echo PRIVATE app_main fmt::fmt mbits::args)
     set_target_properties(cov-echo PROPERTIES FOLDER tests/spawn)
 
     add_cov_tool(cov-pwd tests/cov-pwd.cc)
-    target_compile_options(cov-pwd PRIVATE ${ADDITIONAL_WALL_FLAGS})
-    target_link_options(cov-pwd PRIVATE ${ADDITIONAL_LINK_FLAGS})
-    target_link_libraries(cov-pwd PRIVATE fmt::fmt mbits::args)
+    target_link_libraries(cov-pwd PRIVATE app_main fmt::fmt mbits::args)
     set_target_properties(cov-pwd PROPERTIES FOLDER tests/spawn)
 
     set_target_properties(cov-echo PROPERTIES
@@ -203,3 +191,5 @@ cpack_add_component_group(apps
     DISPLAY_NAME "Executables"
     EXPANDED
 )
+
+set_parent_scope()

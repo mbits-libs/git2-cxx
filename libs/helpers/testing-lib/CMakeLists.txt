@@ -14,3 +14,5 @@ if (COV_TESTING)
     target_link_libraries(testing-lib PUBLIC GTest::gmock_main fmt::fmt)
     set_target_properties(testing-lib PROPERTIES FOLDER tests/libs)
 endif()
+
+set_parent_scope()

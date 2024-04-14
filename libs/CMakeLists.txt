@@ -8,3 +8,5 @@ add_subdirectory(hilite)
 add_subdirectory(cov-api)
 add_subdirectory(app)
 add_subdirectory(cov-rt)
+
+set_parent_scope()

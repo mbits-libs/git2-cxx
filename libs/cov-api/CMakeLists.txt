@@ -209,3 +209,5 @@ cpack_add_component(libcov
   DEPENDS lighter
   GROUP devel
 )
+
+set_parent_scope()

@@ -123,3 +123,5 @@ cpack_add_component(librt
   DISPLAY_NAME "libcov-rt"
   GROUP devel
 )
+
+set_parent_scope()
