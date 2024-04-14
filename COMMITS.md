@@ -9,7 +9,7 @@ This project will use [Conventional Commits v1.0.0](https://www.conventionalcomm
 |`feat`|new feature for the user, not a new feature for build script|MINOR|Features|
 |`fix`|bug fix for the user, not a fix to a build script|PATCH|Bugfixes|
 |`assets`|only artwork: icons, images, but not css (those belong to `style`)|||
-|`build`|changes that affect the build system (conan, cmake, later npm) or external dependencies|||
+|`build`|changes that affect the build system (conan, cmake, later yarn) or external dependencies|||
 |`chore`|updating grunt tasks etc; no production code change|||
 |`ci`|changes to CI configuration files and scripts (GitHub actions)|||
 |`docs`|changes to the documentation|||

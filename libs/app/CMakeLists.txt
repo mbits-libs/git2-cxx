@@ -145,3 +145,5 @@ cpack_add_component(libapp
   DISPLAY_NAME "libapp"
   GROUP devel
 )
+
+set_parent_scope()

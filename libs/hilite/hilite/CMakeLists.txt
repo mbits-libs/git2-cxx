@@ -45,3 +45,5 @@ cpack_add_component(hilite
   DISPLAY_NAME "libhilite"
   GROUP devel
 )
+
+set_parent_scope()
