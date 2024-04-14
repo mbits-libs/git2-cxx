@@ -63,7 +63,7 @@ if (WIN32)
 
     list(APPEND SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/gen/cov/versioninfo.rc"
-            )
+    )
 endif()
 
 add_cov_tool(cov ${SOURCES})
@@ -138,6 +138,7 @@ if (COV_TESTING)
         013-reset
         014-show
         015-worktree
+        016-report-C
     )
         add_test(
             NAME cov-exec--${TEST_SET}

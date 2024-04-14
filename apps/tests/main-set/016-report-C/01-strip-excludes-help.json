@@ -1,0 +1,22 @@
+{
+    "args": "report $DATA/empty-coverage.json -f strip-excludes -o ignored -- --help",
+    "expected": [
+        0,
+        [
+            "usage: strip-excludes [-h] [--src <dir>] [--compiler <name>] [--os <name>] [-v]",
+            "",
+            "optional arguments:",
+            " -h, --help        shows this help message and exits",
+            " --src <dir>       points to root of source files; defaults to current directory",
+            " --compiler <name> adds the name of current compiler to list of markers; defaults to 'gcc'",
+            " --os <name>       adds the name of current platform to list of markers; defaults to 'posix'",
+            " -v                shows more output\n"
+        ],
+        ""
+    ],
+    "prepare": [
+        "unpack $DATA/repo.git.tar $TMP",
+        "cd '$TMP/repo.git'",
+        "cov init"
+    ]
+}

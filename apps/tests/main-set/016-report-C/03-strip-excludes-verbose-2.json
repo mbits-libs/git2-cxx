@@ -1,0 +1,24 @@
+{
+    "args": "report $DATA/strip-excludes/coverage-1.json -f strip-excludes -o ignored -- -v --os l-cars --compiler gcc",
+    "expected": [
+        0,
+        "",
+        [
+            "verbose: ON",
+            "markers: l-cars and gcc.",
+            "sources: $TMP/repo",
+            "\u001b[1;37m$TMP/repo/file.cc:12:5:\u001b[m \u001b[1;35mwarning:\u001b[m found GCOV_EXCL_END; did you mean GCOV_EXCL_STOP?",
+            "\u001b[1;37m$TMP/repo/file.cc:17:5:\u001b[m \u001b[1;35mwarning:\u001b[m double start: found GCOV_EXCL_START",
+            "\u001b[1;37m$TMP/repo/file.cc:8:5:\u001b[m \u001b[1;36mnote:\u001b[m see previous start",
+            "strip-excludes: excluded one line.\n"
+        ]
+    ],
+    "prepare": [
+        "unpack $DATA/repo.git.tar $TMP",
+        "cd '$TMP'",
+        "git clone repo.git",
+        "cd repo",
+        "cov init",
+        "cp '$DATA/strip-excludes/file-1.cc' 'file.cc'"
+    ]
+}

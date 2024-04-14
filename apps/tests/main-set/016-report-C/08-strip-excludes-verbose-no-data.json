@@ -1,0 +1,21 @@
+{
+    "args": "report $DATA/strip-excludes/coverage-3.json -f strip-excludes -o- -- -v --os l-cars --compiler gcc",
+    "expected": [
+        1,
+        "",
+        [
+            "verbose: ON",
+            "markers: l-cars and gcc.",
+            "strip-excludes: missing 'git/head' key in report",
+            "strip-excludes: missing 'files' key in report",
+            "cov report: error: filter strip-excludes exited with return code 1\n"
+        ]
+    ],
+    "prepare": [
+        "unpack $DATA/repo.git.tar $TMP",
+        "cd '$TMP'",
+        "git clone repo.git",
+        "cd repo",
+        "cov init"
+    ]
+}
