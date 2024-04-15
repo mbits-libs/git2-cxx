@@ -67,13 +67,18 @@ jobs:
         sudo apt-get install ninja-build -y
 
     - name: Set up GCC
-      if: ${{ matrix.ubuntu && matrix.gcc }}
+      if: ${{ matrix.ubuntu }}
       run: |
         sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-12 90
         sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-12 90
+        sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-12 90
+        ls -lah /usr/lib/gcc/x86_64-linux-gnu
+
+    - name: Set up GCC as default compiler
+      if: ${{ matrix.ubuntu && matrix.gcc }}
+      run: |
         sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++-12 90
         sudo update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-12 90
-        sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-12 90
 
     - name: Set up Clang
       if: ${{ matrix.clang }}
