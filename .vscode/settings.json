@@ -1,6 +1,15 @@
 {
     "files.insertFinalNewline": true,
     "files.trimFinalNewlines": true,
+    "json.schemas": [
+        {
+            "fileMatch": [
+                "/apps/tests/main-set/**/*.json",
+                "/apps/tests/messages-pl/**/*.json"
+            ],
+            "url": "/build/downloads/json-runner-schema.json"
+        }
+    ],
     "cSpell.words": [
         "arglist",
         "cfglng",
