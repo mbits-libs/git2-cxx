@@ -12,15 +12,15 @@
 
 using namespace std::literals;
 
-#define RULE_MAP(name)                                                      \
-	struct on_##name##_handler {                                            \
-		constexpr on_##name##_handler() = default;                          \
-		template <class Context>                                            \
-		void operator()(Context& context) const;                            \
-	};                                                                      \
-	static constexpr auto on_##name = on_##name##_handler{};                \
-	template <class Context>                                                \
-	void on_##name##_handler::operator()([[maybe_unused]] Context& context) \
+#define RULE_MAP(name)                                                       \
+	struct on_##name##_handler {                                             \
+		constexpr on_##name##_handler() = default;                           \
+		template <class Context>                                             \
+		void operator()(Context& context) const;                             \
+	};                                                                       \
+	static constexpr auto on_##name = on_##name##_handler{};                 \
+	template <class Context>                                                 \
+	void on_##name##_handler::operator()([[maybe_unused]] Context & context) \
 	    const
 
 #define RULE_APPEND(name) \

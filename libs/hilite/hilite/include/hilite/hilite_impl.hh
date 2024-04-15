@@ -8,15 +8,15 @@
 #include "cell/parser.hh"
 #include "cell/special.hh"
 
-#define RULE_MAP(name)                                                      \
-	struct on_##name##_handler {                                            \
-		constexpr on_##name##_handler() = default;                          \
-		template <class Context>                                            \
-		void operator()(Context& context) const;                            \
-	};                                                                      \
-	[[maybe_unused]] constexpr auto on_##name = on_##name##_handler{};      \
-	template <class Context>                                                \
-	void on_##name##_handler::operator()([[maybe_unused]] Context& context) \
+#define RULE_MAP(name)                                                       \
+	struct on_##name##_handler {                                             \
+		constexpr on_##name##_handler() = default;                           \
+		template <class Context>                                             \
+		void operator()(Context& context) const;                             \
+	};                                                                       \
+	[[maybe_unused]] constexpr auto on_##name = on_##name##_handler{};       \
+	template <class Context>                                                 \
+	void on_##name##_handler::operator()([[maybe_unused]] Context & context) \
 	    const
 
 #define RULE_EMIT(name, tok) \

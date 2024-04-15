@@ -204,7 +204,7 @@ namespace cov::app::module {
 		if (ec) {
 			[[unlikely]];    // GCOV_EXCL_LINE
 			error(ec, tr_);  // GCOV_EXCL_LINE
-		}                    // GCOV_EXCL_LINE
+		}  // GCOV_EXCL_LINE
 		auto const covdir = cov::repository::discover(cwd, ec);
 		if (!covdir.empty()) {
 			ec.clear();
@@ -216,8 +216,8 @@ namespace cov::app::module {
 					auto git_repo = git::repository::open(covdir / *gitdir, ec);
 					if (git_repo && !ec) return git_repo;
 				}  // GCOV_EXCL_LINE[WIN32]
-			}      // GCOV_EXCL_LINE[WIN32]
-		}          // GCOV_EXCL_LINE[WIN32]
+			}  // GCOV_EXCL_LINE[WIN32]
+		}  // GCOV_EXCL_LINE[WIN32]
 
 		ec.clear();
 		auto const gitdir = git::repository::discover(cwd, ec);
@@ -250,7 +250,7 @@ namespace cov::app::module {
 		if (ec || !mods) {
 			[[unlikely]];         // GCOV_EXCL_LINE
 			mods = make_empty();  // GCOV_EXCL_LINE
-		}                         // GCOV_EXCL_LINE
+		}  // GCOV_EXCL_LINE
 		return mods;
 	}
 
@@ -277,7 +277,7 @@ namespace cov::app::module {
 		if (ec || !mods) {
 			[[unlikely]];         // GCOV_EXCL_LINE
 			mods = make_empty();  // GCOV_EXCL_LINE
-		}                         // GCOV_EXCL_LINE
+		}  // GCOV_EXCL_LINE
 		return mods;
 	}
 

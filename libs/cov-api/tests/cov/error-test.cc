@@ -13,9 +13,9 @@ namespace cov::testing {
 	X(wrong_object_type) \
 	X(uninitialized_worktree) X(not_a_worktree) X(not_a_branch)
 
-	TEST(error, same_error) {
+	TEST(error, same_error){
 #define X_ASSERT_EQ(ERR) ASSERT_EQ(errc::ERR, cov::make_error_code(errc::ERR));
-		ON_ERRC(X_ASSERT_EQ)
+	    ON_ERRC(X_ASSERT_EQ)
 #undef X_ASSERT_EQ
 	}
 

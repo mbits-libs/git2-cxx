@@ -2,6 +2,7 @@
 // This code is licensed under MIT license (see LICENSE for details)
 
 #include "cov/hash/md5.hh"
+#include <cstdint>
 
 namespace hash {
 	namespace {

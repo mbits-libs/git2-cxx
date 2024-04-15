@@ -68,7 +68,7 @@ namespace cov::io {
 		[[deprecated("use operator=(sys_seconds)")]] timestamp& operator=(
 		    std::uint64_t time) noexcept {
 			hi = static_cast<std::uint32_t>((time >> 32) & 0xFFFF'FFFF);
-			lo = static_cast<std::uint32_t>((time)&0xFFFF'FFFF);
+			lo = static_cast<std::uint32_t>((time) & 0xFFFF'FFFF);
 			return *this;
 		}
 		// GCOV_EXCL_STOP
@@ -76,7 +76,7 @@ namespace cov::io {
 			auto const time =
 			    static_cast<std::uint64_t>(seconds.time_since_epoch().count());
 			hi = static_cast<std::uint32_t>((time >> 32) & 0xFFFF'FFFF);
-			lo = static_cast<std::uint32_t>((time)&0xFFFF'FFFF);
+			lo = static_cast<std::uint32_t>((time) & 0xFFFF'FFFF);
 			return *this;
 		}
 		// GCOV_EXCL_START[Clang]
