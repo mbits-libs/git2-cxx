@@ -145,8 +145,8 @@ namespace fmt {
 		}
 
 		template <typename FormatContext>
-		constexpr auto format(git_oid const& id,
-		                      FormatContext& ctx) const -> decltype(ctx.out()) {
+		constexpr auto format(git_oid const& id, FormatContext& ctx) const
+		    -> decltype(ctx.out()) {
 			return fmt::format_to(ctx.out(), "{}", git::oid_view{id}.str());
 		}
 	};

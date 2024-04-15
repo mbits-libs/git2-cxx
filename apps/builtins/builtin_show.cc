@@ -147,7 +147,7 @@ namespace cov::app::builtin::show {
 				mods = cov::modules::make_modules("/"s, {});
 			} else {                  // GCOV_EXCL_LINE
 				p.error(ec, p.tr());  // GCOV_EXCL_LINE
-			}  // GCOV_EXCL_LINE
+			}                         // GCOV_EXCL_LINE
 		}
 
 		auto view = projection::report_filter{
