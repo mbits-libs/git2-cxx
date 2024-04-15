@@ -473,10 +473,13 @@ class steps:
 
         runner.copy(f"build/{preset}/test-results", "build/artifacts/test-results")
         if config.get("coverage", False):
-            output = f"build/artifacts/coveralls/{config['report_os']}-{config['report_compiler']}-{config['build_type']}.json"
+            with_sanitizer = "-sanitizer" if config.get("sanitizer", False) else ""
+            output = f"build/artifacts/coveralls/{config['report_os']}-{config['report_compiler']}-{config['build_type']}{with_sanitizer}.json"
             print_args("cp", f"build/{preset}/coveralls.json", output)
             if not runner.DRY_RUN:
                 copy_file(f"build/{preset}/coveralls.json", output)
+        for file in [os.path.join(dirpath,f) for (dirpath, _, filenames) in os.walk("build/artifacts/") for f in filenames]:
+            print(file)
 
     @staticmethod
     @step_call(
