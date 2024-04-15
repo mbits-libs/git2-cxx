@@ -99,7 +99,7 @@ namespace cov {
 							device = current_device;
 						} else if (*device != *current_device) {
 							return {};  // GCOV_EXCL_LINE -- untestable
-						}  // GCOV_EXCL_LINE
+						}               // GCOV_EXCL_LINE
 					}
 				}
 			}

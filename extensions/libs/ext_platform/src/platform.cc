@@ -32,4 +32,4 @@ namespace cov::app::platform {
 
 		return result;
 	}  // GCOV_EXCL_LINE
-};  // namespace cov::app::platform
+};     // namespace cov::app::platform

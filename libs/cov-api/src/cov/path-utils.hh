@@ -142,4 +142,4 @@ namespace cov {
 			return strip(line.substr(prefix.length()));
 		}
 	}  // namespace
-};  // namespace cov
+};     // namespace cov

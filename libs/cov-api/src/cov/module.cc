@@ -14,7 +14,7 @@
 		if (ec = (EXPR); ec) {                 \
 			[[unlikely]]; /* GCOV_EXCL_LINE */ \
 			return ec;    /* GCOV_EXCL_LINE */ \
-		} /* GCOV_EXCL_LINE */                 \
+		}                 /* GCOV_EXCL_LINE */ \
 	} while (0)
 
 #define UNLIKELY(TEST)                         \
@@ -22,7 +22,7 @@
 		if (TEST) {                            \
 			[[unlikely]]; /* GCOV_EXCL_LINE */ \
 			return {};    /* GCOV_EXCL_LINE */ \
-		} /* GCOV_EXCL_LINE */                 \
+		}                 /* GCOV_EXCL_LINE */ \
 	} while (0)
 
 #define CHECK_OBJ(OBJ, EXPR) \
@@ -166,7 +166,7 @@ namespace cov {
 				if (ec) {
 					[[unlikely]];  // GCOV_EXCL_LINE
 					return ec;     // GCOV_EXCL_LINE
-				}  // GCOV_EXCL_LINE
+				}                  // GCOV_EXCL_LINE
 
 				std::unordered_set<std::string> to_remove{};
 				CHECK(cfg.foreach_entry([&](git_config_entry const* entry) {

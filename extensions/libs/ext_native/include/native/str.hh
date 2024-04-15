@@ -72,4 +72,4 @@ namespace cov::app {
 		      [&result](auto, auto view) { result.push_back(view); });
 		return result;
 	}  // GCOV_EXCL_LINE[GCC]
-};  // namespace cov::app
+};     // namespace cov::app
