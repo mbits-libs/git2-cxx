@@ -74,7 +74,7 @@ namespace cell {
 			while (it != e__ && it->hashed == probe.hashed &&
 			       it->key != probe.key) {
 				++it;  // GCOV_EXCL_LINE
-			}          // GCOV_EXCL_LINE
+			}  // GCOV_EXCL_LINE
 			return (it != e__ && it->hashed == probe.hashed) ? it : e__;
 		}
 
@@ -155,7 +155,7 @@ namespace cell {
 	};
 
 	template <class _First, class... _Rest>
-	token_map(_First, _Rest...)
-	    -> token_map<1 + sizeof...(_Rest),
-	                 typename remove_map_entry<_First>::type>;
+	token_map(_First,
+	          _Rest...) -> token_map<1 + sizeof...(_Rest),
+	                                 typename remove_map_entry<_First>::type>;
 }  // namespace cell

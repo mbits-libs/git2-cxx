@@ -130,8 +130,8 @@ namespace cov::placeholder {
 	};
 
 	struct names {
-		name_type type;
-		unsigned indent;
+		name_type type{};
+		unsigned indent{};
 		constexpr auto operator<=>(names const&) const noexcept = default;
 	};
 
@@ -213,7 +213,7 @@ namespace cov::placeholder {
 	};
 
 	struct ratio {
-		unsigned num, den;
+		unsigned num{}, den{};
 
 		bool operator==(ratio const&) const noexcept = default;
 		constexpr ratio gcd() const noexcept {
@@ -224,15 +224,15 @@ namespace cov::placeholder {
 	};
 
 	struct base_rating {
-		ratio incomplete;
-		ratio passing;
+		ratio incomplete{};
+		ratio passing{};
 		bool operator==(base_rating const&) const noexcept = default;
 	};
 
 	struct rating {
-		base_rating lines;
-		base_rating functions;
-		base_rating branches;
+		base_rating lines{};
+		base_rating functions{};
+		base_rating branches{};
 		bool operator==(rating const&) const noexcept = default;
 	};
 
@@ -262,9 +262,9 @@ namespace cov::placeholder {
 	};
 
 	struct git_person {
-		std::string_view name;
-		std::string_view email;
-		sys_seconds date;
+		std::string_view name{};
+		std::string_view email{};
+		sys_seconds date{};
 
 		iterator format(iterator out,
 		                internal_environment& env,

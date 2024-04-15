@@ -134,7 +134,9 @@ namespace cov::io::handlers {
 	                              write_stream& out) const {
 		auto const obj = as_a<cov::function_coverage>(
 		    static_cast<object const*>(value.get()));
-		auto entries = obj->entries();
+		using entry_span =
+		    std::span<std::unique_ptr<cov::function_coverage::entry>>;
+		auto entries = obj ? obj->entries() : entry_span{};
 
 		auto stg = [&] {
 			strings_builder strings{};

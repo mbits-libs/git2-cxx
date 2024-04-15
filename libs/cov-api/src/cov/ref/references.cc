@@ -245,7 +245,7 @@ namespace cov {
 			if (result) result = out.commit() == std::error_code{};
 			if (!result) {
 				out.rollback();  // GCOV_EXCL_LINE[GCC, Clang] -- untestable
-			}                    // GCOV_EXCL_LINE[Clang]
+			}  // GCOV_EXCL_LINE[Clang]
 			return result;
 		}
 		std::filesystem::path common_dir_;

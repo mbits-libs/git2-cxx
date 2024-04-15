@@ -62,7 +62,7 @@ namespace cov::app::builtin::branch {
 			prn.format_list(args);
 			std::exit(0);
 		}  // GCOV_EXCL_LINE
-	}      // namespace
+	}  // namespace
 
 	parser::parser(::args::args_view const& arguments,
 	               str::translator_open_info const& langs)

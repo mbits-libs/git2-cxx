@@ -94,7 +94,7 @@ namespace cov::app {
 			[[unlikely]];      // GCOV_EXCL_LINE
 			result = nullptr;  // GCOV_EXCL_LINE
 			return result;     // GCOV_EXCL_LINE
-		}                      // GCOV_EXCL_LINE
+		}  // GCOV_EXCL_LINE
 
 		// if we are inside a repo, add local config as well...
 		if (!current_directory.empty()) {

@@ -29,7 +29,7 @@ namespace cov::app::builtin::init {
 			if (!repo) {
 				[[unlikely]];   // GCOV_EXCL_LINE
 				return common;  // GCOV_EXCL_LINE
-			}                   // GCOV_EXCL_LINE
+			}  // GCOV_EXCL_LINE
 
 			auto const workdir = repo.work_dir();
 			if (workdir) {
@@ -38,7 +38,7 @@ namespace cov::app::builtin::init {
 				if (ec) {
 					[[unlikely]];   // GCOV_EXCL_LINE
 					return common;  // GCOV_EXCL_LINE
-				}                   // GCOV_EXCL_LINE
+				}  // GCOV_EXCL_LINE
 				return result;
 			}
 
