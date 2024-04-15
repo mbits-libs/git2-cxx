@@ -27,7 +27,7 @@ GIT_HEAD = git_log_format("H")
 
 json.dump(
     {
-        "$schema": "https://raw.githubusercontent.com/mzdun/cov/v0.20.0/apps/report-schema.json",
+        "$schema": "https://raw.githubusercontent.com/mzdun/cov/v0.23.0/apps/report-schema.json",
         "git": {"branch": GIT_BRANCH, "head": GIT_HEAD},
         "files": [],
     },
