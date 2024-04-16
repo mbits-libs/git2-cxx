@@ -185,6 +185,13 @@ jobs:
         name: _tests-${{ env.ARTIFACT_SUFFIX }}
         path: ${{github.workspace}}/build/artifacts/test-results/
 
+    - name: Upload coverage
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: _coverage-${{ env.ARTIFACT_SUFFIX }}
+        path: ${{github.workspace}}/build/artifacts/coverage/
+
   merge:
     name: Merge artifacts
     runs-on: ubuntu-latest
@@ -193,19 +200,27 @@ jobs:
       RELEASE: ${{ fromJson(needs.build.outputs.RELEASE) }}
 
     steps:
-     - name: Merge packages
-       uses: actions/upload-artifact/merge@v4
-       if: ${{ fromJson(needs.build.outputs.RELEASE) }}
-       with:
-         name: Packages
-         pattern: _packages-*
-         delete-merged: true
-     - name: Merge test results
-       uses: actions/upload-artifact/merge@v4
-       with:
-         name: Test Results
-         pattern: _tests-*
-         delete-merged: true
+    - name: Merge packages
+      uses: actions/upload-artifact/merge@v4
+      if: ${{ fromJson(needs.build.outputs.RELEASE) }}
+      with:
+        name: Packages
+        pattern: _packages-*
+        delete-merged: true
+    - name: Merge test results
+      uses: actions/upload-artifact/merge@v4
+      if: always()
+      with:
+        name: Test Results
+        pattern: _tests-*
+        delete-merged: true
+    - name: Merge coverage
+      uses: actions/upload-artifact/merge@v4
+      if: always()
+      with:
+        name: Coverage
+        pattern: _coverage-*
+        delete-merged: true
 
   publish:
     name: Upload packages
