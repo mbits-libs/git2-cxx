@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) and [COMMITS.md](COMMITS.md) for commit guidelines.
 
+## [0.23.0](https://github.com/mzdun/cov/compare/v0.22.0...v0.23.0) (2024-04-16)
+
+### New Features
+
+- add strip-excludes filter ([fc17d19](https://github.com/mzdun/cov/commit/fc17d19cab5a1a2359ce75c2d3f14b9ac6e244f1)), closes [#73](https://github.com/mzdun/cov/issues/73)
+- support filter arguments in cov-report ([764b231](https://github.com/mzdun/cov/commit/764b23186670d7ceeae54e3093c327ca6a50c314))
+
+### Bug Fixes
+
+- do not patch schema versions in tests ([e8d0b6e](https://github.com/mzdun/cov/commit/e8d0b6e4e8d6aaa98cb02ea5bb632def2326bd96))
+- iron out kinks in Schemas used in the project ([a682db4](https://github.com/mzdun/cov/commit/a682db4d9a1e5c6e2e6543464086a99265922fb0))
+- bring clang back ([d3c9255](https://github.com/mzdun/cov/commit/d3c9255b0741a30836dcd6511de8d178ab70ebf0)), closes [#76](https://github.com/mzdun/cov/issues/76)
+
 ## [0.22.0](https://github.com/mzdun/cov/compare/v0.21.3...v0.22.0) (2024-04-11)
 
 ### New Features
