@@ -1,21 +1,25 @@
 #!/usr/bin/env python
 
 import json
-import sys
 import os
 import subprocess
+import sys
 from typing import Dict, List, Optional
 
+
 def cov_version():
-    exec = os.environ['COV_EXE_PATH']
+    exec = os.environ["COV_EXE_PATH"]
     try:
-        p = subprocess.Popen([exec, "--version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        p = subprocess.Popen(
+            [exec, "--version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        )
         out, _ = p.communicate()
         if p.returncode == 0:
-            return out.strip().decode('UTF-8').split(' ')[-1]
+            return out.strip().decode("UTF-8").split(" ")[-1]
     except FileNotFoundError:
         pass
-    return '0.23.0'
+    return "0.23.0"
+
 
 def lines_from(lines: List[Optional[int]]) -> Dict[str, int]:
     result: Dict[int, int] = {}
