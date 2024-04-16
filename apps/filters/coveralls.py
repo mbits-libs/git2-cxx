@@ -2,8 +2,20 @@
 
 import json
 import sys
+import os
+import subprocess
 from typing import Dict, List, Optional
 
+def cov_version():
+    exec = os.environ['COV_EXE_PATH']
+    try:
+        p = subprocess.Popen([exec, "--version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        out, _ = p.communicate()
+        if p.returncode == 0:
+            return out.strip().decode('UTF-8').split(' ')[-1]
+    except FileNotFoundError:
+        pass
+    return '0.23.0'
 
 def lines_from(lines: List[Optional[int]]) -> Dict[str, int]:
     result: Dict[int, int] = {}
@@ -29,9 +41,11 @@ def cov_from(coveralls: dict) -> dict:
 data = json.load(sys.stdin)
 git = data["git"]
 git_head = git["head"]
+VERSION = cov_version()
+
 json.dump(
     {
-        "$schema": "https://raw.githubusercontent.com/mzdun/cov/v0.23.0/apps/report-schema.json",
+        "$schema": f"https://raw.githubusercontent.com/mzdun/cov/v${VERSION}/apps/report-schema.json",
         "git": {"branch": git["branch"], "head": git_head["id"]},
         "files": [cov_from(source_file) for source_file in data["source_files"]],
     },

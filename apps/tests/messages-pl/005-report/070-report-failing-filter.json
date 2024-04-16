@@ -6,7 +6,7 @@
         "",
         [
             "{",
-            "    \"$schema\": \"https://raw.githubusercontent.com/mzdun/cov/v0.23.0/apps/report-schema.json\",",
+            "    \"$schema\": \"https://raw.githubusercontent.com/mzdun/cov/v0.22.0/apps/report-schema.json\",",
             "    \"git\": {",
             "        \"branch\": \"main\",",
             "        \"head\": \"f8632047e4ea88f5e30bf57570694e5b145c5c0d\"",
