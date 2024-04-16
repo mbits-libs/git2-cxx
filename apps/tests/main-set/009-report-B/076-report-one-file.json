@@ -1,9 +1,5 @@
 {
     "args": "report $DATA/build-coverage.json -f create-report",
-    "patches": {
-        "\u001b\\[31m\\[main [0-9a-fA-F]+\\]\u001b\\[m second": "\u001b[31m[main $REPORT]\u001b[m second",
-        " \u001b\\[2;37mcontains [0-9a-fA-F]+:\u001b\\[m (.+)": " \u001b[2;37mcontains $BUILD:\u001b[m \\1"
-    },
     "expected": [
         0,
         [

@@ -1,5 +1,5 @@
 {
-    "args": "tag \"bad:name\"",
+    "args": "tag bad\\:name",
     "expected": [
         2,
         "",

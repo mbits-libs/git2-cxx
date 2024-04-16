@@ -1,11 +1,7 @@
 {
     "args": "report $DATA/build-coverage-2-files.json -f create-report",
     "patches": {
-        "\u001b\\[0;49;90m\\[master [0-9a-fA-F]+\\] reported files\u001b\\[m": "\u001b[0;49;90m[master $COMMIT] reported files\u001b[m",
-        "\u001b\\[31m\\[detached HEAD [0-9a-fA-F]+\\]\u001b\\[m reported files": "\u001b[31m[detached HEAD $REPORT]\u001b[m reported files",
-        " \u001b\\[2;37mbased on\u001b\\[m \u001b\\[2;33m[0-9a-fA-F]+@main\u001b\\[m": " \u001b[2;37mbased on\u001b[m \u001b[2;33m$HEAD@main\u001b[m",
-        " parent [0-9a-fA-F]+": " parent $PARENT",
-        " \u001b\\[2;37mcontains [0-9a-fA-F]+:\u001b\\[m (.+)": " \u001b[2;37mcontains $BUILD:\u001b[m \\1"
+        "\u001b\\[0;49;90m\\[master [0-9a-fA-F]+\\] (.+)": "\u001b[0;49;90m[master $COMMIT] \\1"
     },
     "expected": [
         0,

@@ -1,8 +1,5 @@
 {
     "args": "log '--format=  - %mD(4)' --color always --decorate short",
-    "patches": {
-        "Added:     .*": "Added:     $DATE"
-    },
     "expected": [
         0,
         [

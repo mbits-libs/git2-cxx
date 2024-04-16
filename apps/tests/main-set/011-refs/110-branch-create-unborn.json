@@ -3,10 +3,7 @@
     "expected": [
         2,
         "",
-        [
-            "usage: cov branch [-h] [<name> [<start-point>] | -d <name>... | -l [<pattern>...] | --show-current]",
-            "cov branch: error: HEAD refers to branch with no reports\n"
-        ]
+        "cov branch: error: HEAD refers to branch with no reports\n"
     ],
     "prepare": [
         "cd $TMP",

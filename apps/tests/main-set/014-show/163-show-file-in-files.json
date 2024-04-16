@@ -1,8 +1,7 @@
 {
     "args": "show $FILES:src/main.cc",
     "patches": {
-        "build  [0-9a-f]{40} (.*)": "build  $BUILD_HASH \\1",
-        "Added:     .*": "Added:     $NOW"
+        "build  [0-9a-f]{40} (.*)": "build  $BUILD_HASH \\1"
     },
     "expected": [
         0,
