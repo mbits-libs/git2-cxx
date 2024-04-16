@@ -65,7 +65,7 @@ if (COV_TESTING)
 
   set(COVERALLS_PREFIX cov_)
   
-  set(cov_COVERALLS_DIRS
+  set(INCLUDED_IN_COVERAGE
     apps/builtins
     apps/cov
     extensions/filters
@@ -79,19 +79,34 @@ if (COV_TESTING)
     libs/app
     libs/cov-rt
   )
-    list(APPEND cov_COVERALLS_DIRS ${module}/include ${module}/src)
+    list(APPEND INCLUDED_IN_COVERAGE ${module}/include ${module}/src)
   endforeach()
 
   foreach(extra cxx py3 ts)
-    list(APPEND cov_COVERALLS_DIRS libs/hilite/hilite-${extra}/src)
+    list(APPEND INCLUDED_IN_COVERAGE libs/hilite/hilite-${extra}/src)
   endforeach()
 
   foreach(ext_lib excludes ext_native ext_platform)
-    list(APPEND cov_COVERALLS_DIRS
+    list(APPEND INCLUDED_IN_COVERAGE
       extensions/libs/${ext_lib}/include
       extensions/libs/${ext_lib}/src)
   endforeach()
 
+  set(EXCLUDED_FROM_COVERAGE
+    apps/tests
+    extensions/tests
+  )
+  foreach(extension
+    collect-api
+    excludes
+    ext_native
+    ext_platform
+  )
+    list(APPEND EXCLUDED_FROM_COVERAGE
+      extensions/${extension}/test)
+  endforeach()
+
+  set(cov_COVERALLS_DIRS ${INCLUDED_IN_COVERAGE})
   include(${PROJECT_SOURCE_DIR}/tools/coveralls/Coveralls.cmake)
 
   set(TEST_REPORT_DIR "${PROJECT_BINARY_DIR}/test-results")
@@ -206,7 +221,6 @@ add_subdirectory(libs)
 add_subdirectory(extensions)
 add_subdirectory(apps)
 
-
 if (CMAKE_GENERATOR MATCHES "Visual Studio" AND TARGET cov_coveralls_test)
   add_dependencies(cov_coveralls_test
     git2-test git2-stress-test
@@ -245,3 +259,6 @@ else()
 endif()
 
 file(GENERATE OUTPUT "${PROJECT_BINARY_DIR}/report_answers.txt" CONTENT "${COV_PROPERTIES}\n")
+string(REPLACE ";" "\n    include = " SRC_INCLUDE "${INCLUDED_IN_COVERAGE}")
+string(REPLACE ";" "\n    exclude = " SRC_EXCLUDE "${EXCLUDED_FROM_COVERAGE}")
+configure_file("${PROJECT_SOURCE_DIR}/.covcollect.in" "${PROJECT_BINARY_DIR}/.covcollect" @ONLY)

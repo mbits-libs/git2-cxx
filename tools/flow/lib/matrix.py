@@ -475,7 +475,10 @@ class steps:
         if config.get("coverage", False):
             with_sanitizer = "-sanitizer" if config.get("sanitizer", False) else ""
             output_dir = f"build/artifacts/coverage/{config['report_os']}-{config['report_compiler']}-{config['build_type']}{with_sanitizer}"
-            for file in ['coveralls.json', 'report_answers.txt']:
+            for file in ['coveralls.json', 'collected.json', 'report_answers.txt']:
+                if not os.path.exists(f"build/{preset}/{file}"):
+                    continue
+
                 print_args("cp", f"build/{preset}/{file}", f"{output_dir}/{file}")
                 if not runner.DRY_RUN:
                     copy_file(f"build/{preset}/{file}", f"{output_dir}/{file}")
