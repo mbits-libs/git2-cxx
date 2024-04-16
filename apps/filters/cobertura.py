@@ -41,16 +41,19 @@ def output(*args):
 def git_log_format(fmt):
     return output("git", "log", "-1", "--pretty=format:%" + fmt)
 
+
 def cov_version():
-    exec = os.environ['COV_EXE_PATH']
+    exec = os.environ["COV_EXE_PATH"]
     try:
-        p = subprocess.Popen([exec, "--version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        p = subprocess.Popen(
+            [exec, "--version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        )
         out, _ = p.communicate()
         if p.returncode == 0:
-            return out.strip().decode('UTF-8').split(' ')[-1]
+            return out.strip().decode("UTF-8").split(" ")[-1]
     except FileNotFoundError:
         pass
-    return '0.23.0'
+    return "0.23.0"
 
 
 root = ET.parse(sys.stdin).getroot()
