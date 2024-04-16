@@ -3,10 +3,7 @@
     "expected": [
         2,
         "",
-        [
-            "usage: cov config [-h] [<file-options>] [<name> [<value>] | --unset <name> | -l | --list]",
-            "cov config: error: could not find key 'group.other' to delete\n"
-        ]
+        "cov config: error: could not find key 'group.other' to delete\n"
     ],
     "prepare": [
         "touch '$TMP/config' '[group]\nkey = value 1\nkey = value 2'"

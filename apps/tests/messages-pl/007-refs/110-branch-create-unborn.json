@@ -4,10 +4,7 @@
     "expected": [
         2,
         "",
-        [
-            "użycie: cov branch [-h] [<nazwa> [<punkt-startowy>] | -d <nazwa>... | -l [<wzorzec>...] | --show-current]",
-            "cov branch: błąd: HEAD odnosi się do gałęzi bez raportów\n"
-        ]
+        "cov branch: błąd: HEAD odnosi się do gałęzi bez raportów\n"
     ],
     "prepare": [
         "cd $TMP",

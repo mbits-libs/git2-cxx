@@ -1,5 +1,4 @@
-{
-    "args": "report $DATA/build-coverage.json -f create-report -pos=qnx -pdebug=false -pcompiler=javac",
+{    "args": "report $DATA/build-coverage.json -f create-report -pos=qnx -pdebug=false -pcompiler=javac",
     "patches": {
         "\u001b\\[31m\\[main [0-9a-fA-F]+\\]\u001b\\[m second": "\u001b[31m[main $REPORT]\u001b[m second",
         " \u001b\\[2;37mzawiera [0-9a-fA-F]+:\u001b\\[m (.+)": " \u001b[2;37mzawiera $BUILD:\u001b[m \\1"

@@ -78,7 +78,6 @@ namespace cov::app {
 	    str::errors::Strings const& tr,
 	    str::args::Strings const& args) const {
 		auto const msg = message(ec, tr, args);
-		parser_.short_help(stderr);
 		std::fputs(msg.c_str(), stderr);
 		std::fputc('\n', stderr);
 		std::exit(2);

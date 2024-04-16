@@ -3,8 +3,7 @@
     "patches": {
         "report [0-9a-f]{40}": "report $REPORT_HASH",
         "commit [0-9a-f]{40}": "commit $COMMIT_HASH",
-        "build  [0-9a-f]{40} (.*)": "build  $BUILD_HASH \\1",
-        "Added:     .*": "Added:     $NOW"
+        "build  [0-9a-f]{40} (.*)": "build  $BUILD_HASH \\1"
     },
     "expected": [
         0,
