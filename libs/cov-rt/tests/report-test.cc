@@ -162,12 +162,13 @@ namespace cov::app::testing {
 		std::string_view text{};
 		app::report::report_info expected{};
 		bool succeeds{true};
+		std::string_view standard_error{};
 	};
 
 	class report : public ::testing::TestWithParam<report_test> {};
 
 	TEST_P(report, from_text) {
-		auto const& [text, expected, succeeds] = GetParam();
+		auto const& [text, expected, succeeds, standard_error] = GetParam();
 		app::report::report_info actual{};
 
 		if (!text.empty()) {
@@ -176,9 +177,12 @@ namespace cov::app::testing {
 			ASSERT_NE(nullptr, json::cast<json::map>(jsn));
 		}
 
+		::testing::internal::CaptureStderr();
 		auto const result = actual.load_from_text(text);
+		auto const error = ::testing::internal::GetCapturedStderr();
 		ASSERT_EQ(succeeds, result);
 		ASSERT_EQ(expected, actual);
+		ASSERT_EQ(standard_error, error);
 	}
 
 	TEST(report, line_coverage) {
@@ -429,42 +433,76 @@ namespace cov::app::testing {
 	INSTANTIATE_TEST_SUITE_P(good, report, ::testing::ValuesIn(good));
 
 	static report_test const bad[] = {
-	    {.succeeds = false},
-	    {.text = "{}"sv, .succeeds = false},
-	    {.text = R"({"git": {}, "files": []})"sv, .succeeds = false},
+	    {.succeeds = false,
+	     .standard_error = "cov report: /git: undefined\n"
+	                       "cov report: /files: undefined\n"sv},
+	    {.text = "{}"sv,
+	     .succeeds = false,
+	     .standard_error = "cov report: /git: undefined\n"
+	                       "cov report: /files: undefined\n"sv},
+	    {.text = R"({"git": {}, "files": []})"sv,
+	     .succeeds = false,
+	     .standard_error = "cov report: /git/branch: undefined\n"
+	                       "cov report: /git/head: undefined\n"sv},
 	    {.text =
 	         R"({"git": {"branch": "main", "head": "hash"}, "files": {}})"sv,
-	     .succeeds = false},
+	     .succeeds = false,
+	     .standard_error = "cov report: /files: undefined\n"sv},
 	    {.text = R"({"git": {"head": "hash"}, "files": []})"sv,
-	     .succeeds = false},
+	     .succeeds = false,
+	     .standard_error = "cov report: /git/branch: undefined\n"sv},
 	    {.text = R"({"git": {"branch": "main"}, "files": []})"sv,
-	     .succeeds = false},
-	    {.text = R"({"git": {"branch": "main"}, "files": [{}]})"sv,
-	     .succeeds = false},
+	     .succeeds = false,
+	     .standard_error = "cov report: /git/head: undefined\n"sv},
+	    {.text =
+	         R"({
+"git": {"branch": "main", "head": "hash"},
+"files": [{}]
+})"sv,
+	     .succeeds = false,
+	     .standard_error =
+	         "cov report: /files[0]/name: undefined\n"
+	         "cov report: /files[0]/digest: undefined\n"
+	         "cov report: /files[0]/line_coverage: undefined\n"sv},
+	    {.text =
+	         R"({
+"git": {"branch": "main", "head": "hash"},
+"files": [{"name": "A"}]
+})"sv,
+	     .succeeds = false,
+	     .standard_error =
+	         "cov report: /files[0]/digest (A): undefined\n"
+	         "cov report: /files[0]/line_coverage (A): undefined\n"sv},
 	    {.text = R"({
 "git": {"branch": "main", "head": "hash"},
 "files": [
 	{"name": "A", "digest": "md5:value", "line_coverage": []}
 ]})"sv,
-	     .succeeds = false},
+	     .succeeds = false,
+	     .standard_error =
+	         "cov report: /files[0]/line_coverage (A): undefined\n"sv},
 	    {.text = R"({
 "git": {"branch": "main", "head": "hash"},
 "files": [
 	{"name": "A", "digest": "md5:value"}
 ]})"sv,
-	     .succeeds = false},
+	     .succeeds = false,
+	     .standard_error =
+	         "cov report: /files[0]/line_coverage (A): undefined\n"sv},
 	    {.text = R"({
 "git": {"branch": "main", "head": "hash"},
 "files": [
 	{"digest": "md5:value", "line_coverage": {}}
 ]})"sv,
-	     .succeeds = false},
+	     .succeeds = false,
+	     .standard_error = "cov report: /files[0]/name: undefined\n"sv},
 	    {.text = R"({
 "git": {"branch": "main", "head": "hash"},
 "files": [
 	{"name": "A", "line_coverage": {}}
 ]})"sv,
-	     .succeeds = false},
+	     .succeeds = false,
+	     .standard_error = "cov report: /files[0]/digest (A): undefined\n"sv},
 	    {.text = R"({
 "git": {"branch": "main", "head": "hash"},
 "files": [
@@ -476,7 +514,9 @@ namespace cov::app::testing {
 		}
 	}
 ]})"sv,
-	     .succeeds = false},
+	     .succeeds = false,
+	     .standard_error =
+	         "cov report: /file[0]/line_coverage[A]: not-a-number\n"sv},
 	    {.text = R"({
 "git": {"branch": "main", "head": "hash"},
 "files": [
@@ -488,7 +528,8 @@ namespace cov::app::testing {
 		}
 	}
 ]})"sv,
-	     .succeeds = false},
+	     .succeeds = false,
+	     .standard_error = "cov report: /file[0]/line_coverage[A]: 15\n"sv},
 	    {.text = R"({
 "git": {"branch": "main", "head": "hash"},
 "files": [
@@ -500,7 +541,8 @@ namespace cov::app::testing {
 		}
 	}
 ]})"sv,
-	     .succeeds = false},
+	     .succeeds = false,
+	     .standard_error = "cov report: /file[0]/line_coverage[A]: 15\n"sv},
 	    {.text = R"({
 "git": {"branch": "main", "head": "hash"},
 "files": [
@@ -512,7 +554,8 @@ namespace cov::app::testing {
 		}
 	}
 ]})"sv,
-	     .succeeds = false},
+	     .succeeds = false,
+	     .standard_error = "cov report: /file[0]/digest (A): 'md5, value'\n"sv},
 	    {.text = R"({
 "git": {"branch": "main", "head": "hash"},
 "files": [
@@ -524,7 +567,23 @@ namespace cov::app::testing {
 		}
 	}
 ]})"sv,
-	     .succeeds = false},
+	     .succeeds = false,
+	     .standard_error = "cov report: /file[0]/digest (A): 'md0:value'\n"sv},
+	    {.text = R"({
+"git": {"branch": "main", "head": "hash"},
+"files": [
+	{
+		"name": "A",
+		"digest": "md5:value",
+		"line_coverage": {},
+		"functions": [{}]
+	}
+]})"sv,
+	     .succeeds = false,
+	     .standard_error =
+	         "cov report: /files[0]/functions[0]/name (A): undefined\n"
+	         "cov report: /files[0]/functions[0]/count (A): undefined\n"
+	         "cov report: /files[0]/functions[0]/start_line (A): undefined\n"sv},
 	};
 
 	INSTANTIATE_TEST_SUITE_P(bad, report, ::testing::ValuesIn(bad));

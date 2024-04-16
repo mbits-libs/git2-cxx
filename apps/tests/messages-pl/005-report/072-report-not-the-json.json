@@ -5,6 +5,7 @@
         2,
         "",
         [
+            "cov report: /git: undefined",
             "cov report: błąd: wystąpiły problemy z $DATA/no-git-coverage.json\n"
         ]
     ],
