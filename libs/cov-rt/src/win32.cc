@@ -6,6 +6,7 @@
 #include <Windows.h>
 #include <errno.h>
 #include <args/parser.hpp>
+#include <cov/app/dirs.hh>
 #include <cov/app/tools.hh>
 #include <cov/io/file.hh>
 #include <filesystem>
@@ -458,6 +459,9 @@ namespace cov::app::platform {
 				return result;
 				// GCOV_EXCL_STOP
 			}  // GCOV_EXCL_LINE
+
+			SetEnvironmentVariableW(
+			    L"COV_EXE_PATH", app::platform::exec_path().native().c_str());
 
 			STARTUPINFOW si;
 			PROCESS_INFORMATION pi;

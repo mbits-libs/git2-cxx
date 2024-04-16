@@ -5,6 +5,8 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <args/parser.hpp>
+#include <cov/app/dirs.hh>
+#include <cov/app/path.hh>
 #include <cov/app/tools.hh>
 #include <cstdlib>
 #include <filesystem>
@@ -259,6 +261,9 @@ namespace cov::app::platform {
 				result.return_code = -ENOENT;
 				return result;
 			}
+
+			setenv("COV_EXE_PATH",
+			       get_u8path(app::platform::exec_path()).c_str(), 1);
 
 			pipes_type pipes{};
 			if (!pipes.open(input != nullptr, capture)) {
