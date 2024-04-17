@@ -12,9 +12,7 @@ namespace cov::placeholder {
 
 		class file_facade : public object_facade {
 		public:
-			file_facade(cov::files::entry const* data,
-			            cov::repository const* repo)
-			    : data_{data}, repo_{repo} {}
+			file_facade(cov::files::entry const* data) : data_{data} {}
 
 			std::string_view name() const noexcept override { return "blob"sv; }
 			std::string_view secondary_label() const noexcept override {
@@ -51,14 +49,11 @@ namespace cov::placeholder {
 
 		private:
 			cov::files::entry const* data_{};
-			cov::repository const* repo_{};
 		};
 
 		class files_facade : public object_facade {
 		public:
-			files_facade(ref_ptr<cov::files> const& data,
-			             cov::repository const* repo)
-			    : data_{data}, repo_{repo} {}
+			files_facade(ref_ptr<cov::files> const& data) : data_{data} {}
 
 			std::string_view name() const noexcept override {
 				return "files"sv;
@@ -70,7 +65,6 @@ namespace cov::placeholder {
 
 		private:
 			ref_ptr<cov::files> data_{};
-			cov::repository const* repo_{};
 		};
 
 		class build_facade : public object_facade {
@@ -380,13 +374,13 @@ namespace cov::placeholder {
 
 	std::unique_ptr<object_facade> object_facade::present_files(
 	    ref_ptr<cov::files> const& data,
-	    cov::repository const* repo) {
-		return std::make_unique<files_facade>(data, repo);
+	    cov::repository const*) {
+		return std::make_unique<files_facade>(data);
 	}
 
 	std::unique_ptr<object_facade> object_facade::present_file(
 	    cov::files::entry const* data,
-	    cov::repository const* repo) {
-		return std::make_unique<file_facade>(data, repo);
+	    cov::repository const*) {
+		return std::make_unique<file_facade>(data);
 	}
 }  // namespace cov::placeholder

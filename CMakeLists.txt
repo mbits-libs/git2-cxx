@@ -221,15 +221,6 @@ add_subdirectory(libs)
 add_subdirectory(extensions)
 add_subdirectory(apps)
 
-if (CMAKE_GENERATOR MATCHES "Visual Studio" AND TARGET cov_coveralls_test)
-  add_dependencies(cov_coveralls_test
-    git2-test git2-stress-test
-    cov-test cov-stress-test
-    lighter-test lighter-stress-test
-    cov
-  )
-endif()
-
 execute_process(COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/packages/system.py props
     OUTPUT_VARIABLE COV_PROPERTIES
     OUTPUT_STRIP_TRAILING_WHITESPACE

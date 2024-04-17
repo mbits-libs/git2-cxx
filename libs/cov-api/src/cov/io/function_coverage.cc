@@ -134,9 +134,8 @@ namespace cov::io::handlers {
 	                              write_stream& out) const {
 		auto const obj = as_a<cov::function_coverage>(
 		    static_cast<object const*>(value.get()));
-		using entry_span =
-		    std::span<std::unique_ptr<cov::function_coverage::entry>>;
-		auto entries = obj ? obj->entries() : entry_span{};
+		if (!obj) return false;
+		auto entries = obj->entries();
 
 		auto stg = [&] {
 			strings_builder strings{};
@@ -185,9 +184,6 @@ namespace cov::io::handlers {
 
 		return true;
 	}
-#if defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif
 }  // namespace cov::io::handlers
 
 namespace cov {
