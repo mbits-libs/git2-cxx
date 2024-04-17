@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) and [COMMITS.md](COMMITS.md) for commit guidelines.
 
+## [0.24.1](https://github.com/mzdun/cov/compare/v0.24.0...v0.24.1) (2024-04-17)
+
+### Bug Fixes
+
+- do not upload on RELEASE ([6ad91a2](https://github.com/mzdun/cov/commit/6ad91a29a976662689bba988c5997e73fe70f97d))
+
 ## [0.24.0](https://github.com/mzdun/cov/compare/v0.23.0...v0.24.0) (2024-04-17)
 
 ### New Features
