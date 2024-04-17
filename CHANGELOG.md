@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) and [COMMITS.md](COMMITS.md) for commit guidelines.
 
+## [0.24.0](https://github.com/mzdun/cov/compare/v0.23.0...v0.24.0) (2024-04-17)
+
+### New Features
+
+- add error descriptions to `cov-report` ([c49c608](https://github.com/mzdun/cov/commit/c49c608e70338dd41509b2229f74d9ab00f54b6b))
+- clean error output ([bb1af96](https://github.com/mzdun/cov/commit/bb1af96e5892059f18225492c0c9cae85e521710)), closes [#92](https://github.com/mzdun/cov/issues/92)
+- prepare cov-collect configs ([d2a5119](https://github.com/mzdun/cov/commit/d2a5119913e89602660446aab01e4ab9ddb29b2a))
+
 ## [0.23.0](https://github.com/mzdun/cov/compare/v0.22.0...v0.23.0) (2024-04-16)
 
 ### New Features
