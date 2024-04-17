@@ -103,7 +103,6 @@ namespace cov::app::builtin::show {
 
 	ref_ptr<cov::files> get_files(git::oid_view id,
 	                              cov::repository const& repo) {
-		git::oid ref{};
 		std::error_code ec{};
 		auto generic = repo.lookup<cov::object>(id, ec);
 		if (!generic || ec) return {};
@@ -167,7 +166,7 @@ namespace cov::app::builtin::show {
 		                     view.fname.prefix.empty();
 
 		auto const print_build_props = [&repo = info.repo, &range = info.range,
-		                                &ec = ec, &p = p]() {
+		                                &p = p]() {
 			using namespace std::chrono;
 			auto const now = floor<seconds>(system_clock::now());
 

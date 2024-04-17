@@ -34,17 +34,11 @@ namespace cov::io::handlers {
 		return cov::line_coverage::create(std::move(result));
 	}
 
-#if defined(__GNUC__)
-// The warning is legit, since as_a<> can return nullptr, if there is no
-// cov::line_coverage in type tree branch, but this should be called from within
-// db_object::store, which is guarded by line_coverage::recognized
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wnull-dereference"
-#endif
 	bool line_coverage::store(ref_ptr<counted> const& value,
 	                          write_stream& out) const {
 		auto const obj =
 		    as_a<cov::line_coverage>(static_cast<object const*>(value.get()));
+		if (!obj) return false;
 		auto const& items = obj->coverage();
 		v1::line_coverage hdr{.line_count =
 		                          static_cast<uint32_t>(items.size())};
@@ -52,9 +46,6 @@ namespace cov::io::handlers {
 		if (!out.store(items)) return false;
 		return true;
 	}
-#if defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif
 }  // namespace cov::io::handlers
 
 namespace cov {

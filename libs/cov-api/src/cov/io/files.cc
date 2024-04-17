@@ -164,13 +164,6 @@ namespace cov::io::handlers {
 		return builder.extract(oid);
 	}
 
-#if defined(__GNUC__)
-// The warning is legit, since as_a<> can return nullptr, if there is no
-// cov::files in type tree branch, but this should be called from within
-// db_object::store, which is guarded by files::recognized
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wnull-dereference"
-#endif
 	template <typename EntryType>
 	struct init_entry;
 	template <>
@@ -215,6 +208,7 @@ namespace cov::io::handlers {
 	bool files::store(ref_ptr<counted> const& value, write_stream& out) const {
 		auto const obj =
 		    as_a<cov::files>(static_cast<object const*>(value.get()));
+		if (!obj) return false;
 		auto entries = obj->entries();
 
 		auto only_lines = true;
@@ -276,9 +270,6 @@ namespace cov::io::handlers {
 
 		return true;
 	}
-#if defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif
 }  // namespace cov::io::handlers
 
 namespace cov {

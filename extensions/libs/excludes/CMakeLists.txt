@@ -22,16 +22,8 @@ if (COV_TESTING)
     ${EXCLUDES_TEST_SRCS_CPP}
     ${EXCLUDES_TEST_SRCS_CXX})
 
-  add_executable(strip-excludes-test ${EXCLUDES_TEST_SRCS_CC} ${EXCLUDES_TEST_SRCS_CPP} ${EXCLUDES_TEST_SRCS_CXX})
-  set_target_properties(strip-excludes-test PROPERTIES FOLDER tests)
-
-  target_compile_options(strip-excludes-test PRIVATE ${ADDITIONAL_WALL_FLAGS})
-  target_link_options(strip-excludes-test PRIVATE ${ADDITIONAL_LINK_FLAGS})
+  add_cov_test(strip-excludes ${EXCLUDES_TEST_SRCS_CC} ${EXCLUDES_TEST_SRCS_CPP} ${EXCLUDES_TEST_SRCS_CXX})
   target_link_libraries(strip-excludes-test PRIVATE excludes testing-lib)
-  target_include_directories(strip-excludes-test
-    PRIVATE
-      ${CMAKE_CURRENT_SOURCE_DIR}/tests
-      ${CMAKE_CURRENT_BINARY_DIR})
 
   if (COV_CUTDOWN_OS)
     message(STATUS "strip-excludes tests: removing some tests on cutdown OS")
@@ -39,4 +31,10 @@ if (COV_TESTING)
   endif()
 
   add_test(NAME strip-excludes COMMAND strip-excludes-test "--gtest_output=xml:${TEST_REPORT_DIR}/libexludes/${TEST_REPORT_FILE}")
+
+  if (CMAKE_GENERATOR MATCHES "Visual Studio" AND TARGET cov_coveralls_test)
+    add_dependencies(cov_coveralls_test
+      strip-excludes-test
+    )
+  endif()
 endif()
