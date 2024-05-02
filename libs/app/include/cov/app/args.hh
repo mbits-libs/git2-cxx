@@ -62,6 +62,10 @@ namespace cov::app {
 		static std::string message_from_cov_api(str::errors::Strings const&,
 		                                        cov::errc = cov::errc{});
 
+		std::filesystem::path locate_repo_here(
+		    str::errors::Strings const& err_str,
+		    str::args::Strings const& arg_str) const;
+
 	protected:
 		::args::parser parser_;
 

@@ -1,5 +1,7 @@
 set(SOURCES
+    src/open_here.cc
     src/platform.cc
+    include/native/open_here.hh
     include/native/platform.hh
 )
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})
