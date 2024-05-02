@@ -1,0 +1,14 @@
+<html>
+    {{> _head}}
+    <body>
+        <main class="container">
+            {{#build}}{{> _build-info}}{{/build}}
+            {{> _navigation}}
+            {{> _stats-table}}
+        </main>
+    </body>
+    <script>
+        window.json = {{{json}}};
+        console.log(json);
+    </script>
+</html>

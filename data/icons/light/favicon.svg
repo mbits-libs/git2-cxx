@@ -1,0 +1,11 @@
+<svg xmlns='http://www.w3.org/2000/svg' width='256px' height='256px' viewBox='0 0 24 24' version='1.1' fill="none">
+    <g transform="translate(12,0)" mask="url(#mask)">
+        <mask id="mask" stroke="none">
+            <rect width="24" height="24" x="-12" fill="#000" />
+            <circle cx="0" cy="12" r="12" fill="#fff" />
+        </mask>
+        <circle cx="0" cy="12" r="12" fill="#b9e7fc" stroke="#1f88e5" stroke-width="2" />
+        <ellipse cx="0" cy="12" ry="11.5" rx="6" fill="none" stroke="#1f88e5" stroke-width="1" />
+        <path d="M0,0 v24 z M-12,6 h24 z M-12,12 h24 z M-12,18 h24 z" fill="none" stroke="#1f88e5" stroke-width="1" />
+    </g>
+</svg>

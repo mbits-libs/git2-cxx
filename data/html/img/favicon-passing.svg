@@ -1,0 +1,55 @@
+<svg xmlns='http://www.w3.org/2000/svg' width='256px' height='256px' viewBox='0 0 36 36' version='1.1' fill="none">
+    <mask id="mask" stroke="none">
+        <rect width="36" height="36" fill="#000" />
+        <circle cx="18" cy="18" r="18" fill="#fff" />
+        <path transform="translate(27,12)" fill="#000" stroke="#000" stroke-width="6"
+            d="M-9,3 C-4,3 0,0 0,0 C0,0 4,3 9,3 V10.0 C9,18 0,24 0,24 C0,24 -9,18 -9,10 z" />
+    </mask>
+    <style>
+        :root {
+            --globe-fill: #b9e7fc;
+            --globe-stroke: #1f88e5;
+            --shield: #1a7f37;
+            --mark: #e3efe6;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --globe-fill: #81bdf1;
+                --globe-stroke: #e3f1fc;
+                --shield: #e3efe6;
+                --mark: #1a7f37;
+            }
+        }
+
+        .globe {
+            fill: var(--globe-fill);
+            stroke: var(--globe-stroke);
+            stroke-width: 3;
+        }
+
+        .globe-lines {
+            stroke: var(--globe-stroke);
+            stroke-width: 1.5;
+        }
+
+        .shield {
+            fill: var(--shield);
+        }
+
+        .mark {
+            stroke: var(--mark);
+            stroke-width: 2.5;
+        }
+    </style>
+    <g mask="url(#mask)">
+        <circle cx="18" cy="18" r="18" class="globe" />
+        <ellipse cx="18" cy="18" ry="17.5" rx="9" class="globe-lines" />
+        <path d="M18,0 v36 z M0,9 h36 z M0,18 h36 z M0,27 h36 z" class="globe-lines" />
+    </g>
+    <g transform="translate(27,12)">
+        <path d="M-9,3 C-4,3 0,0 0,0 C0,0 4,3 9,3 V10.0 C9,18 0,24 0,24 C0,24 -9,18 -9,10 z" class="shield" />
+        <path d="M-4.5,10.5 L-1.5,13.5 L4.5,7.5" class="mark" />
+        <path fill="rgba(0,0,0,.2)" d="M0,0 C0,0 4,3 9,3 V10.0 C9,18 0,24 0,24 z" />
+    </g>
+</svg>

@@ -1,0 +1,17 @@
+{{#breadcrumbs}}
+<div class="breadcrumbs"> 
+    {{#is-root}}{{{octicons.repo}}} <span class="breadcrumbs-leaf">{{heading.display}}</span>{{/is-root}}
+    {{^is-root}}
+    {{> _icon}}
+    <nav>
+        <ol>
+            <li class="breadcrumbs-root breadcrumbs-item"><a href="{{heading.href}}">{{heading.display}}</a></li>
+            {{#nav}}
+            <li class="breadcrumbs-item"><span class="text">/</span><a href="{{href}}">{{display}}</a></li>
+            {{/nav}}
+            <li><span class="text">/</span><span class="breadcrumbs-leaf">{{leaf}}</span></li>
+        </ol>
+    </nav>
+    {{/is-root}}
+</div>
+{{/breadcrumbs}}

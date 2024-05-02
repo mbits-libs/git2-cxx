@@ -1,0 +1,14 @@
+<head>
+    <title>{{title}} · cov</title>
+{{# build}}
+{{^ mark}}
+    <link rel="icon" type="image/png" href="{{site-root}}img/favicon.png" />
+    <link rel="icon" type="image/svg+xml" href="{{site-root}}img/favicon.svg" />
+{{/ mark}}
+{{# mark}}
+    <link rel="icon" type="image/png" href="{{site-root}}img/favicon-{{mark}}.png" />
+    <link rel="icon" type="image/svg+xml" href="{{site-root}}img/favicon-{{mark}}.svg" />
+{{/ mark}}
+{{/ build}}
+    <link rel="stylesheet" href="{{site-root}}style/style.css" />
+</head>

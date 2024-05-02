@@ -1,0 +1,10 @@
+{{> _icon}}
+{{#is-total}}<svg xmlns='http://www.w3.org/2000/svg' class='octicon' width='1.00em' height='1.00em' viewBox='0 0 16 16' fill='currentColor'><path d=""/></svg>{{/is-total}}
+{{#has-href}}
+{{! = prefix + href ====================================== }}
+{{#has-prefix}}<span class="aligned"><span>{{prefix}}</span><a href="{{href}}">{{display}}</a></span>{{/has-prefix}}
+{{! = href =============================================== }}
+{{^has-prefix}}<a href="{{href}}">{{display}}</a>{{/has-prefix}}
+{{/has-href}}
+
+{{^has-href}}{{prefix}}{{display}}{{/has-href}}

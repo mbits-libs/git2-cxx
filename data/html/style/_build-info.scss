@@ -1,0 +1,155 @@
+.build {
+  font-size: 0.9rem;
+  margin-top: 1em;
+  padding: 0.5rem 0;
+  background: linear-gradient(
+    to right,
+    var(--accent) 0,
+    var(--accent) 10px,
+    white 10px,
+    white 100%
+  );
+  display: flex;
+  justify-content: flex-start;
+  flex-flow: row nowrap;
+
+  code {
+    font-family: monospace, monospace;
+  }
+
+  &.build-passing {
+    --accent: #28a745;
+  }
+
+  &.build-incomplete {
+    --accent: #fd7e14;
+  }
+
+  &.build-failing {
+    --accent: #dc3545;
+  }
+
+  .build-state-icon {
+    color: var(--accent);
+    flex: 0 0 48px;
+    padding-left: 20px;
+    font-size: 1.5rem;
+  }
+
+  .build-columns,
+  .build-column {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .build-column {
+    align-items: stretch;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .build-row {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .build-commit {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .build-subject {
+    font-size: 1rem;
+  }
+
+  .build-grade {
+    color: var(--accent);
+  }
+
+  .build-properties {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-top: 0.5rem;
+    ol {
+      display: flex;
+      flex-flow: row wrap;
+      gap: 0 0.5em;
+      padding: 0 0.5em;
+    }
+
+    li {
+      display: inline-block;
+    }
+
+    ol,
+    li {
+      padding: 0;
+      margin: 0;
+      white-space: normal;
+    }
+
+    .property-name {
+      opacity: 0.6;
+      color: inherit !important;
+
+      &.prop-string {
+        display: none;
+      }
+    }
+
+    .property-value {
+      font-family: monospace, monospace;
+    }
+  }
+
+  .row-icon {
+    margin-right: 5px;
+    width: 16px;
+    text-align: center;
+
+    .avatar {
+      border-radius: 3px;
+    }
+
+    .avatar,
+    svg {
+      display: inline-block;
+      vertical-align: middle;
+    }
+  }
+
+  .build-subject {
+    font-size: 1.2rem;
+  }
+
+  .build-description {
+    padding: 1em 0;
+  }
+
+  .build-description pre {
+    white-space: pre-wrap;
+  }
+
+  .build-columns > .build-column:nth-child(2) {
+    padding-top: 1em;
+  }
+
+  @media (min-width: 992px) {
+    .build-columns {
+      display: flex;
+      flex-flow: row nowrap;
+    }
+    .build-columns > .build-column:nth-child(2) {
+      padding-top: 0;
+    }
+    .build-column:first-child {
+      border-right: solid 1px #eee;
+      flex: 0 0 calc(50%);
+    }
+    .build-column:last-child {
+      flex: 0 0 calc(50%);
+      padding-left: 0.6em;
+    }
+  }
+}
