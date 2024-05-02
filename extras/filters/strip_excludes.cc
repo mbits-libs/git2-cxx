@@ -92,7 +92,8 @@ namespace cov::app::strip {
 	}
 
 	int tool(args::args_view const& arguments) {
-		parser p{arguments, {platform::locale_dir(), ::lngs::system_locales()}};
+		parser p{arguments,
+		         {platform::filters::locale_dir(), ::lngs::system_locales()}};
 		p.parse();
 
 		std::vector<std::string_view> valid_markers{*p.os, *p.compiler};

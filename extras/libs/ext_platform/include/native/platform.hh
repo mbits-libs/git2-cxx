@@ -7,7 +7,25 @@
 #include <vector>
 
 namespace cov::app::platform {
-	std::filesystem::path const& sys_root();
-	std::filesystem::path locale_dir();
+	struct locale_dir_provider {
+		static std::filesystem::path locale_dir_inside(
+		    std::filesystem::path const& sys_root);
+	};
+
+	template <typename Final>
+	struct sys_provider : locale_dir_provider {
+		static std::filesystem::path locale_dir() {
+			return locale_dir_provider::locale_dir_inside(Final::sys_root());
+		}  // GCOV_EXCL_LINE
+	};
+
+	struct filters : sys_provider<filters> {
+		static std::filesystem::path const& sys_root();
+	};
+
+	struct core_extensions : sys_provider<core_extensions> {
+		static std::filesystem::path const& sys_root();
+	};
+
 	std::vector<char8_t> read_input();
 };  // namespace cov::app::platform

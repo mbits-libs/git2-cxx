@@ -3,6 +3,7 @@
 
 #include <git2/errors.h>
 #include <cov/app/args.hh>
+#include <cov/repository.hh>
 #include <regex>
 #include <span>
 
@@ -61,6 +62,12 @@ namespace cov::app {
 		    {GIT_ERROR_CONFIG, nullptr, config_direct, config_regex},
 		    {GIT_ERROR_REGEX, "regex"},
 		};
+
+		inline std::string get_u8path(std::filesystem::path copy) {
+			copy.make_preferred();
+			auto u8 = copy.u8string();
+			return {reinterpret_cast<char const*>(u8.data()), u8.size()};
+		}
 	}  // namespace
 
 	[[noreturn]] void simple_error(str::args::Strings const& tr,
@@ -209,5 +216,33 @@ namespace cov::app {
 	    str::errors::Strings const& tr,
 	    cov::errc ec) {
 		return message_from_errc(tr, ec, cov_general_direct);
+	}
+
+	std::filesystem::path parser_holder::locate_repo_here(
+	    str::errors::Strings const& err_str,
+	    str::args::Strings const& arg_str) const {
+		std::error_code ec{};
+		auto const current_directory = std::filesystem::current_path(ec);
+		// GCOV_EXCL_START
+		if (ec) {
+			[[unlikely]];
+			this->error(ec, err_str, arg_str);
+		}
+		// GCOV_EXCL_STOP
+
+		auto repo_path = cov::discover_repository(current_directory, ec);
+		if (ec) {
+			if (ec == errc::uninitialized_worktree) {
+				fmt::print(stderr, "{}\n\n    cov init --worktree <branch>\n\n",
+				           arg_str(str::args::lng::COV_WITHIN_WORKTREE));
+				std::exit(1);
+			}
+
+			this->error(fmt::format(
+			    fmt::runtime(arg_str(str::args::lng::CANNOT_FIND_COV)),
+			    get_u8path(current_directory)));
+		}
+
+		return repo_path;
 	}
 }  // namespace cov::app
