@@ -13,11 +13,15 @@ target_link_libraries(arch::deps INTERFACE
 add_subdirectory(libarch)
 add_subdirectory(date)
 add_subdirectory(json)
+add_subdirectory(libmstch)
 
-set_target_properties(json PROPERTIES FOLDER libs)
+set_target_properties(json mstch PROPERTIES FOLDER libs)
+target_include_directories(mstch
+  INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/libmstch/include>)
 
 fix_vs_modules(arch)
 fix_vs_modules(date-tz)
 fix_vs_modules(json)
+fix_vs_modules(mstch)
 
 set_parent_scope()

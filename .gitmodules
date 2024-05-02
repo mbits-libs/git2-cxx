@@ -13,3 +13,6 @@
 [submodule "external/libarch"]
 	path = external/libarch
 	url = https://github.com/mbits-libs/libarch.git
+[submodule "external/libmstch"]
+	path = external/libmstch
+	url = https://github.com/mbits-libs/libmstch.git
