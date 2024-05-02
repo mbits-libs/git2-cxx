@@ -72,7 +72,7 @@ if (COV_TESTING)
   set(INCLUDED_IN_COVERAGE
     apps/builtins
     apps/cov
-    extensions/filters
+    extras/filters
   )
 
   foreach(module
@@ -92,13 +92,13 @@ if (COV_TESTING)
 
   foreach(ext_lib excludes ext_native ext_platform)
     list(APPEND INCLUDED_IN_COVERAGE
-      extensions/libs/${ext_lib}/include
-      extensions/libs/${ext_lib}/src)
+      extras/libs/${ext_lib}/include
+      extras/libs/${ext_lib}/src)
   endforeach()
 
   set(EXCLUDED_FROM_COVERAGE
     apps/tests
-    extensions/tests
+    extras/tests
   )
   foreach(extension
     collect-api
@@ -107,7 +107,7 @@ if (COV_TESTING)
     ext_platform
   )
     list(APPEND EXCLUDED_FROM_COVERAGE
-      extensions/${extension}/test)
+      extras/${extension}/test)
   endforeach()
 
   set(cov_COVERALLS_DIRS ${INCLUDED_IN_COVERAGE})
@@ -222,7 +222,7 @@ include(cov)
 
 add_subdirectory(external)
 add_subdirectory(libs)
-add_subdirectory(extensions)
+add_subdirectory(extras)
 add_subdirectory(apps)
 
 execute_process(COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/packages/system.py props

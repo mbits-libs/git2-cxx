@@ -12,11 +12,11 @@
     path = apps/cov/
     path = apps/builtins/
 [module "ext/filters"]
-    path = extensions/filters
+    path = extras/filters
 [module "ext/libs"]
-    path = extensions/libs
+    path = extras/libs
 [module "ext"]
-    path = extensions
+    path = extras
 [module "hilite/lighter"]
     path = libs/hilite/hilite
     path = libs/hilite/lighter
