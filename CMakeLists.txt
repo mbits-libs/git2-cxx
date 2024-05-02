@@ -56,6 +56,9 @@ find_package(ZLIB REQUIRED)
 find_package(BZip2 REQUIRED)
 find_package(lzma_sdk REQUIRED)
 
+find_program(SassC_EXECUTABLE sassc REQUIRED)
+message(STATUS "SassC_EXECUTABLE is: ${SassC_EXECUTABLE}")
+
 if (COV_TESTING)
   enable_testing()
 
@@ -73,6 +76,7 @@ if (COV_TESTING)
     apps/builtins
     apps/cov
     extras/filters
+    extras/cov_export
   )
 
   foreach(module
@@ -90,7 +94,7 @@ if (COV_TESTING)
     list(APPEND INCLUDED_IN_COVERAGE libs/hilite/hilite-${extra}/src)
   endforeach()
 
-  foreach(ext_lib excludes ext_native ext_platform)
+  foreach(ext_lib excludes ext_native ext_platform collect-api)
     list(APPEND INCLUDED_IN_COVERAGE
       extras/libs/${ext_lib}/include
       extras/libs/${ext_lib}/src)
@@ -105,6 +109,7 @@ if (COV_TESTING)
     excludes
     ext_native
     ext_platform
+    cov_export
   )
     list(APPEND EXCLUDED_FROM_COVERAGE
       extras/${extension}/test)
@@ -220,6 +225,7 @@ message(STATUS "Sanitizer: ${COV_SANITIZE}")
 
 include(cov)
 
+add_subdirectory(data)
 add_subdirectory(external)
 add_subdirectory(libs)
 add_subdirectory(extras)

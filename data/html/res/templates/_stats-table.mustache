@@ -1,0 +1,23 @@
+{{# stats}}
+<div class="card">
+    <table class="stats">
+        <thead>
+            <tr>
+            {{#columns}}
+                {{#is-name}}<td class="priority-high">{{display}}</td>{{/is-name}}{{^is-name}}<td colspan="2" class="priority-{{priority}}">{{display}}</td>{{/is-name}}
+            {{/columns}}
+            </tr>
+        </thead>
+        <tbody>
+        {{#rows}}
+            {{> stats-table/_row}}
+        {{/rows}}
+        </tbody>
+        {{#total}}
+            <tfoot>
+                {{> stats-table/_row}}
+            </tfoot>
+        {{/total}}
+    </table>
+</div>
+{{/ stats}}

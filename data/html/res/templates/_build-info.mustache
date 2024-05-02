@@ -1,0 +1,52 @@
+<div class="card build build-{{mark}}">
+    <div class='build-state-icon' title='{{stats.percent.value}}'>{{#is-passing}}{{{octicons.check}}}{{/is-passing}}{{#is-incomplete}}{{{octicons.dash}}}{{/is-incomplete}}{{#is-failing}}{{{octicons.x}}}{{/is-failing}}</div>
+
+{{#commit}}
+		<div class='build-columns'>
+			<div class='build-column'>
+				<div class='build-row build-subject'>{{subject}}</div>
+{{#description}}
+				<div class='build-row build-description'><pre>{{description}}</pre></div>
+{{/description}}
+			</div>
+			<div class='build-column'>
+				<div class='build-row'>
+					<div title='Committed {{commit.date-YmdHM}}'>
+						<span class='row-icon'>{{{octicons.database}}}</span> {{commit.date-relative}}
+					</div>
+					<div title='Added {{report.date-YmdHM}}'>
+						<span class='row-icon'>{{{octicons.cloud}}}</span> {{report.date-relative}}
+					</div>
+				</div>
+				<div class='build-row' style='padding: 1em 0'>
+					<div class='build-report'>
+						<span class='row-icon icon-report'>{{{octicons.git-commit}}}</span> Report <code>{{report.report-id}}</code>
+					</div>
+					<div class='build-commit'>
+						<span class='row-icon icon-commit'>{{{octicons.git-commit}}}</span> Commit <code>{{commit-id}}</code>
+					</div>
+					<div class='build-branch'>
+						<span class='row-icon'>{{{octicons.git-branch}}}</span> Branch <code>{{branch}}</code>
+					</div>
+{{#report.properties}}
+					<div class='build-properties'>
+						<span class='row-icon'>{{{octicons.cache}}}</span>
+                        <ol>
+{{#propset}}
+                            <li title="{{name}}: {{value}}"><span class="property-name prop-{{prop-type}}">{{name}}: </span>{{> build-info/_property}}</li>
+{{/propset}}
+                        </ol>
+					</div>
+{{/report.properties}}
+				</div>
+				<div class='build-row'>
+					<span title='{{author.email}}'><span class='row-icon'><img src='https://www.gravatar.com/avatar/{{author.hash}}?s=16&d=mp' class='avatar'/></span> {{author.name}}</span>
+{{#different_author}}
+					(<nobr>Committed by</nobr>
+					<span title='{{committer.email}}'><span class='row-icon'><img src='https://www.gravatar.com/avatar/{{committer.hash}}?s=16&d=mp' class='avatar'/></span> {{committer.name}}</span>)
+{{/different_author}}
+				</div>
+			</div>
+		</div> <!-- /.build-columns -->
+{{/commit}}
+</div>

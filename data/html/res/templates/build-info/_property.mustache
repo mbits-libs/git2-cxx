@@ -1,0 +1,8 @@
+<span class="property-value prop-{{prop-type}}">
+{{#is-flag}}
+    <span class="row-icon">{{#is-on}}{{{octicons.check-circle}}}{{/is-on}}{{^is-on}}{{{octicons.skip}}}{{/is-on}}</span>
+{{/is-flag}}
+{{^is-flag}}
+    {{value}}
+{{/is-flag}}
+</span>

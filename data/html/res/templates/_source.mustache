@@ -1,0 +1,48 @@
+{{#file-is-present}}
+{{^file-is-empty}}
+<div class='file-contents'>
+    <table class="file">
+{{#file-chunks}}
+{{#missing-before}}
+        <tr class='missing-kebab'>
+            <td>&nbsp;</td>
+            <td colspan="2">{{{octicons.kebab-horizontal}}}</td>
+        </tr>
+{{/missing-before}}
+{{#lines}}
+{{#functions}}
+        <tr class='file-line function file-line-mark-{{class-name}}' id='L{{line-no}}-{{name}}'>
+            <td class='file-line-no'>&nbsp;</td>
+            <td class='file-line-text'><a href="#L{{line-no}}">{{name}}</a></td>
+            <td class='file-line-count'><a href="#L{{line-no}}">&times;{{count}}</a></td>
+        </tr>
+{{/functions}}
+        <tr class='file-line file-line-mark-{{class-name}}' id='L{{line-no}}'>
+            <td class='file-line-no'><a href="#L{{line-no}}">{{line-no}}.</a></td>
+            <td class='file-line-text'><a href="#L{{line-no}}">{{{text}}}</a></td>
+            <td class='file-line-count'>{{#is-null}}&nbsp;{{/is-null}}{{^is-null}}<a href="#L{{line-no}}">&times;{{count}}</a>{{/is-null}}</td>
+        </tr>
+{{/lines}}
+{{#missing-after}}
+        <tr class='missing-kebab'>
+            <td>&nbsp;</td>
+            <td colspan="2">{{{octicons.kebab-horizontal}}}</td>
+        </tr>
+{{/missing-after}}
+{{/file-chunks}}
+    </table>
+</div>
+{{/file-is-empty}}
+{{#file-is-empty}}
+<div class="card message-box warning">
+    <div class='message-box-icon'>{{{octicons.shield}}}</div>
+    <div class='message-box-text'>This file is empty.</div>
+</div>
+{{/file-is-empty}}
+{{/file-is-present}}
+{{^file-is-present}}
+<div class="card message-box warning">
+    <div class='message-box-icon'>{{{octicons.shield}}}</div>
+    <div class='message-box-text'>Contents of this file were not found in the Cov repository.</div>
+</div>
+{{/file-is-present}}

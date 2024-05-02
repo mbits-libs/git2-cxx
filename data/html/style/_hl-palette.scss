@@ -1,0 +1,58 @@
+.hl-block-comment,
+.hl-line-comment {
+  color: #080;
+}
+
+.hl-keyword,
+.hl-meta .hl-meta-identifier {
+  color: #008;
+}
+
+.hl-meta {
+  color: #008;
+}
+.hl-meta span {
+  color: #444;
+}
+
+.hl-meta .hl-system-header-name,
+.hl-meta .hl-local-header-name {
+  color: #800;
+}
+
+.hl-char-encoding,
+.hl-char-udl,
+.hl-string-encoding,
+.hl-string-udl,
+.hl-character,
+.hl-string,
+.hl-raw-string {
+  color: #a31515;
+}
+
+.hl-char-delim,
+.hl-string-delim {
+  color: #f00;
+}
+
+.hl-escape-sequence,
+.hl-character .hl-universal-character-name,
+.hl-string .hl-universal-character-name {
+  color: #b676fb;
+}
+
+.hl-meta .hl-macro-name {
+  font-style: italic;
+}
+.hl-meta .hl-macro-arg-list {
+  color: orange;
+}
+.hl-meta .hl-macro-arg {
+  color: orange;
+}
+.hl-meta .hl-macro-va-args {
+  color: orange;
+}
+.hl-meta .hl-macro-replacement {
+  color: orange;
+}

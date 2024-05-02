@@ -1,0 +1,107 @@
+// Copyright (c) 2024 Marcin Zdun
+// This code is licensed under MIT license (see LICENSE for details)
+
+@import "icon-line";
+
+:root {
+  --color-icon-directory: #54aeff;
+}
+
+.label {
+  width: 100%;
+  padding: 0 1rem;
+  justify-content: stretch;
+  @include flex(0.5rem);
+
+  &.dir > svg {
+    color: var(--color-icon-directory);
+  }
+}
+
+table {
+  border-collapse: collapse;
+}
+
+tr {
+  .stats thead > & > td,
+  .stats thead > & > td:first-child {
+    text-align: center;
+    color: var(--background);
+    background-color: var(--text);
+    padding-left: 1rem;
+    padding-right: 1rem;
+    font-weight: 700;
+    font-variant: small-caps;
+  }
+
+  .stats td:first-child {
+    color: var(--text);
+  }
+
+  .stats tbody > &:hover,
+  .stats tfoot > & {
+    background-color: #00000020;
+  }
+
+  .stats tfoot > &:hover {
+    background-color: #00000040;
+  }
+
+  .stats tfoot > &,
+  .stats &.total {
+    font-weight: 700;
+  }
+}
+
+.value {
+  text-align: right;
+  padding-left: 0.5rem;
+}
+
+.diff {
+  vertical-align: top;
+  font-size: 0.65rem;
+  padding-right: 1rem;
+  font-weight: 400;
+}
+
+.stats td {
+  padding: 0.5rem 0;
+  cursor: default;
+
+  &.passing {
+    color: var(--cov-passing);
+
+    &-bg {
+      background-color: var(--cov-passing-bg);
+    }
+  }
+
+  &.incomplete {
+    color: var(--cov-incomplete);
+
+    &-bg {
+      background-color: var(--cov-incomplete-bg);
+    }
+  }
+
+  &.failing {
+    color: var(--cov-failing);
+
+    &-bg {
+      background-color: var(--cov-failing-bg);
+    }
+  }
+
+  &.bold {
+    font-weight: 700;
+  }
+}
+
+.diff.up {
+  color: var(--cov-up);
+}
+
+.diff.down {
+  color: var(--cov-down);
+}

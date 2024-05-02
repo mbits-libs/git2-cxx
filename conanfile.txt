@@ -17,6 +17,9 @@ mbits-utfconv/1.0.4
 # not ready for conan2:
 libgit2/1.5.0
 
+[tool_requires]
+sassc/3.6.2
+
 [options]
 libgit2/*:with_libssh2=False
 
