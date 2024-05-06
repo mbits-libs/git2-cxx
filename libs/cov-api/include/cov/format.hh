@@ -437,11 +437,11 @@ namespace cov {
 		                                     io::v1::stats const& stats,
 		                                     placeholder::rating const& marks);
 
-	private:
 		static std::string no_translation(long long count,
 		                                  translatable scale,
 		                                  void*);
 
+	private:
 		std::vector<placeholder::printable> format_{};
 		bool needs_timezones_{true};
 	};
