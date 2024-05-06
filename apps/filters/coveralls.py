@@ -49,7 +49,7 @@ VERSION = cov_version()
 
 json.dump(
     {
-        "$schema": f"https://raw.githubusercontent.com/mzdun/cov/v${VERSION}/apps/report-schema.json",
+        "$schema": f"https://raw.githubusercontent.com/mzdun/cov/v{VERSION}/apps/report-schema.json",
         "git": {"branch": git["branch"], "head": git_head["id"]},
         "files": [cov_from(source_file) for source_file in data["source_files"]],
     },
