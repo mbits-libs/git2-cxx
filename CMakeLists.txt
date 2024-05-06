@@ -109,6 +109,7 @@ if (COV_TESTING)
     libs/ext_native
     libs/ext_platform
     libs/web
+    cov_export
   )
     list(APPEND EXCLUDED_FROM_COVERAGE
       extras/${extension}/test)
