@@ -68,7 +68,6 @@ namespace cov::app::report_export {
 		}
 
 		void on_action(std::string_view action) {
-#if 1
 			if (cov::platform::is_terminal(stdout)) {
 				fmt::print("\r\033[2K[{}/{}] {}", index, count, action);
 				std::fflush(stdout);
@@ -76,23 +75,6 @@ namespace cov::app::report_export {
 				fmt::print("[{}/{}] {}\n", index, count, action);
 			}
 			++index;
-#else
-			auto const msg = fmt::format("\r[{}/{}] {}", index, count, action);
-			++index;
-			if (prev_line_length) {
-				std::fputc('\r', stdout);
-				static constexpr auto whiteout =
-				    "                                        "sv;
-				while (prev_line_length) {
-					auto size = prev_line_length > whiteout.length()
-					                ? whiteout.length()
-					                : prev_line_length;
-					prev_line_length -= size;
-					std::fwrite(whiteout.data(), 1, size, stdout);
-				}
-			}
-			std::fputs(msg.c_str(), stdout);
-#endif
 		}
 	};
 
@@ -129,6 +111,7 @@ namespace cov::app::report_export {
 		    .out_dir = info.path,
 		    .repo = info.repo,
 		    .ref = info.range.to,
+		    .base = info.range.from,
 		};
 
 		stage.initialize(ec);

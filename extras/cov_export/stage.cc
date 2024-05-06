@@ -67,7 +67,7 @@ namespace cov::app::web {
 		    out_dir, std::filesystem::copy_options::recursive, ec);
 		if (ec) return;
 
-		std::tie(commit_ctx, report_ctx) = add_build_info(repo, ref, ec);
+		std::tie(commit_ctx, report_ctx) = add_build_info(repo, ref, base, ec);
 		if (ec) return;
 	}
 

@@ -292,6 +292,7 @@ namespace cov::app::web {
 
 	std::pair<mstch::map, mstch::map> add_build_info(cov::repository& repo,
 	                                                 git::oid_view oid,
+	                                                 git::oid_view from,
 	                                                 std::error_code& ec) {
 		std::pair<mstch::map, mstch::map> result{};
 		auto& [commit_ctx, report_ctx] = result;
@@ -366,8 +367,40 @@ namespace cov::app::web {
 
 		auto reporter = placeholder::git_person{.date = report->add_time_utc()};
 
+		auto label = from.str(9);
+		auto base_ref_is_tag = false;
+		auto base_ref_is_branch = false;
+
+		{
+			auto const refs = repo.refs()->iterator();
+			for (auto const& ref : *refs) {
+				auto const peeled = ref->peel_target();
+				if (peeled && peeled->direct_target() &&
+				    from == *peeled->direct_target()) {
+					if (ref->references_tag()) {
+						base_ref_is_tag = true;
+						label = ref->shorthand();
+						break;
+					}
+					if (!base_ref_is_branch && ref->references_branch()) {
+						base_ref_is_branch = true;
+						label = ref->shorthand();
+						continue;
+					}
+				}
+			}
+		}
+
 		report_ctx = mstch::map{
 		    {"report-id", report->oid().str()},
+		    {"base",
+		     mstch::map{
+		         {"present", !from.is_zero()},
+		         {"id", from.str()},
+		         {"label", label},
+		         {"is-tag", base_ref_is_tag},
+		         {"is-branch", base_ref_is_branch},
+		     }},
 		    {"properties", std::move(properties)},
 		    {"date-relative", date_relative(reporter, int_env)},
 		    {"date-YmdHM", date_YmdHM(reporter, int_env)},

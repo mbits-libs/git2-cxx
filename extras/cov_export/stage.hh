@@ -27,6 +27,7 @@ namespace cov::app::web {
 		std::filesystem::path out_dir;
 		cov::repository& repo;
 		git::oid_view ref;
+		git::oid_view base;
 		export_link_service links{};
 		dir_cache tmplt{
 		    {
