@@ -94,7 +94,7 @@ if (COV_TESTING)
     list(APPEND INCLUDED_IN_COVERAGE libs/hilite/hilite-${extra}/src)
   endforeach()
 
-  foreach(ext_lib excludes ext_native ext_platform collect-api)
+  foreach(ext_lib excludes ext_native ext_platform)
     list(APPEND INCLUDED_IN_COVERAGE
       extras/libs/${ext_lib}/include
       extras/libs/${ext_lib}/src)
@@ -105,11 +105,9 @@ if (COV_TESTING)
     extras/tests
   )
   foreach(extension
-    collect-api
-    excludes
-    ext_native
-    ext_platform
-    cov_export
+    libs/excludes
+    libs/ext_native
+    libs/ext_platform
   )
     list(APPEND EXCLUDED_FROM_COVERAGE
       extras/${extension}/test)

@@ -9,7 +9,7 @@
 #include <string>
 #include <string_view>
 
-namespace cov::app::line_printer {
+namespace cov::core::line_printer {
 	std::string to_string(std::optional<unsigned> const& count,
 	                      std::string_view view,
 	                      lighter::highlighted_line const& items,
@@ -21,4 +21,4 @@ namespace cov::app::line_printer {
 	                      bool shortened,
 	                      bool use_color,
 	                      size_t tab_size = 4);
-}  // namespace cov::app::line_printer
+}  // namespace cov::core::line_printer

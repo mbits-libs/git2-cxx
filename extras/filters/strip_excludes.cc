@@ -3,7 +3,6 @@
 
 #include <fmt/format.h>
 #include <args/parser.hpp>
-#include <cov/app/path.hh>
 #include <cov/git2/commit.hh>
 #include <cov/git2/global.hh>
 #include <cov/git2/odb.hh>
@@ -12,6 +11,7 @@
 #include <cov/io/file.hh>
 #include <cov/version.hh>
 #include <json/json.hpp>
+#include <native/path.hh>
 #include <native/platform.hh>
 #include <native/str.hh>
 #include <optional>

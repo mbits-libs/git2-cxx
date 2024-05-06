@@ -3,14 +3,14 @@
 
 #include <array>
 #include <cell/tokens.hh>
-#include <cov/app/line_printer.hh>
+#include <cov/core/line_printer.hh>
 #include <hilite/hilite.hh>
 #include <hilite/none.hh>
 #include <variant>
 
 using namespace std::literals;
 
-namespace cov::app::line_printer {
+namespace cov::core::line_printer {
 	using namespace lighter;
 
 	enum class mark : unsigned { good, bad, irrelevant };
@@ -313,4 +313,4 @@ namespace cov::app::line_printer {
 
 		return ctx.result;
 	}
-}  // namespace cov::app::line_printer
+}  // namespace cov::core::line_printer
