@@ -28,6 +28,18 @@
                 "-v"
             ],
             "preLaunchTask": "CMake: build (debug)"
+        },
+        {
+            "type": "cppdbg",
+            "request": "launch",
+            "name": "Launch cov export",
+            "cwd": "${workspaceFolder}",
+            "program": "${workspaceFolder}/build/debug/libexec/cov/cov-export",
+            "args": [
+                "--html",
+                "./build/html"
+            ],
+            "preLaunchTask": "CMake: build (debug)"
         }
     ]
 }
