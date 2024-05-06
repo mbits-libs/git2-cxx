@@ -1,4 +1,5 @@
 add_subdirectory(libs)
+add_subdirectory(cov_export)
 
 set(NATIVE_FILTERS
     strip-excludes

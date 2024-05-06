@@ -17,7 +17,8 @@ namespace cov::app {
 		constexpr static const auto core = "@CORE_DIR@"sv;
 		constexpr static const auto core_root = "@CORE_ROOT_DIR@"sv;
 		constexpr static const auto share = "@SHARE_DIR@"sv;
-		constexpr static const auto site = "@SHARE_DIR@/site"sv;
+		constexpr static const auto site_html = "@SHARE_DIR@/site/html"sv;
+		constexpr static const auto site_res = "@SHARE_DIR@/site/res"sv;
 		constexpr static const auto prefix = "@CMAKE_INSTALL_PREFIX@"sv;
 		constexpr static const auto build = "@PROJECT_BINARY_DIR@"sv;
 		constexpr static const auto source = "@PROJECT_SOURCE_DIR@"sv;

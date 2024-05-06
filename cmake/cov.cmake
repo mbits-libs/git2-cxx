@@ -75,14 +75,18 @@ endfunction()
 
 macro(add_cov_ext COV_TOOL)
   string(REPLACE "-" "_" __COV_TOOL_SAFE_NAME "${COV_TOOL}")
-  if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/cov_${__COV_TOOL_SAFE_NAME}.cc)
+  get_filename_component(LAST_DIRNAME "${CMAKE_CURRENT_SOURCE_DIR}" NAME)
+  if((EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/main.cc) AND ("${LAST_DIRNAME}" STREQUAL "cov_${__COV_TOOL_SAFE_NAME}"))
+    set(${COV_TOOL}_CODE main.cc)
+  elseif (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/cov_${__COV_TOOL_SAFE_NAME}.cc)
     set(${COV_TOOL}_CODE cov_${__COV_TOOL_SAFE_NAME}.cc)
   elseif(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/cov_${__COV_TOOL_SAFE_NAME}/main.cc)
     set(${COV_TOOL}_CODE cov_${__COV_TOOL_SAFE_NAME}/main.cc)
   elseif(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/cov_${__COV_TOOL_SAFE_NAME}/cov_${__COV_TOOL_SAFE_NAME}.cc)
-    set(${COV_TOOL}_CODE cov_${__COV_TOOL_SAFE_NAME}/${__COV_TOOL_SAFE_NAME}.cc)
+    set(${COV_TOOL}_CODE cov_${__COV_TOOL_SAFE_NAME}/cov_${__COV_TOOL_SAFE_NAME}.cc)
   else()
     message(FATAL_ERROR "Cannot find code for ${COV_TOOL}'s tool() function.\nTried:\n"
+    " - ${CMAKE_CURRENT_SOURCE_DIR}/main.cc\n"
     " - ${CMAKE_CURRENT_SOURCE_DIR}/cov_${__COV_TOOL_SAFE_NAME}.cc\n"
     " - ${CMAKE_CURRENT_SOURCE_DIR}/cov_${__COV_TOOL_SAFE_NAME}/main.cc\n"
     " - ${CMAKE_CURRENT_SOURCE_DIR}/cov_${__COV_TOOL_SAFE_NAME}/cov_${__COV_TOOL_SAFE_NAME}.cc")
