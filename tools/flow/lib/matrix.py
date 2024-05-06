@@ -532,10 +532,12 @@ class steps:
         legacy_reporter = os.environ.get("LEGACY_COV")
         report = f"build/{config['preset']}/coveralls.json"
         response = f"build/{config['preset']}/report_answers.txt"
+        intermediate = f"build/{config['preset']}/coveralls-collected.json"
         at_args = []
         if os.path.isfile(response):
             at_args.append(f"@{response}")
-        runner.call(reporter, "report", "--filter", "coveralls", report, *at_args)
+        runner.call(reporter, "report", "--filter", "coveralls", report, "-o", intermediate)
+        runner.call(reporter, "report", "--filter", "strip-excludes", intermediate, *at_args)
         if legacy_reporter is not None:
             runner.call(legacy_reporter, "import", "--in", report, "--amend")
         if version.tag() in tags:
