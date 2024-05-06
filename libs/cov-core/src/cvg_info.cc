@@ -1,14 +1,13 @@
-
 // Copyright (c) 2023 Marcin Zdun
 // This code is licensed under MIT license (see LICENSE for details)
 
 #include <fmt/format.h>
-#include <cov/app/cvg_info.hh>
-#include <cov/app/line_printer.hh>
+#include <cov/core/cvg_info.hh>
+#include <cov/core/line_printer.hh>
 
 using namespace std::literals;
 
-namespace cov::app {
+namespace cov::core {
 	using namespace lighter;
 
 	inline size_t length_of(highlighted_line const& items) {
@@ -202,4 +201,4 @@ namespace cov::app {
 		                            // GCOV_EXCL_STOP
 		                            syntax.dict, use_color));
 	}
-}  // namespace cov::app
+}  // namespace cov::core

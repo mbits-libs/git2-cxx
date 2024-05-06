@@ -5,10 +5,10 @@
 
 #include <fmt/format.h>
 #include <args/actions.hpp>
-#include <cov/app/cvg_info.hh>
-#include <cov/app/line_printer.hh>
 #include <cov/app/path.hh>
 #include <cov/app/show.hh>
+#include <cov/core/cvg_info.hh>
+#include <cov/core/line_printer.hh>
 #include <cov/format.hh>
 #include <cov/git2/blob.hh>
 #include <cov/git2/repository.hh>
@@ -238,7 +238,7 @@ namespace cov::app::builtin::show {
 		auto const* file_entry = files->by_path(entries.front().name.expanded);
 		if (!file_entry || file_entry->contents().is_zero()) return 1;
 
-		cvg_info cvg{};
+		core::cvg_info cvg{};
 		bool with_functions{true};
 
 		auto const display_width = cov::platform::is_terminal(stdout)
@@ -249,7 +249,7 @@ namespace cov::app::builtin::show {
 			auto const file_cvg = info.repo.lookup<cov::line_coverage>(
 			    file_entry->line_coverage(), ec);
 			if (file_cvg && !ec)
-				cvg = cvg_info::from_coverage(file_cvg->coverage());
+				cvg = core::cvg_info::from_coverage(file_cvg->coverage());
 		}
 
 		if (with_functions && !file_entry->function_coverage().is_zero()) {
@@ -291,7 +291,7 @@ namespace cov::app::builtin::show {
 					break;
 				}
 				fn.at(line_no, [=, &widths](auto const& function) {
-					auto const aliases = cvg_info::soft_alias(function);
+					auto const aliases = core::cvg_info::soft_alias(function);
 					for (auto const& alias : aliases) {
 						fmt::print("{}\n",
 						           cvg.to_string(

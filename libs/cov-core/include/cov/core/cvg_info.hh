@@ -14,7 +14,7 @@
 #include <utility>
 #include <vector>
 
-namespace cov::app {
+namespace cov::core {
 	struct view_columns {
 		size_t line_no_width;
 		size_t count_width;
@@ -60,4 +60,4 @@ namespace cov::app {
 		                      view_columns const& widths,
 		                      bool use_color) const;
 	};
-}  // namespace cov::app
+}  // namespace cov::core
