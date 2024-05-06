@@ -22,6 +22,13 @@
 					<div class='build-report'>
 						<span class='row-icon icon-report'>{{{octicons.git-commit}}}</span> Report <code>{{report.report-id}}</code>
 					</div>
+{{# report.base}}
+{{# present}}
+					<div class='build-base' title='Based on {{id}}'>
+						<span class='row-icon icon-base'>{{#is-tag}}{{{octicons.tag}}}{{/is-tag}}{{^is-tag}}{{#is-branch}}{{{octicons.git-branch}}}{{/is-branch}}{{^is-branch}}{{{octicons.git-commit}}}{{/is-branch}}{{/is-tag}}</span> Based on <code>{{label}}</code>
+					</div>
+{{/ present}}
+{{/ report.base}}
 					<div class='build-commit'>
 						<span class='row-icon icon-commit'>{{{octicons.git-commit}}}</span> Commit <code>{{commit-id}}</code>
 					</div>

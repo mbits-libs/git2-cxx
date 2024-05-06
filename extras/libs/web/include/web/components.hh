@@ -21,6 +21,7 @@ namespace cov::app::web {
 
 	std::pair<mstch::map, mstch::map> add_build_info(cov::repository& repo,
 	                                                 git::oid_view oid,
+	                                                 git::oid_view from,
 	                                                 std::error_code& ec);
 	void add_mark(mstch::map& ctx, translatable mark);
 	void add_navigation(mstch::map& ctx,
