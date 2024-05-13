@@ -122,26 +122,40 @@ namespace cov::projection {
 				std::map<std::string, std::vector<file_stats const*>>
 				    module_data{};
 
-				for (auto const& [modname, dirs] : modules) {
-					auto& mod_files = module_data[modname];
+				for (auto& file : files) {
+					size_t length{};
+					std::string module_name{};
+					bool is_filtered = false;
+					bool found_something = false;
 
-					for (auto const& dir : dirs) {
-						auto const prefix = prefixed{dir};
-
-						for (auto& file : files) {
-							if (!file || !prefix.prefixes(file->filename))
-								continue;
-							mod_files.push_back(file);
-							file = nullptr;
+					for (auto const& [modname, dirs] : modules) {
+						for (auto const& dir : dirs) {
+							auto const prefix = prefixed{dir};
+							if (prefix.prefixes(file->filename) &&
+							    length < prefix.prefix.length()) {
+								length = prefix.prefix.length();
+								module_name = modname;
+								found_something = true;
+							}
 						}
 					}
-				}
 
-				for (auto const& dir : filtered_out) {
-					auto const prefix = prefixed{dir};
+					for (auto const& dir : filtered_out) {
+						auto const prefix = prefixed{dir};
 
-					for (auto& file : files) {
-						if (!file || !prefix.prefixes(file->filename)) continue;
+						if (prefix.prefixes(file->filename) &&
+						    length < prefix.prefix.length()) {
+							length = prefix.prefix.length();
+							module_name.clear();
+							is_filtered = true;
+							found_something = true;
+						}
+					}
+
+					if (found_something) {
+						if (!is_filtered) {
+							module_data[module_name].push_back(file);
+						}
 						file = nullptr;
 					}
 				}
