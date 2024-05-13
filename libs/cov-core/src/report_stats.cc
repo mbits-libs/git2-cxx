@@ -40,6 +40,14 @@ namespace cov::core {
 		        with_branches,
 		    },
 		    column{
+		        column_info::from<col_title::branches_relevant,
+		                          col_priority::supplemental,
+		                          col_data::counter>(),
+		        get_counter_sel<change_is::in_line_with_sign>(
+		            [](auto const& stats) { return stats.branches.relevant; }),
+		        with_branches,
+		    },
+		    column{
 		        column_info::from<col_title::branches_missing,
 		                          col_priority::key,
 		                          col_data::counter>(),
@@ -56,6 +64,14 @@ namespace cov::core {
 		                          col_data::percentage>(),
 		        get_ratio_sel<placeholder::stats::functions_percent>(
 		            [](auto const& stats) { return stats.functions; }),
+		        with_funcs,
+		    },
+		    column{
+		        column_info::from<col_title::functions_relevant,
+		                          col_priority::supplemental,
+		                          col_data::counter>(),
+		        get_counter_sel<change_is::in_line_with_sign>(
+		            [](auto const& stats) { return stats.functions.relevant; }),
 		        with_funcs,
 		    },
 		    column{

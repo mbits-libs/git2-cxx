@@ -105,3 +105,15 @@ tr {
 .diff.down {
   color: var(--cov-down);
 }
+
+@media (max-width: 768px) {
+  .priority-key {
+    display: none;
+  }
+}
+
+@media (max-width: 992px) {
+  .priority-supplemental {
+    display: none;
+  }
+}
