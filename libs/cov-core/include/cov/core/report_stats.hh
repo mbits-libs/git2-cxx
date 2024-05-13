@@ -11,8 +11,10 @@
 namespace cov::core {
 	enum class col_title {
 		branches_covered,
+		branches_relevant,
 		branches_missing,
 		functions_covered,
+		functions_relevant,
 		functions_missing,
 		lines_covered,
 		lines_missing,
