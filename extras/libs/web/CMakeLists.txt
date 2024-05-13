@@ -10,7 +10,7 @@ set(SOURCES
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})
 
 add_cov_library(web ${SOURCES})
-target_link_libraries(web PUBLIC ext_platform mstch)
+target_link_libraries(web PUBLIC ext_platform mstch cxx-filt)
 
 set_target_properties(web PROPERTIES FOLDER libs)
 

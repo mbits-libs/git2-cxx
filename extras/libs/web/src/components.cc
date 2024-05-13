@@ -3,6 +3,7 @@
 
 #include <cov/core/cvg_info.hh>
 #include <cov/hash/md5.hh>
+#include <cxx-filt/parser.hh>
 #include <hilite/hilite.hh>
 #include <hilite/lighter.hh>
 #include <hilite/none.hh>
@@ -500,6 +501,18 @@ namespace cov::app::web {
 		std::span<core::column_info const> columns{};
 	};
 
+	std::string_view class_from_priority(core::col_priority priority) {
+		switch (priority) {
+			case core::col_priority::key:
+				return "priority-key"sv;
+			case core::col_priority::high:
+				return "priority-high"sv;
+			case core::col_priority::supplemental:
+				return "priority-supplemental"sv;
+		}
+		return ""sv;
+	}
+
 	mstch::map add_table_row(add_table_row_options const& options) {
 		std::string_view display{}, prefix{};
 		auto const pos = options.label.rfind('/');
@@ -536,8 +549,14 @@ namespace cov::app::web {
 			auto const& column =
 			    it != options.columns.end() ? *it++ : dummy_column;
 
+			auto prio = class_from_priority(column.priority);
+
 			if (cell.value.empty() && cell.change.empty()) {
-				cells.push_back(mstch::map{{"is-simple", true}});
+				cells.push_back(mstch::map{
+				    {"is-simple", true},
+				    {"value-classes", std::string{prio.data(), prio.size()}},
+				    {"change-classes", std::string{prio.data(), prio.size()}},
+				});
 				continue;
 			}
 
@@ -586,22 +605,8 @@ namespace cov::app::web {
 				change_classes.push_back(bg_color);
 			}
 
-			{
-				auto prio = ""sv;
-				switch (column.priority) {
-					case core::col_priority::key:
-						prio = "priority-key"sv;
-						break;
-					case core::col_priority::high:
-						prio = "priority-high"sv;
-						break;
-					case core::col_priority::supplemental:
-						prio = "priority-supplemental"sv;
-						break;
-				}
-				value_classes.push_back(prio);
-				change_classes.push_back(prio);
-			}
+			value_classes.push_back(prio);
+			change_classes.push_back(prio);
 
 			cells.push_back(mstch::map{
 			    {"is-simple", false},
@@ -638,11 +643,17 @@ namespace cov::app::web {
 					case core::col_title::branches_covered:
 						display = "Branches"sv;
 						break;
+					case core::col_title::branches_relevant:
+						display = "Relevant"sv;
+						break;
 					case core::col_title::branches_missing:
 						display = "Missing"sv;
 						break;
 					case core::col_title::functions_covered:
 						display = "Functions"sv;
+						break;
+					case core::col_title::functions_relevant:
+						display = "Relevant"sv;
 						break;
 					case core::col_title::functions_missing:
 						display = "Missing"sv;
@@ -667,10 +678,14 @@ namespace cov::app::web {
 				ctx["is-name"] = false;
 				ctx["is-branches-covered"] =
 				    col.title == core::col_title::branches_covered;
+				ctx["is-branches-relevant"] =
+				    col.title == core::col_title::branches_relevant;
 				ctx["is-branches-missing"] =
 				    col.title == core::col_title::branches_missing;
 				ctx["is-functions-covered"] =
 				    col.title == core::col_title::functions_covered;
+				ctx["is-functions-relevant"] =
+				    col.title == core::col_title::functions_relevant;
 				ctx["is-functions-missing"] =
 				    col.title == core::col_title::functions_missing;
 				ctx["is-lines-covered"] =
@@ -762,6 +777,7 @@ namespace cov::app::web {
 	                     cov::repository& repo,
 	                     git::oid_view ref,
 	                     std::string_view path,
+	                     cxx_filt::Replacements const& replacements,
 	                     std::error_code& ec) {
 		ctx["file-is-present"] = false;
 
@@ -829,12 +845,16 @@ namespace cov::app::web {
 
 				mstch::array fn_ctx{};
 
-				fn.at(line_no, [=, &fn_ctx](auto const& function) {
+				fn.at(line_no, [=, &fn_ctx,
+				                &replacements](auto const& function) {
 					auto const aliases = core::cvg_info::soft_alias(function);
 					fn_ctx.reserve(fn_ctx.size() + aliases.size());
 					for ([[maybe_unused]] auto const& alias : aliases) {
 						auto fn = mstch::map{
-						    {"name", str(alias.label)},
+						    {"name",
+						     cxx_filt::Parser::statement_from(alias.label)
+						         .simplified(replacements)
+						         .str()},
 						    {"count", alias.count},
 						    {"class-name",
 						     alias.count ? "passing"s : "failing"s},

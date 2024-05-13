@@ -182,7 +182,8 @@ namespace cov::app::web {
 
 		if (is_standalone) {
 			add_file_source(ctx, stg.repo, stg.ref,
-			                entries.front().name.expanded, ec);
+			                entries.front().name.expanded, stg.replacements,
+			                ec);
 			if (ec) return {};
 		}
 

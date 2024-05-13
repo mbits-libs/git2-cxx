@@ -6,6 +6,7 @@
 #include <cov/core/report_stats.hh>
 #include <cov/format.hh>
 #include <cov/projection.hh>
+#include <cxx-filt/expression.hh>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -37,5 +38,6 @@ namespace cov::app::web {
 	                     cov::repository& repo,
 	                     git::oid_view ref,
 	                     std::string_view path,
+	                     cxx_filt::Replacements const& replacements,
 	                     std::error_code& ec);
 }  // namespace cov::app::web
