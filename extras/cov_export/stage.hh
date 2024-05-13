@@ -5,6 +5,7 @@
 
 #include <cov/app/dirs.hh>
 #include <cov/format.hh>
+#include <cxx-filt/expression.hh>
 #include <filesystem>
 #include <native/platform.hh>
 #include <vector>
@@ -28,6 +29,7 @@ namespace cov::app::web {
 		cov::repository& repo;
 		git::oid_view ref;
 		git::oid_view base;
+		cxx_filt::Replacements replacements;
 		export_link_service links{};
 		dir_cache tmplt{
 		    {

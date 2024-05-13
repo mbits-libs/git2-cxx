@@ -5,6 +5,7 @@
 #include <cov/format.hh>
 #include <cov/io/file.hh>
 #include <cov/module.hh>
+#include <cxx-filt/parser.hh>
 #include <native/path.hh>
 #include <set>
 #include <web/link_service.hh>
@@ -78,41 +79,8 @@ namespace cov::app::report_export {
 		}
 	};
 
-	int handle(args::args_view const& args) {
-		parser p{args,
-		         {platform::core_extensions::locale_dir(),
-		          ::lngs::system_locales()}};
-		auto info = p.parse();
-
+	void html_report(web::stage stage, parser& p) {
 		std::error_code ec{};
-		auto mods = cov::modules::from_report(info.range.to, info.repo, ec);
-		if (ec) {
-			if (ec == git::errc::notfound) {
-				ec = {};
-			} else if (ec == cov::errc::wrong_object_type) {
-				ec.clear();
-				mods = cov::modules::make_modules("/"s, {});
-			} else {                  // GCOV_EXCL_LINE
-				p.error(ec, p.tr());  // GCOV_EXCL_LINE
-			}                         // GCOV_EXCL_LINE
-		}
-
-		if (info.only_json) {
-			p.error("--json is not implemented yet");
-		}
-
-		auto diff = report_diff(info, ec);
-		if (ec) p.error(ec, p.tr());
-
-		web::stage stage{
-		    .marks = placeholder::environment::rating_from(info.repo),
-		    .mods = std::move(mods),
-		    .diff = std::move(diff),
-		    .out_dir = info.path,
-		    .repo = info.repo,
-		    .ref = info.range.to,
-		    .base = info.range.from,
-		};
 
 		stage.initialize(ec);
 		if (ec) p.error(ec, p.tr());
@@ -140,6 +108,129 @@ namespace cov::app::report_export {
 
 			out.store(page_text.c_str(), page_text.size());
 		}
+	}
+
+	cxx_filt::Replacements load_replacements() {
+		static constexpr std::pair<std::string_view, std::string_view>
+		    raw_replacements[] = {
+		        {"std::__cxx11::basic_string<$1, $2, $3>"sv,
+		         "std::basic_string<$1, $2, $3>"sv},
+		        {"std::basic_string<$1, $2, std::allocator<$1>>"sv,
+		         "std::basic_string<$1, $2>"sv},
+		        {"std::basic_string<$1, std::char_traits<$1>>"sv,
+		         "std::basic_string<$1>"sv},
+		        {"std::basic_string<char>"sv, "std::string"sv},
+		        {"std::basic_string<wchar_t>"sv, "std::wstring"sv},
+		        {"std::basic_string<char8_t>"sv, "std::u8string"sv},
+		        {"std::basic_string<char16_t>"sv, "std::u8string"sv},
+		        {"std::basic_string<char32_t>"sv, "std::u32string"sv},
+
+		        {"std::basic_string_view<$1, std::char_traits<$1>>"sv,
+		         "std::basic_string_view<$1>"sv},
+		        {"std::basic_string_view<char>"sv, "std::string_view"sv},
+		        {"std::basic_string_view<wchar_t>"sv, "std::wstring_view"sv},
+		        {"std::basic_string_view<char8_t>"sv, "std::u8string_view"sv},
+		        {"std::basic_string_view<char16_t>"sv, "std::u16string_view"sv},
+		        {"std::basic_string_view<char32_t>"sv, "std::u32string_view"sv},
+
+		        {"std::vector<$1, std::allocator<$1>>"sv, "std::vector<$1>"sv},
+		        {"std::span<$1, 18446744073709551615ul>"sv, "std::span<$1>"sv},
+
+		        {"std::map<$1, $2, $3, std::allocator<std::pair<$1 const, $2>>>"sv,
+		         "std::map<$1, $2, $3>"sv},
+		        {"std::map<$1, $2, std::less<$1>>"sv, "std::map<$1, $2>"sv},
+		    };
+		cxx_filt::Replacements result{};
+		result.reserve(std::size(raw_replacements));
+
+		for (auto const& [from, to] : raw_replacements) {
+			auto stmt_from = cxx_filt::Parser::statement_from(from);
+			auto stmt_to = cxx_filt::Parser::statement_from(to);
+			if (stmt_from.items.size() != 1) {
+				fmt::print(stderr,
+				           "Expected to get exactly one expression from "
+				           "'{}', got {}\n",
+				           from, stmt_from.items.size());
+				std::exit(1);
+			}
+			if (stmt_to.items.size() != 1) {
+				fmt::print(stderr,
+				           "Expected to get exactly one expression from "
+				           "'{}', got {}\n",
+				           to, stmt_to.items.size());
+				std::exit(1);
+			}
+			result.push_back(
+			    {std::move(stmt_from.items[0]), std::move(stmt_to.items[0])});
+		}
+		return result;
+	}
+
+	int handle(args::args_view const& args) {
+		parser p{args,
+		         {platform::core_extensions::locale_dir(),
+		          ::lngs::system_locales()}};
+		auto info = p.parse();
+
+		std::error_code ec{};
+		auto mods = cov::modules::from_report(info.range.to, info.repo, ec);
+		if (ec) {
+			if (ec == git::errc::notfound) {
+				ec = {};
+			} else if (ec == cov::errc::wrong_object_type) {
+				ec.clear();
+				mods = cov::modules::make_modules("/"s, {});
+			} else {                  // GCOV_EXCL_LINE
+				p.error(ec, p.tr());  // GCOV_EXCL_LINE
+			}                         // GCOV_EXCL_LINE
+		}
+
+		if (info.only_json) {
+			p.error("--json is not implemented yet");
+		}
+
+		auto diff = report_diff(info, ec);
+		if (ec) p.error(ec, p.tr());
+
+		struct mod {
+			std::vector<std::string> prefixes, files;
+		};
+
+		std::map<std::string, mod> module_mapping{};
+
+		for (auto const& mod : mods->entries()) {
+			module_mapping[mod.name].prefixes = mod.prefixes;
+		}
+
+		for (auto const& item : diff) {
+			size_t length{};
+			std::string module_name{};
+			for (auto const& entry : mods->entries()) {
+				for (std::string_view prefix : entry.prefixes) {
+					if (!prefix.empty() && prefix.back() == '/')
+						prefix = prefix.substr(0, prefix.length() - 1);
+					if (item.filename.starts_with(prefix) &&
+					    (item.filename.length() == prefix.length() ||
+					     item.filename[prefix.length()] == '/') &&
+					    length < prefix.length()) {
+						length = prefix.length();
+						module_name = entry.name;
+					}
+				}
+			}
+
+			module_mapping[module_name].files.push_back(item.filename);
+		}
+
+		html_report({.marks = placeholder::environment::rating_from(info.repo),
+		             .mods = std::move(mods),
+		             .diff = std::move(diff),
+		             .out_dir = info.path,
+		             .repo = info.repo,
+		             .ref = info.range.to,
+		             .base = info.range.from,
+		             .replacements = load_replacements()},
+		            p);
 
 		return 0;
 	}
