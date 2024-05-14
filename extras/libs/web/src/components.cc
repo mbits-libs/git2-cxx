@@ -1,9 +1,9 @@
 // Copyright (c) 2024 Marcin Zdun
 // This code is licensed under MIT license (see LICENSE for details)
 
+#include <c++filt/parser.hh>
 #include <cov/core/cvg_info.hh>
 #include <cov/hash/md5.hh>
-#include <cxx-filt/parser.hh>
 #include <hilite/hilite.hh>
 #include <hilite/lighter.hh>
 #include <hilite/none.hh>

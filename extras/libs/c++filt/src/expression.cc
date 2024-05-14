@@ -2,7 +2,7 @@
 // This code is licensed under MIT license (see LICENSE for details)
 
 #include <fmt/format.h>
-#include <cxx-filt/expression.hh>
+#include <c++filt/expression.hh>
 
 using namespace std::literals;
 
