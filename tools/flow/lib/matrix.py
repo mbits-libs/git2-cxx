@@ -537,7 +537,7 @@ class steps:
         if os.path.isfile(response):
             at_args.append(f"@{response}")
         runner.call(reporter, "report", "--filter", "coveralls", report, "-o", intermediate)
-        runner.call(reporter, "report", "--filter", "strip-excludes", intermediate, *at_args)
+        runner.call(reporter, "report", "--filter", "strip-excludes", intermediate, *at_args, "--", "-v")
         if legacy_reporter is not None:
             runner.call(legacy_reporter, "import", "--in", report, "--amend")
         if version.tag() in tags:

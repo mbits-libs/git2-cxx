@@ -30,4 +30,8 @@ namespace cov::app::strip {
 	unsigned erase_lines(json::map& line_coverage,
 	                     std::span<excl_block const> excludes,
 	                     std::set<unsigned> const& empties);
+
+	size_t filter_blocks(json::array* array,
+	                     std::span<excl_block const> excludes,
+	                     std::set<unsigned> const& empties);
 }  // namespace cov::app::strip

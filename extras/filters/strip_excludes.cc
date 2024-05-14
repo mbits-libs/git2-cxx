@@ -186,6 +186,11 @@ namespace cov::app::strip {
 			}
 
 			line_counter += erase_lines(*json_file_lines, excludes, empties);
+
+			if (auto json_array = json::cast<json::array>(file, u8"functions");
+			    json_array) {
+				fn_counter += filter_blocks(json_array, excludes, empties);
+			}
 		}
 
 		// VERBOSE

@@ -100,4 +100,57 @@ namespace cov::app::strip {
 		return line_counter;
 	}
 
+	excl_block mask_range(json::map const& range,
+	                      std::span<excl_block const> excludes,
+	                      std::set<unsigned> const& empties) {
+		auto json_range_start = cast<long long>(range, u8"start_line");
+		auto json_range_end = cast<long long>(range, u8"end_line");
+		if (!json_range_start) return {.start = 1, .end = 0};
+		auto start_line = *json_range_start;
+		auto end_line = json_range_end ? *json_range_end : start_line;
+
+		for (auto const& block : excludes) {
+			auto const block_start = static_cast<long long>(block.start);
+			auto const block_end = static_cast<long long>(block.end);
+
+			if (end_line < block_start || start_line > block_end) continue;
+			if (start_line >= block_start) start_line = block_end + 1;
+			if (end_line <= block_end) end_line = block_start - 1;
+			if (end_line < start_line) break;
+		}
+
+		for (auto const line : empties) {
+			if (end_line < start_line) break;
+			if (start_line == line) ++start_line;
+			if (end_line == line) --end_line;
+		}
+
+		return {.start = static_cast<unsigned>(start_line),
+		        .end = static_cast<unsigned>(end_line)};
+	}
+
+	size_t filter_blocks(json::array* array,
+	                     std::span<excl_block const> excludes,
+	                     std::set<unsigned> const& empties) {
+		json::array visible{};
+		size_t counter{};
+		visible.reserve(array->size());
+		for (auto& node_range : *array) {
+			auto json_range = cast<json::map>(node_range);
+			if (!json_range) {
+				++counter;  // GCOV_EXCL_LINE -- oh, c'mon, continue is
+				            // counted...
+				continue;
+			}
+			auto const block = mask_range(*json_range, excludes, empties);
+			if (block.start > block.end) {
+				++counter;
+				continue;
+			}
+
+			visible.emplace_back(std::move(node_range));
+		}
+		*array = std::move(visible);
+		return counter;
+	}
 }  // namespace cov::app::strip
