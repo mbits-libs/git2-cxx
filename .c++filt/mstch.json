@@ -1,0 +1,7 @@
+{
+    "mstch::internal::object_t<mstch::node>": "mstch::object",
+    "mstch::internal::callback_t<mstch::node>": "mstch::callback",
+    "mstch::internal::lambda_t<mstch::node>": "mstch::lambda",
+    "std::map<std::string, mstch::node>": "mstch::map",
+    "std::vector<mstch::node>": "mstch::array"
+}

@@ -1,0 +1,4 @@
+{
+    "std::vector<std::pair<cxx_filt::Expression, cxx_filt::Expression>>": "cxx_filt::Replacements",
+    "std::variant<std::string, cxx_filt::Token, cxx_filt::Block>": "cxx_filt::Block::TokenType"
+}
