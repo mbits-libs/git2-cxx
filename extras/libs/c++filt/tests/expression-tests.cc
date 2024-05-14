@@ -3,8 +3,8 @@
 
 #include <fmt/format.h>
 #include <gtest/gtest.h>
-#include <cxx-filt/expression.hh>
-#include <cxx-filt/parser.hh>
+#include <c++filt/expression.hh>
+#include <c++filt/parser.hh>
 #include <string_view>
 
 namespace cxx_filt::testing {

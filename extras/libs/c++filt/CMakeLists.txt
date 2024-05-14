@@ -1,18 +1,20 @@
 set(SOURCES
   src/expression.cc
+  src/json.cc
   src/parser.cc
   src/types.cc
 
-  include/cxx-filt/expression.hh
-  include/cxx-filt/parser.hh
-  include/cxx-filt/types.hh
+  include/c++filt/expression.hh
+  include/c++filt/json.hh
+  include/c++filt/parser.hh
+  include/c++filt/types.hh
 )
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})
 
-add_cov_library(cxx-filt ${SOURCES})
-target_link_libraries(cxx-filt PRIVATE fmt::fmt)
+add_cov_library(c++filt ${SOURCES})
+target_link_libraries(c++filt PRIVATE fmt::fmt json)
 
-set_target_properties(cxx-filt PROPERTIES FOLDER libs)
+set_target_properties(c++filt PROPERTIES FOLDER libs)
 
 if (COV_TESTING)
   enable_testing()
@@ -26,14 +28,14 @@ if (COV_TESTING)
     ${TEST_SRCS_CXX}
   )
 
-  add_cov_test(cxx-filt ${TEST_SRCS_CC} ${TEST_SRCS_CPP} ${TEST_SRCS_CXX})
-  target_link_libraries(cxx-filt-test PRIVATE cxx-filt fmt::fmt testing-lib)
+  add_cov_test(c++filt ${TEST_SRCS_CC} ${TEST_SRCS_CPP} ${TEST_SRCS_CXX})
+  target_link_libraries(c++filt-test PRIVATE c++filt fmt::fmt testing-lib)
 
-  add_test(NAME cxx-filt COMMAND cxx-filt-test "--gtest_output=xml:${TEST_REPORT_DIR}/libcxx-filt/${TEST_REPORT_FILE}")
+  add_test(NAME c++filt COMMAND c++filt-test "--gtest_output=xml:${TEST_REPORT_DIR}/libcxx-filt/${TEST_REPORT_FILE}")
 
   if (CMAKE_GENERATOR MATCHES "Visual Studio" AND TARGET cov_coveralls_test)
     add_dependencies(cov_coveralls_test
-      cxx-filt-test
+      c++filt-test
     )
   endif()
 endif()

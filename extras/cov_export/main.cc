@@ -1,11 +1,12 @@
 // Copyright (c) 2024 Marcin Zdun
 // This code is licensed under MIT license (see LICENSE for details)
 
+#include <c++filt/json.hh>
+#include <c++filt/parser.hh>
 #include <cov/core/report_stats.hh>
 #include <cov/format.hh>
 #include <cov/io/file.hh>
 #include <cov/module.hh>
-#include <cxx-filt/parser.hh>
 #include <native/path.hh>
 #include <set>
 #include <web/link_service.hh>
@@ -77,6 +78,9 @@ namespace cov::app::report_export {
 			}
 			++index;
 		}
+		~counted_actions() {
+			if (cov::platform::is_terminal(stdout)) fmt::print("\n");
+		}
 	};
 
 	void html_report(web::stage stage, parser& p) {
@@ -110,59 +114,96 @@ namespace cov::app::report_export {
 		}
 	}
 
-	cxx_filt::Replacements load_replacements() {
-		static constexpr std::pair<std::string_view, std::string_view>
-		    raw_replacements[] = {
-		        {"std::__cxx11::basic_string<$1, $2, $3>"sv,
-		         "std::basic_string<$1, $2, $3>"sv},
-		        {"std::basic_string<$1, $2, std::allocator<$1>>"sv,
-		         "std::basic_string<$1, $2>"sv},
-		        {"std::basic_string<$1, std::char_traits<$1>>"sv,
-		         "std::basic_string<$1>"sv},
-		        {"std::basic_string<char>"sv, "std::string"sv},
-		        {"std::basic_string<wchar_t>"sv, "std::wstring"sv},
-		        {"std::basic_string<char8_t>"sv, "std::u8string"sv},
-		        {"std::basic_string<char16_t>"sv, "std::u8string"sv},
-		        {"std::basic_string<char32_t>"sv, "std::u32string"sv},
-
-		        {"std::basic_string_view<$1, std::char_traits<$1>>"sv,
-		         "std::basic_string_view<$1>"sv},
-		        {"std::basic_string_view<char>"sv, "std::string_view"sv},
-		        {"std::basic_string_view<wchar_t>"sv, "std::wstring_view"sv},
-		        {"std::basic_string_view<char8_t>"sv, "std::u8string_view"sv},
-		        {"std::basic_string_view<char16_t>"sv, "std::u16string_view"sv},
-		        {"std::basic_string_view<char32_t>"sv, "std::u32string_view"sv},
-
-		        {"std::vector<$1, std::allocator<$1>>"sv, "std::vector<$1>"sv},
-		        {"std::span<$1, 18446744073709551615ul>"sv, "std::span<$1>"sv},
-
-		        {"std::map<$1, $2, $3, std::allocator<std::pair<$1 const, $2>>>"sv,
-		         "std::map<$1, $2, $3>"sv},
-		        {"std::map<$1, $2, std::less<$1>>"sv, "std::map<$1, $2>"sv},
-		    };
-		cxx_filt::Replacements result{};
-		result.reserve(std::size(raw_replacements));
-
-		for (auto const& [from, to] : raw_replacements) {
-			auto stmt_from = cxx_filt::Parser::statement_from(from);
-			auto stmt_to = cxx_filt::Parser::statement_from(to);
-			if (stmt_from.items.size() != 1) {
-				fmt::print(stderr,
-				           "Expected to get exactly one expression from "
-				           "'{}', got {}\n",
-				           from, stmt_from.items.size());
-				std::exit(1);
-			}
-			if (stmt_to.items.size() != 1) {
-				fmt::print(stderr,
-				           "Expected to get exactly one expression from "
-				           "'{}', got {}\n",
-				           to, stmt_to.items.size());
-				std::exit(1);
-			}
-			result.push_back(
-			    {std::move(stmt_from.items[0]), std::move(stmt_to.items[0])});
+	char const* get_home() noexcept {
+		if (auto var = std::getenv("HOME"); var && *var) {
+			return var;
 		}
+		if (auto var = std::getenv("USERPROFILE"); var && *var) {
+			return var;
+		}
+		return nullptr;
+	}
+
+	std::vector<std::filesystem::path> replacement_paths(
+	    cov::repository const& repo) {
+		std::vector<std::filesystem::path> result{};
+
+		auto const system = platform::core_extensions::sys_root();
+		auto const home_var = get_home();
+		auto const home = home_var ? std::filesystem::path{home_var}
+		                           : std::filesystem::path{};
+		auto const maybe_local = repo.git_work_dir();
+		auto const local =
+		    maybe_local ? make_u8path(*maybe_local) : std::filesystem::path{};
+
+		{
+			std::error_code ec{};
+			auto it = std::filesystem::directory_iterator{
+			    system / directory_info::share / "c++filt"sv, ec};
+			if (!ec) {
+				for (auto const& entry : it) {
+					if (entry.is_regular_file() &&
+					    entry.path().extension() == ".json"sv) {
+						result.push_back(entry.path());
+					}
+				}
+			}
+		}
+
+		repo.config().get_multivar_foreach(
+		    "filter.path", nullptr, [&](git_config_entry const* entry) -> int {
+			    std::filesystem::path const* root = nullptr;
+			    switch (entry->level) {
+				    case GIT_CONFIG_LEVEL_PROGRAMDATA:
+				    case GIT_CONFIG_LEVEL_SYSTEM:
+					    root = &system;
+					    break;
+				    case GIT_CONFIG_LEVEL_XDG:
+				    case GIT_CONFIG_LEVEL_GLOBAL:
+					    root = &home;
+					    break;
+				    case GIT_CONFIG_LEVEL_LOCAL:
+					    root = &local;
+					    break;
+				    default:
+					    break;
+			    }
+			    if (!root || root->empty()) return 0;
+			    result.push_back(*root / make_u8path(entry->value));
+			    return 0;
+		    });
+
+		if (!local.empty()) {
+			std::error_code ec{};
+			auto it =
+			    std::filesystem::directory_iterator{local / ".c++filt"sv, ec};
+			if (!ec) {
+				for (auto const& entry : it) {
+					if (entry.is_regular_file() &&
+					    entry.path().extension() == ".json"sv) {
+						result.push_back(entry.path());
+					}
+				}
+			}
+		}
+
+		return result;
+	}
+
+	cxx_filt::Replacements load_replacements(cov::repository const& repo) {
+		cxx_filt::Replacements result{};
+
+		for (auto const& path : replacement_paths(repo)) {
+			auto file = io::fopen(path);
+			if (!file) continue;
+			fmt::print("c++filt: {}\n", get_u8path(path));
+			auto const contents = file.read();
+			cxx_filt::append_replacements(
+			    {reinterpret_cast<const char*>(contents.data()),
+			     contents.size()},
+			    result);
+		}
+
 		return result;
 	}
 
@@ -229,7 +270,7 @@ namespace cov::app::report_export {
 		             .repo = info.repo,
 		             .ref = info.range.to,
 		             .base = info.range.from,
-		             .replacements = load_replacements()},
+		             .replacements = load_replacements(info.repo)},
 		            p);
 
 		return 0;

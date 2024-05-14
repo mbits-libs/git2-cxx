@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <cxx-filt/types.hh>
+#include <c++filt/types.hh>
 
 namespace cxx_filt {
 	struct Block;
