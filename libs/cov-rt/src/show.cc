@@ -7,154 +7,6 @@
 namespace cov::app::show {
 	using namespace projection;
 
-	enum class show_column { name, other };
-
-	using vis_callback = bool (*)(with);
-	bool has(with flags, with test) { return (flags & test) == test; }
-	bool always(with) { return true; }
-	bool with_branches(with flags) { return has(flags, with::branches); }
-	bool with_funcs(with flags) { return has(flags, with::functions); }
-	bool with_branches_missing(with flags) {
-		return has(flags, with::branches | with::branches_missing);
-	}
-	bool with_funcs_missing(with flags) {
-		return has(flags, with::functions | with::functions_missing);
-	}
-	bool with_lines_missing(with flags) {
-		return has(flags, with::lines_missing);
-	}
-
-	using cell_row = std::vector<std::string>;
-	using data_append = void (*)(environment const&,
-	                             cell_row&,
-	                             file_diff const&);
-
-	struct column {
-		struct label_t {
-			std::string_view text;
-			char align;
-			constexpr label_t() = delete;
-			constexpr label_t(std::string_view text, char align = '^')
-			    : text{text}, align{align} {}
-		} label;
-		data_append append;
-		show_column id{show_column::other};
-		vis_callback vis{always};
-
-		void header(std::vector<table_column>& hdr, with flags) const {
-			if (!vis(flags)) return;
-			hdr.push_back(
-			    {{label.text.data(), label.text.size()}, label.align});
-		}
-
-		void data(environment const& env,
-		          std::vector<std::string>& cells,
-		          file_diff const& change,
-		          with flags) const {
-			if (!vis(flags)) return;
-			append(env, cells, change);
-		}
-	};
-
-	static constexpr std::array columns = {
-	    column{{"Name"sv, '<'}, nullptr, show_column::name},
-	    // GCOV_EXCL_START for now
-	    column{"% Branch"sv,
-	           [](environment const& env,
-	              cell_row& cells,
-	              file_diff const& change) {
-		           env.percentage(
-		               cells, change,
-		               [](auto const& stats) { return stats.branches; },
-		               placeholder::color::bold_rating_branches);
-	           },
-	           show_column::other, with_branches},
-	    column{"Missing"sv,
-	           [](environment const& env,
-	              cell_row& cells,
-	              file_diff const& change) {
-		           env.dimmed_count(
-		               cells, change,
-		               [](auto const& stats) {
-			               return stats.branches.relevant -
-			                      stats.branches.visited;
-		               },
-		               placeholder::color::faint_red);
-	           },
-	           show_column::other, with_branches_missing},
-	    // GCOV_EXCL_STOP
-	    column{"% Funcs"sv,
-	           [](environment const& env,
-	              cell_row& cells,
-	              file_diff const& change) {
-		           env.percentage(
-		               cells, change,
-		               [](auto const& stats) { return stats.functions; },
-		               placeholder::color::bold_rating_functions);
-	           },
-	           show_column::other, with_funcs},
-	    column{"Missing"sv,
-	           [](environment const& env,
-	              cell_row& cells,
-	              file_diff const& change) {
-		           env.dimmed_count(
-		               cells, change,
-		               [](auto const& stats) {
-			               return stats.functions.relevant -
-			                      stats.functions.visited;
-		               },
-		               placeholder::color::faint_red);
-	           },
-	           show_column::other, with_funcs_missing},
-	    column{"% Lines"sv,
-	           [](environment const& env,
-	              cell_row& cells,
-	              file_diff const& change) {
-		           env.percentage(
-		               cells, change,
-		               [](auto const& stats) { return stats.lines; },
-		               placeholder::color::bold_rating_lines);
-	           }},
-	    column{"Visited"sv,
-	           [](environment const& env,
-	              cell_row& cells,
-	              file_diff const& change) {
-		           env.count(cells, change, [](auto const& stats) {
-			           return stats.lines.visited;
-		           });
-	           }},
-	    column{"Relevant"sv,
-	           [](environment const& env,
-	              cell_row& cells,
-	              file_diff const& change) {
-		           env.count(
-		               cells, change,
-		               [](auto const& stats) { return stats.lines.relevant; },
-		               placeholder::color::faint_normal);
-	           }},
-	    column{"Missing"sv,
-	           [](environment const& env,
-	              cell_row& cells,
-	              file_diff const& change) {
-		           env.dimmed_count(
-		               cells, change,
-		               [](auto const& stats) {
-			               return stats.lines.relevant - stats.lines.visited;
-		               },
-		               placeholder::color::faint_red);
-	           },
-	           show_column::other, with_lines_missing},
-	    column{"Line count"sv,
-	           [](environment const& env,
-	              cell_row& cells,
-	              file_diff const& change) {
-		           env.count(
-		               cells, change,
-		               [](auto const& stats) { return stats.lines_total; },
-		               placeholder::color::faint_normal);
-	           }},
-	};
-
 	parser::parser(::args::args_view const& arguments,
 	               str::translator_open_info const& langs)
 	    : base_parser<covlng, loglng, errlng, showlng>{langs, arguments} {
@@ -206,71 +58,134 @@ namespace cov::app::show {
 		           : +[](placeholder::color, void*) { return std::string{}; };
 	}
 
-	std::string environment::color_for(placeholder::color clr,
-	                                   io::v1::stats const* stats) const {
+	std::string environment::color_for(placeholder::color clr) const {
 		if (!colorizer) return {};
-		if (stats) clr = formatter::apply_mark(clr, *stats, marks);
 		return colorizer(clr, app);
 	}
 
-	void environment::add(data_table& table,
-	                      char type,
-	                      entry_stats const& stats,
-	                      std::string_view label,
-	                      with flags,
-	                      row_type row) const {
-		using placeholder::color;
+	std::string format(environment const& env,
+	                   std::string const& display,
+	                   placeholder::color color) {
+		if (display.empty() || color == placeholder::color::normal)
+			return display;
+		return fmt::format("{}{}{}", env.color_for(color), display,
+		                   env.color_for(placeholder::color::reset));
+	}
 
-		auto change = stats.diff();
-		std::vector<std::string> cells{};
-		cells.reserve(columns.size() * 2);
-		for (auto const& col : columns) {
-			if (col.id == show_column::name) {
-				cells.push_back({type});
-				cells.push_back({label.data(), label.size()});
-				continue;
-			}
-			col.data(*this, cells, change, flags);
+	std::vector<std::string> environment::add_table_row(
+	    add_table_row_options const& options) const {
+		std::string display{};
+		auto const pos = options.label.rfind('/');
+		if (pos == std::string_view::npos) {
+			display.assign(options.label);
+		} else {
+			auto const prefix = options.label.substr(0, pos + 1);
+			auto const name = options.label.substr(pos + 1);
+			display = fmt::format(
+			    "{}{}{}{}", color_for(placeholder::color::faint_normal), prefix,
+			    color_for(placeholder::color::reset), name);
 		}
 
-		table.emplace(std::move(cells), row == row_type::data);
+		std::vector<std::string> result{};
+		result.reserve((options.columns.size() + 1) * 2);
+
+		result.push_back({options.entry_flag});
+		result.push_back(std::move(display));
+
+		static constinit auto const dummy_column =
+		    core::column_info::from<core::col_title::lines_total,
+		                            core::col_priority::supplemental,
+		                            core::col_data::counter>();
+		auto it = options.columns.begin();
+		for (auto const& cell : options.cells) {
+			auto const& column =
+			    it != options.columns.end() ? *it++ : dummy_column;
+
+			if (cell.value.empty() && cell.change.empty()) {
+				result.push_back({});
+				result.push_back({});
+				continue;
+			}
+
+			using enum core::value_category;
+			using enum core::col_priority;
+			auto color = column.priority == high
+			                 ? cell.category == passing
+			                       ? placeholder::color::bold_green
+			                   : cell.category == incomplete
+			                       ? placeholder::color::bold_yellow
+			                       : placeholder::color::bold_red
+			                 : placeholder::color::normal;
+			auto change_color =
+			    cell.change.empty() ||
+			            column.priority == core::col_priority::supplemental
+			        ? placeholder::color::faint_normal
+			    : cell.change_is_negative ? placeholder::color::faint_red
+			                              : placeholder::color::faint_green;
+
+			result.push_back(format(*this, cell.value, color));
+			result.push_back(format(*this, cell.change, change_color));
+		}
+
+		return result;
 	}
 
 	void environment::print_table(std::vector<entry> const& entries) const {
-		entry_stats total{};
+		auto const [total, flags] = core::stats::calc_stats(entries);
+		auto const projection =
+		    core::stats::project(marks, entries, total, flags);
 
-		with flags{};
+		data_table table{};
 
-		for (auto const& entry : entries) {
-			total.extend(entry.stats);
+		table.header.reserve(projection.columns.size() + 1);
+		table.header.push_back({"Name"s, '<'});
 
-			if (entry.stats.current.lines.relevant !=
-			    entry.stats.current.lines.visited)
-				flags |= with::lines_missing;
-
-			if (entry.stats.current.functions.relevant !=
-			    entry.stats.current.functions.visited)
-				flags |= with::functions_missing;
-
-			if (entry.stats.current.branches.relevant !=
-			    entry.stats.current.branches.visited)
-				flags |= with::branches_missing;  // GCOV_EXCL_LINE for now
+		for (auto const& col : projection.columns) {
+			auto display = ""sv;
+			switch (col.title) {
+				// GCOV_EXCL_START TODO: remove when branch is supported
+				case core::col_title::branches_covered:
+					display = "% Branches"sv;
+					break;
+				case core::col_title::branches_relevant:
+					display = "Relevant"sv;
+					break;
+				case core::col_title::branches_missing:
+					display = "Missing"sv;
+					break;
+				// GCOV_EXCL_STOP
+				case core::col_title::functions_covered:
+					display = "% Funcs"sv;
+					break;
+				case core::col_title::functions_relevant:
+					display = "Relevant"sv;
+					break;
+				case core::col_title::functions_missing:
+					display = "Missing"sv;
+					break;
+				case core::col_title::lines_covered:
+					display = "% Lines"sv;
+					break;
+				case core::col_title::lines_missing:
+					display = "Missing"sv;
+					break;
+				case core::col_title::lines_visited:
+					display = "Visited"sv;
+					break;
+				case core::col_title::lines_relevant:
+					display = "Relevant"sv;
+					break;
+				case core::col_title::lines_total:
+					display = "Line count"sv;
+					break;
+			}
+			table.header.push_back(std::string{display.data(), display.size()});
 		}
 
-		if (total.current.branches.relevant > 0) flags |= with::branches;
-		if (total.current.functions.relevant > 0) flags |= with::functions;
-
-		std::vector<table_column> header{};
-		header.reserve(columns.size());
-		for (auto const& col : columns) {
-			col.header(header, flags);
-		}
-
-		data_table table{.header = std::move(header)};
-
-		for (auto const& entry : entries) {
+		table.rows.reserve(projection.rows.size());
+		for (auto const& row : projection.rows) {
 			auto entry_flag = '?';
-			switch (entry.type) {
+			switch (row.type) {
 				case entry_type::module:
 					entry_flag = 'M';
 					break;
@@ -283,11 +198,20 @@ namespace cov::app::show {
 					break;
 			}
 
-			add(table, entry_flag, entry.stats, entry.name.display, flags);
+			table.emplace(add_table_row({.label = row.name.display,
+			                             .entry_flag = entry_flag,
+			                             .cells = row.data,
+			                             .columns = projection.columns}));
 		}
 
-		if (entries.size() > 1) {
-			add(table, '>', total, "TOTAL"sv, flags, row_type::footer);
+		if (!projection.footer.empty()) {
+			table.emplace(add_table_row({
+			                  .label = "TOTAL"sv,
+			                  .entry_flag = '>',
+			                  .cells = projection.footer,
+			                  .columns = projection.columns,
+			              }),
+			              false);
 		}
 
 		table.print();

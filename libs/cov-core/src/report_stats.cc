@@ -134,14 +134,7 @@ namespace cov::core {
 			result.reserve(column_size);
 			auto const change = stats.diff();
 
-			bool first = true;
 			for (auto const& col : columns) {
-				if (first) {
-					// Skip the name...
-					first = false;
-					continue;
-				}
-
 				if (!col.vis(flags)) continue;
 
 				auto const selector = col.selector;

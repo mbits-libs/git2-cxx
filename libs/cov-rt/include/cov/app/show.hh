@@ -10,16 +10,9 @@
 #include <cov/app/errors_tr.hh>
 #include <cov/app/rt_path.hh>
 #include <cov/app/show_range.hh>
-#include <cov/format.hh>
-#include <cov/projection.hh>
-#include <cov/repository.hh>
-#include <cov/revparse.hh>
+#include <cov/core/report_stats.hh>
 #include <string>
 #include <vector>
-
-namespace cov {
-	struct data_table;
-}
 
 namespace cov::app::show {
 	struct parser : base_parser<covlng, loglng, errlng, showlng> {
@@ -78,86 +71,18 @@ namespace cov::app::show {
 		void* app = nullptr;
 		placeholder::rating marks{};
 
-		template <typename T>
-		static bool is_zero(T val) {
-			return val == T{};
-		}
+		std::string color_for(placeholder::color clr) const;
 
-		template <typename Int>
-		static bool is_zero(io::v1::stats::ratio<Int> const& val) {
-			return val.whole == 0 && val.fraction == 0;
-		}
+		struct add_table_row_options {
+			std::string_view label{};
+			char entry_flag{};
+			std::span<core::cell_info const> cells{};
+			std::span<core::column_info const> columns{};
+		};
 
-		std::string val(auto const& V) const { return fmt::format("{}", V); }
+		std::vector<std::string> add_table_row(
+		    add_table_row_options const& options) const;
 
-		std::string apply_mark(std::string_view label,
-		                       placeholder::color color,
-		                       io::v1::stats const& stats) const {
-			return fmt::format("{}{}{}", color_for(color, &stats), label,
-			                   color_for(placeholder::color::reset));
-		}
-
-		std::string val_sign(
-		    auto const& V,
-		    placeholder::color base = placeholder::color::faint_green) const {
-			using color = placeholder::color;
-			using T = std::remove_cvref_t<decltype(V)>;
-			if (is_zero(V)) return {};
-			if (V < T{}) {
-				if (base == color::faint_green)
-					base = color::faint_red;
-				else if (base == color::faint_red)
-					base = color::faint_green;
-			}
-			return fmt::format("{}{:+}{}", color_for(base), V,
-			                   color_for(color::reset));
-		}
-
-		template <typename Getter>
-		void percentage(std::vector<std::string>& cells,
-		                file_diff const& change,
-		                Getter const& getter,
-		                placeholder::color rating_color) const {
-			cells.push_back(apply_mark(val(getter(change.coverage.current)),
-			                           rating_color,
-			                           getter(change.stats.current)));
-			cells.push_back(val_sign(getter(change.coverage.diff),
-			                         placeholder::color::faint_green));
-		}
-
-		template <typename Getter>
-		void count(
-		    std::vector<std::string>& cells,
-		    file_diff const& change,
-		    Getter const& getter,
-		    placeholder::color base = placeholder::color::faint_green) const {
-			cells.push_back(val(getter(change.stats.current)));
-			cells.push_back(val_sign(getter(change.stats.diff), base));
-		}
-
-		template <typename Getter>
-		void dimmed_count(
-		    std::vector<std::string>& cells,
-		    file_diff const& change,
-		    Getter const& getter,
-		    placeholder::color base = placeholder::color::faint_green) const {
-			auto const& value = getter(change.stats.current);
-			std::string str{};
-			if (!is_zero(value)) {
-				str = val(value);
-			}
-			cells.push_back(str);
-			cells.push_back(val_sign(getter(change.stats.diff), base));
-		}
-
-		std::string color_for(placeholder::color clr,
-		                      io::v1::stats const* stats = nullptr) const;
-		void add(data_table& table,
-		         char type,
-		         projection::entry_stats const& stats,
-		         std::string_view label,
-		         with flags,
-		         row_type row = row_type::data) const;
 		void print_table(std::vector<projection::entry> const& entries) const;
 	};
 }  // namespace cov::app::show
