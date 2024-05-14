@@ -74,11 +74,13 @@ namespace cov::app {
 		}
 
 		if (sysroot.empty()) {
+			// GCOV_EXCL_START
 			[[unlikely]];
 			sysroot = directory_info::prefix;
 			ec.clear();
 			if (!is_directory(sysroot / directory_info::core, ec) || ec)
 				sysroot.clear();
+			// GCOV_EXCL_STOP
 		}
 
 		return sysroot;
