@@ -8,8 +8,10 @@ set(STYLESHEETS
 
 set(HTML_DIR "${PROJECT_BINARY_DIR}/${SHARE_DIR}/site/html")
 set(RES_DIR "${PROJECT_BINARY_DIR}/${SHARE_DIR}/site/res")
+set(CXX_FILT_DIR "${PROJECT_BINARY_DIR}/${SHARE_DIR}/c++filt")
 
 set(TGT_SCRIPT
+    COMMAND "${CMAKE_COMMAND}" -E copy_directory "c++filt" "${CXX_FILT_DIR}"
     COMMAND "${CMAKE_COMMAND}" -E make_directory "${HTML_DIR}/style"
 )
 

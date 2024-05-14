@@ -1,0 +1,4 @@
+{
+    "json::ordered_map<json::node>": "json::map",
+    "std::vector<json::node>": "json::array"
+}

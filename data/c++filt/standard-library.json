@@ -1,0 +1,130 @@
+{
+    "decltype(nullptr)": "std::nullptr_t",
+    "std::string": {
+        "std::__cxx11::basic_string<$1, $2, $3>": "std::basic_string<$1, $2, $3>",
+        "std::basic_string<$1, $2, std::allocator<$1>>": "std::basic_string<$1, $2>",
+        "std::basic_string<$1, std::char_traits<$1>>": "std::basic_string<$1>",
+        "std::basic_string<$1, $2, std::pmr::polymorphic_allocator<$1>>": "std::pmr::basic_string<$1, $2>",
+        "std::pmr::basic_string<$1, std::char_traits<$1>>": "std::pmr::basic_string<$1>",
+        "std::basic_string<char>": "std::string",
+        "std::basic_string<wchar_t>": "std::wstring",
+        "std::basic_string<char8_t>": "std::u8string",
+        "std::basic_string<char16_t>": "std::u8string",
+        "std::basic_string<char32_t>": "std::u32string",
+        "std::pmr::basic_string<char>": "std::pmr::string",
+        "std::pmr::basic_string<wchar_t>": "std::pmr::wstring",
+        "std::pmr::basic_string<char8_t>": "std::pmr::u8string",
+        "std::pmr::basic_string<char16_t>": "std::pmr::u8string",
+        "std::pmr::basic_string<char32_t>": "std::pmr::u32string"
+    },
+    "std::string_view": {
+        "std::basic_string_view<$1, std::char_traits<$1>>": "std::basic_string_view<$1>",
+        "std::basic_string_view<char>": "std::string_view",
+        "std::basic_string_view<wchar_t>": "std::wstring_view",
+        "std::basic_string_view<char8_t>": "std::u8string_view",
+        "std::basic_string_view<char16_t>": "std::u16string_view",
+        "std::basic_string_view<char32_t>": "std::u32string_view"
+    },
+    "CONTAINERS": {
+        "sequence": {
+            "std::vector<$1, std::allocator<$1>>": "std::vector<$1>",
+            "std::vector<$1, std::pmr::polymorphic_allocator<$1>>": "std::pmr::vector<$1>",
+            "std::deque<$1, std::allocator<$1>>": "std::deque<$1>",
+            "std::deque<$1, std::pmr::polymorphic_allocator<$1>>": "std::pmr::deque<$1>",
+            "std::list<$1, std::allocator<$1>>": "std::list<$1>",
+            "std::list<$1, std::pmr::polymorphic_allocator<$1>>": "std::pmr::list<$1>",
+            "std::forward_list<$1, std::allocator<$1>>": "std::forward_list<$1>",
+            "std::forward_list<$1, std::pmr::polymorphic_allocator<$1>>": "std::pmr::forward_list<$1>"
+        },
+        "assoc": {
+            "std::map<$1, $2, $3, std::allocator<std::pair<$1 const, $2>>>": "std::map<$1, $2, $3>",
+            "std::map<$1, $2, std::less<$1>>": "std::map<$1, $2>",
+            "std::map<$1, $2, $3, std::pmr::polymorphic_allocator<std::pair<$1 const, $2>>>": "std::pmr::map<$1, $2, $3>",
+            "std::pmr::map<$1, $2, std::less<$1>>": "std::pmr::map<$1, $2>",
+            "std::multimap<$1, $2, $3, std::allocator<std::pair<$1 const, $2>>>": "std::multimap<$1, $2, $3>",
+            "std::multimap<$1, $2, std::less<$1>>": "std::multimap<$1, $2>",
+            "std::multimap<$1, $2, $3, std::pmr::polymorphic_allocator<std::pair<$1 const, $2>>>": "std::pmr::multimap<$1, $2, $3>",
+            "std::pmr::multimap<$1, $2, std::less<$1>>": "std::pmr::multimap<$1, $2>",
+            "std::set<$1, $2, std::allocator<$1>>": "std::set<$1, $2>",
+            "std::set<$1, std::less<$1>>": "std::set<$1>",
+            "std::set<$1, std::pmr::polymorphic_allocator<$1>>": "std::pmr::set<$1>",
+            "std::pmr::set<$1, std::less<$1>>": "std::pmr::set<$1>",
+            "std::multiset<$1, $2, std::allocator<$1>>": "std::multiset<$1, $2>",
+            "std::multiset<$1, std::less<$1>>": "std::multiset<$1>",
+            "std::multiset<$1, std::pmr::polymorphic_allocator<$1>>": "std::pmr::multiset<$1>",
+            "std::pmr::multiset<$1, std::less<$1>>": "std::pmr::multiset<$1>"
+        },
+        "unordered assoc": {
+            "std::unordered_map<$1, $2, $3, std::allocator<std::pair<$1 const, $2>>>": "std::unordered_map<$1, $2, $3>",
+            "std::unordered_map<$1, $2, std::less<$1>>": "std::unordered_map<$1, $2>",
+            "std::unordered_map<$1, $2, $3, std::pmr::polymorphic_allocator<std::pair<$1 const, $2>>>": "std::pmr::unordered_map<$1, $2, $3>",
+            "std::pmr::unordered_map<$1, $2, std::less<$1>>": "std::pmr::unordered_map<$1, $2>",
+            "std::unordered_multimap<$1, $2, $3, std::allocator<std::pair<$1 const, $2>>>": "std::unordered_multimap<$1, $2, $3>",
+            "std::unordered_multimap<$1, $2, std::less<$1>>": "std::unordered_multimap<$1, $2>",
+            "std::unordered_multimap<$1, $2, $3, std::pmr::polymorphic_allocator<std::pair<$1 const, $2>>>": "std::pmr::unordered_multimap<$1, $2, $3>",
+            "std::pmr::unordered_multimap<$1, $2, std::less<$1>>": "std::pmr::unordered_multimap<$1, $2>",
+            "std::unordered_set<$1, $2, std::allocator<$1>>": "std::unordered_set<$1, $2>",
+            "std::unordered_set<$1, std::less<$1>>": "std::unordered_set<$1>",
+            "std::unordered_set<$1, std::pmr::polymorphic_allocator<$1>>": "std::pmr::unordered_set<$1>",
+            "std::pmr::unordered_set<$1, std::less<$1>>": "std::pmr::unordered_set<$1>",
+            "std::unordered_multiset<$1, $2, std::allocator<$1>>": "std::unordered_multiset<$1, $2>",
+            "std::unordered_multiset<$1, std::less<$1>>": "std::unordered_multiset<$1>",
+            "std::unordered_multiset<$1, $2, std::pmr::polymorphic_allocator<$1>>": "std::pmr::unordered_multiset<$1, $2>",
+            "std::pmr::unordered_multiset<$1, std::less<$1>>": "std::pmr::unordered_multiset<$1>"
+        },
+        "adaptors": {
+            "std::stack<$1, std::deque<$1>>": "std::stack<$1>",
+            "std::queue<$1, std::deque<$1>>": "std::queue<$1>",
+            "std::priority_queue<$1, std::vector<$1>, std::less<$1>>": "std::priority_queue<$1>"
+        },
+        "views": {
+            "std::span<$1, 18446744073709551615ul>": "std::span<$1>",
+            "std::mdspan<$1, $2, $3, std::default_accessor<$1>>": "std::mdspan<$1, $2, $3>",
+            "std::mdspan<$1, $2, std::layout_right>": "std::mdspan<$1, $2>"
+        }
+    },
+    "std::filesystem::path": {
+        "std::filesystem::path": "std::filesystem::path"
+    },
+    "std::ratio": {
+        "std::ratio<$1, 1l>": "std::ratio<$1>",
+        "std::ratio<1l, 1000000000000000000000000000000l>": "std::quecto",
+        "std::ratio<1l, 1000000000000000000000000000l>": "std::ronto",
+        "std::ratio<1l, 1000000000000000000000000l>": "std::yocto",
+        "std::ratio<1l, 1000000000000000000000l>": "std::zepto",
+        "std::ratio<1l, 1000000000000000000l>": "std::atto",
+        "std::ratio<1l, 1000000000000000l>": "std::femto",
+        "std::ratio<1l, 1000000000000l>": "std::pico",
+        "std::ratio<1l, 1000000000l>": "std::nano",
+        "std::ratio<1l, 1000000l>": "std::micro",
+        "std::ratio<1l, 1000l>": "std::milli",
+        "std::ratio<1l, 100l>": "std::centi",
+        "std::ratio<1l, 10l>": "std::deci",
+        "std::ratio<1l>": "std::ratio<>",
+        "std::ratio<10l>": "std::deca",
+        "std::ratio<100l>": "std::hecto",
+        "std::ratio<1000l>": "std::kilo",
+        "std::ratio<1000000l>": "std::mega",
+        "std::ratio<1000000000l>": "std::giga",
+        "std::ratio<1000000000000l>": "std::tera",
+        "std::ratio<1000000000000000l>": "std::peta",
+        "std::ratio<1000000000000000000l>": "std::exa",
+        "std::ratio<1000000000000000000000l>": "std::zetta",
+        "std::ratio<1000000000000000000000000l>": "std::yotta",
+        "std::ratio<1000000000000000000000000000l>": "std::ronna",
+        "std::ratio<1000000000000000000000000000000l>": "std::quetta"
+    },
+    "std::chrono::duration": {
+        "std::chrono::duration<$1, std::ratio<>>": "std::chrono::duration<$1>",
+        "std::chrono::duration<long, std::nano>": "std::chrono::nanoseconds",
+        "std::chrono::duration<long, std::micro>": "std::chrono::microseconds",
+        "std::chrono::duration<long, std::milli>": "std::chrono::milliseconds",
+        "std::chrono::duration<long>": "std::chrono::seconds",
+        "std::chrono::duration<long, std::ratio<60l>>": "std::chrono::minutes",
+        "std::chrono::duration<long, std::ratio<3600l>>": "std::chrono::hours",
+        "std::chrono::duration<long, std::ratio<86400l>>": "std::chrono::days",
+        "std::chrono::duration<long, std::ratio<604800l>>": "std::chrono::weeks",
+        "std::chrono::duration<long, std::ratio<2629746l>>": "std::chrono::months",
+        "std::chrono::duration<long, std::ratio<31556952l>>": "std::chrono::years"
+    }
+}
