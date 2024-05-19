@@ -62,7 +62,7 @@ namespace cov {
 			if (it == end) return 1;
 			if (!std::isdigit(static_cast<unsigned char>(*it))) return 1;
 			size_t result{};
-			if (it != end && std::isdigit(static_cast<unsigned char>(*it))) {
+			while (it != end && std::isdigit(static_cast<unsigned char>(*it))) {
 				result *= 10;
 				result += static_cast<size_t>(*it++ - '0');
 			}
