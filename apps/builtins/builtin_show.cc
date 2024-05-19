@@ -7,6 +7,7 @@
 #include <args/actions.hpp>
 #include <cov/app/path.hh>
 #include <cov/app/show.hh>
+#include <cov/core/c++filt.hh>
 #include <cov/core/cvg_info.hh>
 #include <cov/core/line_printer.hh>
 #include <cov/format.hh>
@@ -238,6 +239,9 @@ namespace cov::app::builtin::show {
 		auto const* file_entry = files->by_path(entries.front().name.expanded);
 		if (!file_entry || file_entry->contents().is_zero()) return 1;
 
+		auto const replacements =
+		    core::load_replacements(platform::sys_root(), info.repo);
+
 		core::cvg_info cvg{};
 		bool with_functions{true};
 
@@ -293,9 +297,15 @@ namespace cov::app::builtin::show {
 				fn.at(line_no, [=, &widths](auto const& function) {
 					auto const aliases = core::cvg_info::soft_alias(function);
 					for (auto const& alias : aliases) {
+						auto const renamed =
+						    cxx_filt::Parser::statement_from(alias.label)
+						        .simplified(replacements)
+						        .str();
 						fmt::print("{}\n",
 						           cvg.to_string(
-						               alias, widths, clr == use_feature::yes,
+						               core::aliased_name{.label = renamed,
+						                                  .count = alias.count},
+						               widths, clr == use_feature::yes,
 						               display_width, function.count));
 					}
 				});

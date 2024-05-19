@@ -86,6 +86,7 @@ if (COV_TESTING)
     libs/hilite/lighter
     libs/app
     libs/cov-rt
+    libs/c++filt
   )
     list(APPEND INCLUDED_IN_COVERAGE ${module}/include ${module}/src)
   endforeach()
@@ -94,7 +95,7 @@ if (COV_TESTING)
     list(APPEND INCLUDED_IN_COVERAGE libs/hilite/hilite-${extra}/src)
   endforeach()
 
-  foreach(ext_lib excludes ext_native ext_platform web c++filt)
+  foreach(ext_lib excludes ext_native ext_platform web)
     list(APPEND INCLUDED_IN_COVERAGE
       extras/libs/${ext_lib}/include
       extras/libs/${ext_lib}/src)
@@ -109,7 +110,6 @@ if (COV_TESTING)
     libs/ext_native
     libs/ext_platform
     libs/web
-    libs/c++filt
     cov_export
   )
     list(APPEND EXCLUDED_FROM_COVERAGE

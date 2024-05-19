@@ -7,6 +7,7 @@ add_subdirectory(helpers)
 add_subdirectory(hilite)
 add_subdirectory(cov-api)
 add_subdirectory(app)
+add_subdirectory(c++filt)
 add_subdirectory(cov-core)
 add_subdirectory(cov-rt)
 
