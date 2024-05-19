@@ -1,8 +1,7 @@
 // Copyright (c) 2024 Marcin Zdun
 // This code is licensed under MIT license (see LICENSE for details)
 
-#include <c++filt/json.hh>
-#include <c++filt/parser.hh>
+#include <cov/core/c++filt.hh>
 #include <cov/core/report_stats.hh>
 #include <cov/format.hh>
 #include <cov/io/file.hh>
@@ -114,99 +113,6 @@ namespace cov::app::report_export {
 		}
 	}
 
-	char const* get_home() noexcept {
-		if (auto var = std::getenv("HOME"); var && *var) {
-			return var;
-		}
-		if (auto var = std::getenv("USERPROFILE"); var && *var) {
-			return var;
-		}
-		return nullptr;
-	}
-
-	std::vector<std::filesystem::path> replacement_paths(
-	    cov::repository const& repo) {
-		std::vector<std::filesystem::path> result{};
-
-		auto const system = platform::core_extensions::sys_root();
-		auto const home_var = get_home();
-		auto const home = home_var ? std::filesystem::path{home_var}
-		                           : std::filesystem::path{};
-		auto const maybe_local = repo.git_work_dir();
-		auto const local =
-		    maybe_local ? make_u8path(*maybe_local) : std::filesystem::path{};
-
-		{
-			std::error_code ec{};
-			auto it = std::filesystem::directory_iterator{
-			    system / directory_info::share / "c++filt"sv, ec};
-			if (!ec) {
-				for (auto const& entry : it) {
-					if (entry.is_regular_file() &&
-					    entry.path().extension() == ".json"sv) {
-						result.push_back(entry.path());
-					}
-				}
-			}
-		}
-
-		repo.config().get_multivar_foreach(
-		    "filter.path", nullptr, [&](git_config_entry const* entry) -> int {
-			    std::filesystem::path const* root = nullptr;
-			    switch (entry->level) {
-				    case GIT_CONFIG_LEVEL_PROGRAMDATA:
-				    case GIT_CONFIG_LEVEL_SYSTEM:
-					    root = &system;
-					    break;
-				    case GIT_CONFIG_LEVEL_XDG:
-				    case GIT_CONFIG_LEVEL_GLOBAL:
-					    root = &home;
-					    break;
-				    case GIT_CONFIG_LEVEL_LOCAL:
-					    root = &local;
-					    break;
-				    default:
-					    break;
-			    }
-			    if (!root || root->empty()) return 0;
-			    result.push_back(*root / make_u8path(entry->value));
-			    return 0;
-		    });
-
-		if (!local.empty()) {
-			std::error_code ec{};
-			auto it =
-			    std::filesystem::directory_iterator{local / ".c++filt"sv, ec};
-			if (!ec) {
-				for (auto const& entry : it) {
-					if (entry.is_regular_file() &&
-					    entry.path().extension() == ".json"sv) {
-						result.push_back(entry.path());
-					}
-				}
-			}
-		}
-
-		return result;
-	}
-
-	cxx_filt::Replacements load_replacements(cov::repository const& repo) {
-		cxx_filt::Replacements result{};
-
-		for (auto const& path : replacement_paths(repo)) {
-			auto file = io::fopen(path);
-			if (!file) continue;
-			fmt::print("c++filt: {}\n", get_u8path(path));
-			auto const contents = file.read();
-			cxx_filt::append_replacements(
-			    {reinterpret_cast<const char*>(contents.data()),
-			     contents.size()},
-			    result);
-		}
-
-		return result;
-	}
-
 	int handle(args::args_view const& args) {
 		parser p{args,
 		         {platform::core_extensions::locale_dir(),
@@ -263,15 +169,18 @@ namespace cov::app::report_export {
 			module_mapping[module_name].files.push_back(item.filename);
 		}
 
-		html_report({.marks = placeholder::environment::rating_from(info.repo),
-		             .mods = std::move(mods),
-		             .diff = std::move(diff),
-		             .out_dir = info.path,
-		             .repo = info.repo,
-		             .ref = info.range.to,
-		             .base = info.range.from,
-		             .replacements = load_replacements(info.repo)},
-		            p);
+		auto const system = platform::core_extensions::sys_root();
+
+		html_report(
+		    {.marks = placeholder::environment::rating_from(info.repo),
+		     .mods = std::move(mods),
+		     .diff = std::move(diff),
+		     .out_dir = info.path,
+		     .repo = info.repo,
+		     .ref = info.range.to,
+		     .base = info.range.from,
+		     .replacements = core::load_replacements(system, info.repo)},
+		    p);
 
 		return 0;
 	}

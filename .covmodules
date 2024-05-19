@@ -6,6 +6,9 @@
     path = libs/cov-api/src/cov
 [module "cov/runtime"]
     path = libs/cov-rt
+[module "cov/core"]
+    path = libs/c++filt
+    path = libs/cov-core
 [module "app/library"]
     path = libs/app
 [module "app/main"]
