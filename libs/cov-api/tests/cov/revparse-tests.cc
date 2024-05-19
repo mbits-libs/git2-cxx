@@ -97,6 +97,20 @@ namespace cov::testing {
 			repo = std::move(secondary);
 
 			/*
+			                                      T
+			                                     /
+			                                    U
+			                                   /
+			                                  V
+			                                 /
+			                                W
+			                               /
+			                              X
+			                             /
+			                            Y
+			                           /
+			                          Z
+			                         /
 			    A                   K
 			     \                 /
 			      B       I       L
@@ -123,6 +137,13 @@ namespace cov::testing {
 			ASSERT_TRUE(report(prev, prev, "M"sv));
 			ASSERT_TRUE(report(prev, prev, "L"sv));
 			ASSERT_TRUE(report(prev, prev, "K"sv));
+			ASSERT_TRUE(report(prev, prev, "Z"sv));
+			ASSERT_TRUE(report(prev, prev, "Y"sv));
+			ASSERT_TRUE(report(prev, prev, "X"sv));
+			ASSERT_TRUE(report(prev, prev, "W"sv));
+			ASSERT_TRUE(report(prev, prev, "V"sv));
+			ASSERT_TRUE(report(prev, prev, "U"sv));
+			ASSERT_TRUE(report(prev, prev, "T"sv));
 
 			ASSERT_TRUE(report(prev, F, "E"sv));
 			ASSERT_TRUE(report(D, prev, "D"sv));
@@ -246,15 +267,19 @@ namespace cov::testing {
 		if (!expected_tags.inaccessible.empty()) {
 			auto const inaccessible =
 			    repo.refs()->dwim(expected_tags.inaccessible);
-			ASSERT_TRUE(inaccessible);
-			ASSERT_TRUE(inaccessible->direct_target());
+			ASSERT_TRUE(inaccessible)
+			    << "Make sure you updated the report tree in SetUpTestSuite()";
+			ASSERT_TRUE(inaccessible->direct_target())
+			    << "Make sure you updated the report tree in SetUpTestSuite()";
 			expected.from = inaccessible->direct_target()->str();
 		}
 
 		if (!expected_tags.accessible.empty()) {
 			auto const accessible = repo.refs()->dwim(expected_tags.accessible);
-			ASSERT_TRUE(accessible);
-			ASSERT_TRUE(accessible->direct_target());
+			ASSERT_TRUE(accessible)
+			    << "Make sure you updated the report tree in SetUpTestSuite()";
+			ASSERT_TRUE(accessible->direct_target())
+			    << "Make sure you updated the report tree in SetUpTestSuite()";
 			expected.to = accessible->direct_target()->str();
 		}
 
@@ -288,6 +313,7 @@ namespace cov::testing {
 	    {"G...K"sv, {}},
 	    {"missing", {.single = true}},
 	    {"G..indirect", {"G"sv, "N"sv}},
+	    {"T~12..T", {"F"sv, "T"sv}},
 	};
 
 	INSTANTIATE_TEST_SUITE_P(tests, revparse, ::testing::ValuesIn(tests));
