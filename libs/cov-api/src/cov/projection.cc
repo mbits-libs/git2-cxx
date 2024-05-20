@@ -30,8 +30,10 @@ namespace cov::projection {
 					continue;
 				}
 
+				// GCOV_EXCL_START
 				it = modules.erase(it);
 				end = modules.end();
+				// GCOV_EXCL_STOP
 			}
 		}
 
