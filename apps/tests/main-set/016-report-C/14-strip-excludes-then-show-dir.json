@@ -1,0 +1,26 @@
+{
+    "args": "show HEAD:a --color always",
+    "expected": [
+        0,
+        [
+            "\u001b[33mdirectory a/\u001b[m",
+            "",
+            "+---------+---------+----------+---------+---------+---------+----------+---------+------------+",
+            "| Name    | % Funcs | Relevant | Missing | % Lines | Visited | Relevant | Missing | Line count |",
+            "+---------+---------+----------+---------+---------+---------+----------+---------+------------+",
+            "| D \u001b[2;37mb/c/\u001b[md |   \u001b[1;31m33.33\u001b[m |        3 |       2 |   \u001b[1;31m50.00\u001b[m |       1 |        2 |       1 |         15 |",
+            "+---------+---------+----------+---------+---------+---------+----------+---------+------------+\n"
+        ],
+        ""
+    ],
+    "prepare": [
+        "unpack $DATA/repo.git.tar $TMP",
+        "cd '$TMP'",
+        "git clone repo.git",
+        "cd repo",
+        "cov init",
+        "mkdirs a/b/c/d",
+        "cp '$DATA/strip-excludes/file-3' 'a/b/c/d/file.cc'",
+        "cov report $DATA/strip-excludes/coverage-5.json -f strip-excludes -- --os l-cars --compiler gcc"
+    ]
+}

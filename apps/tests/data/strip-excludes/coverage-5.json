@@ -1,0 +1,76 @@
+{
+    "$schema": "https://raw.githubusercontent.com/mzdun/cov/v0.22.0/apps/report-schema.json",
+    "git": {
+        "branch": "main",
+        "head": "3845124429f44888c0152dc1929ec6853bc1c9f0"
+    },
+    "files": [
+        {
+            "digest": "sha1:c2d41d07c18b314be45063cd145ca2f9019fb893",
+            "name": "a/b/c/d/file.cc",
+            "line_coverage": {
+                "3": 0,
+                "4": 0,
+                "16": 1,
+                "17": 2,
+                "18": 3,
+                "26": 1,
+                "27": 2,
+                "28": 3,
+                "29": 4,
+                "30": 5
+            },
+            "functions": [
+                {
+                    "count": 3,
+                    "name": "_Z3foov",
+                    "demangled": "foo()",
+                    "start_line": 1,
+                    "end_line": 4
+                },
+                {
+                    "count": 4,
+                    "name": "_Z3barv",
+                    "demangled": "bar()",
+                    "start_line": 1,
+                    "end_line": 4
+                },
+                {
+                    "count": 0,
+                    "name": "_Z12fully_hiddenRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE",
+                    "demangled": "fully_hidden(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)",
+                    "start_line": 25,
+                    "end_line": 30
+                },
+                {
+                    "count": 0,
+                    "name": "_Z12start_hiddenSt6vectorIiSaIiEE",
+                    "demangled": "start_hidden(std::vector<int, std::allocator<int> >)",
+                    "start_line": 34,
+                    "end_line": 40
+                },
+                {
+                    "count": 0,
+                    "name": "_Z10end_hiddenRKSt6vectorINSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEESaIS5_EE",
+                    "demangled": "end_hidden(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&)",
+                    "start_line": 42,
+                    "end_line": 48
+                },
+                {
+                    "count": 0,
+                    "name": "_Z12block_hiddenRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE",
+                    "demangled": "block_hidden(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)",
+                    "start_line": 52,
+                    "end_line": 60
+                },
+                {
+                    "count": 0,
+                    "name": "_Z17empty_line_hiddenRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE",
+                    "demangled": "empty_line_hidden(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)",
+                    "start_line": 64,
+                    "end_line": 70
+                }
+            ]
+        }
+    ]
+}
