@@ -77,6 +77,10 @@ namespace cov::projection {
 			copy.append(name);
 			return copy;
 		}
+
+		void clean(std::string& name) const {
+			if (name.starts_with(prefix)) name = name.substr(prefix.size());
+		}
 	};
 
 	struct report_filter {

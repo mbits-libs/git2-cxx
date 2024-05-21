@@ -7,6 +7,7 @@
 #include <cov/git2/global.hh>
 #include <cov/module.hh>
 #include <cov/projection.hh>
+#include <source_location>
 
 using namespace std::literals;
 
@@ -262,7 +263,8 @@ namespace cov::projection::testing {
 		    std::string_view module_filter,
 		    std::string_view fname_filter,
 		    std::span<entry_info const> const& expected_entries,
-		    std::vector<file_stats> const& files = make_files(all_files)) {
+		    std::vector<file_stats> const& files = make_files(all_files),
+		    std::source_location const loc = std::source_location::current()) {
 			git::init memory{};
 			std::error_code ec;
 
@@ -296,7 +298,8 @@ namespace cov::projection::testing {
 			}
 
 			auto expected = make_entries(expected_entries);
-			ASSERT_EQ(expected, actual);
+			ASSERT_EQ(expected, actual)
+			    << loc.file_name() << ':' << loc.line() << ": see test";
 		}
 	};
 
@@ -330,8 +333,8 @@ namespace cov::projection::testing {
 	}
 	TEST_F(projection, deep_mod_filter) {
 		static constinit entry_info const expected[] = {
-		    {entry_type::directory, "libs/hilite/hilite-cxx/src"sv,
-		     "libs/hilite/hilite-cxx/src"sv, stats(178, 136, 136)},
+		    {entry_type::file, "libs/hilite/hilite-cxx/src/cxx.cc"sv,
+		     "libs/hilite/hilite-cxx/src/cxx.cc"sv, stats(178, 136, 136)},
 		};
 		test(this_project, "hilite :: c++"sv, {}, expected);
 	}
