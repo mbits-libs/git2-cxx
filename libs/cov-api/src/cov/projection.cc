@@ -211,7 +211,44 @@ namespace cov::projection {
 				children = std::vector<dir_entry>{};
 				children = std::move(tmp.front().children);
 			}
+
+			bool swap_directory_with_children(prefixed const& fname) {
+				auto expanded{false};
+				while (children.size() == 1 &&
+				       children.front().result.type == entry_type::directory) {
+					expanded = true;
+					auto name = children.front().result.name.display;
+					name.push_back('/');
+					auto tmp = std::move(children);
+					children = std::vector<dir_entry>{};
+					children = std::move(tmp.front().children);
+
+					for (auto& child : children) {
+						child.result.name.display =
+						    name + child.result.name.display;
+					}
+				}
+
+				if (!expanded) return false;
+
+				for (auto& child : children) {
+					fname.clean(child.result.name.display);
+				}
+
+				return true;
+			}
+
+			bool is_standalone(prefixed const& fname) const noexcept {
+				return children.size() == 1 &&
+				       children.front().result.type == entry_type::file &&
+				       children.front().result.name.display == fname.filter;
+			}
 		};
+
+		inline bool is_standalone(std::span<cov::file_stats const* const> files,
+		                          prefixed const& fname) noexcept {
+			return files.size() == 1 && files.front()->filename == fname.filter;
+		}
 
 		label make_label(std::string_view display) {
 			return {.display{display.data(), display.size()}};
@@ -283,9 +320,8 @@ namespace cov::projection {
 
 		auto files = file_projection(report);
 
-		auto const is_standalone =
-		    files.size() == 1 && files.front()->filename == fname.filter;
-		if (is_standalone) {
+		auto const was_standalone = is_standalone(files, fname);
+		if (was_standalone) {
 			root.add_file(fname.filter, *files.front(), repo);
 		} else {
 			auto [modules, filtered_out] = modules_projection();
@@ -294,20 +330,21 @@ namespace cov::projection {
 		}
 
 		root.propagate(sep);
-		auto fname_filter = fname;
-		if (is_standalone) {
-			if (root.children.front().result.type == entry_type::directory) {
-				root.swap_with_child();
-			}
+		root.swap_directory_with_children(fname);
 
-			root.children.front().result.type = entry_type::standalone_file;
+		auto fname_filter = fname;
+		if (was_standalone && root.is_standalone(fname)) {
+			auto& file = root.children.front().result;
+			file.type = entry_type::standalone_file;
 
 			auto pos = fname.filter.rfind('/');
 			if (pos == std::string::npos)
 				fname_filter = {{}};
 			else
 				fname_filter = {fname.filter.substr(0, pos)};
+			fname_filter.clean(file.name.display);
 		}
+
 		result.reserve(root.children.size());
 		for (auto& child : root.children) {
 			child.result.name.expanded =
