@@ -18,10 +18,7 @@ string(REPLACE ";" ", " DEP_LIST "${DEPS}")
 endif()
 
 
-add_library(lighter STATIC ${SOURCES})
-target_compile_options(lighter PRIVATE ${ADDITIONAL_WALL_FLAGS})
-target_link_options(lighter PRIVATE ${ADDITIONAL_LINK_FLAGS})
-target_include_directories(lighter PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+add_cov_library(lighter ${SOURCES})
 target_link_libraries(lighter PUBLIC ${DEPS})
 set_target_properties(lighter PROPERTIES FOLDER libs/hilite)
 

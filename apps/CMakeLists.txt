@@ -99,6 +99,7 @@ print_cov_ext()
 
 if (COV_TESTING)
     enable_testing()
+    add_to_coverage(builtins cov)
 
     add_cov_tool(cov-echo tests/cov-echo.cc)
     target_link_libraries(cov-echo PRIVATE app_main fmt::fmt mbits::args)

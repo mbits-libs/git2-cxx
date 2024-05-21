@@ -70,61 +70,25 @@ if (COV_TESTING)
   )
   message(STATUS "JsonRunner_EXECUTABLE is: ${JsonRunner_EXECUTABLE}")
 
-  set(COVERALLS_PREFIX cov_)
-  
-  set(INCLUDED_IN_COVERAGE
-    apps/builtins
-    apps/cov
-    extras/filters
-    extras/cov_export
-  )
-
-  foreach(module
-    libs/cov-api
-    libs/cell
-    libs/hilite/hilite
-    libs/hilite/lighter
-    libs/app
-    libs/cov-rt
-    libs/c++filt
-  )
-    list(APPEND INCLUDED_IN_COVERAGE ${module}/include ${module}/src)
-  endforeach()
-
-  foreach(extra cxx py3 ts)
-    list(APPEND INCLUDED_IN_COVERAGE libs/hilite/hilite-${extra}/src)
-  endforeach()
-
-  foreach(ext_lib excludes ext_native ext_platform web)
-    list(APPEND INCLUDED_IN_COVERAGE
-      extras/libs/${ext_lib}/include
-      extras/libs/${ext_lib}/src)
-  endforeach()
-
-  set(EXCLUDED_FROM_COVERAGE
-    apps/tests
-    extras/tests
-  )
-  foreach(extension
-    libs/excludes
-    libs/ext_native
-    libs/ext_platform
-    libs/web
-    cov_export
-  )
-    list(APPEND EXCLUDED_FROM_COVERAGE
-      extras/${extension}/test)
-  endforeach()
-
-  set(cov_COVERALLS_DIRS ${INCLUDED_IN_COVERAGE})
-  include(${PROJECT_SOURCE_DIR}/tools/coveralls/Coveralls.cmake)
-
   set(TEST_REPORT_DIR "${PROJECT_BINARY_DIR}/test-results")
   set(TEST_SANITIZER_TAG "")
   if (COV_SANITIZE)
     set(TEST_SANITIZER_TAG "-sanitizer")
   endif()
   set(TEST_REPORT_FILE "${CMAKE_SYSTEM_NAME}-${CMAKE_CXX_COMPILER_ID}-${CMAKE_BUILD_TYPE}${TEST_SANITIZER_TAG}.xml")
+
+  if (cov_COVERALLS)
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-instr-generate -fcoverage-mapping")
+      set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fprofile-instr-generate -fcoverage-mapping")
+    endif()
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
+      set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fprofile-arcs -ftest-coverage")
+      set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage -lgcov")
+      set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} --coverage -lgcov")
+    endif()
+  endif()
 endif()
 
 include(output_dirs_setup)
@@ -260,7 +224,14 @@ else()
   string(APPEND COV_PROPERTIES "\n-psanitizer=off")
 endif()
 
+if (COV_TESTING)
+  set(COVERALLS_PREFIX cov_)
+  
+  set(cov_COVERALLS_DIRS ${LEGACY_COVERAGE})
+  include(${PROJECT_SOURCE_DIR}/tools/coveralls/Coveralls.cmake)
+endif()
+
 file(GENERATE OUTPUT "${PROJECT_BINARY_DIR}/report_answers.txt" CONTENT "${COV_PROPERTIES}\n")
-string(REPLACE ";" "\n    include = " SRC_INCLUDE "${INCLUDED_IN_COVERAGE}")
-string(REPLACE ";" "\n    exclude = " SRC_EXCLUDE "${EXCLUDED_FROM_COVERAGE}")
+string(REPLACE ";" "\n    include = " SRC_INCLUDE "${COVERED_CODE}")
+string(REPLACE ";" "\n    exclude = " SRC_EXCLUDE "${NOT_COVERED_CODE}")
 configure_file("${PROJECT_SOURCE_DIR}/.covcollect.in" "${PROJECT_BINARY_DIR}/.covcollect" @ONLY)

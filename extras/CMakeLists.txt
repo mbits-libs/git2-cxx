@@ -7,6 +7,8 @@ set(NATIVE_FILTERS
 
 set(NATIVE_FILTERS ${NATIVE_FILTERS} PARENT_SCOPE)
 
+add_to_coverage(filters)
+
 foreach(NAME ${NATIVE_FILTERS})
     string(REPLACE "-" "_" SAFE_NAME "${NAME}")
     add_cov_tool(${NAME} filters/${SAFE_NAME}.cc)
