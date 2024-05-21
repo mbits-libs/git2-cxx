@@ -56,12 +56,7 @@ source_group(TREE ${CMAKE_CURRENT_BINARY_DIR} FILES ${GEN_SOURCES} PREFIX gen)
 source_group(TREE "${PROJECT_BINARY_DIR}/${SHARE_DIR}" FILES ${SHARE_SOURCES} PREFIX gen/share)
 source_group(TREE ${DATA_DIR} FILES ${DATA_SOURCES} PREFIX data)
 
-add_library(app STATIC ${SOURCES} ${GEN_SOURCES} ${SHARE_SOURCES} ${DATA_SOURCES})
-target_compile_options(app PRIVATE ${ADDITIONAL_WALL_FLAGS})
-target_link_options(app PRIVATE ${ADDITIONAL_LINK_FLAGS})
-target_include_directories(app PUBLIC
-  ${CMAKE_CURRENT_SOURCE_DIR}/include
-  ${CMAKE_CURRENT_BINARY_DIR}/include)
+add_cov_library(app ${SOURCES} ${GEN_SOURCES} ${SHARE_SOURCES} ${DATA_SOURCES})
 target_link_libraries(app PUBLIC cov-api lighter mbits::liblngs mbits::args)
 
 add_library(app_main STATIC src/main.cc)

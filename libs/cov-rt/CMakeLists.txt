@@ -40,12 +40,7 @@ elseif(WIN32)
 endif()
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})
 
-add_library(cov-rt STATIC ${SOURCES})
-target_compile_options(cov-rt PRIVATE ${ADDITIONAL_WALL_FLAGS})
-target_link_options(cov-rt PRIVATE ${ADDITIONAL_LINK_FLAGS})
-target_include_directories(cov-rt PUBLIC
-  ${CMAKE_CURRENT_SOURCE_DIR}/include
-  ${CMAKE_CURRENT_BINARY_DIR}/include)
+add_cov_library(cov-rt ${SOURCES})
 target_link_libraries(cov-rt PUBLIC cov-core)
 
 set_target_properties(cov-rt PROPERTIES FOLDER libs)

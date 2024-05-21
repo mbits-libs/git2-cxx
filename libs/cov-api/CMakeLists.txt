@@ -108,14 +108,8 @@ set(COV_SOURCES
 )
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${GIT2_SOURCES} ${COV_SOURCES})
 
-add_library(cov-api STATIC ${GIT2_SOURCES} ${COV_SOURCES})
-target_compile_options(cov-api PRIVATE ${ADDITIONAL_WALL_FLAGS})
-target_link_options(cov-api PRIVATE ${ADDITIONAL_LINK_FLAGS})
-target_include_directories(cov-api PUBLIC
-  ${CMAKE_CURRENT_SOURCE_DIR}/include
-  ${CMAKE_CURRENT_BINARY_DIR}/include)
+add_cov_library(cov-api ${GIT2_SOURCES} ${COV_SOURCES})
 target_link_libraries(cov-api PUBLIC libgit2::libgit2 fmt::fmt date::date-tz mbits::args json arch PRIVATE hilite openssl::openssl)
-
 set_target_properties(cov-api PROPERTIES FOLDER libs)
 
 if (COV_TESTING)
