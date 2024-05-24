@@ -11,6 +11,6 @@ add_cov_library(ext_platform ${SOURCES})
 target_include_directories(ext_platform PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/include/native
 )
-target_link_libraries(ext_platform PUBLIC app_main cov-core)
+target_link_libraries(ext_platform PUBLIC cov-core)
 
 set_parent_scope()

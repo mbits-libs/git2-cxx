@@ -4,6 +4,7 @@
 #include <cov/discover.hh>
 #include <cov/error.hh>
 #include <cov/git2/repository.hh>
+#include <cov/init.hh>
 #include <cov/io/file.hh>
 #include "path-utils.hh"
 

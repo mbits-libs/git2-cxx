@@ -35,20 +35,19 @@ namespace cov::app::web {
 		}
 
 		inline std::string_view rstrip(std::string_view view) {
-			while (!view.empty() && isspace(view.back()))
+			while (!view.empty() && isspace(view.back())) {
+				// GCOV_EXCL_START
+				// `git commit` strips the commit message, so this seems to be
+				// untestable
 				view = view.substr(0, view.length() - 1);
+				// GCOV_EXCL_STOP
+			}
 
 			return view;
 		}
 
 		inline std::string_view strip(std::string_view view) {
 			return rstrip(lstrip(view));
-		}
-
-		inline std::optional<std::string_view> prefixed(std::string_view prefix,
-		                                                std::string_view line) {
-			if (!line.starts_with(prefix)) return std::nullopt;
-			return strip(line.substr(prefix.length()));
 		}
 
 		std::string_view subject_from(std::string_view message) {
@@ -64,12 +63,12 @@ namespace cov::app::web {
 		std::string str(std::string_view s) { return {s.data(), s.size()}; }
 
 		static mstch::map mstch_person(placeholder::git_person const& person) {
-			return {{"name", str(person.name)},
+			return {{"name", str(person.name)},  // GCOV_EXCL_LINE[GCC]
 			        {"email", str(person.email)},
 			        {"hash", hash::md5::once(
 			                     {person.email.data(), person.email.length()})
 			                     .str()}};
-		}
+		}  // GCOV_EXCL_LINE[GCC]
 
 		std::string formatted(placeholder::git_person const& person,
 		                      placeholder::internal_environment& env,
@@ -78,7 +77,7 @@ namespace cov::app::web {
 			auto out = std::back_inserter(result);
 			person.format(out, env, fld);
 			return result;
-		}
+		}  // GCOV_EXCL_LINE[GCC]
 
 		std::string date_relative(placeholder::git_person const& person,
 		                          placeholder::internal_environment& env) {
@@ -98,7 +97,7 @@ namespace cov::app::web {
 				             result.end());
 			}
 			return result;
-		}
+		}  // GCOV_EXCL_LINE[GCC]
 
 		using namespace ::lighter;
 
@@ -113,7 +112,7 @@ namespace cov::app::web {
 	case hl::x:       \
 		return #x##sv;
 			switch (static_cast<hl::token>(tok)) { HILITE_TOKENS(TOKEN_NAME) }
-			return {};
+			return {};  // GCOV_EXCL_LINE[GCC]
 #undef TOKEN_NAME
 		}
 
@@ -260,7 +259,7 @@ namespace cov::app::web {
 			    .out = result,
 			}(contents);
 			return result;
-		}
+		}  // GCOV_EXCL_LINE[GCC]
 
 		ref_ptr<cov::files> get_files(git::oid_view id,
 		                              cov::repository const& repo) {
@@ -283,7 +282,7 @@ namespace cov::app::web {
 
 			if (auto files = as_a<cov::files>(generic); files) {
 				return files;
-			}  // GCOV_EXCL_LINE[WIN32]
+			}
 
 			// The only objects coming here are those above...
 			[[unlikely]];  // GCOV_EXCL_LINE
@@ -321,7 +320,7 @@ namespace cov::app::web {
 			commit_ctx = mstch::map{
 			    {"subject", str(subject_from(git->message))},
 			    {"description", str(body_from(git->message))},
-			    {"different_author", !the_same},
+			    {"different_author", !the_same},  // GCOV_EXCL_LINE[GCC]
 			    {"author", mstch_person(git->author)},
 			    {"committer", mstch_person(git->committer)},
 			    {"branch", str(git->branch)},
@@ -396,7 +395,7 @@ namespace cov::app::web {
 		    {"report-id", report->oid().str()},
 		    {"base",
 		     mstch::map{
-		         {"present", !from.is_zero()},
+		         {"present", !from.is_zero()},  // GCOV_EXCL_LINE[GCC]
 		         {"id", from.str()},
 		         {"label", label},
 		         {"is-tag", base_ref_is_tag},
@@ -462,7 +461,7 @@ namespace cov::app::web {
 	                    std::string_view path,
 	                    link_service const& links) {
 		auto breadcrumbs = mstch::map{{
-		    "heading"s,
+		    "heading"s,  // GCOV_EXCL_LINE[GCC] -- hey, next line is covered!
 		    mstch::map{{"href"s, links.resource_link("index.html")},
 		               {"display"s, "repository"s}},
 		}};
@@ -510,7 +509,7 @@ namespace cov::app::web {
 			case core::col_priority::supplemental:
 				return "priority-supplemental"sv;
 		}
-		return ""sv;
+		return ""sv;  // GCOV_EXCL_LINE
 	}
 
 	mstch::map add_table_row(add_table_row_options const& options) {
@@ -524,6 +523,7 @@ namespace cov::app::web {
 		}
 
 		mstch::map ctx{
+		    // GCOV_EXCL_START[GCC]
 		    {"class-name", str(options.class_name)},
 		    {"display", str(display)},
 		    {"has-prefix", !prefix.empty()},
@@ -532,6 +532,7 @@ namespace cov::app::web {
 		    {"is-directory", options.icon == icon_type::directory},
 		    {"is-file", options.icon == icon_type::file},
 		    {"is-total", options.icon == icon_type::summary},
+		    // GCOV_EXCL_STOP
 		};
 
 		if (!prefix.empty()) ctx["prefix"] = str(prefix);
@@ -562,6 +563,8 @@ namespace cov::app::web {
 
 			auto value = cell.value;
 			auto change = cell.change;
+			// happens for "missing", as a "dimmed" values (zeros turned to
+			// nothing)
 			if (value.empty() && !cell.change.empty())
 				value = column.data_type == core::col_data::counter ? "0"s
 				                                                    : "0.00"s;
@@ -724,7 +727,7 @@ namespace cov::app::web {
 			stats_ctx["columns"] = std::move(columns);
 		}
 
-		mstch::array rows{};
+		mstch::array rows{};  // GCOV_EXCL_LINE
 		rows.reserve(projection.rows.size());
 		for (auto const& row : projection.rows) {
 			std::string_view class_name{};
@@ -829,7 +832,7 @@ namespace cov::app::web {
 		for (auto const& [start, stop] : cvg.chunks) {
 			mstch::map chunk_ctx{
 			    {"missing-before", first && start > 0},
-			    {"missing-after", stop < last_line},
+			    {"missing-after", stop < last_line},  // GCOV_EXCL_LINE[GCC]
 			};
 			first = false;
 
@@ -872,10 +875,10 @@ namespace cov::app::web {
 
 				// TODO: add rest of the line
 				lines_ctx.push_back(mstch::map{
-				    {"line-no", line_no + 1},
+				    {"line-no", line_no + 1},  // GCOV_EXCL_LINE[GCC]
 				    {"functions", std::move(fn_ctx)},
-				    {"is-null", !count},
-				    {"count", count.value_or(0)},
+				    {"is-null", !count},           // GCOV_EXCL_LINE[GCC]
+				    {"count", count.value_or(0)},  // GCOV_EXCL_LINE[GCC]
 				    {"class-name", !count   ? "none"s
 				                   : *count ? "passing"s
 				                            : "failing"s},

@@ -31,6 +31,6 @@ target_sources(strip-excludes PRIVATE
   filters/strip_excludes/parser.hh
   filters/strip_excludes/parser.cc
 )
-target_link_libraries(strip-excludes PRIVATE excludes ext_platform)
+target_link_libraries(strip-excludes PRIVATE app_main excludes ext_platform)
 
 set_parent_scope()
