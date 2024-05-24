@@ -147,8 +147,8 @@ namespace cov::core {
 			}
 
 			return result;
-		}
-	}  // namespace
+		}  // GCOV_EXCL_LINE
+	}      // namespace
 
 	std::pair<entry_stats, with> stats::calc_stats(
 	    std::vector<projection::entry> const& entries) {
@@ -183,17 +183,10 @@ namespace cov::core {
 	                                 with flags) {
 		projected_entries result{};
 
-		result.columns.reserve(columns.size() - 1);
+		result.columns.reserve(columns.size());
 		result.rows.reserve(entries.size());
 
-		bool first = true;
 		for (auto const& col : columns) {
-			if (first) {
-				// Skip the name...
-				first = false;
-				continue;
-			}
-
 			if (!col.vis(flags)) continue;
 			result.columns.push_back(col.info);
 		}
