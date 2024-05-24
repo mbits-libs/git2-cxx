@@ -38,6 +38,11 @@ namespace cov::app::web {
 		std::string path_of(projection::entry_type type,
 		                    projection::label const& name) const override;
 		std::string resource_link(std::string_view resource) const override;
+
+		void set_app_path(std::string_view root_path);
+
+	private:
+		std::string root_;
 	};
 
 #if defined(__GNUC__) && !defined(__clang__)

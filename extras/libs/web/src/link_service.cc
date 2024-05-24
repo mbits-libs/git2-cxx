@@ -76,6 +76,13 @@ namespace cov::app::web {
 
 	std::string server_link_service::resource_link(
 	    std::string_view resource) const {
-		return fmt::format("/{}", resource);
+		return fmt::format("{}/{}", root_, resource);
 	}
+
+	void server_link_service::set_app_path(std::string_view root_path) {
+		if (!root_path.empty() && root_path.back() == '/')
+			root_path = root_path.substr(0, root_path.length() - 1);
+		root_.assign(root_path);
+	}
+
 }  // namespace cov::app::web
