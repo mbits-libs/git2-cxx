@@ -1,0 +1,20 @@
+{
+    "args": "export --html html-report $FILES_ID..",
+    "expected": [
+        2,
+        "",
+        "cov-export: cov::category error: Object cannot be cast to required type\n"
+    ],
+    "prepare": [
+        "unpack $DATA/repo.git.tar $TMP",
+        "cd '$TMP'",
+        "git clone repo.git",
+        "cd '$TMP/repo'",
+        "git config --local user.name 'Johnny Appleseed'",
+        "git config --local user.email 'johnny@appleseed.com'",
+        "cov init",
+        "cov report $DATA/build-coverage-show-functions-1.json -f create-report",
+        "cov report $DATA/build-coverage-show-functions-2.json -f create-report",
+        "store FILES_ID cov log -n1 --format=%H2"
+    ]
+}

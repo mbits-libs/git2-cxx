@@ -63,15 +63,19 @@ namespace cov::app::report_export {
 		size_t index{1};
 		size_t prev_line_length{0};
 
+		// GCOV_EXCL_START
 		[[noreturn]] void error(parser& p, std::error_code const& ec) {
 			if (cov::platform::is_terminal(stdout)) fmt::print("\n");
 			p.error(ec, p.tr());
 		}
+		// GCOV_EXCL_STOP
 
 		void on_action(std::string_view action) {
 			if (cov::platform::is_terminal(stdout)) {
+				// GCOV_EXCL_START -- this needs pseudo-TTY in json-runner
 				fmt::print("\r\033[2K[{}/{}] {}", index, count, action);
 				std::fflush(stdout);
+				// GCOV_EXCL_STOP
 			} else {
 				fmt::print("[{}/{}] {}\n", index, count, action);
 			}
@@ -103,10 +107,12 @@ namespace cov::app::report_export {
 
 			auto out = io::fopen(state.full_path, "wb");
 			if (!out) {
+				// GCOV_EXCL_START
 				auto const error = errno;
 				ec = std::make_error_code(error ? static_cast<std::errc>(error)
 				                                : std::errc::permission_denied);
 				logger.error(p, ec);
+				// GCOV_EXCL_STOP
 			}
 
 			out.store(page_text.c_str(), page_text.size());

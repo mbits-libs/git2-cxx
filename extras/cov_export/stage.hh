@@ -45,7 +45,7 @@ namespace cov::app::web {
 		std::shared_ptr<octicon_callback> octicons = octicon_callback::create(
 		    platform::core_extensions::sys_root() / directory_info::site_res /
 		    "octicons.json"sv);
-		mstch::map commit_ctx{}, report_ctx{};
+		mstch::node commit_ctx{}, report_ctx{};
 
 		void initialize(std::error_code& ec);
 		std::vector<web::page> list_pages_in_report() const;

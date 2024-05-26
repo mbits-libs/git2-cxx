@@ -1,0 +1,22 @@
+{
+    "args": "export --json report.json",
+    "expected": [
+        2,
+        "",
+        [
+            "usage: cov-export cov export [-h] [<report>] (--json <file> | --html <dir>)",
+            "cov-export: error: --json is not implemented yet\n"
+        ]
+    ],
+    "prepare": [
+        "unpack $DATA/repo.git.tar $TMP",
+        "cd '$TMP'",
+        "git clone repo.git",
+        "cd '$TMP/repo'",
+        "git config --local user.name 'Johnny Appleseed'",
+        "git config --local user.email 'johnny@appleseed.com'",
+        "cov init",
+        "cov report $DATA/build-coverage-show-functions-1.json -f create-report",
+        "cov report $DATA/build-coverage-show-functions-2.json -f create-report"
+    ]
+}

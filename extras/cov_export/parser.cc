@@ -11,9 +11,10 @@ namespace cov::app::report_export {
 	    : base_parser<covlng, errlng>{langs, arguments} {
 		using namespace str;
 
-		parser_.usage(fmt::format("cov export [-h] [{}] (--json | --html) {}",
-		                          tr_(covlng::REPORT_META),
-		                          tr_(str::args::lng::DIR_META)));
+		parser_.usage(fmt::format(
+		    "cov export [-h] [{}] (--json {} | --html {})",
+		    tr_(covlng::REPORT_META), tr_(str::args::lng::FILE_META),
+		    tr_(str::args::lng::DIR_META)));
 		parser_
 		    .arg(rev)  // GCOV_EXCL_LINE[GCC]
 		    .meta(tr_(covlng::REPORT_META))
@@ -29,7 +30,7 @@ namespace cov::app::report_export {
 			        oper = op::json;
 		        },
 		        "json")
-		    .meta(tr_(str::args::lng::DIR_META))
+		    .meta(tr_(str::args::lng::FILE_META))
 		    .opt();
 		parser_
 		    .custom(
