@@ -64,7 +64,8 @@ namespace cov::app::web {
 	}
 
 	class lng_callback : public mstch::callback {
-		mutable std::unordered_map<std::string, mstch::node> storage_;
+		mutable std::unordered_map<lng, mstch::node> storage_;
+		mutable std::unordered_map<std::string, mstch::node> str_storage_;
 		non_owning_ptr<lng_provider> provider_;
 
 	public:
@@ -75,12 +76,12 @@ namespace cov::app::web {
 
 		std::vector<std::string> debug_all_keys() const override {
 			return {
-#define X(LNG) #LNG,
+#define X(LNG) "LNG_" #LNG,
 			    MSTCH_LNG(X)
 #undef X
 			};
 		}
-		static mstch::node create(non_owning_ptr<lng_provider> provider) {
+		static auto create(non_owning_ptr<lng_provider> provider) {
 			return mk_shared<lng_callback>(provider);
 		}
 	};
