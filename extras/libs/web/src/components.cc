@@ -290,15 +290,22 @@ namespace cov::app::web {
 		}
 	}  // namespace
 
-	std::pair<mstch::map, mstch::map> add_build_info(cov::repository& repo,
-	                                                 git::oid_view oid,
-	                                                 git::oid_view from,
-	                                                 std::error_code& ec) {
-		std::pair<mstch::map, mstch::map> result{};
+	std::pair<mstch::node, mstch::node> add_build_info(cov::repository& repo,
+	                                                   git::oid_view oid,
+	                                                   git::oid_view from,
+	                                                   std::error_code& ec) {
+		std::pair<mstch::node, mstch::node> result{};
 		auto& [commit_ctx, report_ctx] = result;
 
 		auto report = repo.lookup<cov::report>(oid, ec);
-		if (ec) return result;
+		if (ec) {
+			if (ec == cov::errc::wrong_object_type) {
+				ec = {};
+				commit_ctx = mstch::array{};
+				report_ctx = mstch::array{};
+			}
+			return result;
+		}
 
 		auto const facade =
 		    placeholder::object_facade::present_report(report, &repo);
