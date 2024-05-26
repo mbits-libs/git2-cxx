@@ -86,33 +86,13 @@ namespace cov::app::web {
 			if (candidates.empty())
 				return find_partial(roots.front() / res, partial);
 
-			auto min_result = candidates.front();
+			auto max_result = candidates.front();
 			for (auto const& result : candidates) {
-				if (std::get<1>(result) < std::get<1>(min_result))
-					min_result = result;
+				if (std::get<0>(result) > std::get<0>(max_result))
+					max_result = result;
 			}
-			return min_result;
+			return max_result;
 		}
-	}  // namespace
-
-	namespace {
-#if 0
-		time_t conv(std::filesystem::file_time_type ftime) {
-			using clock = std::filesystem::file_time_type::clock;
-#ifdef WIN32
-			using system = std::chrono::system_clock;
-			constexpr auto compiler_specific = std::filesystem::file_time_type{
-				clock::duration(__std_fs_file_time_epoch_adjustment)
-			};
-
-			auto const dur = (ftime - compiler_specific);
-			auto const wall = system::time_point{ dur };
-			return system::to_time_t(wall);
-#else
-			return clock::to_time_t(ftime);
-#endif
-		}
-#endif
 	}  // namespace
 
 	std::pair<std::filesystem::file_time_type, std::string> dir_cache::load_ex(
@@ -241,22 +221,26 @@ namespace cov::app::web {
 		return keys;
 	}
 
+	lng_provider::~lng_provider() = default;
+
 	mstch::node const& lng_callback::at(std::string const& name) const {
 		if (provider_) {
 			auto const& keys = strings();
 			auto it = keys.find(name);
 			if (it != keys.end()) {
+				auto it_stg = storage_.find(it->second);
+				if (it_stg != storage_.end()) {
+					return it_stg->second;
+				}
+
 				auto view = provider_->get(it->second);
-				auto& ret = storage_[name];
-				if (view.empty())
-					ret = std::string{};
-				else
-					ret = std::string{view.data(), view.size()};
+				auto& ret = storage_[it->second];
+				ret = std::string{view.data(), view.size()};
 				return ret;
 			}
 		}
 
-		auto& ret = storage_[name];
+		auto& ret = str_storage_[name];
 		ret = "\xC2\xAB" + name + "\xC2\xBB";
 		return ret;
 	}
@@ -285,7 +269,7 @@ namespace cov::app::web {
 			}
 			std::sort(result.begin(), result.end());
 			return result;
-		}
+		}  // GCOV_EXCL_LINE[GCC]
 
 		std::string build(std::string const& key) const {
 			auto it = icons_.find(key);
