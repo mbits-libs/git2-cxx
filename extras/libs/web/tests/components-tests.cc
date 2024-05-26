@@ -585,12 +585,12 @@ namespace cov::app::web::testing {
 	                         components,
 	                         ConvertGenerator(ValuesIn(table_tests)));
 
-	static constexpr wrapper::component_test<wrapper::build_info> const
-	    build_info_tests[] = {
-	        {
-	            .tmplt = build_info_template,
-	            .expected =
-	                // clang-format off
+	static constexpr wrapper::component_test<
+	    wrapper::build_info> const build_info_tests[] = {
+	    {
+	        .tmplt = build_info_template,
+	        .expected =
+	            // clang-format off
 	            "COMMIT:\n"
 				" - subject: Initial\n"
 				" - description: \n"
@@ -619,16 +619,16 @@ namespace cov::app::web::testing {
 				"   - sanitizer: flag = off;\n"
 				" - date-YmdHM: 2024-05-23 06:32"
 				""sv,
-	            // clang-format on
-	            .context =
-	                {
-	                    .oid = "af2a93f2c862ad474a55ae5a553d521268f1b43e"sv,
-	                },
-	        },
-	        {
-	            .tmplt = build_info_template,
-	            .expected =
-	                // clang-format off
+	        // clang-format on
+	        .context =
+	            {
+	                .oid = "af2a93f2c862ad474a55ae5a553d521268f1b43e"sv,
+	            },
+	    },
+	    {
+	        .tmplt = build_info_template,
+	        .expected =
+	            // clang-format off
 	            "COMMIT:\n"
 				" - subject: Not so initial\n"
 				" - description: A more description, for the heck of it.\n"
@@ -660,17 +660,17 @@ namespace cov::app::web::testing {
 				"   - sanitizer: flag = off;\n"
 				" - date-YmdHM: 2024-05-24 16:05"
 				""sv,
-	            // clang-format on
-	            .context =
-	                {
-	                    .oid = "c924e9d5ee8655b8d2af9f0c4b5ca3458ca9361c"sv,
-	                    .from = "af2a93f2c862ad474a55ae5a553d521268f1b43e"sv,
-	                },
-	        },
-	        {
-	            .tmplt = build_info_template,
-	            .expected =
-	                // clang-format off
+	        // clang-format on
+	        .context =
+	            {
+	                .oid = "c924e9d5ee8655b8d2af9f0c4b5ca3458ca9361c"sv,
+	                .from = "af2a93f2c862ad474a55ae5a553d521268f1b43e"sv,
+	            },
+	    },
+	    {
+	        .tmplt = build_info_template,
+	        .expected =
+	            // clang-format off
 	            "COMMIT:\n"
 				" - subject: Initial\n"
 				" - description: \n"
@@ -699,13 +699,23 @@ namespace cov::app::web::testing {
 				"   - sanitizer: flag = off;\n"
 				" - date-YmdHM: 2024-05-23 06:32"
 				""sv,
-	            // clang-format on
-	            .context =
-	                {
-	                    .oid = "af2a93f2c862ad474a55ae5a553d521268f1b43e"sv,
-	                    .from = "c924e9d5ee8655b8d2af9f0c4b5ca3458ca9361c"sv,
-	                },
-	        },
+	        // clang-format on
+	        .context =
+	            {
+	                .oid = "af2a93f2c862ad474a55ae5a553d521268f1b43e"sv,
+	                .from = "c924e9d5ee8655b8d2af9f0c4b5ca3458ca9361c"sv,
+	            },
+	    },
+	    {
+	        .tmplt = build_info_template,
+	        .expected = ""sv,
+	        .context = {.oid = "9dd1933e47eda7b6613d9bfcd35ca7b3eec3d162"sv},
+	    },
+	    {
+	        .tmplt = build_info_template,
+	        .expected = ""sv,
+	        .context = {.oid = "f23d04a9dd54870bf016b8ec1b7614e8f38b95da"sv},
+	    },
 	};
 
 	INSTANTIATE_TEST_SUITE_P(build_info,
@@ -742,6 +752,66 @@ namespace cov::app::web::testing {
 	        .context =
 	            {
 	                .oid = "af2a93f2c862ad474a55ae5a553d521268f1b43e"sv,
+	                .path = "src/main.cpp"sv,
+	            },
+	    },
+	    {
+	        .tmplt = file_source_template,
+	        .expected =
+	            // clang-format off
+	            "- file-is-present: true\n"
+				"- last-line: 12\n"
+				"- file-is-empty: false\n"
+				"- file-chunks:\n"
+				"  - missing-before: true\n"
+				"  - missing-after: false\n"
+				"  - lines:\n"
+				"    - 3 |   | none | \n"
+				"    - 4 |   | none | <span class=\"hl-meta\"><span class=\"hl-keyword\">import</span> <span class=\"hl-identifier\"><span class=\"hl-module-name\">greetings</span></span><span class=\"hl-punctuator\">;</span></span>\n"
+				"    - 5 |   | none | \n"
+				"    - 6 | 0 | failing | <span class=\"hl-keyword\">int</span> <span class=\"hl-identifier\">main</span><span class=\"hl-punctuator\">(</span><span class=\"hl-keyword\">int</span> <span class=\"hl-identifier\">argc</span><span class=\"hl-punctuator\">,</span> <span class=\"hl-keyword\">char</span> <span class=\"hl-punctuator\">*</span><span class=\"hl-identifier\">argv</span><span class=\"hl-punctuator\">[</span><span class=\"hl-punctuator\">]</span><span class=\"hl-punctuator\">)</span> <span class=\"hl-punctuator\">{</span>\n"
+				"      - 0 | failing | main\n"
+				"    - 7 | 0 | failing |   <span class=\"hl-identifier\">std</span><span class=\"hl-punctuator\">::</span><span class=\"hl-known-ident-3\">vector</span><span class=\"hl-punctuator\">&lt;</span><span class=\"hl-identifier\">std</span><span class=\"hl-punctuator\">::</span><span class=\"hl-known-ident-3\">string</span><span class=\"hl-punctuator\">&gt;</span> <span class=\"hl-identifier\">names</span><span class=\"hl-punctuator\">{</span><span class=\"hl-punctuator\">}</span><span class=\"hl-punctuator\">;</span>\n"
+				"    - 8 | 0 | failing |   <span class=\"hl-identifier\">names</span><span class=\"hl-punctuator\">.</span><span class=\"hl-identifier\">reserve</span><span class=\"hl-punctuator\">(</span><span class=\"hl-identifier\">argc</span><span class=\"hl-punctuator\">)</span><span class=\"hl-punctuator\">;</span>\n"
+				"    - 9 | 0 | failing |   <span class=\"hl-keyword\">for</span> <span class=\"hl-punctuator\">(</span><span class=\"hl-keyword\">int</span> <span class=\"hl-identifier\">index</span> <span class=\"hl-punctuator\">=</span> <span class=\"hl-number\">0</span><span class=\"hl-punctuator\">;</span> <span class=\"hl-identifier\">index</span> <span class=\"hl-punctuator\">&lt;</span> <span class=\"hl-identifier\">argc</span><span class=\"hl-punctuator\">;</span> <span class=\"hl-punctuator\">++</span><span class=\"hl-identifier\">index</span><span class=\"hl-punctuator\">)</span>\n"
+				"    - 10 | 0 | failing |     <span class=\"hl-identifier\">names</span><span class=\"hl-punctuator\">.</span><span class=\"hl-identifier\">push_back</span><span class=\"hl-punctuator\">(</span><span class=\"hl-identifier\">argv</span><span class=\"hl-punctuator\">[</span><span class=\"hl-identifier\">index</span><span class=\"hl-punctuator\">]</span><span class=\"hl-punctuator\">)</span><span class=\"hl-punctuator\">;</span>\n"
+				"    - 11 | 0 | failing | \n"
+				"    - 12 | 0 | failing |   <span class=\"hl-identifier\">print_names</span><span class=\"hl-punctuator\">(</span><span class=\"hl-identifier\">names</span><span class=\"hl-punctuator\">)</span><span class=\"hl-punctuator\">;</span>\n"
+				"    - 13 | 0 | failing | <span class=\"hl-punctuator\">}</span>"sv,
+	        // clang-format on
+	        .context =
+	            {
+	                .oid = "9dd1933e47eda7b6613d9bfcd35ca7b3eec3d162"sv,
+	                .path = "src/main.cpp"sv,
+	            },
+	    },
+	    {
+	        .tmplt = file_source_template,
+	        .expected =
+	            // clang-format off
+	            "- file-is-present: true\n"
+				"- last-line: 12\n"
+				"- file-is-empty: false\n"
+				"- file-chunks:\n"
+				"  - missing-before: true\n"
+				"  - missing-after: false\n"
+				"  - lines:\n"
+				"    - 3 |   | none | \n"
+				"    - 4 |   | none | <span class=\"hl-meta\"><span class=\"hl-keyword\">import</span> <span class=\"hl-identifier\"><span class=\"hl-module-name\">greetings</span></span><span class=\"hl-punctuator\">;</span></span>\n"
+				"    - 5 |   | none | \n"
+				"    - 6 | 0 | failing | <span class=\"hl-keyword\">int</span> <span class=\"hl-identifier\">main</span><span class=\"hl-punctuator\">(</span><span class=\"hl-keyword\">int</span> <span class=\"hl-identifier\">argc</span><span class=\"hl-punctuator\">,</span> <span class=\"hl-keyword\">char</span> <span class=\"hl-punctuator\">*</span><span class=\"hl-identifier\">argv</span><span class=\"hl-punctuator\">[</span><span class=\"hl-punctuator\">]</span><span class=\"hl-punctuator\">)</span> <span class=\"hl-punctuator\">{</span>\n"
+				"      - 0 | failing | main\n"
+				"    - 7 | 0 | failing |   <span class=\"hl-identifier\">std</span><span class=\"hl-punctuator\">::</span><span class=\"hl-known-ident-3\">vector</span><span class=\"hl-punctuator\">&lt;</span><span class=\"hl-identifier\">std</span><span class=\"hl-punctuator\">::</span><span class=\"hl-known-ident-3\">string</span><span class=\"hl-punctuator\">&gt;</span> <span class=\"hl-identifier\">names</span><span class=\"hl-punctuator\">{</span><span class=\"hl-punctuator\">}</span><span class=\"hl-punctuator\">;</span>\n"
+				"    - 8 | 0 | failing |   <span class=\"hl-identifier\">names</span><span class=\"hl-punctuator\">.</span><span class=\"hl-identifier\">reserve</span><span class=\"hl-punctuator\">(</span><span class=\"hl-identifier\">argc</span><span class=\"hl-punctuator\">)</span><span class=\"hl-punctuator\">;</span>\n"
+				"    - 9 | 0 | failing |   <span class=\"hl-keyword\">for</span> <span class=\"hl-punctuator\">(</span><span class=\"hl-keyword\">int</span> <span class=\"hl-identifier\">index</span> <span class=\"hl-punctuator\">=</span> <span class=\"hl-number\">0</span><span class=\"hl-punctuator\">;</span> <span class=\"hl-identifier\">index</span> <span class=\"hl-punctuator\">&lt;</span> <span class=\"hl-identifier\">argc</span><span class=\"hl-punctuator\">;</span> <span class=\"hl-punctuator\">++</span><span class=\"hl-identifier\">index</span><span class=\"hl-punctuator\">)</span>\n"
+				"    - 10 | 0 | failing |     <span class=\"hl-identifier\">names</span><span class=\"hl-punctuator\">.</span><span class=\"hl-identifier\">push_back</span><span class=\"hl-punctuator\">(</span><span class=\"hl-identifier\">argv</span><span class=\"hl-punctuator\">[</span><span class=\"hl-identifier\">index</span><span class=\"hl-punctuator\">]</span><span class=\"hl-punctuator\">)</span><span class=\"hl-punctuator\">;</span>\n"
+				"    - 11 | 0 | failing | \n"
+				"    - 12 | 0 | failing |   <span class=\"hl-identifier\">print_names</span><span class=\"hl-punctuator\">(</span><span class=\"hl-identifier\">names</span><span class=\"hl-punctuator\">)</span><span class=\"hl-punctuator\">;</span>\n"
+				"    - 13 | 0 | failing | <span class=\"hl-punctuator\">}</span>"sv,
+	        // clang-format on
+	        .context =
+	            {
+	                .oid = "f23d04a9dd54870bf016b8ec1b7614e8f38b95da"sv,
 	                .path = "src/main.cpp"sv,
 	            },
 	    },
