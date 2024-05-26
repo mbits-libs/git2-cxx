@@ -18,14 +18,12 @@ if (COV_TESTING)
   enable_testing()
 
   file(GLOB WEB_TEST_SRCS_CC tests/*.cc)
-  file(GLOB WEB_TEST_SRCS_CPP tests/*.cpp)
-  file(GLOB WEB_TEST_SRCS_CXX tests/*.cxx)
+  file(GLOB WEB_TEST_SRCS_CC_2 tests/mstch_cache/*.cc)
   source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/tests FILES
     ${WEB_TEST_SRCS_CC}
-    ${WEB_TEST_SRCS_CPP}
-    ${WEB_TEST_SRCS_CXX})
+    ${WEB_TEST_SRCS_CC_2})
 
-  add_cov_test(web ${WEB_TEST_SRCS_CC} ${WEB_TEST_SRCS_CPP} ${WEB_TEST_SRCS_CXX})
+  add_cov_test(web ${WEB_TEST_SRCS_CC} ${WEB_TEST_SRCS_CC_2})
   target_link_libraries(web-test PRIVATE web testing-lib)
 
   if (COV_CUTDOWN_OS)
