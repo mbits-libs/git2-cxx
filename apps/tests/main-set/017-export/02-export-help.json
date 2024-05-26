@@ -1,0 +1,18 @@
+{
+    "args": "export --help",
+    "expected": [
+        0,
+        [
+            "usage: cov-export cov export [-h] [<report>] (--json <file> | --html <dir>)",
+            "",
+            "positional arguments:",
+            " <report>      shows either changes between given report and the report directly preceeding (if only one reference is given), or between two reports (when there are two refs separated by a '..'); defaults to HEAD if missing",
+            "",
+            "optional arguments:",
+            " -h, --help    shows this help message and exits",
+            " --json <file> ",
+            " --html <dir>  \n"
+        ],
+        ""
+    ]
+}

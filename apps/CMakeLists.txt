@@ -140,6 +140,7 @@ if (COV_TESTING)
         014-show
         015-worktree
         016-report-C
+        017-export
     )
         add_test(
             NAME cov-exec--${TEST_SET}
