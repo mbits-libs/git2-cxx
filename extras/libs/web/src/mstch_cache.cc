@@ -39,7 +39,7 @@ namespace cov::app::web {
 #undef CASE
 			}
 			static thread_local char buf[100];
-			sprintf(buf, "unknown(%d)", static_cast<int>(t));
+			snprintf(buf, sizeof(buf), "unknown(%d)", static_cast<int>(t));
 			return buf;
 		}
 #endif

@@ -86,7 +86,7 @@ namespace cov::app::web::testing {
 		static auto const& cache_root() {
 			static auto const result = setup::test_dir() / "cache"sv;
 			return result;
-		};
+		}
 
 		void touch(touch_options const& options) {
 			auto const path = cache_root() / setup::make_u8path(options.path);

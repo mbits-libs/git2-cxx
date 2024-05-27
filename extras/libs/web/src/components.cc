@@ -435,7 +435,7 @@ namespace cov::app::web {
 				break;
 			default:
 				break;
-		};
+		}
 	}
 
 	std::vector<std::pair<std::string, std::string>> make_breadcrumbs(

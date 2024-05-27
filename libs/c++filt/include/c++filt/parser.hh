@@ -4,6 +4,8 @@
 #pragma once
 
 #include <c++filt/types.hh>
+#include <string>
+#include <vector>
 
 namespace cxx_filt {
 	struct Block;

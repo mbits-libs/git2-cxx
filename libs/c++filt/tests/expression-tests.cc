@@ -475,7 +475,6 @@ namespace cxx_filt::testing {
 	          .repr =
 	              "Expr[]{\"std::chrono::duration\", <Expr[]{\"long\"}, Expr[]{\"std::ratio\", <Expr[]{\"31556952l\"}>}>}"sv,
 	          .simplified = "std::chrono::years"sv}},
-
 	};
 	INSTANTIATE_TEST_SUITE_P(chrono, expression, ::testing::ValuesIn(chrono));
 
