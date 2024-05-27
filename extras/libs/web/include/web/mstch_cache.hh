@@ -5,8 +5,11 @@
 
 #include <filesystem>
 #include <map>
+#include <memory>
 #include <mstch/mstch.hpp>
 #include <string>
+#include <unordered_map>
+#include <utility>
 #include <vector>
 
 namespace cov::app::web {

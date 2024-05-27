@@ -52,9 +52,9 @@ namespace cxx_filt {
 				case '~':
 				case ',':
 					return true;
-			};
+			}
 			return false;
-		};
+		}
 
 		bool starts_with(std::string_view self, std::string_view prefix) {
 			return std::string_view{self.data(),

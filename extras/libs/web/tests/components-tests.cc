@@ -369,7 +369,8 @@ namespace cov::app::web::testing {
 	         "\n - " EQ_PRINT("branch")
 	         "\n - " EQ_PRINT("commit-id")
 	         "\n - " EQ_PRINT("date-YmdHM")
-		) OPEN("report",
+		)  //
+		OPEN("report",
 			"\nREPORT:"
 		    "\n - " EQ_PRINT("report-id")
 			"\n - " EQ_PRINT("base.present")
@@ -387,7 +388,8 @@ namespace cov::app::web::testing {
 					)
 			)
 		    "\n - date-YmdHM: " PRINT("date-YmdHM")
-		) ""sv;
+		)  //
+		""sv;
 
 	static constexpr auto file_source_template =
 	    "- " EQ_PRINT("file-is-present")  //

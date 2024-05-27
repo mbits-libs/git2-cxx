@@ -10,6 +10,7 @@
 #include <fmt/format.h>
 #include <gtest/gtest.h>
 #include <cov/app/dirs.hh>
+#include <memory>
 #include <native/platform.hh>
 #include <string_view>
 #include <web/mstch_cache.hh>

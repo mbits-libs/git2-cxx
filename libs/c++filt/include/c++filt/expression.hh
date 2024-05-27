@@ -6,6 +6,8 @@
 #include <c++filt/types.hh>
 #include <map>
 #include <optional>
+#include <string>
+#include <utility>
 #include <vector>
 
 namespace cxx_filt {
@@ -83,7 +85,7 @@ namespace cxx_filt {
 
 	struct Statement {
 		std::vector<Expression> items{};
-		Cvrs const& cvrs() const { return items.front().cvrs; };
+		Cvrs const& cvrs() const { return items.front().cvrs; }
 
 		Statement with(Cvrs const& external) const {
 			auto copy = *this;
