@@ -7,6 +7,7 @@
 #include <hilite/hilite.hh>
 #include <hilite/lighter.hh>
 #include <hilite/none.hh>
+#include <json/json.hpp>
 #include <native/path.hh>
 #include <web/components.hh>
 #include "../../../cov-api/src/cov/format/internal_environment.hh"
@@ -288,6 +289,48 @@ namespace cov::app::web {
 			[[unlikely]];  // GCOV_EXCL_LINE
 			return {};     // GCOV_EXCL_LINE
 		}
+
+		inline std::string from_u8s(std::u8string_view str) {
+			return {reinterpret_cast<char const*>(str.data()), str.size()};
+		}
+
+		inline std::u8string to_u8s(std::string_view str) {
+			return {reinterpret_cast<char8_t const*>(str.data()), str.size()};
+		}
+
+		struct json_visitor {
+			json::node operator()(auto const&) const { return nullptr; }
+			json::node operator()(std::string const& v) const {
+				return to_u8s(v);
+			}
+			json::node operator()(long long v) const { return v; }
+			json::node operator()(double v) const { return v; }
+			json::node operator()(bool v) const { return v; }
+			json::node operator()(mstch::array const& v) const {
+				json::array a{};
+				a.reserve(v.size());
+				for (auto const& item : v) {
+					a.push_back(std::visit(json_visitor{}, item.base()));
+				}
+				return a;
+			}
+			json::node operator()(mstch::map const& v) const {
+				json::map m{};
+				for (auto const& [key, item] : v) {
+					m.set(to_u8s(key), std::visit(json_visitor{}, item.base()));
+				}
+				return m;
+			}
+			json::node operator()(
+			    std::shared_ptr<mstch::callback> const& v) const {
+				json::map m{};
+				auto const keys = v->debug_all_keys();
+				for (auto const& key : keys) {
+					m.set(to_u8s(key), std::visit(json_visitor{}, v->at(key)));
+				}
+				return m;
+			}
+		};
 	}  // namespace
 
 	std::pair<mstch::node, mstch::node> add_build_info(cov::repository& repo,
@@ -904,5 +947,87 @@ namespace cov::app::web {
 
 		ctx["file-is-empty"] = chunks_ctx.empty();
 		ctx["file-chunks"] = std::move(chunks_ctx);
+	}
+
+	bool add_page_context(mstch::map& ctx,
+	                      projection::report_filter const& view,
+	                      std::vector<projection::entry> const& entries,
+	                      git::oid_view ref,
+	                      placeholder::rating const& marks,
+	                      cov::repository& repo,
+	                      mstch::node const& commit_ctx,
+	                      mstch::node const& report_ctx,
+	                      mstch::node const& octicons,
+	                      cxx_filt::Replacements const& replacements,
+	                      bool with_json_context,
+	                      link_service const& links,
+	                      std::error_code& ec) {
+		auto const is_standalone =
+		    entries.size() == 1 &&
+		    entries.front().type == projection::entry_type::standalone_file;
+
+		auto const is_root = !is_standalone && view.module.filter.empty() &&
+		                     view.fname.prefix.empty();
+
+		auto const [total, flags] = core::stats::calc_stats(entries);
+		auto const table = core::stats::project(marks, entries, total, flags);
+
+		std::string title;
+		std::string path;
+		bool is_module = false;
+		if (is_root) {
+			title = "repository"s;
+		} else if (is_standalone) {
+			auto const& name = entries.front().name;
+			title = name.expanded;
+			path = title;
+		} else if (!view.module.filter.empty()) {
+			title = fmt::format("[{}]", view.module.filter);
+			path = view.module.filter;
+			is_module = true;
+		} else if (!view.fname.prefix.empty()) {
+			title = view.fname.prefix;
+			title.pop_back();
+			path = title;
+		}
+
+		auto mark = formatter::apply_mark(total.current.lines, marks.lines);
+
+		{
+			mstch::map build;
+			add_mark(build, mark);
+			build["commit"] = commit_ctx;
+			build["report"] = report_ctx;
+			ctx["build"] = std::move(build);
+		}
+
+		add_navigation(ctx, is_root, is_module, is_standalone, path, links);
+		add_table(ctx, table, links);
+		ctx["title"] = std::string{title.data(), title.size()};
+		ctx["site-root"] = links.resource_link("");
+		ctx["octicons"] = octicons;
+
+		if (is_standalone) {
+			add_file_source(ctx, repo, ref, entries.front().name.expanded,
+			                replacements, ec);
+			if (ec) {
+				// GCOV_EXCL_START
+				ctx.clear();
+				return true;
+				// GCOV_EXCL_STOP
+			}
+		}
+
+		if (with_json_context) {
+			json::string json_context{};
+			{
+				mstch::node node{ctx};
+				auto jsn = std::visit(json_visitor{}, node.base());
+				json::write_json(json_context, jsn, json::four_spaces);
+			}
+			ctx["json"] = from_u8s(json_context);
+		}
+
+		return is_standalone;
 	}
 }  // namespace cov::app::web
