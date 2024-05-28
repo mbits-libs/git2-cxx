@@ -3,6 +3,7 @@
 
 #include <gtest/gtest.h>
 #include <cov/git2/global.hh>
+#include <cov/module.hh>
 #include <memory>
 #include <ranges>
 #include <string_view>
@@ -18,6 +19,10 @@ namespace cov::app::web::testing {
 	using ::testing::ValuesIn;
 
 	using namespace projection;
+
+	inline std::string str(std::string_view view) {
+		return {view.data(), view.size()};
+	}
 
 	struct template_context {
 		virtual ~template_context() = default;
@@ -300,6 +305,104 @@ namespace cov::app::web::testing {
 			});
 		}
 
+		struct page_info {
+			std::string_view ref{};
+			std::string_view fname_filter{};
+			std::string_view module_filter{};
+			std::string_view modules{};
+			std::span<std::string_view const> files{};
+		};
+
+		struct dummy_provider : lng_provider {
+#define X(LNG) std::string_view LNG##_ = #LNG ""sv;
+			MSTCH_LNG(X)
+#undef X
+
+			std::string_view get(lng id) const noexcept override {
+				try {
+					switch (id) {
+#define X(LNG)     \
+	case lng::LNG: \
+		return LNG##_;
+						MSTCH_LNG(X)
+#undef X
+					}
+				} catch (...) {
+				}
+				return ""sv;
+			}
+		};
+
+		static dummy_provider provider{};
+
+		ref_ptr<modules> modules_from(std::string_view config) {
+			git::config cfg{};
+			auto ec = cfg.add_memory(config);
+			if (ec) return {};
+			return modules::from_config(cfg, ec);
+		}
+
+		std::unique_ptr<template_context> wrap_payload(page_info const& page) {
+			return wrap([=](mstch::map& ctx,
+			                link_service const& links) -> bool {
+				git::init init{};
+
+				auto const oid = git::oid::from(page.ref);
+
+				std::error_code ec{};
+				auto const covdir =
+				    cov::repository::discover(setup::test_dir(), ec);
+				if (ec) {
+					fmt::print("cov::repository::discover: error {}: {}\n",
+					           ec.value(), ec.message());
+					return false;
+				}
+
+				auto repo = cov::repository::open(
+				    setup::test_dir() / "sysroot"sv, covdir, ec);
+				if (ec) {
+					fmt::print("cov::repository::open: error {}: {}\n",
+					           ec.value(), ec.message());
+					return false;
+				}
+
+				auto mods = modules_from(page.modules);
+				auto view = projection::report_filter{mods.get(),
+				                                      str(page.module_filter),
+				                                      str(page.fname_filter)};
+				std::vector<file_stats> diff{};
+				diff.reserve(page.files.size());
+				for (auto const file : page.files) {
+					diff.push_back({.filename = str(file)});
+				}
+
+				auto entries = view.project(diff);
+				static constexpr placeholder::rating marks{
+				    .lines{.incomplete{75, 100}, .passing{9, 10}},
+				    .functions{.incomplete{75, 100}, .passing{9, 10}},
+				    .branches{.incomplete{75, 100}, .passing{9, 10}}};
+
+				cxx_filt::Replacements replacements{};
+
+				auto const is_standalone = add_page_context(
+				    ctx, view, entries, oid, marks, repo, mstch::array{},
+				    mstch::array{},
+				    mstch::map{{"number", 3.14},
+				               {"long-long", 5ll},
+				               {"none", nullptr},
+				               {"lngs", lng_callback::create(&provider)}},
+				    replacements, true, links, ec);
+				ctx["is-standalone"] = is_standalone;
+
+				if (ec) {
+					fmt::print("is_standalone: error {}: {}\n", ec.value(),
+					           ec.message());
+					return false;
+				}
+				return true;
+			});
+		}
+
 		template <typename Payload>
 		struct component_test {
 			std::string_view tmplt;
@@ -420,6 +523,11 @@ namespace cov::app::web::testing {
 	         )                                                 //
 	    ""sv;
 
+	static constexpr auto page_info_template =  //
+	    "- " EQ_PRINT("is-standalone")          //
+	    "\n- json: " PRINT_RAW("json")          //
+	    ""sv;
+
 	static constexpr wrapper::component_test<cov::translatable> mark_tests[] = {
 	    {.tmplt = mark_template,
 	     .expected = "OK -- passing"sv,
@@ -497,6 +605,11 @@ namespace cov::app::web::testing {
 		    {relevant_funcs, covered_funcs},
 		    {relevant_branches, covered_branches},
 		};
+	}
+
+	template <typename T, size_t Length>
+	consteval std::span<T const> span(T const (&v)[Length]) noexcept {
+		return {v, Length};
 	}
 
 	static wrapper::component_test<std::vector<wrapper::entry_info>> const
@@ -930,4 +1043,543 @@ namespace cov::app::web::testing {
 	INSTANTIATE_TEST_SUITE_P(file_source,
 	                         components,
 	                         ConvertGenerator(ValuesIn(file_source_tests)));
+
+	static constexpr std::string_view files[] = {
+	    "src/component1/file1.cc"sv, "src/component1/file2.cc"sv,
+	    "src/component1/file3.cc"sv, "src/component1/file4.cc"sv,
+	    "src/component2/file1.cc"sv, "src/component2/file2.cc"sv,
+	    "src/component2/file3.cc"sv, "src/component2/file4.cc"sv,
+	    "src/component3/file1.cc"sv, "src/component3/file2.cc"sv,
+	    "src/component3/file3.cc"sv, "src/component3/file4.cc"sv,
+	};
+
+	static constexpr auto dot_cov_modules = R"([module "src"]
+	path = src
+[module "src/c1"]
+	path = src/component1
+[module "src/c2"]
+	path = src/component2
+)"sv;
+
+	static constexpr wrapper::component_test<
+	    wrapper::page_info> const page_info_tests[] = {
+	    {
+	        .tmplt = page_info_template,
+	        .expected =
+	            // clang-format off
+	            "- is-standalone: false\n"
+				"- json: {\n"
+				"    \"breadcrumbs\": {\"heading\": {\"display\": \"repository\", \"href\": \"../../../index.html\"}},\n"
+				"    \"build\": {\n"
+				"        \"commit\": [],\n"
+				"        \"is-failing\": true,\n"
+				"        \"is-incomplete\": false,\n"
+				"        \"is-passing\": false,\n"
+				"        \"mark\": \"failing\",\n"
+				"        \"report\": []\n"
+				"    },\n"
+				"    \"is-directory\": false,\n"
+				"    \"is-file\": false,\n"
+				"    \"is-module\": false,\n"
+				"    \"is-root\": true,\n"
+				"    \"octicons\": {\n"
+				"        \"lngs\": {\n"
+				"            \"LNG_COVERAGE_BRANDING\": \"COVERAGE_BRANDING\",\n"
+				"            \"LNG_COVERAGE_BUILDS\": \"COVERAGE_BUILDS\",\n"
+				"            \"LNG_COMMIT_AUTHOR\": \"COMMIT_AUTHOR\",\n"
+				"            \"LNG_COMMIT_COMMITTER\": \"COMMIT_COMMITTER\",\n"
+				"            \"LNG_COMMIT_ID\": \"COMMIT_ID\",\n"
+				"            \"LNG_COMMIT_BRANCH\": \"COMMIT_BRANCH\",\n"
+				"            \"LNG_FILE_LINES\": \"FILE_LINES\",\n"
+				"            \"LNG_FILE_NAME\": \"FILE_NAME\",\n"
+				"            \"LNG_FILE_COVERAGE\": \"FILE_COVERAGE\",\n"
+				"            \"LNG_FILE_LINES_TOTAL\": \"FILE_LINES_TOTAL\",\n"
+				"            \"LNG_FILE_RELEVANT\": \"FILE_RELEVANT\",\n"
+				"            \"LNG_FILE_COVERED\": \"FILE_COVERED\",\n"
+				"            \"LNG_FILE_MISSED\": \"FILE_MISSED\",\n"
+				"            \"LNG_ROW_TOTAL\": \"ROW_TOTAL\"\n"
+				"        },\n"
+				"        \"long-long\": 5,\n"
+				"        \"none\": null,\n"
+				"        \"number\": 3.14\n"
+				"    },\n"
+				"    \"site-root\": \"../../../\",\n"
+				"    \"title\": \"repository\"\n"
+				"}"
+				""sv,
+	        // clang-format on
+	        .context =
+	            {
+
+	            },
+	    },
+	    {
+	        .tmplt = page_info_template,
+	        .expected =
+	            // clang-format off
+	            "- is-standalone: false\n"
+				"- json: {\n"
+				"    \"breadcrumbs\": {\n"
+				"        \"heading\": {\"display\": \"repository\", \"href\": \"../../../index.html\"},\n"
+				"        \"leaf\": \"component1\",\n"
+				"        \"nav\": [{\"display\": \"src\", \"href\": \"../../../dirs/src.html\"}]\n"
+				"    },\n"
+				"    \"build\": {\n"
+				"        \"commit\": [],\n"
+				"        \"is-failing\": true,\n"
+				"        \"is-incomplete\": false,\n"
+				"        \"is-passing\": false,\n"
+				"        \"mark\": \"failing\",\n"
+				"        \"report\": []\n"
+				"    },\n"
+				"    \"is-branches-covered\": false,\n"
+				"    \"is-branches-missing\": false,\n"
+				"    \"is-branches-relevant\": false,\n"
+				"    \"is-directory\": true,\n"
+				"    \"is-file\": false,\n"
+				"    \"is-functions-covered\": false,\n"
+				"    \"is-functions-missing\": false,\n"
+				"    \"is-functions-relevant\": false,\n"
+				"    \"is-lines-covered\": false,\n"
+				"    \"is-lines-missing\": false,\n"
+				"    \"is-lines-relevant\": false,\n"
+				"    \"is-lines-total\": true,\n"
+				"    \"is-lines-visited\": false,\n"
+				"    \"is-module\": false,\n"
+				"    \"is-name\": false,\n"
+				"    \"is-root\": false,\n"
+				"    \"octicons\": {\n"
+				"        \"lngs\": {\n"
+				"            \"LNG_COVERAGE_BRANDING\": \"COVERAGE_BRANDING\",\n"
+				"            \"LNG_COVERAGE_BUILDS\": \"COVERAGE_BUILDS\",\n"
+				"            \"LNG_COMMIT_AUTHOR\": \"COMMIT_AUTHOR\",\n"
+				"            \"LNG_COMMIT_COMMITTER\": \"COMMIT_COMMITTER\",\n"
+				"            \"LNG_COMMIT_ID\": \"COMMIT_ID\",\n"
+				"            \"LNG_COMMIT_BRANCH\": \"COMMIT_BRANCH\",\n"
+				"            \"LNG_FILE_LINES\": \"FILE_LINES\",\n"
+				"            \"LNG_FILE_NAME\": \"FILE_NAME\",\n"
+				"            \"LNG_FILE_COVERAGE\": \"FILE_COVERAGE\",\n"
+				"            \"LNG_FILE_LINES_TOTAL\": \"FILE_LINES_TOTAL\",\n"
+				"            \"LNG_FILE_RELEVANT\": \"FILE_RELEVANT\",\n"
+				"            \"LNG_FILE_COVERED\": \"FILE_COVERED\",\n"
+				"            \"LNG_FILE_MISSED\": \"FILE_MISSED\",\n"
+				"            \"LNG_ROW_TOTAL\": \"ROW_TOTAL\"\n"
+				"        },\n"
+				"        \"long-long\": 5,\n"
+				"        \"none\": null,\n"
+				"        \"number\": 3.14\n"
+				"    },\n"
+				"    \"site-root\": \"../../../\",\n"
+				"    \"stats\": {\n"
+				"        \"columns\": [\n"
+				"            {\"display\": \"Name\", \"is-name\": true},\n"
+				"            {\"display\": \"Lines\", \"priority\": \"high\"},\n"
+				"            {\"display\": \"Visited\", \"priority\": \"key\"},\n"
+				"            {\"display\": \"Relevant\", \"priority\": \"supplemental\"},\n"
+				"            {\"display\": \"Line count\", \"priority\": \"supplemental\"}\n"
+				"        ],\n"
+				"        \"rows\": [\n"
+				"            {\n"
+				"                \"cells\": [\n"
+				"                    {\n"
+				"                        \"change\": \"\xC2\xA0\",\n"
+				"                        \"change-classes\": \"diff passing-bg priority-high\",\n"
+				"                        \"is-simple\": false,\n"
+				"                        \"value\": \"100.00%\",\n"
+				"                        \"value-classes\": \"value bold passing passing-bg priority-high\"\n"
+				"                    },\n"
+				"                    {\n"
+				"                        \"change\": \"\xC2\xA0\",\n"
+				"                        \"change-classes\": \"diff priority-key\",\n"
+				"                        \"is-simple\": false,\n"
+				"                        \"value\": \"0\",\n"
+				"                        \"value-classes\": \"value priority-key\"\n"
+				"                    },\n"
+				"                    {\n"
+				"                        \"change\": \"\xC2\xA0\",\n"
+				"                        \"change-classes\": \"diff priority-supplemental\",\n"
+				"                        \"is-simple\": false,\n"
+				"                        \"value\": \"0\",\n"
+				"                        \"value-classes\": \"value priority-supplemental\"\n"
+				"                    },\n"
+				"                    {\n"
+				"                        \"change\": \"\xC2\xA0\",\n"
+				"                        \"change-classes\": \"diff priority-supplemental\",\n"
+				"                        \"is-simple\": false,\n"
+				"                        \"value\": \"0\",\n"
+				"                        \"value-classes\": \"value priority-supplemental\"\n"
+				"                    }\n"
+				"                ],\n"
+				"                \"class-name\": \"file\",\n"
+				"                \"display\": \"file1.cc\",\n"
+				"                \"has-href\": true,\n"
+				"                \"has-prefix\": false,\n"
+				"                \"href\": \"../../../files/src/component1/file1.cc.html\",\n"
+				"                \"is-directory\": false,\n"
+				"                \"is-file\": true,\n"
+				"                \"is-module\": false,\n"
+				"                \"is-total\": false\n"
+				"            },\n"
+				"            {\n"
+				"                \"cells\": [\n"
+				"                    {\n"
+				"                        \"change\": \"\xC2\xA0\",\n"
+				"                        \"change-classes\": \"diff passing-bg priority-high\",\n"
+				"                        \"is-simple\": false,\n"
+				"                        \"value\": \"100.00%\",\n"
+				"                        \"value-classes\": \"value bold passing passing-bg priority-high\"\n"
+				"                    },\n"
+				"                    {\n"
+				"                        \"change\": \"\xC2\xA0\",\n"
+				"                        \"change-classes\": \"diff priority-key\",\n"
+				"                        \"is-simple\": false,\n"
+				"                        \"value\": \"0\",\n"
+				"                        \"value-classes\": \"value priority-key\"\n"
+				"                    },\n"
+				"                    {\n"
+				"                        \"change\": \"\xC2\xA0\",\n"
+				"                        \"change-classes\": \"diff priority-supplemental\",\n"
+				"                        \"is-simple\": false,\n"
+				"                        \"value\": \"0\",\n"
+				"                        \"value-classes\": \"value priority-supplemental\"\n"
+				"                    },\n"
+				"                    {\n"
+				"                        \"change\": \"\xC2\xA0\",\n"
+				"                        \"change-classes\": \"diff priority-supplemental\",\n"
+				"                        \"is-simple\": false,\n"
+				"                        \"value\": \"0\",\n"
+				"                        \"value-classes\": \"value priority-supplemental\"\n"
+				"                    }\n"
+				"                ],\n"
+				"                \"class-name\": \"file\",\n"
+				"                \"display\": \"file2.cc\",\n"
+				"                \"has-href\": true,\n"
+				"                \"has-prefix\": false,\n"
+				"                \"href\": \"../../../files/src/component1/file2.cc.html\",\n"
+				"                \"is-directory\": false,\n"
+				"                \"is-file\": true,\n"
+				"                \"is-module\": false,\n"
+				"                \"is-total\": false\n"
+				"            },\n"
+				"            {\n"
+				"                \"cells\": [\n"
+				"                    {\n"
+				"                        \"change\": \"\xC2\xA0\",\n"
+				"                        \"change-classes\": \"diff passing-bg priority-high\",\n"
+				"                        \"is-simple\": false,\n"
+				"                        \"value\": \"100.00%\",\n"
+				"                        \"value-classes\": \"value bold passing passing-bg priority-high\"\n"
+				"                    },\n"
+				"                    {\n"
+				"                        \"change\": \"\xC2\xA0\",\n"
+				"                        \"change-classes\": \"diff priority-key\",\n"
+				"                        \"is-simple\": false,\n"
+				"                        \"value\": \"0\",\n"
+				"                        \"value-classes\": \"value priority-key\"\n"
+				"                    },\n"
+				"                    {\n"
+				"                        \"change\": \"\xC2\xA0\",\n"
+				"                        \"change-classes\": \"diff priority-supplemental\",\n"
+				"                        \"is-simple\": false,\n"
+				"                        \"value\": \"0\",\n"
+				"                        \"value-classes\": \"value priority-supplemental\"\n"
+				"                    },\n"
+				"                    {\n"
+				"                        \"change\": \"\xC2\xA0\",\n"
+				"                        \"change-classes\": \"diff priority-supplemental\",\n"
+				"                        \"is-simple\": false,\n"
+				"                        \"value\": \"0\",\n"
+				"                        \"value-classes\": \"value priority-supplemental\"\n"
+				"                    }\n"
+				"                ],\n"
+				"                \"class-name\": \"file\",\n"
+				"                \"display\": \"file3.cc\",\n"
+				"                \"has-href\": true,\n"
+				"                \"has-prefix\": false,\n"
+				"                \"href\": \"../../../files/src/component1/file3.cc.html\",\n"
+				"                \"is-directory\": false,\n"
+				"                \"is-file\": true,\n"
+				"                \"is-module\": false,\n"
+				"                \"is-total\": false\n"
+				"            },\n"
+				"            {\n"
+				"                \"cells\": [\n"
+				"                    {\n"
+				"                        \"change\": \"\xC2\xA0\",\n"
+				"                        \"change-classes\": \"diff passing-bg priority-high\",\n"
+				"                        \"is-simple\": false,\n"
+				"                        \"value\": \"100.00%\",\n"
+				"                        \"value-classes\": \"value bold passing passing-bg priority-high\"\n"
+				"                    },\n"
+				"                    {\n"
+				"                        \"change\": \"\xC2\xA0\",\n"
+				"                        \"change-classes\": \"diff priority-key\",\n"
+				"                        \"is-simple\": false,\n"
+				"                        \"value\": \"0\",\n"
+				"                        \"value-classes\": \"value priority-key\"\n"
+				"                    },\n"
+				"                    {\n"
+				"                        \"change\": \"\xC2\xA0\",\n"
+				"                        \"change-classes\": \"diff priority-supplemental\",\n"
+				"                        \"is-simple\": false,\n"
+				"                        \"value\": \"0\",\n"
+				"                        \"value-classes\": \"value priority-supplemental\"\n"
+				"                    },\n"
+				"                    {\n"
+				"                        \"change\": \"\xC2\xA0\",\n"
+				"                        \"change-classes\": \"diff priority-supplemental\",\n"
+				"                        \"is-simple\": false,\n"
+				"                        \"value\": \"0\",\n"
+				"                        \"value-classes\": \"value priority-supplemental\"\n"
+				"                    }\n"
+				"                ],\n"
+				"                \"class-name\": \"file\",\n"
+				"                \"display\": \"file4.cc\",\n"
+				"                \"has-href\": true,\n"
+				"                \"has-prefix\": false,\n"
+				"                \"href\": \"../../../files/src/component1/file4.cc.html\",\n"
+				"                \"is-directory\": false,\n"
+				"                \"is-file\": true,\n"
+				"                \"is-module\": false,\n"
+				"                \"is-total\": false\n"
+				"            }\n"
+				"        ],\n"
+				"        \"total\": {\n"
+				"            \"cells\": [\n"
+				"                {\n"
+				"                    \"change\": \"\xC2\xA0\",\n"
+				"                    \"change-classes\": \"diff passing-bg priority-high\",\n"
+				"                    \"is-simple\": false,\n"
+				"                    \"value\": \"100.00%\",\n"
+				"                    \"value-classes\": \"value bold passing passing-bg priority-high\"\n"
+				"                },\n"
+				"                {\n"
+				"                    \"change\": \"\xC2\xA0\",\n"
+				"                    \"change-classes\": \"diff priority-key\",\n"
+				"                    \"is-simple\": false,\n"
+				"                    \"value\": \"0\",\n"
+				"                    \"value-classes\": \"value priority-key\"\n"
+				"                },\n"
+				"                {\n"
+				"                    \"change\": \"\xC2\xA0\",\n"
+				"                    \"change-classes\": \"diff priority-supplemental\",\n"
+				"                    \"is-simple\": false,\n"
+				"                    \"value\": \"0\",\n"
+				"                    \"value-classes\": \"value priority-supplemental\"\n"
+				"                },\n"
+				"                {\n"
+				"                    \"change\": \"\xC2\xA0\",\n"
+				"                    \"change-classes\": \"diff priority-supplemental\",\n"
+				"                    \"is-simple\": false,\n"
+				"                    \"value\": \"0\",\n"
+				"                    \"value-classes\": \"value priority-supplemental\"\n"
+				"                }\n"
+				"            ],\n"
+				"            \"class-name\": \"total\",\n"
+				"            \"display\": \"Total\",\n"
+				"            \"has-href\": false,\n"
+				"            \"has-prefix\": false,\n"
+				"            \"is-directory\": false,\n"
+				"            \"is-file\": false,\n"
+				"            \"is-module\": false,\n"
+				"            \"is-total\": true\n"
+				"        }\n"
+				"    },\n"
+				"    \"title\": \"src/component1\"\n"
+				"}"
+				""sv,
+	        // clang-format on
+	        .context =
+	            {
+	                .ref = "c924e9d5ee8655b8d2af9f0c4b5ca3458ca9361c"sv,
+	                .fname_filter = "src/component1",
+	                .modules = dot_cov_modules,
+	                .files = span(files),
+	            },
+	    },
+	    {
+	        .tmplt = page_info_template,
+	        .expected =
+	            // clang-format off
+				"- is-standalone: false\n"
+				"- json: {\n"
+				"    \"breadcrumbs\": {\n"
+				"        \"heading\": {\"display\": \"repository\", \"href\": \"../../../index.html\"},\n"
+				"        \"leaf\": \"c1\",\n"
+				"        \"nav\": [{\"display\": \"src\", \"href\": \"../../../mods/src.html\"}]\n"
+				"    },\n"
+				"    \"build\": {\n"
+				"        \"commit\": [],\n"
+				"        \"is-failing\": true,\n"
+				"        \"is-incomplete\": false,\n"
+				"        \"is-passing\": false,\n"
+				"        \"mark\": \"failing\",\n"
+				"        \"report\": []\n"
+				"    },\n"
+				"    \"is-directory\": false,\n"
+				"    \"is-file\": false,\n"
+				"    \"is-module\": true,\n"
+				"    \"is-root\": false,\n"
+				"    \"octicons\": {\n"
+				"        \"lngs\": {\n"
+				"            \"LNG_COVERAGE_BRANDING\": \"COVERAGE_BRANDING\",\n"
+				"            \"LNG_COVERAGE_BUILDS\": \"COVERAGE_BUILDS\",\n"
+				"            \"LNG_COMMIT_AUTHOR\": \"COMMIT_AUTHOR\",\n"
+				"            \"LNG_COMMIT_COMMITTER\": \"COMMIT_COMMITTER\",\n"
+				"            \"LNG_COMMIT_ID\": \"COMMIT_ID\",\n"
+				"            \"LNG_COMMIT_BRANCH\": \"COMMIT_BRANCH\",\n"
+				"            \"LNG_FILE_LINES\": \"FILE_LINES\",\n"
+				"            \"LNG_FILE_NAME\": \"FILE_NAME\",\n"
+				"            \"LNG_FILE_COVERAGE\": \"FILE_COVERAGE\",\n"
+				"            \"LNG_FILE_LINES_TOTAL\": \"FILE_LINES_TOTAL\",\n"
+				"            \"LNG_FILE_RELEVANT\": \"FILE_RELEVANT\",\n"
+				"            \"LNG_FILE_COVERED\": \"FILE_COVERED\",\n"
+				"            \"LNG_FILE_MISSED\": \"FILE_MISSED\",\n"
+				"            \"LNG_ROW_TOTAL\": \"ROW_TOTAL\"\n"
+				"        },\n"
+				"        \"long-long\": 5,\n"
+				"        \"none\": null,\n"
+				"        \"number\": 3.14\n"
+				"    },\n"
+				"    \"site-root\": \"../../../\",\n"
+				"    \"title\": \"[src/c1]\"\n"
+				"}"
+				""sv,
+	        // clang-format on
+	        .context =
+	            {
+	                .ref = "c924e9d5ee8655b8d2af9f0c4b5ca3458ca9361c"sv,
+	                .module_filter = "src/c1",
+	                .modules = dot_cov_modules,
+	                .files = span(files),
+	            },
+	    },
+	    {
+	        .tmplt = page_info_template,
+	        .expected =
+	            // clang-format off
+				"- is-standalone: true\n"
+				"- json: {\n"
+				"    \"breadcrumbs\": {\n"
+				"        \"heading\": {\"display\": \"repository\", \"href\": \"../../../index.html\"},\n"
+				"        \"leaf\": \"file4.cc\",\n"
+				"        \"nav\": [\n"
+				"            {\"display\": \"src\", \"href\": \"../../../dirs/src.html\"},\n"
+				"            {\"display\": \"component3\", \"href\": \"../../../dirs/src/component3.html\"}\n"
+				"        ]\n"
+				"    },\n"
+				"    \"build\": {\n"
+				"        \"commit\": [],\n"
+				"        \"is-failing\": true,\n"
+				"        \"is-incomplete\": false,\n"
+				"        \"is-passing\": false,\n"
+				"        \"mark\": \"failing\",\n"
+				"        \"report\": []\n"
+				"    },\n"
+				"    \"file-is-present\": false,\n"
+				"    \"is-branches-covered\": false,\n"
+				"    \"is-branches-missing\": false,\n"
+				"    \"is-branches-relevant\": false,\n"
+				"    \"is-directory\": false,\n"
+				"    \"is-file\": true,\n"
+				"    \"is-functions-covered\": false,\n"
+				"    \"is-functions-missing\": false,\n"
+				"    \"is-functions-relevant\": false,\n"
+				"    \"is-lines-covered\": false,\n"
+				"    \"is-lines-missing\": false,\n"
+				"    \"is-lines-relevant\": false,\n"
+				"    \"is-lines-total\": true,\n"
+				"    \"is-lines-visited\": false,\n"
+				"    \"is-module\": false,\n"
+				"    \"is-name\": false,\n"
+				"    \"is-root\": false,\n"
+				"    \"octicons\": {\n"
+				"        \"lngs\": {\n"
+				"            \"LNG_COVERAGE_BRANDING\": \"COVERAGE_BRANDING\",\n"
+				"            \"LNG_COVERAGE_BUILDS\": \"COVERAGE_BUILDS\",\n"
+				"            \"LNG_COMMIT_AUTHOR\": \"COMMIT_AUTHOR\",\n"
+				"            \"LNG_COMMIT_COMMITTER\": \"COMMIT_COMMITTER\",\n"
+				"            \"LNG_COMMIT_ID\": \"COMMIT_ID\",\n"
+				"            \"LNG_COMMIT_BRANCH\": \"COMMIT_BRANCH\",\n"
+				"            \"LNG_FILE_LINES\": \"FILE_LINES\",\n"
+				"            \"LNG_FILE_NAME\": \"FILE_NAME\",\n"
+				"            \"LNG_FILE_COVERAGE\": \"FILE_COVERAGE\",\n"
+				"            \"LNG_FILE_LINES_TOTAL\": \"FILE_LINES_TOTAL\",\n"
+				"            \"LNG_FILE_RELEVANT\": \"FILE_RELEVANT\",\n"
+				"            \"LNG_FILE_COVERED\": \"FILE_COVERED\",\n"
+				"            \"LNG_FILE_MISSED\": \"FILE_MISSED\",\n"
+				"            \"LNG_ROW_TOTAL\": \"ROW_TOTAL\"\n"
+				"        },\n"
+				"        \"long-long\": 5,\n"
+				"        \"none\": null,\n"
+				"        \"number\": 3.14\n"
+				"    },\n"
+				"    \"site-root\": \"../../../\",\n"
+				"    \"stats\": {\n"
+				"        \"columns\": [\n"
+				"            {\"display\": \"Name\", \"is-name\": true},\n"
+				"            {\"display\": \"Lines\", \"priority\": \"high\"},\n"
+				"            {\"display\": \"Visited\", \"priority\": \"key\"},\n"
+				"            {\"display\": \"Relevant\", \"priority\": \"supplemental\"},\n"
+				"            {\"display\": \"Line count\", \"priority\": \"supplemental\"}\n"
+				"        ],\n"
+				"        \"rows\": [{\n"
+				"            \"cells\": [\n"
+				"                {\n"
+				"                    \"change\": \"\xC2\xA0\",\n"
+				"                    \"change-classes\": \"diff passing-bg priority-high\",\n"
+				"                    \"is-simple\": false,\n"
+				"                    \"value\": \"100.00%\",\n"
+				"                    \"value-classes\": \"value bold passing passing-bg priority-high\"\n"
+				"                },\n"
+				"                {\n"
+				"                    \"change\": \"\xC2\xA0\",\n"
+				"                    \"change-classes\": \"diff priority-key\",\n"
+				"                    \"is-simple\": false,\n"
+				"                    \"value\": \"0\",\n"
+				"                    \"value-classes\": \"value priority-key\"\n"
+				"                },\n"
+				"                {\n"
+				"                    \"change\": \"\xC2\xA0\",\n"
+				"                    \"change-classes\": \"diff priority-supplemental\",\n"
+				"                    \"is-simple\": false,\n"
+				"                    \"value\": \"0\",\n"
+				"                    \"value-classes\": \"value priority-supplemental\"\n"
+				"                },\n"
+				"                {\n"
+				"                    \"change\": \"\xC2\xA0\",\n"
+				"                    \"change-classes\": \"diff priority-supplemental\",\n"
+				"                    \"is-simple\": false,\n"
+				"                    \"value\": \"0\",\n"
+				"                    \"value-classes\": \"value priority-supplemental\"\n"
+				"                }\n"
+				"            ],\n"
+				"            \"class-name\": \"file\",\n"
+				"            \"display\": \"file4.cc\",\n"
+				"            \"has-href\": false,\n"
+				"            \"has-prefix\": false,\n"
+				"            \"is-directory\": false,\n"
+				"            \"is-file\": true,\n"
+				"            \"is-module\": false,\n"
+				"            \"is-total\": false\n"
+				"        }],\n"
+				"        \"total\": false\n"
+				"    },\n"
+				"    \"title\": \"src/component3/file4.cc\"\n"
+				"}"
+				""sv,
+	        // clang-format on
+	        .context =
+	            {
+	                .ref = "c924e9d5ee8655b8d2af9f0c4b5ca3458ca9361c"sv,
+	                .fname_filter = "src/component3/file4.cc",
+	                .modules = dot_cov_modules,
+	                .files = span(files),
+	            },
+	    },
+	};
+
+	INSTANTIATE_TEST_SUITE_P(page_info,
+	                         components,
+	                         ConvertGenerator(ValuesIn(page_info_tests)));
 }  // namespace cov::app::web::testing

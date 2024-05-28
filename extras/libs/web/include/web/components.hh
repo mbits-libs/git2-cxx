@@ -40,4 +40,18 @@ namespace cov::app::web {
 	                     std::string_view path,
 	                     cxx_filt::Replacements const& replacements,
 	                     std::error_code& ec);
+
+	bool add_page_context(mstch::map& ctx,
+	                      projection::report_filter const& view,
+	                      std::vector<projection::entry> const& entries,
+	                      git::oid_view ref,
+	                      placeholder::rating const& marks,
+	                      cov::repository& repo,
+	                      mstch::node const& commit_ctx,
+	                      mstch::node const& report_ctx,
+	                      mstch::node const& octicons,
+	                      cxx_filt::Replacements const& replacements,
+	                      bool with_json_context,
+	                      link_service const& links,
+	                      std::error_code& ec);
 }  // namespace cov::app::web
