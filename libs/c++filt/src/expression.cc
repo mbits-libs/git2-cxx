@@ -85,7 +85,7 @@ namespace cxx_filt {
 	}
 
 	ArgumentList ArgumentList::replace_with(Refs const& refs) const {
-		ArgumentList result{.start = start, .stop = stop};
+		ArgumentList result{.start = start, .stop = stop, .items = {}};
 		result.items.reserve(items.size());
 		for (auto const& item : items) {
 			result.items.push_back(item.replace_with(refs));

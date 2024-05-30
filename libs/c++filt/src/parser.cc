@@ -73,6 +73,7 @@ namespace cxx_filt {
 		ArgumentList result{
 		    .start = start,
 		    .stop = stop,
+		    .items = {},
 		};
 
 		size_t prev = 0;

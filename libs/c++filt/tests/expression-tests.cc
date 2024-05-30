@@ -184,11 +184,15 @@ namespace cxx_filt::testing {
 
 	TEST(expression, args_unmatched_start_stop) {
 		auto const paren = ArgumentList{.start = Token::OPEN_PAREN,
-		                                .stop = Token::CLOSE_PAREN};
+		                                .stop = Token::CLOSE_PAREN,
+		                                .items = {}};
 		auto const curly = ArgumentList{.start = Token::OPEN_CURLY,
-		                                .stop = Token::CLOSE_CURLY};
-		auto const almost_paren = ArgumentList{
-		    .start = Token::OPEN_PAREN, .stop = Token::CLOSE_ANGLE_BRACKET};
+		                                .stop = Token::CLOSE_CURLY,
+		                                .items = {}};
+		auto const almost_paren =
+		    ArgumentList{.start = Token::OPEN_PAREN,
+		                 .stop = Token::CLOSE_ANGLE_BRACKET,
+		                 .items = {}};
 		Refs refs{};
 		ASSERT_FALSE(paren.matches(curly, refs));
 		ASSERT_FALSE(paren.matches(almost_paren, refs));

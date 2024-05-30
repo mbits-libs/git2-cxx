@@ -47,7 +47,7 @@ namespace cxx_filt {
 
 	struct ArgumentList {
 		Token start{}, stop{};
-		std::vector<Statement> items{};
+		std::vector<Statement> items;
 
 		std::string str() const;
 		std::string repr() const;
@@ -67,11 +67,7 @@ namespace cxx_filt {
 		std::vector<Union> items{};
 		Cvrs cvrs{};
 
-		Expression with(Cvrs const& external) const {
-			auto copy = *this;
-			copy.cvrs.merge(external);
-			return copy;
-		}  // GCOV_EXCL_LINE[GCC]
+		inline Expression with(Cvrs const& external) const;
 
 		std::string str() const;
 		std::string repr() const;
@@ -99,5 +95,11 @@ namespace cxx_filt {
 		Statement replace_with(Refs const& refs) const;
 		Statement simplified(Replacements const& replacements) const;
 	};
+
+	inline Expression Expression::with(Cvrs const& external) const {
+		auto copy = *this;
+		copy.cvrs.merge(external);
+		return copy;
+	}  // GCOV_EXCL_LINE[GCC]
 
 }  // namespace cxx_filt
