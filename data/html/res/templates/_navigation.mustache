@@ -10,6 +10,15 @@
             <li class="breadcrumbs-item"><span class="text">/</span><a href="{{href}}">{{display}}</a></li>
             {{/nav}}
             <li><span class="text">/</span><span class="breadcrumbs-leaf">{{leaf}}</span></li>
+            {{#has-copy-path}}
+            <li><button class="copy" data-path="{{copy-path}}">
+                <div class="pos">
+                    <span class="copy-icon ready">{{{octicons.copy}}}</span>
+                    <span class="copy-icon ok">{{{octicons.check}}}</span>
+                    <span class="copy-icon failed">{{{octicons.x}}}</span>
+                </div>
+            </button></li>
+            {{/has-copy-path}}
         </ol>
     </nav>
     {{/is-root}}
