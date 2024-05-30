@@ -1,8 +1,13 @@
 set(STYLESHEETS
     html/style/style.scss
+    html/style/_build-info.scss
     html/style/_container.scss
+    html/style/_copy.scss
     html/style/_heading.scss
+    html/style/_hl-palette.scss
+    html/style/_icon-line.scss
     html/style/_reset.scss
+    html/style/_source.scss
     html/style/_stats_table.scss
 )
 

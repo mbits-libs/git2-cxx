@@ -194,7 +194,9 @@ namespace cov::app::web {
 	case C:                 \
 		out.append(id::ID); \
 		break;
-						HTML_X(X_CASE)
+						// there is little to no chance, there will be a kind
+						// with '"', '&', etc.
+						HTML_X(X_CASE)  // GCOV_EXCL_LINE
 #undef X_CASE
 						case '_':
 							out.push_back('-');
@@ -974,6 +976,7 @@ namespace cov::app::web {
 
 		std::string title;
 		std::string path;
+		std::string path_to_copy;
 		bool is_module = false;
 		if (is_root) {
 			title = "repository"s;
@@ -981,6 +984,7 @@ namespace cov::app::web {
 			auto const& name = entries.front().name;
 			title = name.expanded;
 			path = title;
+			path_to_copy = title;
 		} else if (!view.module.filter.empty()) {
 			title = fmt::format("[{}]", view.module.filter);
 			path = view.module.filter;
@@ -1004,6 +1008,8 @@ namespace cov::app::web {
 		add_navigation(ctx, is_root, is_module, is_standalone, path, links);
 		add_table(ctx, table, links);
 		ctx["title"] = std::string{title.data(), title.size()};
+		if (!path_to_copy.empty()) ctx["copy-path"] = path_to_copy;
+		ctx["has-copy-path"] = !path_to_copy.empty();
 		ctx["site-root"] = links.resource_link("");
 		ctx["octicons"] = octicons;
 
