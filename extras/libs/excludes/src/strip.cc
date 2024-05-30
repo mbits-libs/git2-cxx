@@ -137,11 +137,14 @@ namespace cov::app::strip {
 		visible.reserve(array->size());
 		for (auto& node_range : *array) {
 			auto json_range = cast<json::map>(node_range);
+			// GCOV_EXCL_START[Clang]
 			if (!json_range) {
 				++counter;  // GCOV_EXCL_LINE -- oh, c'mon, continue is
 				            // counted...
 				continue;
 			}
+			// GCOV_EXCL_STOP
+
 			auto const block = mask_range(*json_range, excludes, empties);
 			if (block.start > block.end) {
 				++counter;

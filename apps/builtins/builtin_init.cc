@@ -191,7 +191,9 @@ namespace cov::app::builtin::init {
 		}
 
 		[[unlikely]];
+		// GCOV_EXCL_START[CLANG]
 		p.tr().print(cov_init::lng::CANNOT_INITIALIZE, get_u8path(directory));
+		// GCOV_EXCL_STOP
 		std::fputc('\n', stdout);
 		p.error(ec, p.tr());
 	}  // GCOV_EXCL_LINE[WIN32]

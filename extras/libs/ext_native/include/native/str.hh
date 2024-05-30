@@ -10,17 +10,21 @@
 #include <vector>
 
 namespace cov::app {
+	// GCOV_EXCL_START[Clang]
 	inline std::u8string_view to_u8(std::string_view str) {
 		return {reinterpret_cast<char8_t const*>(str.data()), str.size()};
 	}
+	// GCOV_EXCL_STOP
 
 	inline std::u8string to_u8s(std::string_view str) {
 		return {reinterpret_cast<char8_t const*>(str.data()), str.size()};
 	}
 
+	// GCOV_EXCL_START[Clang]
 	inline std::string_view from_u8(std::u8string_view str) {
 		return {reinterpret_cast<char const*>(str.data()), str.size()};
 	}
+	// GCOV_EXCL_STOP
 
 	inline std::string from_u8s(std::u8string_view str) {
 		return {reinterpret_cast<char const*>(str.data()), str.size()};
@@ -62,6 +66,7 @@ namespace cov::app {
 		cb(block, text.substr(prev));
 	}
 
+	// GCOV_EXCL_START[CLANG]
 	inline std::vector<std::string_view> split(std::string_view text,
 	                                           char sep) {
 		size_t length{};
@@ -71,5 +76,6 @@ namespace cov::app {
 		split(text, sep,
 		      [&result](auto, auto view) { result.push_back(view); });
 		return result;
-	}  // GCOV_EXCL_LINE[GCC]
-};     // namespace cov::app
+		// GCOV_EXCL_STOP
+	}  // GCOV_EXCL_LINE[GCC, CLANG]
+}  // namespace cov::app

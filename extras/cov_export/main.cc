@@ -113,7 +113,7 @@ namespace cov::app::report_export {
 				                                : std::errc::permission_denied);
 				logger.error(p, ec);
 				// GCOV_EXCL_STOP
-			}
+			}  // GCOV_EXCL_LINE[Clang]
 
 			out.store(page_text.c_str(), page_text.size());
 		}

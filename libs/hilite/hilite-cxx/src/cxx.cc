@@ -942,7 +942,7 @@ namespace hl::cxx::parser {
 	constexpr wrapped<Wrapped> wrap(const Wrapped& inner) {
 		return inner;
 	}
-	// GCOV_EXL_STOP
+	// GCOV_EXCL_STOP
 
 	// clang-format off
 	constexpr auto pp_include = wrap([] {

@@ -536,8 +536,11 @@ class steps:
         at_args = []
         if os.path.isfile(response):
             at_args.append(f"@{response}")
+        at_args.append("--")
+        at_args.append("-v")
+        at_args.append(f"--compiler={config['report_compiler']}")
         runner.call(reporter, "report", "--filter", "coveralls", report, "-o", intermediate)
-        runner.call(reporter, "report", "--filter", "strip-excludes", intermediate, *at_args, "--", "-v")
+        runner.call(reporter, "report", "--filter", "strip-excludes", intermediate, *at_args)
         if legacy_reporter is not None:
             runner.call(legacy_reporter, "import", "--in", report, "--amend")
         if version.tag() in tags:
