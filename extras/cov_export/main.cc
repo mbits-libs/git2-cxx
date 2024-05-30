@@ -129,7 +129,7 @@ namespace cov::app::report_export {
 		auto mods = cov::modules::from_report(info.range.to, info.repo, ec);
 		if (ec) {
 			if (ec == git::errc::notfound) {
-				ec = {};
+				ec = {};  // GCOV_EXCL_LINE
 			} else if (ec == cov::errc::wrong_object_type) {
 				ec.clear();
 				mods = cov::modules::make_modules("/"s, {});
@@ -149,12 +149,6 @@ namespace cov::app::report_export {
 			std::vector<std::string> prefixes, files;
 		};
 
-		std::map<std::string, mod> module_mapping{};
-
-		for (auto const& mod : mods->entries()) {
-			module_mapping[mod.name].prefixes = mod.prefixes;
-		}
-
 		for (auto const& item : diff) {
 			size_t length{};
 			std::string module_name{};
@@ -171,8 +165,6 @@ namespace cov::app::report_export {
 					}
 				}
 			}
-
-			module_mapping[module_name].files.push_back(item.filename);
 		}
 
 		auto const system = platform::core_extensions::sys_root();

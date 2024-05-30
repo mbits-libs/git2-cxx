@@ -1,0 +1,29 @@
+{
+    "args": "export --html html-report",
+    "expected": [
+        0,
+        [
+            "[1/6] index.html",
+            "[2/6] mods/mod.html",
+            "[3/6] mods/mod/libs.html",
+            "[4/6] mods/mod/src.html",
+            "[5/6] dirs/src.html",
+            "[6/6] files/src/main.cc.html\n"
+        ],
+        ""
+    ],
+    "prepare": [
+        "unpack $DATA/repo.git.tar $TMP",
+        "cd '$TMP'",
+        "mkdirs win-profile",
+        "git clone repo.git",
+        "cd '$TMP/repo'",
+        "git config --local user.name 'Johnny Appleseed'",
+        "git config --local user.email 'johnny@appleseed.com'",
+        "cov init",
+        "cov report $DATA/build-coverage-show-functions-1.json -f create-report",
+        "cov report $DATA/build-coverage-show-functions-2.json -f create-report",
+        "cov module --add mod/libs src/libs/",
+        "cov module --add mod/src src"
+    ]
+}

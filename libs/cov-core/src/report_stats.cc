@@ -137,13 +137,7 @@ namespace cov::core {
 			for (auto const& col : columns) {
 				if (!col.vis(flags)) continue;
 
-				auto const selector = col.selector;
-				if (selector == nullptr) {
-					result.push_back({});
-					continue;
-				}
-
-				result.push_back(selector().cell(marks, change));
+				result.push_back(col.selector().cell(marks, change));
 			}
 
 			return result;
