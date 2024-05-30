@@ -10,9 +10,9 @@
         [
             "c++filt: $INST/share/cov-$VERSION_SHORT/c++filt/standard-library.json",
             "c++filt: $INST/system/c++filt.json",
-            "c++filt: $TMP/repo/local/c++filt.json",
             "c++filt: $TMP/repo/.c++filt/one.json",
             "c++filt: $TMP/repo/.c++filt/two.json",
+            "c++filt: $TMP/repo/local/c++filt.json",
             "[1/3] index.html",
             "[2/3] dirs/src.html",
             "[3/3] files/src/main.cc.html\n"
