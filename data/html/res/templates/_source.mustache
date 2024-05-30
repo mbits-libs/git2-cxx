@@ -6,19 +6,28 @@
 {{#missing-before}}
         <tr class='missing-kebab'>
             <td>&nbsp;</td>
-            <td colspan="2">{{{octicons.kebab-horizontal}}}</td>
+            <td colspan="3">{{{octicons.kebab-horizontal}}}</td>
         </tr>
 {{/missing-before}}
 {{#lines}}
 {{#functions}}
         <tr class='file-line function file-line-mark-{{class-name}}' id='L{{line-no}}-{{name}}'>
             <td class='file-line-no'>&nbsp;</td>
-            <td class='file-line-text'><a href="#L{{line-no}}">{{name}}</a></td>
+            <td class='file-line-text' colspan="2"><a href="#L{{line-no}}">{{name}}</a></td>
             <td class='file-line-count'><a href="#L{{line-no}}">&times;{{count}}</a></td>
         </tr>
 {{/functions}}
         <tr class='file-line file-line-mark-{{class-name}}' id='L{{line-no}}'>
             <td class='file-line-no'><a href="#L{{line-no}}">{{line-no}}.</a></td>
+            <td>
+                <button class="copy file-line-copy" data-path="{{copy-path}}:{{line-no}}">
+                    <div class="pos">
+                        <span class="copy-icon ready">{{{octicons.copy}}}</span>
+                        <span class="copy-icon ok">{{{octicons.check}}}</span>
+                        <span class="copy-icon failed">{{{octicons.x}}}</span>
+                    </div>
+                </button>                
+            </td>
             <td class='file-line-text'><a href="#L{{line-no}}">{{{text}}}</a></td>
             <td class='file-line-count'>{{#is-null}}&nbsp;{{/is-null}}{{^is-null}}<a href="#L{{line-no}}">&times;{{count}}</a>{{/is-null}}</td>
         </tr>
@@ -26,7 +35,7 @@
 {{#missing-after}}
         <tr class='missing-kebab'>
             <td>&nbsp;</td>
-            <td colspan="2">{{{octicons.kebab-horizontal}}}</td>
+            <td colspan="3">{{{octicons.kebab-horizontal}}}</td>
         </tr>
 {{/missing-after}}
 {{/file-chunks}}

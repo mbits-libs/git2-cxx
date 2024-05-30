@@ -23,15 +23,27 @@
       max-width: 1%;
     }
     td:nth-child(2) {
-      max-width: 90%;
+      max-width: 1%;
     }
     td:nth-child(3) {
+      max-width: 90%;
+    }
+    td:nth-child(4) {
       max-width: 1%;
     }
 
     td.file-line-no,
     td.file-line-count {
       text-align: right;
+    }
+
+    .file-line-copy {
+      opacity: 0;
+      transition: opacity 300ms ease-in-out;
+    }
+
+    &:hover .file-line-copy {
+      opacity: 1;
     }
 
     &.file-line-mark-passing td {
@@ -79,6 +91,7 @@
 
   .file-line-text {
     white-space: pre-wrap;
+    tab-size: 4;
   }
 }
 
