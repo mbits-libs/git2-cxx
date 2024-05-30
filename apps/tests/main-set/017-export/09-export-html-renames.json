@@ -31,7 +31,6 @@
         "cov init",
         "cov report $DATA/build-coverage-show-functions-1.json -f create-report",
         "cov report $DATA/build-coverage-show-functions-2.json -f create-report",
-        "store FILES_ID cov log -n1 --format=%H2",
         "touch .c++filt/one.json '{}'",
         "touch .c++filt/two.json '[]'",
         "touch .c++filt/two.md '[link](url)'",

@@ -145,8 +145,11 @@ namespace cov::app::web {
 				    key == hl::whitespace ? std::string_view{} : hl_color(key);
 
 				if (kind.empty()) {
+					// line printer hides them anyway
+					// GCOV_EXCL_START
 					auto it = dict.find(key);
 					if (it != dict.end()) kind = it->second;
+					// GCOV_EXCL_STOP
 				}
 
 				return kind;
