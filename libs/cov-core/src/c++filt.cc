@@ -88,6 +88,7 @@ namespace cov::core {
 				}
 			}
 
+			std::sort(result.begin(), result.end());
 			return result;
 		}  // GCOV_EXCL_LINE
 	}      // namespace
