@@ -36,13 +36,13 @@ namespace cov::app::web {
 		}
 
 		inline std::string_view rstrip(std::string_view view) {
+			// GCOV_EXCL_START
 			while (!view.empty() && isspace(view.back())) {
-				// GCOV_EXCL_START
 				// `git commit` strips the commit message, so this seems to be
 				// untestable
 				view = view.substr(0, view.length() - 1);
-				// GCOV_EXCL_STOP
 			}
+			// GCOV_EXCL_STOP
 
 			return view;
 		}
@@ -144,13 +144,13 @@ namespace cov::app::web {
 				auto kind =
 				    key == hl::whitespace ? std::string_view{} : hl_color(key);
 
+				// GCOV_EXCL_START
+				// line printer hides them anyway
 				if (kind.empty()) {
-					// line printer hides them anyway
-					// GCOV_EXCL_START
 					auto it = dict.find(key);
 					if (it != dict.end()) kind = it->second;
-					// GCOV_EXCL_STOP
 				}
+				// GCOV_EXCL_STOP
 
 				return kind;
 			}
@@ -159,12 +159,14 @@ namespace cov::app::web {
 				size_t len = 0;
 				for (auto c : text) {
 					switch (c) {
+						// GCOV_EXCL_START[CLANG]
 #define X_CASE(C, ID)           \
 	case C:                     \
 		len += id::ID.length(); \
 		break;
 						HTML_X(X_CASE)
 #undef X_CASE
+						// GCOV_EXCL_STOP
 						default:
 							++len;
 					}
@@ -177,12 +179,14 @@ namespace cov::app::web {
 			            std::string_view text) const noexcept {
 				for (auto c : text) {
 					switch (c) {
+						// GCOV_EXCL_START[CLANG]
 #define X_CASE(C, ID)       \
 	case C:                 \
 		out.append(id::ID); \
 		break;
 						HTML_X(X_CASE)
 #undef X_CASE
+						// GCOV_EXCL_STOP
 						default:
 							out.push_back(c);
 					}
@@ -193,14 +197,16 @@ namespace cov::app::web {
 			                 std::string_view text) const noexcept {
 				for (auto c : text) {
 					switch (c) {
+						// GCOV_EXCL_START
+						// there is little to no chance, there will be a kind
+						// with '"', '&', etc.
 #define X_CASE(C, ID)       \
 	case C:                 \
 		out.append(id::ID); \
 		break;
-						// there is little to no chance, there will be a kind
-						// with '"', '&', etc.
-						HTML_X(X_CASE)  // GCOV_EXCL_LINE
+						HTML_X(X_CASE)
 #undef X_CASE
+						// GCOV_EXCL_STOP
 						case '_':
 							out.push_back('-');
 							break;
@@ -1024,7 +1030,7 @@ namespace cov::app::web {
 				ctx.clear();
 				return true;
 				// GCOV_EXCL_STOP
-			}
+			}  // GCOV_EXCL_LINE[CLANG]
 		}
 
 		if (with_json_context) {

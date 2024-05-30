@@ -116,7 +116,7 @@ namespace cov::app::web {
 		if constexpr (!std::is_same_v<decltype(size_maxint), size_t>) {
 			if (size_maxint >= std::numeric_limits<size_t>::max())
 				return result;
-		}
+		}  // GCOV_EXCL_LINE[CLANG]
 
 #if defined(__GNUC__) && !defined(__clang__)
 #pragma GCC diagnostic push
