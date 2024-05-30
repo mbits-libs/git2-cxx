@@ -40,6 +40,15 @@
     .file-line-copy {
       opacity: 0;
       transition: opacity 300ms ease-in-out;
+      color: #666;
+    }
+
+    &.file-line-mark-passing .file-line-copy {
+      color: #464;
+    }
+
+    &.file-line-mark-failing .file-line-copy {
+      color: #422;
     }
 
     &:hover .file-line-copy {
