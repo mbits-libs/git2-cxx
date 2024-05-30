@@ -1109,10 +1109,7 @@ namespace cov::app::web::testing {
 				"}"
 				""sv,
 	        // clang-format on
-	        .context =
-	            {
-
-	            },
+	        .context = {},
 	    },
 	    {
 	        .tmplt = page_info_template,
