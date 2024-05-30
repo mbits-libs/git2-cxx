@@ -13,6 +13,8 @@
 
 #if __cpp_lib_chrono >= 201907L
 #define HAS_CXX20_FILE_CLOCK
+#elif defined(__clang__)
+#define HAS_CXX20_FILE_CLOCK
 #elif defined(__GNUC__)
 #define GCC_VER (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
 #if GCC_VER >= 100100

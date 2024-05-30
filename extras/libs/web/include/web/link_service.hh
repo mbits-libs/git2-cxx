@@ -7,7 +7,7 @@
 #include <string>
 
 namespace cov::app::web {
-#if defined(__GNUC__) && !defined(__clang__)
+#if defined(__GNUC__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wnon-virtual-dtor"
 #endif
@@ -45,7 +45,7 @@ namespace cov::app::web {
 		std::string root_;
 	};
 
-#if defined(__GNUC__) && !defined(__clang__)
+#if defined(__GNUC__)
 #pragma GCC diagnostic pop
 #endif
 }  // namespace cov::app::web
