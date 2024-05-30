@@ -42,6 +42,7 @@ namespace cov::app::report_export {
 			revs range{};
 			std::string path{};
 			cov::repository repo{};
+			unsigned verbose{};
 		};
 
 		response parse();
@@ -54,5 +55,6 @@ namespace cov::app::report_export {
 		op oper{op::none};
 		std::optional<std::string> rev{};
 		std::string path{};
+		unsigned verbose{};
 	};
 }  // namespace cov::app::report_export

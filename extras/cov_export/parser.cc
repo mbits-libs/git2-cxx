@@ -41,6 +41,7 @@ namespace cov::app::report_export {
 		        "html")
 		    .meta(tr_(str::args::lng::DIR_META))
 		    .opt();
+		parser_.custom([&]() { ++verbose; }, "v").opt();
 	}
 
 	parser::response parser::parse() {
@@ -59,6 +60,7 @@ namespace cov::app::report_export {
 		if (!rev) rev = "HEAD"s;
 		result.path = path;
 		result.only_json = oper == op::json;
+		result.verbose = verbose;
 
 		auto ec = revs::parse(result.repo, *rev, result.range);
 		if (ec) error(ec, tr_);

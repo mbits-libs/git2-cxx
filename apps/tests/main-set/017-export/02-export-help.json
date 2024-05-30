@@ -11,7 +11,8 @@
             "optional arguments:",
             " -h, --help    shows this help message and exits",
             " --json <file> ",
-            " --html <dir>  \n"
+            " --html <dir>  ",
+            " -v            \n"
         ],
         ""
     ]

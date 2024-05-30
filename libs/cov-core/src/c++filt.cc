@@ -66,8 +66,8 @@ namespace cov::core {
 					    case GIT_CONFIG_LEVEL_LOCAL:
 						    root = &local;
 						    break;
-					    default:
-						    break;
+					    default:    // GCOV_EXCL_LINE
+						    break;  // GCOV_EXCL_LINE
 				    }
 				    if (!root || root->empty()) return 0;
 				    result.push_back(*root / app::make_u8path(entry->value));
@@ -84,13 +84,13 @@ namespace cov::core {
 						    entry.path().extension() == ".json"sv) {
 							result.push_back(entry.path());
 						}
-					}
+					}  // GCOV_EXCL_LINE
 				}
 			}
 
 			return result;
-		}
-	}  // namespace
+		}  // GCOV_EXCL_LINE
+	}      // namespace
 
 	cxx_filt::Replacements load_replacements(
 	    std::filesystem::path const& system,
@@ -110,6 +110,6 @@ namespace cov::core {
 		}
 
 		return result;
-	}
+	}  // GCOV_EXCL_LINE
 
 };  // namespace cov::core
