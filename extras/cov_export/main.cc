@@ -177,16 +177,16 @@ namespace cov::app::report_export {
 
 		auto const system = platform::core_extensions::sys_root();
 
-		html_report(
-		    {.marks = placeholder::environment::rating_from(info.repo),
-		     .mods = std::move(mods),
-		     .diff = std::move(diff),
-		     .out_dir = info.path,
-		     .repo = info.repo,
-		     .ref = info.range.to,
-		     .base = info.range.from,
-		     .replacements = core::load_replacements(system, info.repo)},
-		    p);
+		html_report({.marks = placeholder::environment::rating_from(info.repo),
+		             .mods = std::move(mods),
+		             .diff = std::move(diff),
+		             .out_dir = info.path,
+		             .repo = info.repo,
+		             .ref = info.range.to,
+		             .base = info.range.from,
+		             .replacements = core::load_replacements(system, info.repo,
+		                                                     info.verbose > 0)},
+		            p);
 
 		return 0;
 	}
