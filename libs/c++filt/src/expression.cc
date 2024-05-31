@@ -237,7 +237,6 @@ namespace cxx_filt {
 		if (items.size() == 1 &&
 		    std::holds_alternative<Reference>(items.front())) {
 			auto const& ref_id = std::get<Reference>(items.front()).id;
-			refs.find(ref_id);
 			auto it = refs.find(ref_id);
 			if (it == refs.end()) {
 				return {.items = {"?"s}, .cvrs = cvrs};

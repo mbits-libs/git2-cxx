@@ -109,8 +109,10 @@ namespace cov::app::strip {
 			          valid_markers);
 		}
 
-		auto const text = platform::read_input();
-		auto root = json::read_json({text.data(), text.size()});
+		auto root = []() {
+			auto const text = platform::read_input();
+			return json::read_json({text.data(), text.size()});
+		}();
 		auto cvg = json::cast<json::map>(root);
 		if (!cvg) return 1;
 

@@ -11,6 +11,10 @@ namespace cov::app::web {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wnon-virtual-dtor"
 #endif
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable : 4265)
+#endif
 
 	struct link_service {
 		virtual std::string path_of(projection::entry_type type,
@@ -45,6 +49,9 @@ namespace cov::app::web {
 		std::string root_;
 	};
 
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 #if defined(__GNUC__)
 #pragma GCC diagnostic pop
 #endif
