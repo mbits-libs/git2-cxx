@@ -585,7 +585,6 @@ namespace cov::testing {
 		    "\x20\x00\x00\x00"
 		    "\x14\x00\x00\x00"
 		    ""sv;
-		test_stream stream{};
 
 		io::db_object dbo{};
 		dbo.add_handler<io::OBJECT::FUNCTIONS,

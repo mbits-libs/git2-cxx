@@ -23,7 +23,10 @@ if (COV_TESTING)
     ${WEB_TEST_SRCS_CC}
     ${WEB_TEST_SRCS_CC_2})
 
-  add_cov_test(web ${WEB_TEST_SRCS_CC} ${WEB_TEST_SRCS_CC_2})
+  add_cov_test(web
+    ${WEB_TEST_SRCS_CC}
+    ${WEB_TEST_SRCS_CC_2}
+    tests/mstch_cache/common.hh)
   target_link_libraries(web-test PRIVATE web testing-lib)
 
   if (COV_CUTDOWN_OS)

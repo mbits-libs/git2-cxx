@@ -72,9 +72,9 @@ namespace cov {
 		        ec);
 		    !git_dir.empty()) {
 			TRY(git_dir / names::covdata_dir);
-			std::error_code local{};
-			auto const repo = git::repository::open(git_dir, local);
-			if (!local) {
+			std::error_code local_ec{};
+			auto const repo = git::repository::open(git_dir, local_ec);
+			if (!local_ec) {
 				auto const common_dir = repo.common_dir();
 				if (!common_dir.empty()) {
 					TRY_EX(make_path(common_dir) / names::covdata_dir, {

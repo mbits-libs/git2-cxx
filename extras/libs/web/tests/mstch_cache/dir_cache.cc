@@ -6,63 +6,15 @@
 // REST OF THE CODE.
 
 #include <fmt/chrono.h>
+#include <arch/base/io/stream.hh>
 #include <cov/io/file.hh>
 #include <optional>
 #include "../setup.hh"
 #include "common.hh"
 
-#if __cpp_lib_chrono >= 201907L
-#define HAS_CXX20_FILE_CLOCK
-#elif defined(__clang__)
-#define HAS_CXX20_FILE_CLOCK
-#elif defined(__GNUC__)
-#define GCC_VER (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
-#if GCC_VER >= 100100
-#define HAS_CXX20_FILE_CLOCK
-#endif
-#endif
-
 namespace cov::app::web::testing {
 	using sys_time = std::chrono::system_clock::time_point;
 	using sys_duration = std::chrono::system_clock::duration;
-
-#if defined(HAS_CXX20_FILE_CLOCK)
-	sys_time to_system_clock(std::filesystem::file_time_type last_write_time) {
-		return std::chrono::file_clock::to_sys(last_write_time);
-	}
-
-	std::filesystem::file_time_type to_file_clock(sys_time last_write_time) {
-		return std::chrono::file_clock::from_sys(last_write_time);
-	}
-#else
-#ifdef _WIN32
-	// on windows, both sys clock and file clock use the same duration, but the
-	// epochs are moved apart, by the value below (taken from xfilesystem_abi.h)
-	inline static constexpr long long __std_fs_file_time_epoch_adjustment =
-	    0x19DB1DED53E8000LL;
-
-	sys_time to_system_clock(std::filesystem::file_time_type last_write_time) {
-		using tp = sys_time;
-		auto const ticks = last_write_time.time_since_epoch().count() -
-		                   __std_fs_file_time_epoch_adjustment;
-		auto const since_epoch = tp::duration{ticks};
-		return tp{since_epoch};
-	}
-
-	std::filesystem::file_time_type to_file_clock(sys_time last_write_time) {
-		auto const ticks = last_write_time.time_since_epoch().count() +
-		                   __std_fs_file_time_epoch_adjustment;
-		auto const since_epoch =
-		    std::filesystem::file_time_type::duration{ticks};
-		return std::filesystem::file_time_type{since_epoch};
-	}
-#else
-	sys_time to_system_clock(std::filesystem::file_time_type last_write_time) {}
-
-	std::filesystem::file_time_type to_file_clock(sys_time last_write_time) {}
-#endif
-#endif
-
 	auto now() {
 		static auto time_point = std::chrono::system_clock::now();
 		return time_point;
@@ -104,7 +56,7 @@ namespace cov::app::web::testing {
 
 			if (options.timestamp) {
 				auto const timestamp =
-				    to_file_clock(now() + *options.timestamp);
+				    arch::base::io::to_file_clock(now() + *options.timestamp);
 				std::filesystem::last_write_time(path, timestamp);
 			}
 		}
