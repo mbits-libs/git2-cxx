@@ -1,0 +1,45 @@
+{
+    "env": {
+        "HOME": "$TMP/posix-home",
+        "XDG_CONFIG_HOME": null,
+        "USERPROFILE": null
+    },
+    "args": "export --html html-report -vv",
+    "expected": [
+        0,
+        [
+            "c++filt: $INST/share/cov-$VERSION_SHORT/c++filt/standard-library.json",
+            "c++filt: $INST/system/c++filt.json",
+            "c++filt: $TMP/posix-home/global/c++filt.json",
+            "c++filt: $TMP/repo/local/c++filt.json",
+            "c++filt: $TMP/repo/.c++filt/one.json",
+            "c++filt: $TMP/repo/.c++filt/two.json",
+            "[1/3] index.html",
+            "[2/3] dirs/src.html",
+            "[3/3] files/src/main.cc.html\n"
+        ],
+        ""
+    ],
+    "prepare": [
+        "unpack $DATA/repo.git.tar $TMP",
+        "cd '$TMP'",
+        "mkdirs posix-home",
+        "git clone repo.git",
+        "cd '$TMP/repo'",
+        "git config --local user.name 'Johnny Appleseed'",
+        "git config --local user.email 'johnny@appleseed.com'",
+        "cov init",
+        "cov report $DATA/build-coverage-show-functions-1.json -f create-report",
+        "cov report $DATA/build-coverage-show-functions-2.json -f create-report",
+        "touch .c++filt/one.json '{}'",
+        "touch .c++filt/two.json '[]'",
+        "touch .c++filt/two.md '[link](url)'",
+        "touch .c++filt/three.json/file.json '{}'",
+        "touch local/c++filt.json '{}'",
+        "touch '$TMP/posix-home/global/c++filt.json' '{}'",
+        "touch '$INST/system/c++filt.json' '{}'",
+        "cov config --local filter.path local/c++filt.json",
+        "touch '$TMP/posix-home/.covconfig' '[filter]\npath=global/c++filt.json\n",
+        "touch '$INST/etc/covconfig' '[filter]\npath=system/c++filt.json\n"
+    ]
+}
