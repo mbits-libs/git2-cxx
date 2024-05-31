@@ -1,5 +1,4 @@
 {
-    "disabled": "linux",
     "args": "report $DATA/strip-excludes/coverage-1.json -f strip-excludes -o- -- -vv --os l-cars --compiler gcc",
     "expected": [
         0,
@@ -9,14 +8,11 @@
             "markers: l-cars and gcc.",
             "sources: $TMP/repo",
             "\u001b[1;37m$TMP/repo/file.cc:12:5:\u001b[m \u001b[1;35mwarning:\u001b[m found GCOV_EXCL_END; did you mean GCOV_EXCL_STOP?",
-            "\u001b[1;37m$TMP/repo/file.cc:17:5:\u001b[m \u001b[1;35mwarning:\u001b[m double start: found GCOV_EXCL_START",
-            "\u001b[1;37m$TMP/repo/file.cc:8:5:\u001b[m \u001b[1;36mnote:\u001b[m see previous start",
-            "file.cc(4)",
+            "\u001b[1;37m$TMP/repo/file.cc:8:5:\u001b[m \u001b[1;35mwarning:\u001b[m GCOV_EXCL_START not matched with GCOV_EXCL_STOP",
+            "-- file.cc:4",
             "     0 | \u001b[2;49;30m}  // GCOV_EXCL_LINE\u001b[m",
-            "file.cc(17)",
-            "       | \u001b[2;49;30m\t// GCOV_EXCL_START\u001b[m",
-            "       | \u001b[2;49;30m\tfoo();\u001b[m",
-            "       | \u001b[2;49;30m\t// GCOV_EXCL_STOP\u001b[m",
+            "-- file.cc:17",
+            "       | \u001b[2;49;30m\tfoo();  // GCOV_EXCL_LINE\u001b[m",
             "strip-excludes: excluded one line.\n"
         ]
     ],
@@ -26,6 +22,6 @@
         "git clone repo.git",
         "cd repo",
         "cov init",
-        "cp '$DATA/strip-excludes/file-1' 'file.cc'"
+        "cp '$DATA/strip-excludes/file-2' 'file.cc'"
     ]
 }

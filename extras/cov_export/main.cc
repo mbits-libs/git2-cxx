@@ -96,7 +96,7 @@ namespace cov::app::report_export {
 		counted_actions logger{.count = pages.size()};
 
 		for (auto const& item : pages) {
-			logger.on_action(get_u8path(item.filename));
+			logger.on_action(get_generic_u8path(item.filename));
 			auto state = stage.next_page(item, ec);
 			if (ec) logger.error(p, ec);
 
