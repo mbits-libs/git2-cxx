@@ -221,7 +221,7 @@ namespace cxx_filt {
 			}
 
 			return false;
-		}
+		}  // GCOV_EXCL_LINE[MSVC]
 		return true;
 	}
 
@@ -291,7 +291,7 @@ namespace cxx_filt {
 				result = next_result;
 				modified = true;
 				break;
-			}
+			}  // GCOV_EXCL_LINE[MSVC]
 		}
 
 		return result;

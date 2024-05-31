@@ -270,7 +270,7 @@ namespace cxx_filt {
 			return ret;
 		}
 		// GCOV_EXCL_STOP
-		return {};
+		return {};  // GCOV_EXCL_LINE[MSVC]
 	}
 
 	struct TokenStream {

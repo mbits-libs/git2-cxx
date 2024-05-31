@@ -107,7 +107,7 @@ namespace cov::app::builtin::report {
 				if (file) file.store(text.data(), text.size());
 			}
 			std::exit(0);
-		}  // GCOV_EXCL_LINE[GCC]
+		}  // GCOV_EXCL_LINE[GCC, MSVC]
 
 		if (!result.report.load_from_text(
 		        report_contents(result.repo.git(), rest))) {

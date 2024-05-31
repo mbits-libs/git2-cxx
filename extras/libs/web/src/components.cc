@@ -113,7 +113,7 @@ namespace cov::app::web {
 	case hl::x:       \
 		return #x##sv;
 			switch (static_cast<hl::token>(tok)) { HILITE_TOKENS(TOKEN_NAME) }
-			return {};  // GCOV_EXCL_LINE[GCC]
+			return {};  // GCOV_EXCL_LINE[GCC, MSVC]
 #undef TOKEN_NAME
 		}
 
@@ -294,7 +294,7 @@ namespace cov::app::web {
 
 			if (auto files = as_a<cov::files>(generic); files) {
 				return files;
-			}
+			}  // GCOV_EXCL_LINE[MSVC]
 
 			// The only objects coming here are those above...
 			[[unlikely]];  // GCOV_EXCL_LINE
