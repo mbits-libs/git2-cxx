@@ -1,6 +1,7 @@
 // Copyright (c) 2024 Marcin Zdun
 // This code is licensed under MIT license (see LICENSE for details)
 
+#include <concepts>
 #include <string>
 #include <web/link_service.hh>
 
@@ -8,6 +9,29 @@ using namespace std::literals;
 
 namespace cov::app::web {
 	namespace {
+		template <typename Char, Char OsSep>
+		auto os_normalized(std::string_view path) {
+			if constexpr (std::same_as<Char, char> && OsSep == '/') {
+				return path;
+			} else {
+				std::string result{};
+				result.reserve(path.size());
+				for (auto const c : path) {
+					if (c == OsSep)
+						result.push_back('/');
+					else
+						result.push_back(c);
+				}
+				return result;
+			}
+		}
+
+		auto normalized(std::string_view resource_path) {
+			using std::filesystem::path;
+			return os_normalized<path::value_type, path::preferred_separator>(
+			    resource_path);
+		}
+
 		std::string path_of(projection::entry_type type,
 		                    projection::label const& name,
 		                    std::string_view ext) {
@@ -25,7 +49,7 @@ namespace cov::app::web {
 					break;
 			}
 
-			return fmt::format("{}/{}{}", cat, name.expanded, ext);
+			return fmt::format("{}/{}{}", cat, normalized(name.expanded), ext);
 		}
 	}  // namespace
 
@@ -43,7 +67,7 @@ namespace cov::app::web {
 
 	std::string export_link_service::resource_link(
 	    std::string_view resource) const {
-		return fmt::format("{}/{}", root_, resource);
+		return fmt::format("{}/{}", root_, normalized(resource));
 	}
 
 	void export_link_service::adjust_root(
@@ -76,7 +100,7 @@ namespace cov::app::web {
 
 	std::string server_link_service::resource_link(
 	    std::string_view resource) const {
-		return fmt::format("{}/{}", root_, resource);
+		return fmt::format("{}/{}", root_, normalized(resource));
 	}
 
 	void server_link_service::set_app_path(std::string_view root_path) {

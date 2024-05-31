@@ -17,4 +17,9 @@ namespace cov::app {
 		auto u8 = copy.u8string();
 		return {reinterpret_cast<char const*>(u8.data()), u8.size()};
 	}
+
+	inline std::string get_generic_u8path(std::filesystem::path copy) {
+		auto u8 = copy.generic_u8string();
+		return {reinterpret_cast<char const*>(u8.data()), u8.size()};
+	}
 }  // namespace cov::app

@@ -211,11 +211,7 @@ namespace cov::app::strip {
 
 			for (auto const& [line, counter, text] : lines) {
 				if (first || (line - prev) > 1) {
-#ifdef _WIN32
-					fmt::print(stderr, "{}({})\n", filename, line);
-#else
 					fmt::print(stderr, "-- {}:{}\n", filename, line);
-#endif
 				}
 				first = false;
 				prev = line;
