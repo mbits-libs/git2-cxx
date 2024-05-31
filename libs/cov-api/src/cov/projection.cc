@@ -34,7 +34,7 @@ namespace cov::projection {
 				it = modules.erase(it);
 				end = modules.end();
 				// GCOV_EXCL_STOP
-			}
+			}  // GCOV_EXCL_LINE[MSVC]
 		}
 
 		struct dir_entry;

@@ -76,7 +76,7 @@ namespace cov::app::report_export {
 				fmt::print("\r\033[2K[{}/{}] {}", index, count, action);
 				std::fflush(stdout);
 				// GCOV_EXCL_STOP
-			} else {
+			} else {  // GCOV_EXCL_LINE[MSVC]
 				fmt::print("[{}/{}] {}\n", index, count, action);
 			}
 			++index;
