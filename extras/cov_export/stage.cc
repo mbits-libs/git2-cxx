@@ -44,11 +44,12 @@ namespace cov::app::web {
 		}
 
 		for (auto const& stat : diff) {
-			files.insert(stat.filename);
+			auto const file_path = make_u8path(stat.filename);
+			files.insert(get_generic_u8path(file_path));
 			auto const empty_path = std::filesystem::path{};
-			auto dir = make_u8path(stat.filename).parent_path();
+			auto dir = file_path.parent_path();
 			while (dir != empty_path) {
-				dirs.insert(get_u8path(dir));
+				dirs.insert(get_generic_u8path(dir));
 				dir = dir.parent_path();
 			}
 		}
