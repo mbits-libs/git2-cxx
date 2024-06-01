@@ -49,11 +49,6 @@ jobs:
       with:
          submodules: true
 
-    - name: Conanfile hash
-      run: |
-        echo ${{ hashFiles('conanfile.txt') }}
-        echo ${{ matrix.latest_conan_hash }}
-
 #     ######## ##    ## ##     ## #### ########   #######  ##    ## ##     ## ######## ##    ## ########
 #     ##       ###   ## ##     ##  ##  ##     ## ##     ## ###   ## ###   ### ##       ###   ##    ##
 #     ##       ####  ## ##     ##  ##  ##     ## ##     ## ####  ## #### #### ##       ####  ##    ##
@@ -137,7 +132,7 @@ jobs:
         path: ${{ matrix.home }}/.conan/data
         key: ${{ env.CONAN_CACHE }}-${{ hashFiles('conanfile.txt') }}
         restore-keys: |
-          ${{ env.CONAN_CACHE }}-${{ matrix.latest_conan_hash }}
+          ${{ env.CONAN_CACHE }}-
 
     - name: Install OpenCppCoverage
       uses: KungFuDonkey/Install-OpenCppCoverage@v1
