@@ -17,8 +17,10 @@ if os.name == "nt":
     ARCHIVE_ARCH = "windows-x86_64"
     EXEC_EXT = ".exe"
 else:
+    from flow.lib.uname import uname
+
     ARCHIVE_EXT = "tar.gz"
-    ARCHIVE_ARCH = "ubuntu-22.04-x86_64"
+    ARCHIVE_ARCH = "-".join(uname())
     EXEC_EXT = ""
 
 
@@ -115,11 +117,21 @@ else:
         return True
 
 
+def lts_for(arch: str):
+    triplet = arch.split('-')
+    if triplet[0] == 'ubuntu':
+        ver = triplet[1].split('.')
+        if ver[1] == '10': ver[1] = '04'
+        maj = int(ver[0])
+        if maj % 2 == 1: maj -= 1
+        triplet[1] = f"{maj}.{'.'.join(ver[1:])}"
+        arch = '-'.join(triplet)
+    
+    return arch
+
+
 def download_tools(version: str):
-    package_name = f"{TOOL_NAME}-{version}-{ARCHIVE_ARCH}"
     sha_url = f"https://github.com/mzdun/{TOOL_NAME}/releases/download/v{version}/sha256sum.txt"
-    arch_url = f"https://github.com/mzdun/{TOOL_NAME}/releases/download/v{version}/{package_name}.{ARCHIVE_EXT}"
-    path = f"{TOOL_DIR}/{package_name}.{ARCHIVE_EXT}"
 
     os.makedirs(TOOL_DIR, exist_ok=True)
 
@@ -139,13 +151,21 @@ def download_tools(version: str):
         filename = filename[1:]
         sha256sum[filename] = hash
 
+    package_name = f"{TOOL_NAME}-{version}-{ARCHIVE_ARCH}"
+    orig_package_name = package_name
     expected_hash = sha256sum.get(f"{package_name}.{ARCHIVE_EXT}")
     if expected_hash is None:
+        package_name = f"{TOOL_NAME}-{version}-{lts_for(ARCHIVE_ARCH)}"
+        expected_hash = sha256sum.get(f"{package_name}.{ARCHIVE_EXT}")
+    if expected_hash is None:
         print(
-            f"{sha_url}: error: cannot locate sha256sum for {package_name}.{ARCHIVE_EXT}",
+            f"{sha_url}: error: cannot locate sha256sum for {orig_package_name}.{ARCHIVE_EXT}",
             file=sys.stderr,
         )
         return False
+
+    arch_url = f"https://github.com/mzdun/{TOOL_NAME}/releases/download/v{version}/{package_name}.{ARCHIVE_EXT}"
+    path = f"{TOOL_DIR}/{package_name}.{ARCHIVE_EXT}"
 
     needs_download = True
     if os.path.isfile(path):
@@ -191,6 +211,6 @@ def download_tools(version: str):
 
 
 if __name__ == "__main__" and not download_tools(
-    "0.2.1" if len(sys.argv) < 2 else sys.argv[1]
+    "0.3.0" if len(sys.argv) < 2 else sys.argv[1]
 ):
     sys.exit(1)
