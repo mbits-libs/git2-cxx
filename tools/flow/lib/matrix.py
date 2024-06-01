@@ -28,7 +28,7 @@ _conan: Optional[conan] = None
 _platform_name, _platform_version, _platform_arch = uname()
 
 _report_version = (0, 20, 0)
-_runner_version = (0, 2, 2)
+_runner_version = (0, 3, 0)
 
 platform = _platform_name
 

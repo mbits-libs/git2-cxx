@@ -7,7 +7,7 @@ import json
 import os
 import sys
 from contextlib import contextmanager
-from typing import List, Set
+from typing import List, Set, TypeVar
 
 import lib.matrix as matrix
 import lib.runner as runner
@@ -30,6 +30,10 @@ DEF_STEPS = {
 }
 cmd = os.path.splitext(os.path.basename(sys.argv[0]))[0]
 
+_ubuntu_lts = ["ubuntu-20.04", "ubuntu-22.04", "ubuntu-24.04"]
+
+
+T = TypeVar('T')
 
 @contextmanager
 def cd(path):
@@ -60,8 +64,18 @@ def _boolean(value: str):
 _TRUE = {"true", "on", "yes", "1", "with-sanitizer"}
 _TYPES = {"compiler": _compiler, "sanitizer": _boolean}
 
+def _exluded_ubuntu(config: dict) -> bool:
+    if config["github_os"] == "ubuntu-20.04":
+        return config.get("sanitizer") == True
+    if config["github_os"] == "ubuntu-24.04":
+        return config.get("sanitizer") == True or config.get("compiler", "").lower() == "clang"
+    return False
 
-def _flatten(array: List[list]) -> list:
+def _postprocess(array: List[dict]) -> List[dict]:
+    return [item for item in array if not _exluded_ubuntu(item)]
+
+
+def _flatten(array: List[List[T]]) -> List[T]:
     return [item for sublist in array for item in sublist]
 
 
@@ -240,12 +254,20 @@ parser.add_argument(
     help="cut matrix to minimal set of builds",
 )
 
-
-def _turn(config: dict):
-    config["github_os"] = f"{config['os']}-latest"
-    config["github_sanitizer"] = f"{'with' if config['sanitizer'] else 'no'}-sanitizer"
+def _turn_one(config: dict, github_os: str, os_in_name: str):
+    build_name = f"{config['build_type']} with {config['compiler']} on {os_in_name}"
+    if config["sanitizer"]:
+        build_name += " (and sanitizer)"
+    config["github_os"] = github_os
+    config["build_name"] = build_name
+    os_ver = github_os.split("-")[1]
+    config["needs_gcc_ppa"] = os_ver != "latest" and config["os"] == "ubuntu" and int(os_ver.split(".")[0]) < 24
     return config
 
+def _turn(config: dict, spread_lts: bool):
+    if config["os"] == "ubuntu" and spread_lts:
+        return [_turn_one({key: config[key] for key in config}, lts, lts) for lts in _ubuntu_lts]
+    return [_turn_one(config, f"{config['os']}-latest", config["os"])]
 
 def main():
     args = parser.parse_args()
@@ -282,11 +304,11 @@ def main():
         paths.append(os.path.join(root, "flow.official.json"))
     configs, keys = matrix.load_matrix(*paths)
 
-    usable = [
-        _turn(config)
+    usable = _postprocess(_flatten([
+        _turn(config, args.matrix)
         for config in configs
         if len(args.configs) == 0 or matrix.matches_any(config, args.configs)
-    ]
+    ]))
 
     if args.matrix:
         if "GITHUB_ACTIONS" in os.environ:

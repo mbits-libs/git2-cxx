@@ -15,8 +15,7 @@ def _os_release_fallback():
             if line == "":
                 continue
             name, value = line.split("=", 1)
-            value = " ".join(shlex.split(value))
-            result[name]
+            result[name] = " ".join(shlex.split(value))
     return result
 
 

@@ -43,12 +43,12 @@ def print_args(args: Tuple[str]):
     print(f"\033[33m{cmd}\033[m {args}", file=sys.stderr)
 
 
-def run(*args: str, **kwargs) -> subprocess.CompletedProcess[bytes]:
+def run(*args: str, **kwargs) -> subprocess.CompletedProcess:
     print_args(args)
     return subprocess.run(args, shell=False, **kwargs)
 
 
-def checked(*args: str, **kwargs) -> Optional[subprocess.CompletedProcess[bytes]]:
+def checked(*args: str, **kwargs) -> Optional[subprocess.CompletedProcess]:
     print_args(args)
     if Environment.DRY_RUN:
         return None
@@ -57,7 +57,7 @@ def checked(*args: str, **kwargs) -> Optional[subprocess.CompletedProcess[bytes]
 
 def checked_capture(
     *args: str, **kwargs
-) -> Optional[subprocess.CompletedProcess[bytes]]:
+) -> Optional[subprocess.CompletedProcess]:
     print_args(args)
     if Environment.DRY_RUN:
         return None
