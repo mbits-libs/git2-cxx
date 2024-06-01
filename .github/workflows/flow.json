@@ -21,7 +21,7 @@
       "cpack_generator": ["TGZ", "DEB"],
       "ubuntu": true,
       "home": "/home/runner",
-      "latest_conan_hash": "138430d3e768c55b9e8f91be01fa2c79216211788a32e3f29de9a9cff24ffa27"
+      "latest_conan_hash": "872a03fa83ffdbb1d9b87922fdd3cc9c5286ef3df699cae7a2829313e81fef00"
     },
     {
       "os": "windows",
@@ -31,7 +31,7 @@
       "cpack_generator": ["ZIP", "WIX"],
       "windows": true,
       "home": "C:/Users/runneradmin",
-      "latest_conan_hash": "17852b51448658ba468732f58692781f1ea5ffb897c556d2215646d5ce29a81a"
+      "latest_conan_hash": "8d6e98eb0bbfcb8d7ed5d32d74e9a50c9450ee5ecaf1c1698cdbdb4db65e86e6"
     },
     {"os": "ubuntu", "report_os": "Linux"},
     {"compiler": "gcc", "report_compiler": "GNU", "gcc": true},
