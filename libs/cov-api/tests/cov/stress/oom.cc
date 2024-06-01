@@ -1,14 +1,6 @@
 // Copyright (c) 2022 Marcin Zdun
 // This code is licensed under MIT license (see LICENSE for details)
 
-#if defined(__GNUC__) && !defined(__clang__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuseless-cast"
-#endif
-#include <date/tz.h>
-#if defined(__GNUC__) && !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif
 #include <gtest/gtest.h>
 #include <cov/branch.hh>
 #include <cov/format.hh>
@@ -18,6 +10,7 @@
 #include <cov/io/strings.hh>
 #include <cov/repository.hh>
 #include <cov/tag.hh>
+#include <cov/tz.hh>
 #include <fstream>
 #include "../setup.hh"
 #include "new.hh"

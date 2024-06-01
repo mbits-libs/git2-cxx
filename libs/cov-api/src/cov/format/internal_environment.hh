@@ -11,15 +11,8 @@
 #pragma warning(pop)
 #endif
 
-#if defined(__GNUC__) && !defined(__clang__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuseless-cast"
-#endif
-#include <date/tz.h>
-#if defined(__GNUC__) && !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif
 #include <cov/format.hh>
+#include <cov/tz.hh>
 #include <optional>
 #include <string>
 #include <string_view>
