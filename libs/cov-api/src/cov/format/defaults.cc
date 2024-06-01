@@ -10,18 +10,11 @@
 #pragma warning(pop)
 #endif
 
-#if defined(__GNUC__) && !defined(__clang__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuseless-cast"
-#endif
-#include <date/tz.h>
-#if defined(__GNUC__) && !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif
 #include <fmt/chrono.h>
 #include <charconv>
 #include <cov/format.hh>
 #include <cov/repository.hh>
+#include <cov/tz.hh>
 #include <ctime>
 #include <iostream>
 #include "../path-utils.hh"

@@ -69,6 +69,7 @@ set(COV_SOURCES
   src/cov/revparse.cc
   src/cov/streams.cc
   src/cov/tag.cc
+  src/cov/tz.cc
   src/cov/zstream.cc
   include/cov/branch.hh
   include/cov/counted.hh
@@ -102,6 +103,7 @@ set(COV_SOURCES
   include/cov/streams.hh
   include/cov/tabular.hh
   include/cov/tag.hh
+  include/cov/tz.hh
   include/cov/zstream.hh
 )
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${GIT2_SOURCES} ${COV_SOURCES})
@@ -112,7 +114,7 @@ target_link_options(cov-api PRIVATE ${ADDITIONAL_LINK_FLAGS})
 target_include_directories(cov-api PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}/include
   ${CMAKE_CURRENT_BINARY_DIR}/include)
-target_link_libraries(cov-api PUBLIC libgit2::libgit2 fmt::fmt date::date-tz mbits::args json PRIVATE hilite openssl::openssl)
+target_link_libraries(cov-api PUBLIC libgit2::libgit2 fmt::fmt date::date-tz mbits::args json arch PRIVATE hilite openssl::openssl)
 
 set_target_properties(cov-api PROPERTIES FOLDER libs)
 
