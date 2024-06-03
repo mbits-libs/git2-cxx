@@ -1,6 +1,6 @@
 {
     "$schema": "https://json-schema.org/draft/2019-09/schema",
-    "$id": "https://raw.githubusercontent.com/mzdun/cov/v0.23.0/apps/report-schema.json",
+    "$id": "https://raw.githubusercontent.com/mzdun/cov/v0.25.0/apps/report-schema.json",
     "type": "object",
     "default": {},
     "title": "Root Schema",

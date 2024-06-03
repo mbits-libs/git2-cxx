@@ -1,5 +1,5 @@
 {
-    "$schema": "https://raw.githubusercontent.com/mzdun/cov/v0.22.0/apps/report-schema.json",
+    "$schema": "https://raw.githubusercontent.com/mzdun/cov/v0.25.0/apps/report-schema.json",
     "git": {
         "branch": "main"
     }
