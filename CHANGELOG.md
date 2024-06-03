@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) and [COMMITS.md](COMMITS.md) for commit guidelines.
 
+## [0.26.1](https://github.com/mzdun/cov/compare/v0.26.0...v0.26.1) (2024-06-03)
+
+### Bug Fixes
+
+- add builds-schema ([849609c](https://github.com/mzdun/cov/commit/849609c3e6da3e9da75a0eb418c1c4c9ca4c0bdc)), references [#58](https://github.com/mzdun/cov/issues/58)
+- **docs**: update roadmap ([b5c7b65](https://github.com/mzdun/cov/commit/b5c7b650453733d66954d808859d859525af6f3a))
+
 ## [0.26.0](https://github.com/mzdun/cov/compare/v0.25.0...v0.26.0) (2024-06-03)
 
 ### New Features
