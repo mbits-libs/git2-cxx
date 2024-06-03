@@ -69,6 +69,7 @@
     - [x] fully alias co-existing function in report stats (_0.21.0_, mzdun/cov#55)
     - [x] `$COV_FILTER_PATH` (_0.21.1_, mzdun/cov#47)
   - [ ] `cov export` from report, build and files (mzdun/cov#58)
+    - [x] schema (_0.26.1_)
     - [ ] `--json`
     - [x] `--html` (_0.26.0_)
   - [ ] `cov report` (mzdun/cov#59)
