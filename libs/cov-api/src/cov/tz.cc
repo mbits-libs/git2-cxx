@@ -65,7 +65,13 @@ namespace cov::init_magic {
 			date::set_tar_gz_helper(arch::extract_gz_file);
 			std::error_code ec{};
 			auto const tmp = std::filesystem::temp_directory_path(ec);
-			if (!ec && !tmp.empty()) date::set_install(tmp / "cov/tzdata");
+			if (!ec && !tmp.empty()) {
+				auto const parent = tmp / "cov";
+				std::filesystem::create_directories(parent, ec);
+				if (!ec) {
+					date::set_install(parent / "tzdata");
+				}
+			}
 		}
 	}  // namespace
 
