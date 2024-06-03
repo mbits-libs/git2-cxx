@@ -1,0 +1,157 @@
+{
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "$id": "https://raw.githubusercontent.com/mzdun/cov/v0.25.0/apps/report-schema.json",
+    "type": "object",
+    "default": {},
+    "title": "Root Schema",
+    "required": [
+        "git",
+        "builds"
+    ],
+    "properties": {
+        "git": {
+            "type": "object",
+            "default": {},
+            "title": "git info",
+            "required": [
+                "branch",
+                "head"
+            ],
+            "properties": {
+                "branch": {
+                    "type": "string",
+                    "default": "",
+                    "title": "git branch associated with this report",
+                    "examples": [
+                        "main"
+                    ]
+                },
+                "head": {
+                    "type": "string",
+                    "default": "",
+                    "title": "git commit associated with this report",
+                    "examples": [
+                        "f8632047e4ea88f5e30bf57570694e5b145c5c0d"
+                    ]
+                }
+            },
+            "examples": [
+                {
+                    "branch": "main",
+                    "head": "f8632047e4ea88f5e30bf57570694e5b145c5c0d"
+                }
+            ]
+        },
+        "builds": {
+            "type": "array",
+            "default": [],
+            "title": "build list",
+            "items": {
+                "type": "object",
+                "title": "single build reference",
+                "required": [
+                    "name",
+                    "digest",
+                    "props"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "title": "path of the report-schema file, relative to this file",
+                        "examples": [
+                            "build-1.json",
+                            "build-2.json"
+                        ]
+                    },
+                    "digest": {
+                        "oneOf": [
+                            {
+                                "type": "string",
+                                "pattern": "md5:[0-9a-fA-F]{32}"
+                            },
+                            {
+                                "type": "string",
+                                "pattern": "sha1:[0-9a-fA-F]{40}"
+                            }
+                        ],
+                        "title": "the digest of the linked build report; contains a digest algorithm and hash, separated by a colon; known algorithms are: md5 and sha1",
+                        "examples": [
+                            "md5:192cc23d05c33a7b423da3e3e4653eff",
+                            "sha1:d76762b8592ac4958463b65506cdef0779a2c8ef"
+                        ]
+                    },
+                    "props": {
+                        "type": "object",
+                        "title": "the properties attached to this build of the report",
+                        "examples": [
+                            {
+                                "build_type": "Debug",
+                                "compiler": "gcc"
+                            }
+                        ]
+                    }
+                },
+                "examples": [
+                    {
+                        "name": "build-1.json",
+                        "digest": "md5:192cc23d05c33a7b423da3e3e4653eff",
+                        "props": {
+                            "build_type": "Debug",
+                            "compiler": "gcc"
+                        }
+                    }
+                ]
+            },
+            "examples": [
+                [
+                    {
+                        "name": "build-gcc-14.json",
+                        "digest": "md5:192cc23d05c33a7b423da3e3e4653eff",
+                        "props": {
+                            "build_type": "Debug",
+                            "compiler": "gcc",
+                            "compiler.version": 14
+                        }
+                    },
+                    {
+                        "name": "build-clang-18.cc",
+                        "digest": "sha1:d76762b8592ac4958463b65506cdef0779a2c8ef",
+                        "props": {
+                            "build_type": "Debug",
+                            "compiler": "clang",
+                            "compiler.version": 18
+                        }
+                    }
+                ]
+            ]
+        }
+    },
+    "examples": [
+        {
+            "git": {
+                "branch": "report-api",
+                "head": "f8632047e4ea88f5e30bf57570694e5b145c5c0d"
+            },
+            "builds": [
+                {
+                    "name": "build-gcc-14.json",
+                    "digest": "md5:192cc23d05c33a7b423da3e3e4653eff",
+                    "props": {
+                        "build_type": "Debug",
+                        "compiler": "gcc",
+                        "compiler.version": 14
+                    }
+                },
+                {
+                    "name": "build-clang-18.cc",
+                    "digest": "sha1:d76762b8592ac4958463b65506cdef0779a2c8ef",
+                    "props": {
+                        "build_type": "Debug",
+                        "compiler": "clang",
+                        "compiler.version": 18
+                    }
+                }
+            ]
+        }
+    ]
+}
