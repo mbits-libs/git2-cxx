@@ -5,6 +5,7 @@
 #include <cov/app/dirs.hh>
 #include <cov/app/tools.hh>
 #include <cov/git2/global.hh>
+#include <source_location>
 
 namespace cov::app::testing {
 	using namespace ::std::literals;
@@ -12,9 +13,13 @@ namespace cov::app::testing {
 
 	class tools : public ::testing::Test {
 	protected:
-		void assert_eq(std::set<std::string_view> const& expected,
-		               std::set<std::string> const& actual) {
-			ASSERT_EQ(format(expected), format(actual));
+		void assert_eq(
+		    std::set<std::string_view> const& expected,
+		    std::set<std::string> const& actual,
+		    std::source_location const& loc = std::source_location::current()) {
+			ASSERT_EQ(format(expected), format(actual))
+			    << loc.file_name() << ':' << loc.line()
+			    << ": see the call place.";
 		}
 
 	private:
@@ -23,7 +28,7 @@ namespace cov::app::testing {
 			std::string result{};
 			size_t size = 0;
 			for (auto const& str : set) {
-				size += str.size() + 2;  // ""sv\n
+				size += str.size() + 2;  // ",\n"sv
 			}
 			result.reserve(size);
 			for (auto const& str : set) {
