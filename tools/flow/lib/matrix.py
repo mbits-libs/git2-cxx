@@ -538,7 +538,7 @@ class steps:
             at_args.append(f"@{response}")
         at_args.append("--")
         at_args.append("-v")
-        at_args.append(f"--compiler={config['report_compiler']}")
+        at_args.append(f"--compiler={config['compiler'][0]}")
         runner.call(reporter, "report", "--filter", "coveralls", report, "-o", intermediate)
         runner.call(reporter, "report", "--filter", "strip-excludes", intermediate, *at_args)
         if legacy_reporter is not None:
