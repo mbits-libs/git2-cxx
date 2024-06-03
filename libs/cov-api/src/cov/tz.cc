@@ -40,16 +40,16 @@ namespace arch {
 	};
 
 	bool extract_gz_file(const std::string& /*version*/,
-	                     const std::string& gz_file,
-	                     const std::string& dest_folder) {
-		auto file = io::file::open(make_u8path(gz_file));
+	                     const std::filesystem::path& gz_file,
+	                     const std::filesystem::path& dest_folder) {
+		auto file = io::file::open(gz_file);
 		if (!file) return false;
 
 		base::archive::ptr archive{};
 		auto status = open(std::move(file), archive);
 		if (status != open_status::ok) return false;
 
-		expand_unpacker unp{make_u8path(dest_folder)};
+		expand_unpacker unp{dest_folder};
 
 		return unp.unpack(*archive);
 	}
@@ -63,6 +63,9 @@ namespace cov::init_magic {
 
 		void setup_archives() {
 			date::set_tar_gz_helper(arch::extract_gz_file);
+			std::error_code ec{};
+			auto const tmp = std::filesystem::temp_directory_path(ec);
+			if (!ec && !tmp.empty()) date::set_install(tmp / "cov/tzdata");
 		}
 	}  // namespace
 

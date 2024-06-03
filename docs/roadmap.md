@@ -110,16 +110,17 @@
 - [ ] Highlight partial C++ strings
 - [ ] Add hilite for Python
 - [ ] Add hilite for TypeScript
-- [ ] 💸 Cleanup initalization for `data-tz`
-  - [ ] Properly setup `access_install` directory
-  - [ ] Work with 7zip binary
+- [x] 💸 Cleanup initialization for `data-tz`
+  - [x] Properly setup `access_install` directory
+  - [x] ~~Work with 7zip binary~~ Replace with `libarch`
 
 ## Next steps:
 
-1. mzdun/cov#61 `branch_coverage`/`"bran"`
-1. mzdun/cov#59 build set manipulation (adding, removing from HEAD)
+1. mzdun/cov#102 cleanup initialization for data-tz
 1. mzdun/cov#58 `cov export (--json | --html)` 
-1. mzdun/cov#60 support for a pager
 1. mzdun/cov#62 look into tortoise and a hare
+1. mzdun/cov#59 build set manipulation (adding, removing from HEAD)
+1. mzdun/cov#61 `branch_coverage`/`"bran"`
+1. mzdun/cov#60 support for a pager
 1. mzdun/cov#63 freeze strings
 1. ??? major release
