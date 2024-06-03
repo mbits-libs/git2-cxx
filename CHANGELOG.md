@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) and [COMMITS.md](COMMITS.md) for commit guidelines.
 
+## [0.26.0](https://github.com/mzdun/cov/compare/v0.25.0...v0.26.0) (2024-06-03)
+
+### New Features
+
+- print c++filt replacement files ([d6f81f0](https://github.com/mzdun/cov/commit/d6f81f014286fbee5da6718713d970d32795a919))
+- add copy buttons to lines of code ([ba47a18](https://github.com/mzdun/cov/commit/ba47a1821fbafaced3eb4d4c9c8e5a90e61b165a))
+- add clipboard button to filenames ([bfa2c8f](https://github.com/mzdun/cov/commit/bfa2c8f4c3e91888f57229ec624f469e0db045bf))
+- create context for builds and files ([abaa86f](https://github.com/mzdun/cov/commit/abaa86fa7c2fd07c4bbc3aa0c274d5173cff515a))
+- use c++filt in `cov show` ([2a622bd](https://github.com/mzdun/cov/commit/2a622bdd0d155726fdb7995b2eefc39bc0e1acc1))
+- use new table in `cov show` ([79eb5e5](https://github.com/mzdun/cov/commit/79eb5e516d03173eb83606e987638575fe9089ee))
+- rename cxx-filt to c++filt ([3229853](https://github.com/mzdun/cov/commit/32298530b08e27f2a356269d5c904d0754f939cb))
+- show both sub-modules and directories ([fc580b3](https://github.com/mzdun/cov/commit/fc580b3efa61f59867b8b36408a00a8595460d99))
+- add "relevant" columns to branches and functions ([a815c84](https://github.com/mzdun/cov/commit/a815c84c0ce63dedeae25b3e9a826efe68310f21))
+- shorten the function names if appropriate ([41f33dd](https://github.com/mzdun/cov/commit/41f33dd88e56a968d5dc184600b37fb95fc62c6a))
+- report start of the ref range ([ccd8339](https://github.com/mzdun/cov/commit/ccd8339f4ec7ca16d8b79ff6309b71cb98d0a903))
+- add `cov export` tool ([5c77a14](https://github.com/mzdun/cov/commit/5c77a14f9b811050539230caf8fbbafd721ec0d6))
+- add web library ([1cd37dc](https://github.com/mzdun/cov/commit/1cd37dc0ca2408940034dc2e48228093673f1490))
+
+### Bug Fixes
+
+- stabilize order of c++filt JSON files ([d159604](https://github.com/mzdun/cov/commit/d159604e73554492eef87043a9f49290b3fec3cf))
+- unify output between *nixen and windows ([6e3a4c7](https://github.com/mzdun/cov/commit/6e3a4c7c5254805c30dfe2b22689e4f68654bda7))
+- clean Mustache glue code ([fdea7b2](https://github.com/mzdun/cov/commit/fdea7b28cea33518600d5a512394b668d0812c8a))
+- untangle cov module and libs directory ([4337a6f](https://github.com/mzdun/cov/commit/4337a6f57b9239e6f03c5361229055d638b777d4))
+- allow more, than 9 parents at a time ([1e4d82f](https://github.com/mzdun/cov/commit/1e4d82faf1012aee698c7de95f1fb395b5735166))
+- strip excluded functions ([91f8f84](https://github.com/mzdun/cov/commit/91f8f84a1209241c50f1df40489beb3db0b1d140))
+- allow using open_here in all extras ([47591d8](https://github.com/mzdun/cov/commit/47591d81be3a5fbb25893093b5c360238fcb87be))
+- **win32**: find proper projection for path filters with slashes ([ffade8d](https://github.com/mzdun/cov/commit/ffade8d6699362ce717ce412fe937b0e8cbda72e))
+
 ## [0.25.0](https://github.com/mzdun/cov/compare/v0.24.1...v0.25.0) (2024-06-03)
 
 ### New Features

@@ -70,7 +70,7 @@
     - [x] `$COV_FILTER_PATH` (_0.21.1_, mzdun/cov#47)
   - [ ] `cov export` from report, build and files (mzdun/cov#58)
     - [ ] `--json`
-    - [ ] `--html`
+    - [x] `--html` (_0.26.0_)
   - [ ] `cov report` (mzdun/cov#59)
     - [ ] build set manipulation (adding, removing from HEAD)
     - [ ] `cov show` changes: take a list of properties to select only some builds
