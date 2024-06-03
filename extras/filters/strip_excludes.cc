@@ -109,7 +109,7 @@ namespace cov::app::strip {
 			          valid_markers);
 		}
 
-		auto root = []() {
+		auto root = []() {  // GCOV_EXCL_LINE[GCC]
 			auto const text = platform::read_input();
 			return json::read_json({text.data(), text.size()});
 		}();
