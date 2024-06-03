@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) and [COMMITS.md](COMMITS.md) for commit guidelines.
 
+## [0.25.0](https://github.com/mzdun/cov/compare/v0.24.1...v0.25.0) (2024-06-03)
+
+### New Features
+
+- use libarch to unpack the iana db ([35533fc](https://github.com/mzdun/cov/commit/35533fcee7da7cef03b05562d6d202f887bf3680))
+
+### Bug Fixes
+
+- files need directories to exist ([90b7038](https://github.com/mzdun/cov/commit/90b7038c127ae29959657a2b4a7e87e88f721dc0))
+- download data-tz to TMP ([b8347c6](https://github.com/mzdun/cov/commit/b8347c6e42c9c3afaf9bd3916520f1cecdbf6ba5))
+- **docs**: update roadmap ([8cc4b2d](https://github.com/mzdun/cov/commit/8cc4b2de5a1f40b5b9de64272de91f80feb25fd5))
+
 ## [0.24.1](https://github.com/mzdun/cov/compare/v0.24.0...v0.24.1) (2024-04-17)
 
 ### Bug Fixes

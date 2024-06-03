@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 3.25)
 project (cov
   DESCRIPTION "Code coverage presented locally"
-  VERSION 0.24.1
+  VERSION 0.25.0
   LANGUAGES CXX
 )
 
