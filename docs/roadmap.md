@@ -110,13 +110,12 @@
 - [ ] Highlight partial C++ strings
 - [ ] Add hilite for Python
 - [ ] Add hilite for TypeScript
-- [x] 💸 Cleanup initialization for `data-tz`
+- [x] 💸 Cleanup initialization for `data-tz` (_0.25.0_, mzdun/cov#102)
   - [x] Properly setup `access_install` directory
   - [x] ~~Work with 7zip binary~~ Replace with `libarch`
 
 ## Next steps:
 
-1. mzdun/cov#102 cleanup initialization for data-tz
 1. mzdun/cov#58 `cov export (--json | --html)` 
 1. mzdun/cov#62 look into tortoise and a hare
 1. mzdun/cov#59 build set manipulation (adding, removing from HEAD)
