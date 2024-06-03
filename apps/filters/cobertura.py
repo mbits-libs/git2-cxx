@@ -53,7 +53,7 @@ def cov_version():
             return out.strip().decode("UTF-8").split(" ")[-1]
     except FileNotFoundError:
         pass
-    return "0.23.0"
+    return "0.25.0"
 
 
 root = ET.parse(sys.stdin).getroot()

@@ -25,6 +25,19 @@ SCOPE_FIX = {"ws": "webapi", "rest": "webapi", "lngs": "lang"}
 #####################################################################
 
 
+def update_schema_id(schema: str, schema_id: str, next_tag: str):
+    with open(schema, encoding="utf-8") as in_file:
+        start, rest = in_file.read().split(schema_id, 1)
+        path, rest = rest.split('"', 1)
+        path = path.split('/', 1)[1]
+        if path != schema:
+            return False
+        text = f'{start}{schema_id}{next_tag}/{schema}"{rest}'
+    with open(schema, "w", encoding="utf-8") as out_file:
+        out_file.write(text)
+    return True
+
+
 def release(
     take_all: bool,
     forced_level: Optional[int],
@@ -33,6 +46,7 @@ def release(
 ):
     project = get_version()
     github_link = f"https://github.com/{GITHUB_ORG}/{project.name.value}"
+    schema_id = f"https://raw.githubusercontent.com/{GITHUB_ORG}/{project.name.value}/"
     tags = get_tags(project)
     log, level = get_log(tags, SCOPE_FIX, take_all)
     force_stability = False
@@ -64,13 +78,19 @@ def release(
             next_stability = ''
             level = LEVEL_BENIGN
     next_tag = f"v{bump_version(project.ver(), level)}{next_stability}"
+    additional_changed_files = []
     if not Environment.DRY_RUN or show_changelog:
         update_changelog(log, next_tag, project.tag(), github_link)
         set_version(next_tag[1:])
+        for schema in ["apps/report-schema.json"]:
+            if update_schema_id(schema, schema_id, next_tag):
+                additional_changed_files.append(os.path.join(ROOT, schema))
 
     commit_message = f"release {next_tag[1:]}"
 
-    add_files(os.path.join(ROOT, "CMakeLists.txt"), os.path.join(ROOT, "CHANGELOG.md"))
+    add_files(os.path.join(ROOT, "CMakeLists.txt"),
+              os.path.join(ROOT, "CHANGELOG.md"),
+              *additional_changed_files)
     commit(f"chore: {commit_message}")
     annotated_tag(next_tag, commit_message)
 
