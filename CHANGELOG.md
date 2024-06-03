@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) and [COMMITS.md](COMMITS.md) for commit guidelines.
 
+## [0.26.2](https://github.com/mzdun/cov/compare/v0.26.1...v0.26.2) (2024-06-03)
+
+### Bug Fixes
+
+- quick cleanup of schema $id ([30352f7](https://github.com/mzdun/cov/commit/30352f788697ed321b40ada80037921c6f6d1c7b))
+
 ## [0.26.1](https://github.com/mzdun/cov/compare/v0.26.0...v0.26.1) (2024-06-03)
 
 ### Bug Fixes

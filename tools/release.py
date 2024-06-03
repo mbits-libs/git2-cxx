@@ -82,9 +82,12 @@ def release(
     if not Environment.DRY_RUN or show_changelog:
         update_changelog(log, next_tag, project.tag(), github_link)
         set_version(next_tag[1:])
-        for schema in ["apps/report-schema.json", "apps/builds-schema.json"]:
-            if update_schema_id(schema, schema_id, next_tag):
-                additional_changed_files.append(os.path.join(ROOT, schema))
+    for schema in ["apps/report-schema.json", "apps/builds-schema.json"]:
+        append = True
+        if not Environment.DRY_RUN:
+            append = update_schema_id(schema, schema_id, next_tag)
+        if append:
+            additional_changed_files.append(os.path.join(ROOT, schema))
 
     commit_message = f"release {next_tag[1:]}"
 
